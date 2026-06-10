@@ -66,6 +66,8 @@ Chapterly/
 
 A WKWebView using the default persistent `WKWebsiteDataStore`. The Patreon login session lives entirely inside webview storage; the app never reads, copies, or exports it. Login is the normal patreon.com login page.
 
+**Top-level navigation policy**: top-level navigations are allowed only to `patreon.com` / `www.patreon.com` (and Patreon's own auth subdomains required for login). Any other top-level destination opens in Safari via `openURL` and is cancelled in the webview. The app never reads cookies or website data through `WKWebsiteDataStore` APIs — the store is only ever wiped (logout), never enumerated.
+
 ### 3.2 Reader
 
 The same WKWebView navigated to a chapter URL from the local map, plus:
@@ -89,27 +91,50 @@ User-triggered only; never automatic crawling.
 
 Worked example: current chapter "5 脣瓣" → previous "4 愛", next "6 浴室的紅櫻桃(R18+)", all resolved from the saved map of collection "【更新中】焚心 The Burning Heart".
 
+**Script message payload schemas (strict).** Every `WKScriptMessageHandler` payload is validated against a fixed schema before any processing:
+
+- Importer messages may contain only: `title`, `url`, `visibleDateText`, `collectionName`, `collectionURL`, `domOrder`.
+- Progress messages may contain only: `url`, `scrollProgress`.
+- Any payload containing a key named `bodyText`, `innerText`, `innerHTML`, `html`, `content`, `article`, `paragraphs`, `images`, or `comments` is rejected outright (the whole message is dropped, not just the offending field).
+- Payloads exceeding size limits are rejected: per-string field cap (e.g. 1 KB for titles/names, 2 KB for URLs) and per-message cap (e.g. 256 KB for a batch import message). Limits are constants in one place.
+- Unknown keys cause rejection. Validation failures are logged locally without logging the payload contents.
+
+This makes the native side a content firewall: even a compromised or buggy injected script cannot push post bodies into persistence.
+
+**Current-page TOC is ephemeral.** A table of contents generated from the visible page (e.g. from post-body headings) may exist in memory for the current reading session only. It is never persisted to SwiftData. Only collection-page chapter metadata (the importer schema above) is ever persisted.
+
+**URL normalization.** Prev/next matching and merge-by-URL use normalized Patreon post URLs: lowercase host normalized to `www.patreon.com`, https enforced, tracking query parameters stripped (e.g. `utm_*`, `fan_landing`, `mc_*`), fragment removed, trailing slash normalized where safe. Both stored chapter URLs and the webview's current URL are normalized through the same single function before comparison.
+
 ### 3.4 Data model
 
+SwiftData `@Model` classes (not nested Codable structs), with an explicit relationship between collection and chapters and an explicitly stored `orderIndex`:
+
 ```swift
-struct LocalCollection: Identifiable, Codable {
-    let id: String
-    let title: String
-    let sourceURL: URL
-    let creatorName: String?
+import SwiftData
+
+@Model
+final class LocalCollectionModel {
+    @Attribute(.unique) var id: String
+    var title: String
+    var sourceURL: URL
+    var creatorName: String?
     var sortDirection: CollectionSortDirection
-    var chapters: [LocalChapter]
+    @Relationship(deleteRule: .cascade, inverse: \LocalChapterModel.collection)
+    var chapters: [LocalChapterModel]
+    // init omitted in spec
 }
 
-struct LocalChapter: Identifiable, Codable {
-    let id: String
-    let title: String
-    let url: URL
-    let sourceCollectionURL: URL
-    var orderIndex: Int
+@Model
+final class LocalChapterModel {
+    @Attribute(.unique) var id: String
+    var title: String
+    var url: URL              // stored normalized
+    var orderIndex: Int       // explicit, never derived at query time
     var visibleDateText: String?
     var readingProgress: Double?
     var lastReadAt: Date?
+    var collection: LocalCollectionModel?
+    // init omitted in spec
 }
 
 enum CollectionSortDirection: String, Codable {
@@ -118,7 +143,7 @@ enum CollectionSortDirection: String, Codable {
 }
 ```
 
-Implemented as SwiftData models mirroring these shapes. User preferences (font size, reader mode on/off) in UserDefaults. Stored data is metadata only — titles, URLs, dates, order, progress. Never post bodies.
+Chapter URLs are stored already normalized (see URL normalization in §3.3). User preferences (font size, reader mode on/off) in UserDefaults. Stored data is metadata only — titles, URLs, dates, order, progress. Never post bodies.
 
 ### 3.5 Screens (6)
 
@@ -126,10 +151,15 @@ Implemented as SwiftData models mirroring these shapes. User preferences (font s
 2. **Library** — imported collections list
 3. **Table of Contents** — chapters of one collection: title, date, progress, last-read marker; edit mode for reorder/rename/delete/add; reverse-order toggle
 4. **Reader** — webview + reader CSS + native prev/next bars
-5. **Settings** — font size, reader mode toggle, clear all local data, about, license
+5. **Settings** — font size, reader mode toggle, Clear Library Data, Logout from Patreon, about, license
 6. **Empty state** — library with no collections; points user to Browse + import
 
-"Clear all local data" wipes SwiftData and the `WKWebsiteDataStore` (acts as logout). There is no separate token logout because the app holds no tokens.
+Data clearing is split into two independent actions:
+
+- **Clear Library Data** — deletes only SwiftData metadata: collections, chapters, progress, bookmarks. The Patreon webview session is untouched.
+- **Logout from Patreon** — wipes the `WKWebsiteDataStore` (cookies, site storage) ending the Patreon session. Library metadata is untouched.
+
+There is no token logout because the app holds no tokens.
 
 ## 4. Error handling
 
@@ -145,9 +175,11 @@ Premium minimalist editorial reading app: Apple Books / Instapaper mood, not a d
 
 ## 6. Testing
 
-- Unit: importer parsing against saved HTML fixtures (including CJK titles such as "5 脣瓣" and collection labels such as "【更新中】焚心 The Burning Heart"), order/reverse logic, merge-by-URL re-import, progress store round-trip
-- Manual smoke: real Patreon account, real collection import, prev/next navigation, progress restore, clear-data wipe
-- Fixture HTML must be sanitized: structure only, no real paid post bodies committed to the repo
+- Unit: importer parsing against saved HTML fixtures (including CJK titles such as "5 脣瓣" and collection labels such as "【更新中】焚心 The Burning Heart"), order/reverse logic, merge-by-URL re-import, URL normalization, progress store round-trip
+- **Metadata-only proof tests**: fixtures deliberately include fake post body text; tests assert the importer output and everything written to SwiftData contain no body text, no HTML fragments, and no keys outside the allowed schemas. Payload-validator tests assert rejection of forbidden keys (`bodyText`, `innerHTML`, `html`, `content`, …), unknown keys, and oversized payloads
+- Navigation-policy tests: non-Patreon top-level navigation is cancelled and routed to Safari
+- Manual smoke: real Patreon account, real collection import, prev/next navigation, progress restore, Clear Library Data and Logout from Patreon verified independent
+- Fixture HTML must be sanitized: structure plus fake body text only, no real paid post bodies committed to the repo
 
 ## 7. Accepted risks
 
