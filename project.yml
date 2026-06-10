@@ -1,0 +1,20 @@
+name: Chapterly
+options:
+  bundleIdPrefix: dev.chapterly
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  ChapterlyCore:
+    path: ChapterlyCore
+targets:
+  Chapterly:
+    type: application
+    platform: iOS
+    sources: [App]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Chapterly
+        UILaunchScreen: {}
+    dependencies:
+      - package: ChapterlyCore
