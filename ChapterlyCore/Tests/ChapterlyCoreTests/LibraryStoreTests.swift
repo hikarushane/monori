@@ -1,0 +1,97 @@
+import XCTest
+import SwiftData
+@testable import ChapterlyCore
+
+@MainActor
+final class LibraryStoreTests: XCTestCase {
+    private var store: LibraryStore!
+
+    override func setUp() async throws {
+        store = try LibraryStore.inMemory()
+    }
+
+    private func payload(_ title: String, _ url: String, order: Int) -> ImporterChapterPayload {
+        ImporterChapterPayload(title: title, url: url, visibleDateText: nil,
+                               collectionName: "【更新中】焚心 The Burning Heart",
+                               collectionURL: "https://www.patreon.com/collection/9999",
+                               domOrder: order)
+    }
+
+    func testImportCreatesCollectionAndChapters() throws {
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+        ])
+        let collections = try store.collections()
+        XCTAssertEqual(collections.count, 1)
+        XCTAssertEqual(collections[0].title, "【更新中】焚心 The Burning Heart")
+        XCTAssertEqual(store.orderedChapters(of: collections[0]).map(\.title), ["4 愛", "5 脣瓣"])
+    }
+
+    func testReimportMergesWithoutDuplicates() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2/", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+        ])
+        let chapters = store.orderedChapters(of: try store.collections()[0])
+        XCTAssertEqual(chapters.map(\.title), ["4 愛", "5 脣瓣"])
+    }
+
+    func testReverseDirectionFlipsReadingOrder() throws {
+        try store.applyImport([
+            payload("newest", "https://patreon.com/posts/n-3", order: 0),
+            payload("oldest", "https://patreon.com/posts/o-1", order: 1)
+        ])
+        let collection = try store.collections()[0]
+        collection.sortDirection = .newestToOldest
+        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), ["oldest", "newest"])
+    }
+
+    func testNeighborsFollowReadingOrder() throws {
+        try store.applyImport([
+            payload("3", "https://patreon.com/posts/3-1", order: 0),
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 1),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 2)
+        ])
+        let collection = try store.collections()[0]
+        let middle = store.orderedChapters(of: collection)[1]
+        let n = store.neighbors(of: middle)
+        XCTAssertEqual(n.previous?.title, "3")
+        XCTAssertEqual(n.next?.title, "5 脣瓣")
+    }
+
+    func testProgressSavedByNormalizedURL() throws {
+        try store.applyImport([payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0)])
+        store.setProgress(forPageURL: "https://www.patreon.com/posts/5-3?utm_source=share", progress: 0.6)
+        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/5-3/")
+        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.6, accuracy: 0.001)
+        XCTAssertNotNil(chapter?.lastReadAt)
+    }
+
+    func testManualAddRenameDelete() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let collection = try store.collections()[0]
+        try store.addManualChapter(to: collection, title: "Extra",
+                                   urlString: "https://patreon.com/posts/extra-9")
+        var chapters = store.orderedChapters(of: collection)
+        XCTAssertEqual(chapters.count, 2)
+        store.rename(chapters[1], to: "Extra (fixed)")
+        store.delete(chapters[0])
+        let remaining = store.orderedChapters(of: collection)
+        XCTAssertEqual(remaining.map(\.title), ["Extra (fixed)"])
+    }
+
+    func testClearLibraryRemovesEverything() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.clearLibrary()
+        XCTAssertTrue(try store.collections().isEmpty)
+    }
+
+    func testNoChapterStoresBodyText() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let chapter = store.orderedChapters(of: try store.collections()[0])[0]
+        XCTAssertLessThan(chapter.title.utf8.count, PayloadValidator.maxFieldLength + 1)
+        XCTAssertLessThan(chapter.urlString.utf8.count, PayloadValidator.maxURLLength + 1)
+    }
+}
