@@ -9,7 +9,7 @@ struct AppRootView: View {
                 .tabItem { Label("Browse", systemImage: "globe") }
             LibraryView()
                 .tabItem { Label("Library", systemImage: "books.vertical") }
-            Text("Settings")
+            SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
         .environment(env)
