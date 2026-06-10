@@ -7,11 +7,12 @@ struct AppRootView: View {
         TabView {
             BrowseView()
                 .tabItem { Label("Browse", systemImage: "globe") }
-            Text("Library")
+            LibraryView()
                 .tabItem { Label("Library", systemImage: "books.vertical") }
             Text("Settings")
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
         .environment(env)
+        .modelContainer(env.store.container)
     }
 }
