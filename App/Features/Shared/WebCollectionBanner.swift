@@ -12,6 +12,7 @@ struct WebCollectionBanner: View {
     @Environment(AppEnvironment.self) private var env
     let model: WebViewModel
     @State private var showImportConfirmation = false
+    @State private var importing = false
 
     var body: some View {
         banner
@@ -22,7 +23,7 @@ struct WebCollectionBanner: View {
                 if env.importedCountThisSession == 0 {
                     Text("No chapter links were found on this page. Patreon's markup may have changed — you can add chapters manually from the collection's page in Library.")
                 } else {
-                    Text("Imported \(env.importedCountThisSession) visible chapters. Scroll the collection page to load more, then import again — already-imported chapters are merged, not duplicated.")
+                    Text("Imported \(env.importedCountThisSession) chapters. Already-imported chapters are merged, not duplicated.")
                 }
             }
     }
@@ -34,10 +35,14 @@ struct WebCollectionBanner: View {
                 Label("Collection page", systemImage: "books.vertical")
                     .font(.subheadline)
                 Spacer()
-                Button("Import visible chapters") {
-                    model.runCollectionImport()
+                Button {
+                    importing = true
+                    env.importedCountThisSession = 0
                     Task {
-                        try? await Task.sleep(for: .milliseconds(800))
+                        await model.runCollectionImport()
+                        // applyImport flushes 300ms after the last chapter
+                        // message lands; wait it out before reading the count.
+                        try? await Task.sleep(for: .milliseconds(500))
                         if AppEnvironment.isSmokeMode && env.importedCountThisSession == 0 {
                             bannerLog.notice("[SMOKE] Import found 0 chapters — dumping page structure")
                             model.dumpPageLinks { dump in
@@ -46,11 +51,22 @@ struct WebCollectionBanner: View {
                                 }
                             }
                         }
+                        importing = false
                         showImportConfirmation = true
+                    }
+                } label: {
+                    if importing {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.mini)
+                            Text("Importing…")
+                        }
+                    } else {
+                        Text("Import all chapters")
                     }
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
+                .disabled(importing)
                 .accessibilityIdentifier("smoke.importChaptersButton")
             }
             .padding(.horizontal)

@@ -82,7 +82,7 @@ final class SmokeAutopilot {
         }
 
         let rejectedBefore = env.browse.router.rejectedCount
-        env.browse.runCollectionImport()
+        await env.browse.runCollectionImport()
         let imported = await waitUntil { [env] in
             env.importedCountThisSession > 0 && ((try? env.store.collectionCount()) ?? 0) > 0
         }

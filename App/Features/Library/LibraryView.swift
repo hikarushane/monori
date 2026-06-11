@@ -49,7 +49,7 @@ struct LibraryView: View {
         ContentUnavailableView {
             Label("No collections yet", systemImage: "books.vertical")
         } description: {
-            Text("Browse to a Patreon post, open its series page, and tap \u{201c}Import visible chapters\u{201d}.")
+            Text("Browse to a Patreon post, open its series page, and tap \u{201c}Import all chapters\u{201d}.")
         }
     }
 }

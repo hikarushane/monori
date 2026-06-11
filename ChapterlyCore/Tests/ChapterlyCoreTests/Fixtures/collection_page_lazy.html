@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><title>【更新中】焚心 The Burning Heart | Patreon</title></head>
+<body>
+  <h1>【更新中】焚心 The Burning Heart</h1>
+  <main>
+    <article id="post-list">
+      <a href="https://www.patreon.com/posts/9-901">9 最新章</a>
+      <a href="https://www.patreon.com/posts/8-902">8 次新章</a>
+    </article>
+    <div style="height: 3000px;"></div>
+  </main>
+  <script>
+    // Mimics Patreon's infinite scroll: more post cards appear only after the
+    // page has been scrolled.
+    var loaded = false;
+    window.addEventListener("scroll", function () {
+      if (loaded) { return; }
+      loaded = true;
+      var list = document.getElementById("post-list");
+      [["7-903", "7 中段章"], ["6-904", "6 更舊章"], ["5-905", "5 最舊章"]]
+        .forEach(function (item) {
+          var a = document.createElement("a");
+          a.href = "https://www.patreon.com/posts/" + item[0];
+          a.textContent = item[1];
+          list.appendChild(a);
+        });
+    });
+  </script>
+</body>
+</html>

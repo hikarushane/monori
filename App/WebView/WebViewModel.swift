@@ -88,8 +88,14 @@ final class WebViewModel: NSObject {
         webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
     }
 
-    func runCollectionImport() {
-        webView.evaluateJavaScript(JSAssets.collectionImport, completionHandler: nil)
+    /// Expands the lazily-loaded collection list (scrolling until no new post
+    /// links appear) and posts every chapter to the import handler. Returns
+    /// after the page-side script has finished posting.
+    @discardableResult
+    func runCollectionImport() async -> Int {
+        let result = try? await webView.callAsyncJavaScript(JSAssets.collectionImport,
+                                                            contentWorld: .page)
+        return result as? Int ?? 0
     }
 
     func dumpPageLinks(completion: @escaping (String) -> Void) {

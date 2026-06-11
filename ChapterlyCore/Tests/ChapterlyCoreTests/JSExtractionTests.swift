@@ -27,7 +27,9 @@ final class JSExtractionTests: XCTestCase {
             if !webView.isLoading { break }
             try await Task.sleep(for: .milliseconds(50))
         }
-        _ = try? await webView.evaluateJavaScript(script)
+        // callAsyncJavaScript so scripts may use top-level await/return and the
+        // test resumes only after the script (including its scroll loop) finishes.
+        _ = try? await webView.callAsyncJavaScript(script, contentWorld: .page)
         try await Task.sleep(for: .milliseconds(200))
         return collector.bodies
     }
@@ -127,6 +129,16 @@ final class JSExtractionTests: XCTestCase {
                                          handlerName: "chapterlyImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.creatorName), ["ocean", "ocean"])
+    }
+
+    func testCollectionImportLoadsLazyContentBeforeScraping() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_lazy",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.title),
+                       ["9 最新章", "8 次新章", "7 中段章", "6 更舊章", "5 最舊章"])
+        XCTAssertEqual(payloads.map(\.domOrder), [0, 1, 2, 3, 4])
     }
 
     func testCollectionDetectFindsSeriesLink() async throws {
