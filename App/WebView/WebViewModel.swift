@@ -14,6 +14,12 @@ final class WebViewModel: NSObject {
         guard let url = currentURL else { return false }
         return url.path.contains("/collection/")
     }
+    /// Series detection only makes sense on a single post: on the home feed the
+    /// first matching card link would put a meaningless banner over the feed.
+    var isOnPostPage: Bool {
+        guard let url = currentURL else { return false }
+        return URLNormalizer.patreonPostID(url.absoluteString) != nil
+    }
 
     private var urlObservation: NSKeyValueObservation?
 
@@ -31,6 +37,12 @@ final class WebViewModel: NSObject {
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.progressTracker,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        // iOS gives every <a>/<img> a drag interaction, which lets Patreon's nav
+        // menu entries be "picked up" and dragged around. The app never needs
+        // HTML drag-and-drop, so cancel drag starts wholesale.
+        config.userContentController.addUserScript(WKUserScript(
+            source: "window.addEventListener('dragstart', function (e) { e.preventDefault(); }, true);",
+            injectionTime: .atDocumentStart, forMainFrameOnly: true))
 
         webView = WKWebView(frame: .zero, configuration: config)
         super.init()
@@ -72,6 +84,7 @@ final class WebViewModel: NSObject {
     }
 
     func runCollectionDetect() {
+        guard isOnPostPage else { return }
         webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
     }
 

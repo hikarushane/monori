@@ -134,7 +134,10 @@ final class AppEnvironment {
             }
         }
         model.router.onCollectionLink = { [weak model] payload in
-            model?.detectedCollection = payload
+            // Detect runs against whatever DOM the SPA still shows; by the time the
+            // message arrives the user may have left the post (e.g. back to home).
+            guard let model, model.isOnPostPage else { return }
+            model.detectedCollection = payload
         }
         model.router.onProgress = { [weak self] payload in
             guard let self else { return }
