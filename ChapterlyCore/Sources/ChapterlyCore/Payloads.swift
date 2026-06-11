@@ -4,17 +4,20 @@ public struct ImporterChapterPayload: Equatable {
     public let title: String
     public let url: String
     public let visibleDateText: String?
+    public let excerpt: String?
     public let creatorName: String?
     public let collectionName: String
     public let collectionURL: String
     public let domOrder: Int
 
     public init(title: String, url: String, visibleDateText: String?,
+                excerpt: String? = nil,
                 creatorName: String? = nil,
                 collectionName: String, collectionURL: String, domOrder: Int) {
         self.title = title
         self.url = url
         self.visibleDateText = visibleDateText
+        self.excerpt = excerpt
         self.creatorName = creatorName
         self.collectionName = collectionName
         self.collectionURL = collectionURL

@@ -83,6 +83,70 @@
       || "Patreon post";
   }
 
+  function excerptWithin(root, title) {
+    var selectors = [
+      '[data-tag*="teaser"]',
+      '[class*="teaser"]',
+      '[class*="excerpt"]',
+      '[class*="Excerpt"]',
+      '[class*="snippet"]',
+      'p'
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var nodes = root.querySelectorAll ? root.querySelectorAll(selectors[i]) : [];
+      for (var j = 0; j < nodes.length; j++) {
+        var text = compactText(nodes[j].textContent);
+        if (!text || text === title) { continue; }
+        if (text.length >= 10 && text.length <= 300) { return text; }
+      }
+    }
+    return "";
+  }
+
+  function excerptFromAnchorText(anchor, title) {
+    var raw = anchor.textContent || "";
+    var lines = raw.split(/\n+/).map(compactText).filter(Boolean);
+    var rest = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i] === title) { continue; }
+      rest.push(lines[i]);
+    }
+    var joined = compactText(rest.join(" "));
+    return joined.length >= 10 ? joined : "";
+  }
+
+  function distinctPostLinkCount(node) {
+    var anchors = node.querySelectorAll ? node.querySelectorAll('a[href*="/posts/"]') : [];
+    var seenHrefs = {};
+    var count = 0;
+    for (var i = 0; i < anchors.length; i++) {
+      var href = anchors[i].href || "";
+      if (!href || seenHrefs[href]) { continue; }
+      seenHrefs[href] = true;
+      count += 1;
+    }
+    return count;
+  }
+
+  function excerptFromCard(anchor, title) {
+    // 1. Teaser inside the anchor itself.
+    var inside = excerptWithin(anchor, title);
+    if (inside) { return inside.slice(0, 256); }
+    // 2. Anchor text has title + teaser on separate lines.
+    var fromText = excerptFromAnchorText(anchor, title);
+    if (fromText) { return fromText.slice(0, 256); }
+    // 3. Teaser is a sibling: climb to the card container, but never past
+    //    a node that spans more than one distinct post link.
+    var node = anchor.parentElement;
+    for (var depth = 0; node && depth < 4; depth++) {
+      if (distinctPostLinkCount(node) > 1) { break; }
+      var found = excerptWithin(node, title);
+      if (found) { return found.slice(0, 256); }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
   function creatorNameFromPage() {
     var meta = document.querySelector('meta[name="author"], meta[property="article:author"]');
     var fromMeta = meta && meta.getAttribute("content");
@@ -110,6 +174,7 @@
       title: title,
       url: href,
       visibleDateText: null,
+      excerpt: excerptFromCard(a, title),
       creatorName: creatorName || null,
       collectionName: collectionName,
       collectionURL: collectionURL,

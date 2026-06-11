@@ -44,7 +44,8 @@ public final class LibraryStore {
         let existing = collection.chapters
             .sorted { $0.orderIndex < $1.orderIndex }
             .map { ChapterRecord(title: $0.title, urlString: $0.urlString,
-                                 visibleDateText: $0.visibleDateText, orderIndex: $0.orderIndex) }
+                                 visibleDateText: $0.visibleDateText,
+                                 excerpt: $0.excerpt, orderIndex: $0.orderIndex) }
         let merged = ChapterMapMerger.merge(existing: existing, incoming: payloads)
 
         var existingByURL: [String: LocalChapterModel] = [:]
@@ -57,10 +58,14 @@ public final class LibraryStore {
                 if chapter.visibleDateText == nil {
                     chapter.visibleDateText = record.visibleDateText
                 }
+                if chapter.excerpt == nil {
+                    chapter.excerpt = record.excerpt
+                }
             } else {
                 let chapter = LocalChapterModel(title: record.title, urlString: record.urlString,
                                                 orderIndex: record.orderIndex,
-                                                visibleDateText: record.visibleDateText)
+                                                visibleDateText: record.visibleDateText,
+                                                excerpt: record.excerpt)
                 chapter.collection = collection
                 context.insert(chapter)
             }
@@ -87,10 +92,11 @@ public final class LibraryStore {
     public func neighbors(of chapter: LocalChapterModel)
         -> (previous: LocalChapterModel?, next: LocalChapterModel?) {
         guard let collection = chapter.collection else { return (nil, nil) }
-        let ordered = orderedChapters(of: collection)
-        guard let i = ordered.firstIndex(where: { $0.id == chapter.id }) else { return (nil, nil) }
-        return (i > 0 ? ordered[i - 1] : nil,
-                i < ordered.count - 1 ? ordered[i + 1] : nil)
+        // orderIndex 0 = newest (first in Patreon DOM). Story order = descending orderIndex.
+        let storyOrder = collection.chapters.sorted { $0.orderIndex > $1.orderIndex }
+        guard let i = storyOrder.firstIndex(where: { $0.id == chapter.id }) else { return (nil, nil) }
+        return (i > 0 ? storyOrder[i - 1] : nil,
+                i < storyOrder.count - 1 ? storyOrder[i + 1] : nil)
     }
 
     public func chapter(withPageURL pageURL: String) -> LocalChapterModel? {

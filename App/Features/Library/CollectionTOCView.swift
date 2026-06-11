@@ -14,7 +14,6 @@ struct CollectionTOCView: View {
     @State private var newURL = ""
     @State private var renameTarget: LocalChapterModel?
     @State private var renameText = ""
-    @State private var expandedPreviewIDs: Set<String> = []
 
     private var chapters: [LocalChapterModel] { env.store.orderedChapters(of: collection) }
 
@@ -99,7 +98,7 @@ struct CollectionTOCView: View {
     private func chapterRow(_ chapter: LocalChapterModel) -> some View {
         let text = ChapterTextFormatter.presentation(storedTitle: chapter.title,
                                                      urlString: chapter.urlString)
-        let isExpanded = expandedPreviewIDs.contains(chapter.id)
+        let previewText = chapter.excerpt ?? text.preview
 
         return VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top) {
@@ -124,20 +123,11 @@ struct CollectionTOCView: View {
                     }
                 }
             }
-            if let preview = text.preview {
+            if let preview = previewText {
                 Text(preview)
                     .font(.callout)
                     .foregroundStyle(.secondary)
-                    .lineLimit(isExpanded ? nil : 5)
-                Button(isExpanded ? "收起" : "......查看更多") {
-                    if isExpanded {
-                        expandedPreviewIDs.remove(chapter.id)
-                    } else {
-                        expandedPreviewIDs.insert(chapter.id)
-                    }
-                }
-                .font(.caption.weight(.medium))
-                .buttonStyle(.borderless)
+                    .lineLimit(2)
             }
         }
         .padding(.vertical, 4)

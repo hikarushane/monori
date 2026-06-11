@@ -57,4 +57,42 @@ public enum ReaderStyler {
     public static func scrollToTopScript() -> String {
         "window.scrollTo(0, 0);"
     }
+
+    /// Pins the scroll position to `progress` (or top when nil) for a few seconds,
+    /// re-applying every 400ms to defeat Patreon's own auto-scroll. Stops as soon as
+    /// the user touches or wheel-scrolls the page. Also resets the shared interaction
+    /// flag so ProgressTracker ignores non-user scrolls after each navigation.
+    public static func enforceScrollScript(progress: Double?) -> String {
+        let target = progress.map { min(1.0, max(0.0, $0)) } ?? 0.0
+        return """
+        (function () {
+          var target = \(target);
+          var until = Date.now() + 4000;
+          if (!window.__chapterlyInteractionHook) {
+            window.__chapterlyInteractionHook = true;
+            var mark = function () { window.__chapterlyUserInteracted = true; };
+            window.addEventListener("touchstart", mark, { passive: true });
+            window.addEventListener("wheel", mark, { passive: true });
+          }
+          window.__chapterlyUserInteracted = false;
+          if (window.__chapterlyScrollEnforcer) {
+            clearInterval(window.__chapterlyScrollEnforcer);
+          }
+          function apply() {
+            var doc = document.documentElement;
+            var max = doc.scrollHeight - window.innerHeight;
+            window.scrollTo(0, max > 0 ? max * target : 0);
+          }
+          apply();
+          window.__chapterlyScrollEnforcer = setInterval(function () {
+            if (window.__chapterlyUserInteracted === true || Date.now() > until) {
+              clearInterval(window.__chapterlyScrollEnforcer);
+              window.__chapterlyScrollEnforcer = null;
+              return;
+            }
+            apply();
+          }, 400);
+        })();
+        """
+    }
 }

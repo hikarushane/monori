@@ -23,6 +23,23 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertEqual(ReaderStyler.scrollToTopScript(), "window.scrollTo(0, 0);")
     }
 
+    func testEnforceScrollScriptEmbedsTargetAndUserInteractionGuard() {
+        let js = ReaderStyler.enforceScrollScript(progress: 0.5)
+        XCTAssertTrue(js.contains("var target = 0.5"))
+        XCTAssertTrue(js.contains("__chapterlyUserInteracted"))
+        XCTAssertTrue(js.contains("setInterval"))
+    }
+
+    func testEnforceScrollScriptDefaultsToTopWhenNil() {
+        let js = ReaderStyler.enforceScrollScript(progress: nil)
+        XCTAssertTrue(js.contains("var target = 0.0"))
+    }
+
+    func testEnforceScrollScriptClampsOutOfRangeProgress() {
+        XCTAssertTrue(ReaderStyler.enforceScrollScript(progress: 1.7).contains("var target = 1.0"))
+        XCTAssertTrue(ReaderStyler.enforceScrollScript(progress: -0.3).contains("var target = 0.0"))
+    }
+
     func testRulesetEscapedForTemplateLiteral() {
         XCTAssertFalse(ReaderStyler.ruleset().contains("`"))
         XCTAssertFalse(ReaderStyler.ruleset().contains("${"))

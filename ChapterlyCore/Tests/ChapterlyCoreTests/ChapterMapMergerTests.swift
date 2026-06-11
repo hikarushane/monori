@@ -2,8 +2,10 @@ import XCTest
 import ChapterlyCore
 
 final class ChapterMapMergerTests: XCTestCase {
-    private func payload(_ title: String, _ url: String, order: Int) -> ImporterChapterPayload {
+    private func payload(_ title: String, _ url: String, order: Int,
+                         excerpt: String? = nil) -> ImporterChapterPayload {
         ImporterChapterPayload(title: title, url: url, visibleDateText: nil,
+                               excerpt: excerpt,
                                collectionName: "焚心", collectionURL: "https://www.patreon.com/collection/9",
                                domOrder: order)
     }
@@ -52,6 +54,21 @@ final class ChapterMapMergerTests: XCTestCase {
         ])
         XCTAssertEqual(merged.count, 1)
         XCTAssertEqual(merged[0].title, "真正的文章標題")
+    }
+
+    func testReimportFillsMissingExcerptKeepsExisting() {
+        let existing = [
+            ChapterRecord(title: "A", urlString: "https://www.patreon.com/posts/a-1",
+                          visibleDateText: nil, excerpt: nil, orderIndex: 0),
+            ChapterRecord(title: "B", urlString: "https://www.patreon.com/posts/b-2",
+                          visibleDateText: nil, excerpt: "原有摘要", orderIndex: 1)
+        ]
+        let merged = ChapterMapMerger.merge(existing: existing, incoming: [
+            payload("A", "https://patreon.com/posts/a-1", order: 0, excerpt: "新摘要"),
+            payload("B", "https://patreon.com/posts/b-2", order: 1, excerpt: "不該覆蓋")
+        ])
+        XCTAssertEqual(merged[0].excerpt, "新摘要")
+        XCTAssertEqual(merged[1].excerpt, "原有摘要")
     }
 
     func testDuplicateURLsWithinImportDeduped() {

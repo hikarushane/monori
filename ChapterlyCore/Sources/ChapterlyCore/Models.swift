@@ -42,6 +42,7 @@ public final class LocalChapterModel {
     public var urlString: String              // normalized
     public var orderIndex: Int                // explicit, never derived at query time
     public var visibleDateText: String?
+    public var excerpt: String?
     public var readingProgress: Double?
     public var lastReadAt: Date?
     public var collection: LocalCollectionModel?
@@ -50,11 +51,13 @@ public final class LocalChapterModel {
                 title: String,
                 urlString: String,
                 orderIndex: Int,
-                visibleDateText: String? = nil) {
+                visibleDateText: String? = nil,
+                excerpt: String? = nil) {
         self.id = id
         self.title = title
         self.urlString = urlString
         self.orderIndex = orderIndex
         self.visibleDateText = visibleDateText
+        self.excerpt = excerpt
     }
 }

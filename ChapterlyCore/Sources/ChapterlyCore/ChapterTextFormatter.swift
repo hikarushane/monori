@@ -6,6 +6,8 @@ public struct ChapterTextPresentation: Equatable {
 }
 
 public enum ChapterTextFormatter {
+    private static let maxPreviewLength = 150
+
     public static func presentation(storedTitle: String, urlString: String) -> ChapterTextPresentation {
         let cleaned = normalizedMultiline(storedTitle)
         guard isProbablyContaminatedTitle(cleaned) else {
@@ -13,19 +15,42 @@ public enum ChapterTextFormatter {
                                            preview: nil)
         }
 
+        let lines = cleaned.components(separatedBy: "\n").filter { !$0.isEmpty }
+        let firstLine = lines.first ?? ""
         let fallback = fallbackTitle(from: urlString)
-        let firstLine = cleaned.components(separatedBy: "\n").first ?? ""
-        let title = fallback.isEmpty ? firstLine : fallback
-        return ChapterTextPresentation(title: title.isEmpty ? "Patreon post" : title,
-                                       preview: cleaned.isEmpty ? nil : cleaned)
+
+        let firstLineIsTitle = !firstLine.isEmpty
+            && firstLine.count <= 100
+            && !looksLikeBodyText(firstLine)
+
+        let title: String
+        let previewSource: String
+        if firstLineIsTitle {
+            title = firstLine
+            previewSource = lines.dropFirst().joined(separator: "\n")
+        } else {
+            title = !fallback.isEmpty ? fallback : "Patreon post"
+            previewSource = cleaned
+        }
+
+        let preview: String? = previewSource.isEmpty ? nil
+            : previewSource.count <= maxPreviewLength ? previewSource
+            : String(previewSource.prefix(maxPreviewLength))
+        return ChapterTextPresentation(title: title, preview: preview)
+    }
+
+    static func looksLikeBodyText(_ text: String) -> Bool {
+        if text.contains("。") { return true }
+        if text.count > 60, text.contains(". ") { return true }
+        return false
     }
 
     public static func isProbablyContaminatedTitle(_ title: String) -> Bool {
         let cleaned = normalizedMultiline(title)
         let lines = cleaned.components(separatedBy: "\n").filter { !$0.isEmpty }
-        if lines.count >= 3 { return true }
-        if cleaned.count > 180 { return true }
-        if lines.count >= 2, cleaned.count > 80 { return true }
+        if lines.count >= 2 { return true }
+        if cleaned.count > 100 { return true }
+        if looksLikeBodyText(cleaned) { return true }
         return false
     }
 

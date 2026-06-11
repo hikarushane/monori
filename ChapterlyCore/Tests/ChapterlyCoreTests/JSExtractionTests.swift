@@ -99,6 +99,28 @@ final class JSExtractionTests: XCTestCase {
         XCTAssertFalse(allText.contains("FAKE_BODY_TEXT_MUST_NEVER_LEAK"))
     }
 
+    func testCollectionImportExtractsSiblingTeaserAsExcerpt() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_sibling_teaser",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.title), ["陽光普照 19", "陽光普照 18"])
+        XCTAssertEqual(payloads[0].excerpt,
+                       "隨著玻璃門被輕輕推開，掛在門上的銅製風鈴發出了一串清脆的叮噹聲。")
+        XCTAssertEqual(payloads[1].excerpt,
+                       "等到朝陽完全升起，金燦燦的陽光照亮了整座社區公園。")
+    }
+
+    func testCollectionImportExtractsInAnchorExcerpt() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_card_excerpt",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.count, 2)
+        XCTAssertNotNil(payloads[0].excerpt)
+        XCTAssertFalse(payloads.map(\.title).joined().contains("FAKE_BODY_TEXT_MUST_NEVER_LEAK"))
+    }
+
     func testCollectionImportIncludesCreatorNameFromPageTitle() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_card_excerpt",

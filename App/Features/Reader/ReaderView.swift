@@ -7,6 +7,7 @@ struct ReaderView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var current: LocalChapterModel
     @State private var prefs = ReaderPreferences()
+    @State private var targetProgress: Double?
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
@@ -21,6 +22,7 @@ struct ReaderView: View {
         }
         .onAppear { open(current) }
         .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
+        .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
     }
 
     private var neighbors: (previous: LocalChapterModel?, next: LocalChapterModel?) {
@@ -34,9 +36,21 @@ struct ReaderView: View {
 
     private func open(_ chapter: LocalChapterModel) {
         current = chapter
+        targetProgress = chapter.readingProgress
         if let url = URL(string: chapter.urlString) {
             env.reader.load(url)
         }
+    }
+
+    /// Patreon navigates between posts client-side (SPA), so didFinish may never fire.
+    /// Keep `current` in sync with whatever article the web view actually shows.
+    private func syncCurrentChapter(to url: URL?) {
+        guard let url,
+              let chapter = env.store.chapter(withPageURL: url.absoluteString),
+              chapter.id != current.id else { return }
+        current = chapter
+        targetProgress = chapter.readingProgress
+        applyReaderTreatment()
     }
 
     private func applyReaderTreatment() {
@@ -48,15 +62,9 @@ struct ReaderView: View {
                                        completionHandler: nil)
         }
         repairCurrentTitleIfNeeded(webView)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            if let progress = current.readingProgress,
-               ReaderProgressPolicy.shouldRestore(progress) {
-                webView.evaluateJavaScript(
-                    ReaderStyler.restoreScrollScript(progress: progress), completionHandler: nil)
-            } else {
-                webView.evaluateJavaScript(ReaderStyler.scrollToTopScript(), completionHandler: nil)
-            }
-        }
+        let restorable = targetProgress.flatMap { ReaderProgressPolicy.shouldRestore($0) ? $0 : nil }
+        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: restorable),
+                                   completionHandler: nil)
     }
 
     private func repairCurrentTitleIfNeeded(_ webView: WKWebView) {

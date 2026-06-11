@@ -4,12 +4,15 @@ public struct ChapterRecord: Equatable {
     public var title: String
     public var urlString: String        // always normalized
     public var visibleDateText: String?
+    public var excerpt: String?
     public var orderIndex: Int
 
-    public init(title: String, urlString: String, visibleDateText: String?, orderIndex: Int) {
+    public init(title: String, urlString: String, visibleDateText: String?,
+                excerpt: String? = nil, orderIndex: Int) {
         self.title = title
         self.urlString = urlString
         self.visibleDateText = visibleDateText
+        self.excerpt = excerpt
         self.orderIndex = orderIndex
     }
 }
@@ -31,11 +34,15 @@ public enum ChapterMapMerger {
                 if result[index].visibleDateText == nil {
                     result[index].visibleDateText = candidate.visibleDateText
                 }
+                if result[index].excerpt == nil, let excerpt = candidate.excerpt {
+                    result[index].excerpt = excerpt
+                }
                 continue
             }
             result.append(ChapterRecord(title: candidate.title,
                                         urlString: normalized,
                                         visibleDateText: candidate.visibleDateText,
+                                        excerpt: candidate.excerpt,
                                         orderIndex: nextIndex))
             nextIndex += 1
         }

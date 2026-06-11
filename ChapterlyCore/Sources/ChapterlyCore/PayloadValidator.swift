@@ -11,13 +11,14 @@ public enum PayloadValidator {
 
     public static func validateImporterChapter(_ body: Any) -> Result<ImporterChapterPayload, PayloadError> {
         let required = ["title", "url", "collectionName", "collectionURL", "domOrder"]
-        let optional = ["visibleDateText", "creatorName"]
+        let optional = ["visibleDateText", "excerpt", "creatorName"]
         return checked(body, required: required, optional: optional).flatMap { dict in
             do {
                 return .success(ImporterChapterPayload(
                     title: try string(dict, "title", max: maxFieldLength),
                     url: try string(dict, "url", max: maxURLLength),
                     visibleDateText: try optionalString(dict, "visibleDateText", max: maxFieldLength),
+                    excerpt: try optionalString(dict, "excerpt", max: maxFieldLength),
                     creatorName: try optionalString(dict, "creatorName", max: maxFieldLength),
                     collectionName: try string(dict, "collectionName", max: maxFieldLength),
                     collectionURL: try string(dict, "collectionURL", max: maxURLLength),

@@ -10,8 +10,10 @@ final class LibraryStoreTests: XCTestCase {
         store = try LibraryStore.inMemory()
     }
 
-    private func payload(_ title: String, _ url: String, order: Int) -> ImporterChapterPayload {
+    private func payload(_ title: String, _ url: String, order: Int,
+                         excerpt: String? = nil) -> ImporterChapterPayload {
         ImporterChapterPayload(title: title, url: url, visibleDateText: nil,
+                               excerpt: excerpt,
                                creatorName: "ocean",
                                collectionName: "【更新中】焚心 The Burning Heart",
                                collectionURL: "https://www.patreon.com/collection/9999",
@@ -40,6 +42,16 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(chapters.map(\.title), ["4 愛", "5 脣瓣"])
     }
 
+    func testImportPersistsExcerptAndReimportFillsMissing() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        var chapter = store.orderedChapters(of: try store.collections()[0])[0]
+        XCTAssertNil(chapter.excerpt)
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0,
+                                       excerpt: "卡片上的公開短摘要。")])
+        chapter = store.orderedChapters(of: try store.collections()[0])[0]
+        XCTAssertEqual(chapter.excerpt, "卡片上的公開短摘要。")
+    }
+
     func testReverseDirectionFlipsReadingOrder() throws {
         try store.applyImport([
             payload("newest", "https://patreon.com/posts/n-3", order: 0),
@@ -50,15 +62,18 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), ["oldest", "newest"])
     }
 
-    func testNeighborsFollowReadingOrder() throws {
+    func testNeighborsFollowStoryOrder() throws {
+        // Patreon DOM order: newest first (order 0 = newest)
         try store.applyImport([
-            payload("3", "https://patreon.com/posts/3-1", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0),
             payload("4 愛", "https://patreon.com/posts/4-2", order: 1),
-            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 2)
+            payload("3", "https://patreon.com/posts/3-1", order: 2)
         ])
         let collection = try store.collections()[0]
-        let middle = store.orderedChapters(of: collection)[1]
+        let chapters = store.orderedChapters(of: collection)
+        let middle = chapters.first { $0.title == "4 愛" }!
         let n = store.neighbors(of: middle)
+        // previous = older chapter, next = newer chapter
         XCTAssertEqual(n.previous?.title, "3")
         XCTAssertEqual(n.next?.title, "5 脣瓣")
     }
