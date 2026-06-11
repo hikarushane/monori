@@ -48,7 +48,11 @@ final class WebViewModel: NSObject {
         super.init()
 
         webView.navigationDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
+        // Off on purpose: the built-in gesture skips Patreon's same-document
+        // (SPA) history entries, and PatreonWebView installs its own left-edge
+        // swipe that calls goBack() — keeping both would double-navigate on
+        // full page loads.
+        webView.allowsBackForwardNavigationGestures = false
 
         urlObservation = webView.observe(\.url, options: [.new]) { [weak self] _, change in
             Task { @MainActor [weak self] in
