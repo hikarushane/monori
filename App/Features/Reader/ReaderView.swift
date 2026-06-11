@@ -8,6 +8,10 @@ struct ReaderView: View {
     @State private var current: LocalChapterModel
     @State private var prefs = ReaderPreferences()
     @State private var targetProgress: Double?
+    /// Non-nil while the web view shows a page outside the library (e.g. a related
+    /// post from a collection that has not been imported). Holds the display title.
+    @State private var foreignPageTitle: String?
+    @State private var foreignTitleTask: Task<Void, Never>?
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
@@ -21,20 +25,24 @@ struct ReaderView: View {
             bottomBar
         }
         .onAppear { open(current) }
+        .onDisappear { foreignTitleTask?.cancel() }
         .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
         .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
     }
 
     private var neighbors: (previous: LocalChapterModel?, next: LocalChapterModel?) {
-        env.store.neighbors(of: current)
+        foreignPageTitle == nil ? env.store.neighbors(of: current) : (nil, nil)
     }
 
     private var currentTitle: String {
-        ChapterTextFormatter.presentation(storedTitle: current.title,
-                                          urlString: current.urlString).title
+        if let foreignPageTitle { return foreignPageTitle }
+        return ChapterTextFormatter.presentation(storedTitle: current.title,
+                                                 urlString: current.urlString).title
     }
 
     private func open(_ chapter: LocalChapterModel) {
+        foreignTitleTask?.cancel()
+        foreignPageTitle = nil
         current = chapter
         targetProgress = chapter.readingProgress
         if let url = URL(string: chapter.urlString) {
@@ -44,13 +52,47 @@ struct ReaderView: View {
 
     /// Patreon navigates between posts client-side (SPA), so didFinish may never fire.
     /// Keep `current` in sync with whatever article the web view actually shows.
+    /// Pages outside the library (e.g. not-yet-imported related posts) get a
+    /// "foreign" state: the title comes from the page itself, prev/next navigation
+    /// is hidden, and no stored progress is applied to them.
     private func syncCurrentChapter(to url: URL?) {
-        guard let url,
-              let chapter = env.store.chapter(withPageURL: url.absoluteString),
-              chapter.id != current.id else { return }
-        current = chapter
-        targetProgress = chapter.readingProgress
-        applyReaderTreatment()
+        guard let url else { return }
+        if let chapter = env.store.chapter(withPageURL: url.absoluteString) {
+            foreignTitleTask?.cancel()
+            foreignPageTitle = nil
+            guard chapter.id != current.id else { return }
+            current = chapter
+            targetProgress = chapter.readingProgress
+            applyReaderTreatment()
+        } else {
+            targetProgress = nil
+            let staleTitles: Set<String> = [current.title, currentTitle]
+            let slugTitle = ChapterTextFormatter.presentation(storedTitle: "",
+                                                              urlString: url.absoluteString).title
+            foreignPageTitle = slugTitle.isEmpty ? "Patreon post" : slugTitle
+            pollForeignTitle(rejecting: staleTitles)
+        }
+    }
+
+    /// The SPA may still render the previous post for a moment after the URL changes,
+    /// so poll briefly and keep the latest title the page settles on. Titles matching
+    /// the chapter we navigated away from are ignored.
+    private func pollForeignTitle(rejecting staleTitles: Set<String>) {
+        foreignTitleTask?.cancel()
+        foreignTitleTask = Task { @MainActor in
+            for _ in 0..<8 {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled, foreignPageTitle != nil else { return }
+                env.reader.webView.evaluateJavaScript(Self.readerTitleScript) { result, _ in
+                    Task { @MainActor in
+                        guard foreignPageTitle != nil,
+                              let title = result as? String, !title.isEmpty,
+                              !staleTitles.contains(title) else { return }
+                        foreignPageTitle = title
+                    }
+                }
+            }
+        }
     }
 
     private func applyReaderTreatment() {
@@ -61,6 +103,8 @@ struct ReaderView: View {
             webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
                                        completionHandler: nil)
         }
+        // Foreign pages have no library chapter to repair or restore progress for.
+        guard foreignPageTitle == nil else { return }
         repairCurrentTitleIfNeeded(webView)
         let restorable = targetProgress.flatMap { ReaderProgressPolicy.shouldRestore($0) ? $0 : nil }
         webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: restorable),
@@ -110,7 +154,7 @@ struct ReaderView: View {
                 Button("Increase font") { prefs.fontSize = min(32, prefs.fontSize + 1) }
                 Button("Decrease font") { prefs.fontSize = max(14, prefs.fontSize - 1) }
                 Toggle("Reader mode", isOn: $prefs.readerModeEnabled)
-                if let url = URL(string: current.urlString) {
+                if let url = env.reader.currentURL ?? URL(string: current.urlString) {
                     Link("Open on Patreon", destination: url)
                 }
             } label: {
