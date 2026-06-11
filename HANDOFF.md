@@ -7,6 +7,10 @@
 6 個 bug 全部修完；verify.sh 85/85 pass。Cloudflare 驗證已由使用者手動解掉，
 第一輪 4 修後 smoke-auto 7/7；第二輪（Load more + 左滑返回）修後 smoke 結果見 auto-report.md。
 
+## ✅ 第三輪修復（2026-06-12）
+- **Bug 7（創作者頁點擊無反應）**：兩個 root cause——(a) 沒有 WKUIDelegate，target=_blank 連結被 WKWebView 靜默忽略 → 加 `createWebViewWith` 走 NavigationPolicy 原地載入；(b) Reader CSS（藏 nav/aside/footer、article 42em）連 foreign 頁都注入 → foreign 改跑 `removalScript()`
+- **Bug 8（post card 體驗）**：新 `CardTreatment.js` user script（Browse/Reader 都注入）：`[data-tag="post-card"]` 整卡可點（點非互動區 → 觸發 title link）、卡內文字不可選取、隱藏中英文 Show more 按鈕、teaser 容器加 mask 漸層淡出；MutationObserver（300ms throttle）跟隨 SPA 重渲染。TDD：`post_cards.html` fixture + `testCardTreatmentMakesCardsClickableAndCollapsesTeasers`
+
 ## ✅ 第二輪修復（2026-06-12）
 - **Bug 5（Load more 沒吃到）**：matcher 只認英文 + 點擊前置於捲動且穩定計數不看按鈕 → 中文「載入更多」永遠不點、點了也會在網路延遲中提前退出。修：中英 matcher（button/[role=button]、aria-label fallback）、捲底後找按鈕、點擊後等 1200ms、結束條件 = **無按鈕 AND 連結數穩定 3 輪**、上限 240 輪。TDD：`collection_page_load_more.html`（中文按鈕 + 1.5s 延遲）RED→GREEN
 - **Bug 6（Browse 左滑不返回）**：WKWebView 原生手勢不支援 SPA same-document entry。修：關原生手勢，`PatreonWebView` 裝左緣 `UIScreenEdgePanGestureRecognizer`（translation>60pt）→ `goBack()`

@@ -17,6 +17,7 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 | Collection detect 範圍 | 只在 post 頁跑（`patreonPostID != nil`）+ 收訊時再驗 | detect 對舊 DOM / 首頁 feed 跑會誤設 banner（SPA race）| active | 2026-06-11 |
 | Import 全章節 | `callAsyncJavaScript` + JS 捲動展開迴圈：捲底→找「Load more」按鈕（中英 matcher）→點擊後等 1200ms；結束條件 = 無按鈕 AND 連結數穩定 3 輪（500ms/輪、上限 240 輪）| Patreon collection 清單 = 無限捲動 + 分頁按鈕混合；點擊後網路載入有延遲，穩定判定必須同時看按鈕存在性 | active | 2026-06-12 |
 | Scroll enforce 範圍 | known 和 foreign 頁都跑 `enforceScrollScript`（foreign 釘頂部）| foreign 不跑就被 Patreon auto-scroll 拖到底；只有 progress 還原限 known | active | 2026-06-11 |
+| Post card 整卡可點 | `CardTreatment.js` user script（兩個 webview 都注入）：`[data-tag="post-card"]` 整卡 click→title link、user-select none、隱藏中英 Show more、teaser 加 mask 漸層 | Patreon 卡片只有標題可點、文字可被選取、Show more 展開佔版面；MutationObserver 300ms throttle 跟 SPA 重渲染 | active | 2026-06-12 |
 
 ## 規範
 ### Patreon DOM
@@ -72,6 +73,10 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **callAsyncJavaScript vs evaluateJavaScript**（2026-06-11）：JS 檔有 top-level `return`/`await` 只能用 `callAsyncJavaScript`（source 被當 async function body）；`evaluateJavaScript` 會 SyntaxError。JSExtractionTests harness 已同步改。
 
 - **Load more 按鈕是 localized**（2026-06-12）：英文 regex `/^(load|show|view)\s+more/` 抓不到中文介面的「載入更多」→ 長篇連載只匯入前幾頁。matcher 需含中英（載入/顯示/查看更多）；點擊後網路載入 >1.5s，穩定計數須在按鈕存在時歸零，否則提前退出。
+
+- **target=_blank 連結沒有 WKUIDelegate 就完全沒反應**（2026-06-12）：Patreon 創作者頁部分連結 target=_blank，WKWebView 沒實作 `createWebViewWith` 時點擊靜默無效（「點什麼都沒反應」）。修：uiDelegate 走 NavigationPolicy 在原 webView 載入、return nil。
+
+- **Reader CSS 不能套在非 post 頁**（2026-06-12）：`ReaderRuleset.css` 會 `nav/aside/footer display:none` + `article max-width:42em`；foreign（創作者頁/集合頁）套了會藏掉導航、擠壓 feed。修：`applyReaderTreatment` foreign 路徑改跑 `removalScript()`。
 
 - **WKWebView 原生返回手勢不支援 SPA entry**（2026-06-12）：`allowsBackForwardNavigationGestures` 對 Patreon same-document（pushState）歷史項目不會觸發，但 `goBack()` API 可以。解法：關掉原生手勢、PatreonWebView 裝自訂 `UIScreenEdgePanGestureRecognizer`（左緣、translation>60pt）呼叫 `goBack()`；兩者並存會在真導航時 double-back。
 
