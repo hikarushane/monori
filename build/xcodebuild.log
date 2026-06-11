@@ -10,7 +10,7 @@ Resolve Package Graph
 Resolved source packages:
   ChapterlyCore: /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
 
-2026-06-11 18:26:04.517 xcodebuild[22042:2448310] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-06-11 18:33:14.029 xcodebuild[24817:2462594] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 ComputePackagePrebuildTargetDependencyGraph
 
 Prepare packages
@@ -46,9 +46,9 @@ ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefaul
 Building for debugging...
 [0/2] Write swift-version--58304C5D6DBC2206.txt
 Build complete! (0.07s)
-Test Suite 'All tests' started at 2026-06-11 18:26:05.307.
-Test Suite 'ChapterlyCorePackageTests.xctest' started at 2026-06-11 18:26:05.307.
-Test Suite 'ChapterMapMergerTests' started at 2026-06-11 18:26:05.308.
+Test Suite 'All tests' started at 2026-06-11 18:33:14.662.
+Test Suite 'ChapterlyCorePackageTests.xctest' started at 2026-06-11 18:33:14.663.
+Test Suite 'ChapterMapMergerTests' started at 2026-06-11 18:33:14.663.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testDuplicateURLsWithinImportDeduped]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testDuplicateURLsWithinImportDeduped]' passed (0.001 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testFreshImportUsesDomOrder]' started.
@@ -61,9 +61,9 @@ Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportReplacesContam
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportReplacesContaminatedCardTextTitle]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testUnnormalizableURLSkipped]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testUnnormalizableURLSkipped]' passed (0.000 seconds).
-Test Suite 'ChapterMapMergerTests' passed at 2026-06-11 18:26:05.310.
+Test Suite 'ChapterMapMergerTests' passed at 2026-06-11 18:33:14.665.
 	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'ChapterTextFormatterTests' started at 2026-06-11 18:26:05.310.
+Test Suite 'ChapterTextFormatterTests' started at 2026-06-11 18:33:14.665.
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithChinesePeriodIsFlagged]' started.
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithChinesePeriodIsFlagged]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithoutURLSlugFallsBackToGeneric]' started.
@@ -84,32 +84,32 @@ Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTitleWithQuestionM
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTitleWithQuestionMarkNotFlagged]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTwoLineTextIsFlaggedAsContaminated]' started.
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTwoLineTextIsFlaggedAsContaminated]' passed (0.000 seconds).
-Test Suite 'ChapterTextFormatterTests' passed at 2026-06-11 18:26:05.311.
+Test Suite 'ChapterTextFormatterTests' passed at 2026-06-11 18:33:14.667.
 	 Executed 10 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'JSExtractionTests' started at 2026-06-11 18:26:05.311.
+Test Suite 'JSExtractionTests' started at 2026-06-11 18:33:14.667.
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' passed (0.462 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' passed (0.466 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' passed (0.327 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' passed (0.292 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsInAnchorExcerpt]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsInAnchorExcerpt]' passed (0.321 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsInAnchorExcerpt]' passed (0.323 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' passed (0.314 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' passed (0.311 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsSiblingTeaserAsExcerpt]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsSiblingTeaserAsExcerpt]' passed (0.345 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsSiblingTeaserAsExcerpt]' passed (0.314 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' passed (0.359 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' passed (0.317 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportPrefersCardTitleOverExcerptText]' started.
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportPrefersCardTitleOverExcerptText]' passed (0.316 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' passed (0.301 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' passed (0.316 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' passed (0.311 seconds).
-Test Suite 'JSExtractionTests' passed at 2026-06-11 18:26:08.370.
-	 Executed 9 tests, with 0 failures (0 unexpected) in 3.057 (3.059) seconds
-Test Suite 'LibraryStoreTests' started at 2026-06-11 18:26:08.370.
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' passed (0.308 seconds).
+Test Suite 'JSExtractionTests' passed at 2026-06-11 18:33:17.633.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 2.965 (2.967) seconds
+Test Suite 'LibraryStoreTests' started at 2026-06-11 18:33:17.633.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' passed (0.020 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' passed (0.021 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testFooterScrollDoesNotOverwriteReadingProgress]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testFooterScrollDoesNotOverwriteReadingProgress]' passed (0.005 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportCreatesCollectionAndChapters]' started.
@@ -125,14 +125,14 @@ Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNoChapterStoresBodyText]' 
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByMatchingPatreonPostIDWhenSlugChanges]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByMatchingPatreonPostIDWhenSlugChanges]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByNormalizedURL]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByNormalizedURL]' passed (0.003 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByNormalizedURL]' passed (0.004 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' passed (0.004 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReverseDirectionFlipsReadingOrder]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReverseDirectionFlipsReadingOrder]' passed (0.002 seconds).
-Test Suite 'LibraryStoreTests' passed at 2026-06-11 18:26:08.423.
-	 Executed 11 tests, with 0 failures (0 unexpected) in 0.052 (0.053) seconds
-Test Suite 'NavigationPolicyTests' started at 2026-06-11 18:26:08.423.
+Test Suite 'LibraryStoreTests' passed at 2026-06-11 18:33:17.688.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.054 (0.055) seconds
+Test Suite 'NavigationPolicyTests' started at 2026-06-11 18:33:17.688.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testExternalMainFrameOpensSafari]' started.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testExternalMainFrameOpensSafari]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testNonHTTPSchemesBlocked]' started.
@@ -141,9 +141,9 @@ Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testPatreonMainFrameAllowe
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testPatreonMainFrameAllowed]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testSubframesAlwaysAllowed]' started.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testSubframesAlwaysAllowed]' passed (0.000 seconds).
-Test Suite 'NavigationPolicyTests' passed at 2026-06-11 18:26:08.424.
+Test Suite 'NavigationPolicyTests' passed at 2026-06-11 18:33:17.689.
 	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'PayloadValidatorTests' started at 2026-06-11 18:26:08.424.
+Test Suite 'PayloadValidatorTests' started at 2026-06-11 18:33:17.689.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testForbiddenKeyRejectsWholeMessage]' started.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testForbiddenKeyRejectsWholeMessage]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testImporterDomOrderAcceptsJavaScriptNumber]' started.
@@ -174,9 +174,9 @@ Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidImporterPayload]'
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidImporterPayload]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidProgressPayload]' started.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidProgressPayload]' passed (0.000 seconds).
-Test Suite 'PayloadValidatorTests' passed at 2026-06-11 18:26:08.426.
+Test Suite 'PayloadValidatorTests' passed at 2026-06-11 18:33:17.691.
 	 Executed 15 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'ReaderStylerTests' started at 2026-06-11 18:26:08.426.
+Test Suite 'ReaderStylerTests' started at 2026-06-11 18:33:17.691.
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptClampsOutOfRangeProgress]' started.
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptClampsOutOfRangeProgress]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptDefaultsToTopWhenNil]' started.
@@ -193,9 +193,9 @@ Test Case '-[ChapterlyCoreTests.ReaderStylerTests testRulesetEscapedForTemplateL
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testRulesetEscapedForTemplateLiteral]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testScrollToTopScript]' started.
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testScrollToTopScript]' passed (0.000 seconds).
-Test Suite 'ReaderStylerTests' passed at 2026-06-11 18:26:08.428.
-	 Executed 8 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
-Test Suite 'ScriptMessageRouterTests' started at 2026-06-11 18:26:08.428.
+Test Suite 'ReaderStylerTests' passed at 2026-06-11 18:33:17.693.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'ScriptMessageRouterTests' started at 2026-06-11 18:33:17.693.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRejectsAndCountsForbiddenPayload]' started.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRejectsAndCountsForbiddenPayload]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesProgressAndCollectionLink]' started.
@@ -204,9 +204,9 @@ Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesValidImporter
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesValidImporterMessage]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testUnknownHandlerNameIgnored]' started.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testUnknownHandlerNameIgnored]' passed (0.000 seconds).
-Test Suite 'ScriptMessageRouterTests' passed at 2026-06-11 18:26:08.428.
+Test Suite 'ScriptMessageRouterTests' passed at 2026-06-11 18:33:17.693.
 	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'SmokeSupportTests' started at 2026-06-11 18:26:08.428.
+Test Suite 'SmokeSupportTests' started at 2026-06-11 18:33:17.693.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualOutsideTolerance]' started.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualOutsideTolerance]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualWithinTolerance]' started.
@@ -219,14 +219,14 @@ Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLinePassIgnoresReason]
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLinePassIgnoresReason]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineReasonWhitespaceIsSanitized]' started.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineReasonWhitespaceIsSanitized]' passed (0.000 seconds).
-Test Suite 'SmokeSupportTests' passed at 2026-06-11 18:26:08.429.
-	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'SmokeTests' started at 2026-06-11 18:26:08.429.
+Test Suite 'SmokeSupportTests' passed at 2026-06-11 18:33:17.694.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'SmokeTests' started at 2026-06-11 18:33:17.694.
 Test Case '-[ChapterlyCoreTests.SmokeTests testVersion]' started.
 Test Case '-[ChapterlyCoreTests.SmokeTests testVersion]' passed (0.000 seconds).
-Test Suite 'SmokeTests' passed at 2026-06-11 18:26:08.429.
+Test Suite 'SmokeTests' passed at 2026-06-11 18:33:17.694.
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
-Test Suite 'URLNormalizerTests' started at 2026-06-11 18:26:08.429.
+Test Suite 'URLNormalizerTests' started at 2026-06-11 18:33:17.694.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testIsPatreonHomeMatchesHomeAndRoot]' started.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testIsPatreonHomeMatchesHomeAndRoot]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testIsPatreonHomeRejectsOtherPages]' started.
@@ -245,12 +245,12 @@ Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStringConvenience]' start
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStringConvenience]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStripsTrackingParamsAndFragment]' started.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStripsTrackingParamsAndFragment]' passed (0.000 seconds).
-Test Suite 'URLNormalizerTests' passed at 2026-06-11 18:26:08.431.
+Test Suite 'URLNormalizerTests' passed at 2026-06-11 18:33:17.695.
 	 Executed 9 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'ChapterlyCorePackageTests.xctest' passed at 2026-06-11 18:26:08.431.
-	 Executed 83 tests, with 0 failures (0 unexpected) in 3.117 (3.123) seconds
-Test Suite 'All tests' passed at 2026-06-11 18:26:08.431.
-	 Executed 83 tests, with 0 failures (0 unexpected) in 3.117 (3.124) seconds
+Test Suite 'ChapterlyCorePackageTests.xctest' passed at 2026-06-11 18:33:17.695.
+	 Executed 83 tests, with 0 failures (0 unexpected) in 3.027 (3.032) seconds
+Test Suite 'All tests' passed at 2026-06-11 18:33:17.695.
+	 Executed 83 tests, with 0 failures (0 unexpected) in 3.027 (3.033) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 1902
 ↳ Target Platform: arm64e-apple-macos14.0
