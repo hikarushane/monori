@@ -118,7 +118,10 @@ final class SmokeAutopilot {
         }
         pass("reader_css")
 
+        // ProgressTracker only saves after a user gesture (touchstart/wheel); fire a
+        // synthetic wheel event first so the gate treats this scroll as user-driven.
         env.reader.webView.evaluateJavaScript("""
+        window.dispatchEvent(new Event('wheel'));
         \(ReaderStyler.restoreScrollScript(progress: 0.5))
         window.dispatchEvent(new Event('scroll'));
         """, completionHandler: nil)
