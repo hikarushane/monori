@@ -149,22 +149,6 @@ public final class LibraryStore {
         try context.save()
     }
 
-    public func moveChapters(in collection: LocalCollectionModel, from source: IndexSet, to destination: Int) {
-        let ordered = orderedChapters(of: collection)
-        // Manually reorder: collect items being moved, remove them, then insert at destination.
-        let moving = source.map { ordered[$0] }
-        var remaining = ordered.enumerated()
-            .filter { !source.contains($0.offset) }
-            .map(\.element)
-        let insertAt = destination - source.filter { $0 < destination }.count
-        remaining.insert(contentsOf: moving, at: min(insertAt, remaining.count))
-        let canonical: [LocalChapterModel] = collection.sortDirection == .oldestToNewest
-            ? remaining
-            : remaining.reversed()
-        for (i, chapter) in canonical.enumerated() { chapter.orderIndex = i }
-        try? context.save()
-    }
-
     public func clearLibrary() throws {
         for collection in try collections() { context.delete(collection) }
         try context.save()

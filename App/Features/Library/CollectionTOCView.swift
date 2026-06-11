@@ -33,9 +33,6 @@ struct CollectionTOCView: View {
                         }
                     }
             }
-            .onMove { source, destination in
-                env.store.moveChapters(in: collection, from: source, to: destination)
-            }
         }
         .listStyle(.plain)
         .navigationTitle(collection.title)
@@ -51,7 +48,6 @@ struct CollectionTOCView: View {
                 .accessibilityLabel("Reverse chapter order")
                 Button { showAddSheet = true } label: { Image(systemName: "plus") }
                     .accessibilityLabel("Add chapter manually")
-                EditButton()
             }
         }
         .fullScreenCover(item: $readerTarget) { target in
