@@ -20,6 +20,9 @@ struct ReaderView: View {
     var body: some View {
         VStack(spacing: 0) {
             topBar
+            if foreignPageTitle != nil {
+                WebCollectionBanner(model: env.reader)
+            }
             PatreonWebView(model: env.reader)
                 .accessibilityIdentifier("smoke.readerWebView")
             bottomBar
@@ -83,6 +86,9 @@ struct ReaderView: View {
             for _ in 0..<8 {
                 try? await Task.sleep(for: .milliseconds(500))
                 guard !Task.isCancelled, foreignPageTitle != nil else { return }
+                // The one-shot collection detect can race the SPA render; refresh it
+                // alongside the title so the series banner reflects the settled page.
+                env.reader.runCollectionDetect()
                 env.reader.webView.evaluateJavaScript(Self.readerTitleScript) { result, _ in
                     Task { @MainActor in
                         guard foreignPageTitle != nil,
