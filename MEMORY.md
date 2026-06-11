@@ -15,7 +15,7 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 | Tab 重選行為 | `AppTab` enum + custom `Binding` 攔截重選事件 | 標準 `TabView(selection:)` 無法偵測重選同一 tab；custom Binding 攔截後呼叫 `handleBrowseTabReselect()` | active | 2026-06-11 |
 | Browse/Reader 共用 banner | `WebCollectionBanner(model:)` 吃 `WebViewModel` | Browse 和 Reader 需要同樣的 collection banner UI + import alert；抽共用元件避免重複 | active | 2026-06-11 |
 | Collection detect 範圍 | 只在 post 頁跑（`patreonPostID != nil`）+ 收訊時再驗 | detect 對舊 DOM / 首頁 feed 跑會誤設 banner（SPA race）| active | 2026-06-11 |
-| Import 全章節 | `callAsyncJavaScript` + JS 捲動展開迴圈（500ms/輪、穩定 3 輪停、上限 60 輪）| Patreon collection 清單 lazy load；逐輪累積擷取容忍虛擬化，`domOrder`=首見順序 | active | 2026-06-11 |
+| Import 全章節 | `callAsyncJavaScript` + JS 捲動展開迴圈：捲底→找「Load more」按鈕（中英 matcher）→點擊後等 1200ms；結束條件 = 無按鈕 AND 連結數穩定 3 輪（500ms/輪、上限 240 輪）| Patreon collection 清單 = 無限捲動 + 分頁按鈕混合；點擊後網路載入有延遲，穩定判定必須同時看按鈕存在性 | active | 2026-06-12 |
 | Scroll enforce 範圍 | known 和 foreign 頁都跑 `enforceScrollScript`（foreign 釘頂部）| foreign 不跑就被 Patreon auto-scroll 拖到底；只有 progress 還原限 known | active | 2026-06-11 |
 
 ## 規範
@@ -70,6 +70,10 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **同 id 早退跳過 treatment**（2026-06-11）：`syncCurrentChapter` found 分支 `guard chapter.id != current.id else { return }` 在「foreign SPA 返回同一章」時跳過 enforce（SPA 無 didFinish 補刀）→ 自動捲到底回歸的第二個洞。修：`wasForeign` 時重套 treatment。
 
 - **callAsyncJavaScript vs evaluateJavaScript**（2026-06-11）：JS 檔有 top-level `return`/`await` 只能用 `callAsyncJavaScript`（source 被當 async function body）；`evaluateJavaScript` 會 SyntaxError。JSExtractionTests harness 已同步改。
+
+- **Load more 按鈕是 localized**（2026-06-12）：英文 regex `/^(load|show|view)\s+more/` 抓不到中文介面的「載入更多」→ 長篇連載只匯入前幾頁。matcher 需含中英（載入/顯示/查看更多）；點擊後網路載入 >1.5s，穩定計數須在按鈕存在時歸零，否則提前退出。
+
+- **WKWebView 原生返回手勢不支援 SPA entry**（2026-06-12）：`allowsBackForwardNavigationGestures` 對 Patreon same-document（pushState）歷史項目不會觸發，但 `goBack()` API 可以。解法：關掉原生手勢、PatreonWebView 裝自訂 `UIScreenEdgePanGestureRecognizer`（左緣、translation>60pt）呼叫 `goBack()`；兩者並存會在真導航時 double-back。
 
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險

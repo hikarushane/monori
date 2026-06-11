@@ -1,11 +1,15 @@
 # HANDOFF
 
-> 上次 session: 2026-06-11（session 3）
+> 上次 session: 2026-06-12（session 3 延續）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-4 個 bug 全部修完（3 個待修 + 1 個新發現的 import 問題）；verify.sh 84/84 pass。
-smoke-auto 卡在 **Patreon 的 Cloudflare 人類驗證**（與程式碼無關），需手動處理後重跑。
+6 個 bug 全部修完；verify.sh 85/85 pass。Cloudflare 驗證已由使用者手動解掉，
+第一輪 4 修後 smoke-auto 7/7；第二輪（Load more + 左滑返回）修後 smoke 結果見 auto-report.md。
+
+## ✅ 第二輪修復（2026-06-12）
+- **Bug 5（Load more 沒吃到）**：matcher 只認英文 + 點擊前置於捲動且穩定計數不看按鈕 → 中文「載入更多」永遠不點、點了也會在網路延遲中提前退出。修：中英 matcher（button/[role=button]、aria-label fallback）、捲底後找按鈕、點擊後等 1200ms、結束條件 = **無按鈕 AND 連結數穩定 3 輪**、上限 240 輪。TDD：`collection_page_load_more.html`（中文按鈕 + 1.5s 延遲）RED→GREEN
+- **Bug 6（Browse 左滑不返回）**：WKWebView 原生手勢不支援 SPA same-document entry。修：關原生手勢，`PatreonWebView` 裝左緣 `UIScreenEdgePanGestureRecognizer`（translation>60pt）→ `goBack()`
 
 ## ✅ 本次完成
 - **Bug 1（scroll 回歸）**：root cause 是 `1f29d51` 在 `applyReaderTreatment()` 加了 `guard foreignPageTitle == nil else { return }`，foreign 頁面從此不跑 `enforceScrollScript`；另外 `syncCurrentChapter` 同 id 早退路徑在 SPA 返回已知章節時也跳過 treatment（SPA 無 didFinish）。修法：enforce 永遠執行（foreign 釘在頂部、known 還原進度）；found 分支 `wasForeign` 時重新套用 treatment；foreign 分支進入時就套用，並用 `foreignPageKey`（postID）防同頁 URL 重寫重複釘頂
