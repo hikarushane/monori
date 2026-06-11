@@ -12,6 +12,9 @@ struct ReaderView: View {
     /// post from a collection that has not been imported). Holds the display title.
     @State private var foreignPageTitle: String?
     @State private var foreignTitleTask: Task<Void, Never>?
+    /// Identity of the foreign page currently shown (post ID when available),
+    /// so SPA URL rewrites on the same page don't re-pin the scroll position.
+    @State private var foreignPageKey: String?
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
@@ -46,6 +49,7 @@ struct ReaderView: View {
     private func open(_ chapter: LocalChapterModel) {
         foreignTitleTask?.cancel()
         foreignPageTitle = nil
+        foreignPageKey = nil
         current = chapter
         targetProgress = chapter.readingProgress
         if let url = URL(string: chapter.urlString) {
@@ -62,17 +66,32 @@ struct ReaderView: View {
         guard let url else { return }
         if let chapter = env.store.chapter(withPageURL: url.absoluteString) {
             foreignTitleTask?.cancel()
+            let wasForeign = foreignPageTitle != nil
             foreignPageTitle = nil
-            guard chapter.id != current.id else { return }
-            current = chapter
-            targetProgress = chapter.readingProgress
-            applyReaderTreatment()
+            foreignPageKey = nil
+            if chapter.id != current.id {
+                current = chapter
+                targetProgress = chapter.readingProgress
+                applyReaderTreatment()
+            } else if wasForeign {
+                // SPA return to the chapter we were already on: didFinish never fires,
+                // so re-apply treatment here or the page keeps Patreon's auto-scroll.
+                targetProgress = chapter.readingProgress
+                applyReaderTreatment()
+            }
         } else {
+            let key = URLNormalizer.patreonPostID(url.absoluteString)
+                ?? URLNormalizer.normalize(url.absoluteString)?.absoluteString
+                ?? url.absoluteString
+            let samePage = foreignPageTitle != nil && key == foreignPageKey
+            foreignPageKey = key
             targetProgress = nil
+            guard !samePage else { return }
             let staleTitles: Set<String> = [current.title, currentTitle]
             let slugTitle = ChapterTextFormatter.presentation(storedTitle: "",
                                                               urlString: url.absoluteString).title
             foreignPageTitle = slugTitle.isEmpty ? "Patreon post" : slugTitle
+            applyReaderTreatment()
             pollForeignTitle(rejecting: staleTitles)
         }
     }
@@ -109,10 +128,14 @@ struct ReaderView: View {
             webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
                                        completionHandler: nil)
         }
-        // Foreign pages have no library chapter to repair or restore progress for.
-        guard foreignPageTitle == nil else { return }
-        repairCurrentTitleIfNeeded(webView)
-        let restorable = targetProgress.flatMap { ReaderProgressPolicy.shouldRestore($0) ? $0 : nil }
+        // Foreign pages have no library chapter to repair or restore progress for,
+        // but they still need the scroll pinned (to the top) or Patreon's own
+        // auto-scroll drags every unimported page to the bottom.
+        var restorable: Double?
+        if foreignPageTitle == nil {
+            repairCurrentTitleIfNeeded(webView)
+            restorable = targetProgress.flatMap { ReaderProgressPolicy.shouldRestore($0) ? $0 : nil }
+        }
         webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: restorable),
                                    completionHandler: nil)
     }
