@@ -151,6 +151,57 @@ final class JSExtractionTests: XCTestCase {
         XCTAssertEqual(payloads.map(\.domOrder), [0, 1, 2, 3, 4, 5])
     }
 
+    func testCardTreatmentMakesCardsClickableAndCollapsesTeasers() async throws {
+        let config = WKWebViewConfiguration()
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 844),
+                                configuration: config)
+        let url = Bundle.module.url(forResource: "post_cards", withExtension: "html")!
+        let html = try String(contentsOf: url, encoding: .utf8)
+        webView.loadHTMLString(html, baseURL: URL(string: "https://www.patreon.com/")!)
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+
+        _ = try? await webView.callAsyncJavaScript(JSAssets.cardTreatment, contentWorld: .page)
+        try await Task.sleep(for: .milliseconds(200))
+
+        // Record link clicks instead of navigating away from the fixture.
+        _ = try await webView.evaluateJavaScript("""
+        (function () {
+          window.__clicked = null;
+          document.addEventListener("click", function (e) {
+            var a = e.target.closest("a");
+            if (a) { window.__clicked = a.href; e.preventDefault(); }
+          }, true);
+          return true;
+        })();
+        """)
+
+        let checks = try await webView.evaluateJavaScript("""
+        (function () {
+          var card = document.getElementById("card-1");
+          document.getElementById("teaser-1").click();
+          return [
+            !!document.getElementById("chapterly-card-style"),
+            getComputedStyle(card).webkitUserSelect === "none",
+            getComputedStyle(document.getElementById("more-1")).display === "none",
+            getComputedStyle(document.getElementById("more-2")).display === "none",
+            document.querySelector("#card-1 .post-content").classList.contains("chapterly-fade"),
+            window.__clicked || ""
+          ];
+        })();
+        """)
+        let values = try XCTUnwrap(checks as? [Any])
+        XCTAssertEqual(values[0] as? Bool, true, "style element missing")
+        XCTAssertEqual(values[1] as? Bool, true, "card text still selectable")
+        XCTAssertEqual(values[2] as? Bool, true, "English Show more still visible")
+        XCTAssertEqual(values[3] as? Bool, true, "中文顯示更多 still visible")
+        XCTAssertEqual(values[4] as? Bool, true, "teaser fade not applied")
+        XCTAssertEqual(values[5] as? String, "https://www.patreon.com/posts/26-901",
+                       "tapping teaser did not open the card's post")
+    }
+
     func testCollectionDetectFindsSeriesLink() async throws {
         let bodies = try await runScript(JSAssets.collectionDetect,
                                          fixture: "post_page",

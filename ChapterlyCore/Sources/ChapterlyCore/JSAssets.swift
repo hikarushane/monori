@@ -13,4 +13,5 @@ public enum JSAssets {
     public static var collectionImport: String { script(named: "CollectionImport") }
     public static var collectionDetect: String { script(named: "CollectionDetect") }
     public static var progressTracker: String { script(named: "ProgressTracker") }
+    public static var cardTreatment: String { script(named: "CardTreatment") }
 }
