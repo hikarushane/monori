@@ -1,482 +1,480 @@
 Timestamp               Ty Process[PID:TID]
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=<nil>
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=no_url_loaded
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
-2026-06-11 02:38:52.683 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:38:52.684 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:38:52.684 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:38:55.413 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=auth result=pass
-2026-06-11 02:38:55.413 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=collection_detect result=pass
-2026-06-11 02:38:57.292 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_payload_batch_count=19
-2026-06-11 02:38:57.292 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_store_collection_count=1
-2026-06-11 02:38:57.482 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=import result=pass
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:38:57.900 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:38:57.901 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:38:57.902 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:38:59.551 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=open_reader result=pass
-2026-06-11 02:38:59.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=reader_css result=pass
-2026-06-11 02:39:00.154 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] progress_payload_received matched=false value=0.482021
-2026-06-11 02:39:01.267 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] progress_payload_received matched=false value=0.876410
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:03.083 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:03.084 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:03.084 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:03.086 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:03.087 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:03.088 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:03.089 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:08.403 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:08.404 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:08.404 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:08.407 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:08.408 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:08.409 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:08.410 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:13.623 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:13.624 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:13.625 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:13.625 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:13.627 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:13.628 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:13.629 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:13.630 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:13.631 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:13.631 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:13.631 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:18.765 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:18.765 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:18.766 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:18.777 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:18.778 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:18.779 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:18.780 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:18.781 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:18.781 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:18.781 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:23.971 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:23.972 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:23.972 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:23.973 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:23.974 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:23.975 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:23.976 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:23.976 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:23.976 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
-2026-06-11 02:39:29.206 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:29.207 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:29.207 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:29.209 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 149
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 146
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
-2026-06-11 02:39:29.210 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
-2026-06-11 02:39:29.211 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /create (1)
-2026-06-11 02:39:29.212 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
-2026-06-11 02:39:29.213 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
-2026-06-11 02:39:29.741 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] step=progress_save result=fail reason=stored_progress=nil
-2026-06-11 02:39:29.741 Df Chapterly[5310:13f459] [dev.chapterly:smoke-diagnostics] [SMOKE] autopilot=complete pass=5 fail=1
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=<nil>
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
+2026-06-11 18:22:40.319 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=no_url_loaded
+2026-06-11 18:22:40.320 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
+2026-06-11 18:22:40.320 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:22:40.320 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:22:40.320 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:22:43.062 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=auth result=pass
+2026-06-11 18:22:43.062 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=collection_detect result=pass
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_payload_batch_count=19
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_store_collection_count=2
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:22:45.511 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:22:45.512 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:22:45.513 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:22:45.514 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:22:45.677 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=import result=pass
+2026-06-11 18:22:48.290 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=open_reader result=pass
+2026-06-11 18:22:48.292 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=reader_css result=pass
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:22:50.770 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:22:50.771 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:22:50.771 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:22:50.773 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:22:50.774 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:22:50.775 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:22:50.776 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:22:50.777 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:22:56.051 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:22:56.052 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:22:56.052 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:22:56.054 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:22:56.055 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:22:56.056 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:22:56.057 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:22:56.058 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:22:56.058 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:22:56.058 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:23:01.230 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:01.231 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:01.231 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:01.234 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:23:01.236 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:23:01.237 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:23:01.238 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:06.280 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:23:06.281 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:23:06.281 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:06.281 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:06.281 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:06.282 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:23:06.283 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:23:06.284 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:23:11.390 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:23:11.391 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:11.392 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:11.392 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:11.394 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:23:11.395 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:23:11.396 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:23:11.397 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:23:16.516 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:16.516 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=true
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=true
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=19
+2026-06-11 18:23:16.517 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:16.518 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:16.518 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:16.520 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === Page Links Dump ===
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: URL: https://www.patreon.com/collection/2123904?view=expanded
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Title: 陽光普照 | Collection from ocean | 19 posts | Patreon
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>: 151
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Total <a>[href]: 148
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: Match a[href*="/posts/"]: 19
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link: --- URL path patterns ---
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068 (15)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /m/ocean068 (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/posts (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/quips (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/collections (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/chats (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ocean068/membership (4)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /home (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /messages (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /notifications (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /purchases (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /settings/basics (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Crunchless (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/afterwarddays (3)
+2026-06-11 18:23:16.522 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Li_dog (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingyu1992 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/RB_herchiww (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/chpoemo (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hi_jamie_de (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/AmberEmber (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/ninilawyer (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/junesiphone (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /hxxsxxmxx (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /OnlyForLO (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /SundaySunAirWater (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hyw91 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/HelenChan411 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Laina722 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/hephaestion77 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /Edyiyi06 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/mootsai (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/nightviper (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Lingorm_127 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/Ksana_1127 (3)
+2026-06-11 18:23:16.523 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/rainball (3)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /cw/thesnugcozycabinofcelestia (3)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /collection/2123904 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   / (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /ocean068 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160628832 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160206289 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160104646 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/160019909 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] link:   /posts/159919210 (1)
+2026-06-11 18:23:16.524 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Page Links ===
+2026-06-11 18:23:18.701 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] step=progress_save result=fail reason=stored_progress=nil
+2026-06-11 18:23:18.701 Df Chapterly[18459:252886] [dev.chapterly:smoke-diagnostics] [SMOKE] autopilot=complete pass=5 fail=1
 Timestamp               Ty Process[PID:TID]
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=<nil>
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=no_url_loaded
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
-2026-06-11 02:39:35.121 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:35.122 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:35.122 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
-2026-06-11 02:39:35.220 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] step=progress_restore result=fail reason=no_saved_progress_found
-2026-06-11 02:39:35.220 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] autopilot=complete pass=0 fail=1
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/home
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=url_path_does_not_contain_/collection/
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
-2026-06-11 02:39:40.213 Df Chapterly[6360:140007] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=<nil>
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=no_url_loaded
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:22.922 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 18:23:27.196 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] step=progress_restore result=pass
+2026-06-11 18:23:27.196 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] autopilot=complete pass=1 fail=0
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/home
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=url_path_does_not_contain_/collection/
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
+2026-06-11 18:23:28.028 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 18:23:28.029 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=2
+2026-06-11 18:23:28.029 Df Chapterly[19232:253163] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
