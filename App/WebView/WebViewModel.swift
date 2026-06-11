@@ -43,11 +43,15 @@ final class WebViewModel: NSObject {
         config.userContentController.addUserScript(WKUserScript(
             source: "window.addEventListener('dragstart', function (e) { e.preventDefault(); }, true);",
             injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        config.userContentController.addUserScript(WKUserScript(
+            source: JSAssets.cardTreatment,
+            injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
         webView = WKWebView(frame: .zero, configuration: config)
         super.init()
 
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         // Off on purpose: the built-in gesture skips Patreon's same-document
         // (SPA) history entries, and PatreonWebView installs its own left-edge
         // swipe that calls goBack() — keeping both would double-navigate on
@@ -186,5 +190,27 @@ extension WebViewModel: WKNavigationDelegate {
         finishedNavigationCount += 1
         detectedCollection = nil
         runCollectionDetect()
+    }
+}
+
+extension WebViewModel: WKUIDelegate {
+    /// Patreon renders some links with target="_blank"; without this delegate
+    /// WKWebView silently ignores those taps ("nothing happens"). Route them
+    /// through the same policy and load them in place instead.
+    func webView(_ webView: WKWebView,
+                 createWebViewWith configuration: WKWebViewConfiguration,
+                 for navigationAction: WKNavigationAction,
+                 windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if let url = navigationAction.request.url {
+            switch NavigationPolicy.decide(url: url, isMainFrame: true) {
+            case .allowInWebView:
+                webView.load(navigationAction.request)
+            case .openInSafari:
+                UIApplication.shared.open(url)
+            case .block:
+                break
+            }
+        }
+        return nil
     }
 }

@@ -124,9 +124,15 @@ struct ReaderView: View {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
         if prefs.readerModeEnabled {
-            webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
-            webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
-                                       completionHandler: nil)
+            if foreignPageTitle == nil {
+                webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+                webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
+                                           completionHandler: nil)
+            } else {
+                // The ruleset is post-page specific: on creator/collection pages it
+                // hides the chrome and squeezes the feed, so strip it there.
+                webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
+            }
         }
         // Foreign pages have no library chapter to repair or restore progress for,
         // but they still need the scroll pinned (to the top) or Patreon's own
