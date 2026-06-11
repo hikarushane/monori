@@ -10,7 +10,7 @@ Resolve Package Graph
 Resolved source packages:
   ChapterlyCore: /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
 
-2026-06-11 12:02:26.876 xcodebuild[19012:1909761] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-06-11 17:26:07.813 xcodebuild[97515:2344268] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 ComputePackagePrebuildTargetDependencyGraph
 
 Prepare packages
@@ -37,363 +37,89 @@ GatherProvisioningInputs
 
 CreateBuildDescription
 
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
-
-Build description signature: 6d298ef1a8c4a05a892ba1f03c74471b
-Build description path: /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/XCBuildData/6d298ef1a8c4a05a892ba1f03c74471b.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache
     cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache
 
-CpResource /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle/CollectionImport.js /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/Assets/CollectionImport.js (in target 'ChapterlyCore_ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/Assets/CollectionImport.js /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle
-
-WriteAuxiliaryFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    write-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList
-
-WriteAuxiliaryFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftConstValuesFileList (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    write-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftConstValuesFileList
-
-WriteAuxiliaryFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.LinkFileList (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    write-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.LinkFileList
-
-WriteAuxiliaryFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-OutputFileMap.json (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    write-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-OutputFileMap.json
-
-SwiftDriver ChapterlyCore normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ChapterlyCore -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE -DXcode -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -package-name chapterlycore -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_const_extract_protocols.json -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj -experimental-emit-module-separately -disable-cmo
-
-ProcessInfoPlistFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle/Info.plist /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.build/empty-ChapterlyCore_ChapterlyCore.plist (in target 'ChapterlyCore_ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-infoPlistUtility /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.build/empty-ChapterlyCore_ChapterlyCore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle/Info.plist
-
-SwiftCompile normal arm64 Compiling\ Payloads.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/Payloads.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/Payloads.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ LibraryStore.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/LibraryStore.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/LibraryStore.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ ChapterMapMerger.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ChapterMapMerger.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ChapterMapMerger.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ ChapterTextFormatter.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ChapterTextFormatter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ChapterTextFormatter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ PayloadValidator.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/PayloadValidator.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/PayloadValidator.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftEmitModule normal arm64 Emitting\ module\ for\ ChapterlyCore (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-EmitSwiftModule normal arm64 (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ ReaderStyler.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftCompile normal arm64 Compiling\ ReaderProgressPolicy.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ReaderProgressPolicy.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ReaderProgressPolicy.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling ReaderProgressPolicy.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ReaderStyler.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriverJobDiscovery normal arm64 Compiling Payloads.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 Compiling\ ScriptMessageRouter.swift /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ScriptMessageRouter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/ChapterlyCore/Sources/ChapterlyCore/ScriptMessageRouter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling ChapterTextFormatter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ChapterMapMerger.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriverJobDiscovery normal arm64 Emitting module for ChapterlyCore (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriver\ Compilation\ Requirements ChapterlyCore normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ChapterlyCore -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE -DXcode -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -package-name chapterlycore -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_const_extract_protocols.json -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj -experimental-emit-module-separately -disable-cmo
-
-SwiftDriverJobDiscovery normal arm64 Compiling PayloadValidator.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.abi.json (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.abi.json /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/arm64-apple-ios-simulator.abi.json
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftsourceinfo (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftsourceinfo /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.swiftmodule/arm64-apple-ios-simulator.swiftmodule
-
-SwiftDriver Chapterly normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Chapterly -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_const_extract_protocols.json -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-generated-files.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-own-target-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly-e541ea5c5a3396c6a0f850da5a653cda-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-project-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly -experimental-emit-module-separately -disable-cmo
-
-SwiftDriverJobDiscovery normal arm64 Compiling ScriptMessageRouter.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriverJobDiscovery normal arm64 Compiling LibraryStore.swift (in target 'ChapterlyCore' from project 'ChapterlyCore')
-
-SwiftDriver\ Compilation ChapterlyCore normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
-    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ChapterlyCore -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE -DXcode -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -package-name chapterlycore -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_const_extract_protocols.json -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj -experimental-emit-module-separately -disable-cmo
-
-Ld /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o normal (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -r -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -filelist /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.LinkFileList -nostdlib -Xlinker -object_path_lto -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_lto.o -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-linker-args.resp -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o
-
-ExtractAppIntentsMetadata (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ChapterlyCore --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F42 --platform-family iOS --deployment-target 17.0 --bundle-identifier chapterlycore.ChapterlyCore --output /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.appintents --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o --dependency-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_dependency_info.dat --stringsdata-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList --metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/ChapterlyCore.DependencyMetadataFileList --static-metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/ChapterlyCore.DependencyStaticMetadataFileList --swift-const-vals-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-06-11 12:02:28.194 appintentsmetadataprocessor[19224:1910246] Starting appintentsmetadataprocessor export
-2026-06-11 12:02:28.213 appintentsmetadataprocessor[19224:1910246] Extracted no relevant App Intents symbols, skipping writing output
-
-RegisterExecutionPolicyException /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o (in target 'ChapterlyCore' from project 'ChapterlyCore')
-    cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
-    builtin-RegisterExecutionPolicyException /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/ChapterlyCore_ChapterlyCore.bundle /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore_ChapterlyCore.bundle /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app
-
-ProcessInfoPlistFile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Info.plist /Users/shane_yeh/Projects/Chapterly/App/Info.plist (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-infoPlistUtility /Users/shane_yeh/Projects/Chapterly/App/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -scanforprivacyfile /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/ChapterlyCore_ChapterlyCore.bundle -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Info.plist
-
-SwiftCompile normal arm64 Compiling\ BrowseView.swift /Users/shane_yeh/Projects/Chapterly/App/Features/Browse/BrowseView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/Features/Browse/BrowseView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ PatreonWebView.swift /Users/shane_yeh/Projects/Chapterly/App/WebView/PatreonWebView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/WebView/PatreonWebView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ AppRootView.swift /Users/shane_yeh/Projects/Chapterly/App/AppRootView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/AppRootView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ LibraryView.swift /Users/shane_yeh/Projects/Chapterly/App/Features/Library/LibraryView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/Features/Library/LibraryView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ ReaderView.swift /Users/shane_yeh/Projects/Chapterly/App/Features/Reader/ReaderView.swift (in target 'Chapterly' from project 'Chapterly')
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/Features/Reader/ReaderView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ WebViewModel.swift /Users/shane_yeh/Projects/Chapterly/App/WebView/WebViewModel.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/WebView/WebViewModel.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftEmitModule normal arm64 Emitting\ module\ for\ Chapterly (in target 'Chapterly' from project 'Chapterly')
-
-EmitSwiftModule normal arm64 (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ CollectionTOCView.swift /Users/shane_yeh/Projects/Chapterly/App/Features/Library/CollectionTOCView.swift (in target 'Chapterly' from project 'Chapterly')
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/Features/Library/CollectionTOCView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ SmokeAutopilot.swift /Users/shane_yeh/Projects/Chapterly/App/SmokeAutopilot.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/SmokeAutopilot.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-/Users/shane_yeh/Projects/Chapterly/App/SmokeAutopilot.swift:121:28: warning: consider using asynchronous alternative function
-        env.reader.webView.evaluateJavaScript("""
-                           ^
-WebKit.WKWebView.evaluateJavaScript:2:11: note: 'evaluateJavaScript' declared here
-open func evaluateJavaScript(_ javaScriptString: String) async throws -> Any?}
-          ^
-
-SwiftCompile normal arm64 Compiling\ SettingsView.swift /Users/shane_yeh/Projects/Chapterly/App/Features/Settings/SettingsView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/Features/Settings/SettingsView.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftCompile normal arm64 Compiling\ AppEnvironment.swift /Users/shane_yeh/Projects/Chapterly/App/AppEnvironment.swift (in target 'Chapterly' from project 'Chapterly')
-SwiftCompile normal arm64 /Users/shane_yeh/Projects/Chapterly/App/AppEnvironment.swift (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling PatreonWebView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling AppRootView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling SettingsView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Emitting module for Chapterly (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriver\ Compilation\ Requirements Chapterly normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Chapterly -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_const_extract_protocols.json -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-generated-files.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-own-target-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly-e541ea5c5a3396c6a0f850da5a653cda-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-project-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly -experimental-emit-module-separately -disable-cmo
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/arm64-apple-ios-simulator.swiftmodule
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.abi.json (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.abi.json /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/arm64-apple-ios-simulator.abi.json
-
-Copy /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftsourceinfo (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftsourceinfo /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
-
-SwiftDriverJobDiscovery normal arm64 Compiling WebViewModel.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling LibraryView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling SmokeAutopilot.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling BrowseView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ReaderView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling CollectionTOCView.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriverJobDiscovery normal arm64 Compiling AppEnvironment.swift (in target 'Chapterly' from project 'Chapterly')
-
-SwiftDriver\ Compilation Chapterly normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Chapterly -Onone @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_const_extract_protocols.json -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-generated-files.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-own-target-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly-e541ea5c5a3396c6a0f850da5a653cda-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-project-headers.hmap -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources-normal/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources/arm64 -Xcc -I/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-Swift.h -working-directory /Users/shane_yeh/Projects/Chapterly -experimental-emit-module-separately -disable-cmo
-
-Ld /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly.debug.dylib normal (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -filelist /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.LinkFileList -install_name @rpath/Chapterly.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.swiftmodule @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly-linker-args.resp -Wl,-no_warn_duplicate_libraries -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly.debug.dylib -Xlinker -add_ast_path -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.swiftmodule @/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore-linker-args.resp
-
-ConstructStubExecutorLinkFileList /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-ExecutorLinkFileList-normal-arm64.txt (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    construct-stub-executor-link-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-ExecutorLinkFileList-normal-arm64.txt
-note: Using stub executor library with Swift entry point. (in target 'Chapterly' from project 'Chapterly')
-
-Ld /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly normal (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly-ExecutorLinkFileList-normal-arm64.txt /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly.debug.dylib -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly
-
-CopySwiftLibs /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly.debug.dylib --scan-folder /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Frameworks --scan-folder /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/PlugIns --scan-folder /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/SystemExtensions --scan-folder /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
-Ignoring --strip-bitcode because --sign was not passed
-
-ExtractAppIntentsMetadata (in target 'Chapterly' from project 'Chapterly')
-    cd /Users/shane_yeh/Projects/Chapterly
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Chapterly --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F42 --platform-family iOS --deployment-target 17.0 --bundle-identifier dev.chapterly.Chapterly --output /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly --dependency-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_dependency_info.dat --stringsdata-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftFileList --metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly.DependencyMetadataFileList --static-metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly.DependencyStaticMetadataFileList --swift-const-vals-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-06-11 12:02:29.659 appintentsmetadataprocessor[19277:1910385] Starting appintentsmetadataprocessor export
-2026-06-11 12:02:29.660 appintentsmetadataprocessor[19277:1910385] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
-
 ** BUILD SUCCEEDED **
 
-[0/1] Planning build
 Building for debugging...
-[0/4] Write sources
-[2/4] Write swift-version--58304C5D6DBC2206.txt
-[4/6] Emitting module ChapterlyCore
-[5/6] Compiling ChapterlyCore LibraryStore.swift
-[6/8] Compiling ChapterlyCoreTests LibraryStoreTests.swift
-[7/8] Emitting module ChapterlyCoreTests
-[7/9] Write Objects.LinkFileList
-[8/9] Linking ChapterlyCorePackageTests
-Build complete! (1.18s)
-Test Suite 'All tests' started at 2026-06-11 12:02:32.059.
-Test Suite 'ChapterlyCorePackageTests.xctest' started at 2026-06-11 12:02:32.060.
-Test Suite 'ChapterMapMergerTests' started at 2026-06-11 12:02:32.060.
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.09s)
+Test Suite 'All tests' started at 2026-06-11 17:26:08.536.
+Test Suite 'ChapterlyCorePackageTests.xctest' started at 2026-06-11 17:26:08.536.
+Test Suite 'ChapterMapMergerTests' started at 2026-06-11 17:26:08.536.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testDuplicateURLsWithinImportDeduped]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testDuplicateURLsWithinImportDeduped]' passed (0.001 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testFreshImportUsesDomOrder]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testFreshImportUsesDomOrder]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportFillsMissingExcerptKeepsExisting]' started.
+Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportFillsMissingExcerptKeepsExisting]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportPreservesManualEditsAndAppendsNew]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportPreservesManualEditsAndAppendsNew]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportReplacesContaminatedCardTextTitle]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testReimportReplacesContaminatedCardTextTitle]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testUnnormalizableURLSkipped]' started.
 Test Case '-[ChapterlyCoreTests.ChapterMapMergerTests testUnnormalizableURLSkipped]' passed (0.000 seconds).
-Test Suite 'ChapterMapMergerTests' passed at 2026-06-11 12:02:32.062.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'ChapterTextFormatterTests' started at 2026-06-11 12:02:32.062.
+Test Suite 'ChapterMapMergerTests' passed at 2026-06-11 17:26:08.539.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'ChapterTextFormatterTests' started at 2026-06-11 17:26:08.539.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithChinesePeriodIsFlagged]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithChinesePeriodIsFlagged]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithoutURLSlugFallsBackToGeneric]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testBodyTextWithoutURLSlugFallsBackToGeneric]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testCleanTitleWithPunctuationInPreviewNotFlagged]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testCleanTitleWithPunctuationInPreviewNotFlagged]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedDetectionDoesNotFlagManualRename]' started.
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedDetectionDoesNotFlagManualRename]' passed (0.000 seconds).
-Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedStoredTextUsesURLSlugAsTitleAndKeepsPreviewCollapsed]' started.
-Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedStoredTextUsesURLSlugAsTitleAndKeepsPreviewCollapsed]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedStoredTextUsesFirstLineAsTitleAndSeparatesPreview]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testContaminatedStoredTextUsesFirstLineAsTitleAndSeparatesPreview]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testPreviewTruncatedToMaxLength]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testPreviewTruncatedToMaxLength]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testShortTitleDisplaysAsTitleOnly]' started.
 Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testShortTitleDisplaysAsTitleOnly]' passed (0.000 seconds).
-Test Suite 'ChapterTextFormatterTests' passed at 2026-06-11 12:02:32.063.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'JSExtractionTests' started at 2026-06-11 12:02:32.063.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testSingleLineLongTextIsFlaggedAsContaminated]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testSingleLineLongTextIsFlaggedAsContaminated]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTitleWithQuestionMarkNotFlagged]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTitleWithQuestionMarkNotFlagged]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTwoLineTextIsFlaggedAsContaminated]' started.
+Test Case '-[ChapterlyCoreTests.ChapterTextFormatterTests testTwoLineTextIsFlaggedAsContaminated]' passed (0.000 seconds).
+Test Suite 'ChapterTextFormatterTests' passed at 2026-06-11 17:26:08.540.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'JSExtractionTests' started at 2026-06-11 17:26:08.540.
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' passed (0.448 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionDetectFindsSeriesLink]' passed (0.470 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' passed (0.291 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportCapsLargeCardTextBeforeValidation]' passed (0.310 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsInAnchorExcerpt]' started.
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsInAnchorExcerpt]' passed (0.314 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' passed (0.313 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsMetadataOnly]' passed (0.323 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsSiblingTeaserAsExcerpt]' started.
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportExtractsSiblingTeaserAsExcerpt]' passed (0.316 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' passed (0.306 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportIncludesCreatorNameFromPageTitle]' passed (0.308 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportPrefersCardTitleOverExcerptText]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportPrefersCardTitleOverExcerptText]' passed (0.301 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportPrefersCardTitleOverExcerptText]' passed (0.303 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' passed (0.314 seconds).
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty]' passed (0.300 seconds).
 Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' started.
-Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' passed (0.305 seconds).
-Test Suite 'JSExtractionTests' passed at 2026-06-11 12:02:34.341.
-	 Executed 7 tests, with 0 failures (0 unexpected) in 2.277 (2.278) seconds
-Test Suite 'LibraryStoreTests' started at 2026-06-11 12:02:34.341.
+Test Case '-[ChapterlyCoreTests.JSExtractionTests testExternalDecoySkippedAfterNormalization]' passed (0.314 seconds).
+Test Suite 'JSExtractionTests' passed at 2026-06-11 17:26:11.498.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 2.957 (2.958) seconds
+Test Suite 'LibraryStoreTests' started at 2026-06-11 17:26:11.499.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' passed (0.020 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testClearLibraryRemovesEverything]' passed (0.014 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testFooterScrollDoesNotOverwriteReadingProgress]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testFooterScrollDoesNotOverwriteReadingProgress]' passed (0.004 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportCreatesCollectionAndChapters]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportCreatesCollectionAndChapters]' passed (0.004 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportCreatesCollectionAndChapters]' passed (0.003 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportPersistsExcerptAndReimportFillsMissing]' started.
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testImportPersistsExcerptAndReimportFillsMissing]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testManualAddRenameDelete]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testManualAddRenameDelete]' passed (0.006 seconds).
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNeighborsFollowReadingOrder]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNeighborsFollowReadingOrder]' passed (0.004 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testManualAddRenameDelete]' passed (0.004 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNeighborsFollowStoryOrder]' started.
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNeighborsFollowStoryOrder]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNoChapterStoresBodyText]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testNoChapterStoresBodyText]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByMatchingPatreonPostIDWhenSlugChanges]' started.
@@ -401,12 +127,12 @@ Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByMatchingPat
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByNormalizedURL]' started.
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testProgressSavedByNormalizedURL]' passed (0.003 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' passed (0.004 seconds).
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReimportMergesWithoutDuplicates]' passed (0.007 seconds).
 Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReverseDirectionFlipsReadingOrder]' started.
-Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReverseDirectionFlipsReadingOrder]' passed (0.003 seconds).
-Test Suite 'LibraryStoreTests' passed at 2026-06-11 12:02:34.395.
-	 Executed 10 tests, with 0 failures (0 unexpected) in 0.054 (0.055) seconds
-Test Suite 'NavigationPolicyTests' started at 2026-06-11 12:02:34.395.
+Test Case '-[ChapterlyCoreTests.LibraryStoreTests testReverseDirectionFlipsReadingOrder]' passed (0.004 seconds).
+Test Suite 'LibraryStoreTests' passed at 2026-06-11 17:26:11.550.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.051 (0.052) seconds
+Test Suite 'NavigationPolicyTests' started at 2026-06-11 17:26:11.550.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testExternalMainFrameOpensSafari]' started.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testExternalMainFrameOpensSafari]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testNonHTTPSchemesBlocked]' started.
@@ -415,9 +141,9 @@ Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testPatreonMainFrameAllowe
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testPatreonMainFrameAllowed]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testSubframesAlwaysAllowed]' started.
 Test Case '-[ChapterlyCoreTests.NavigationPolicyTests testSubframesAlwaysAllowed]' passed (0.000 seconds).
-Test Suite 'NavigationPolicyTests' passed at 2026-06-11 12:02:34.396.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'PayloadValidatorTests' started at 2026-06-11 12:02:34.396.
+Test Suite 'NavigationPolicyTests' passed at 2026-06-11 17:26:11.551.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PayloadValidatorTests' started at 2026-06-11 17:26:11.551.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testForbiddenKeyRejectsWholeMessage]' started.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testForbiddenKeyRejectsWholeMessage]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testImporterDomOrderAcceptsJavaScriptNumber]' started.
@@ -448,9 +174,15 @@ Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidImporterPayload]'
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidImporterPayload]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidProgressPayload]' started.
 Test Case '-[ChapterlyCoreTests.PayloadValidatorTests testValidProgressPayload]' passed (0.000 seconds).
-Test Suite 'PayloadValidatorTests' passed at 2026-06-11 12:02:34.398.
-	 Executed 15 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'ReaderStylerTests' started at 2026-06-11 12:02:34.398.
+Test Suite 'PayloadValidatorTests' passed at 2026-06-11 17:26:11.555.
+	 Executed 15 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'ReaderStylerTests' started at 2026-06-11 17:26:11.555.
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptClampsOutOfRangeProgress]' started.
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptClampsOutOfRangeProgress]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptDefaultsToTopWhenNil]' started.
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptDefaultsToTopWhenNil]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptEmbedsTargetAndUserInteractionGuard]' started.
+Test Case '-[ChapterlyCoreTests.ReaderStylerTests testEnforceScrollScriptEmbedsTargetAndUserInteractionGuard]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testFontSizeScriptSetsVariable]' started.
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testFontSizeScriptSetsVariable]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testInjectionScriptEmbedsRulesetAndStyleId]' started.
@@ -461,24 +193,24 @@ Test Case '-[ChapterlyCoreTests.ReaderStylerTests testRulesetEscapedForTemplateL
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testRulesetEscapedForTemplateLiteral]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testScrollToTopScript]' started.
 Test Case '-[ChapterlyCoreTests.ReaderStylerTests testScrollToTopScript]' passed (0.000 seconds).
-Test Suite 'ReaderStylerTests' passed at 2026-06-11 12:02:34.400.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
-Test Suite 'ScriptMessageRouterTests' started at 2026-06-11 12:02:34.400.
+Test Suite 'ReaderStylerTests' passed at 2026-06-11 17:26:11.558.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'ScriptMessageRouterTests' started at 2026-06-11 17:26:11.558.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRejectsAndCountsForbiddenPayload]' started.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRejectsAndCountsForbiddenPayload]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesProgressAndCollectionLink]' started.
-Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesProgressAndCollectionLink]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesProgressAndCollectionLink]' passed (0.001 seconds).
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesValidImporterMessage]' started.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testRoutesValidImporterMessage]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testUnknownHandlerNameIgnored]' started.
 Test Case '-[ChapterlyCoreTests.ScriptMessageRouterTests testUnknownHandlerNameIgnored]' passed (0.000 seconds).
-Test Suite 'ScriptMessageRouterTests' passed at 2026-06-11 12:02:34.401.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'SmokeSupportTests' started at 2026-06-11 12:02:34.401.
+Test Suite 'ScriptMessageRouterTests' passed at 2026-06-11 17:26:11.561.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'SmokeSupportTests' started at 2026-06-11 17:26:11.561.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualOutsideTolerance]' started.
-Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualOutsideTolerance]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualOutsideTolerance]' passed (0.001 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualWithinTolerance]' started.
-Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualWithinTolerance]' passed (0.000 seconds).
+Test Case '-[ChapterlyCoreTests.SmokeSupportTests testApproximatelyEqualWithinTolerance]' passed (0.001 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineFailWithReason]' started.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineFailWithReason]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLinePass]' started.
@@ -487,14 +219,14 @@ Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLinePassIgnoresReason]
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLinePassIgnoresReason]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineReasonWhitespaceIsSanitized]' started.
 Test Case '-[ChapterlyCoreTests.SmokeSupportTests testStepLineReasonWhitespaceIsSanitized]' passed (0.000 seconds).
-Test Suite 'SmokeSupportTests' passed at 2026-06-11 12:02:34.401.
-	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'SmokeTests' started at 2026-06-11 12:02:34.401.
+Test Suite 'SmokeSupportTests' passed at 2026-06-11 17:26:11.564.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'SmokeTests' started at 2026-06-11 17:26:11.564.
 Test Case '-[ChapterlyCoreTests.SmokeTests testVersion]' started.
 Test Case '-[ChapterlyCoreTests.SmokeTests testVersion]' passed (0.000 seconds).
-Test Suite 'SmokeTests' passed at 2026-06-11 12:02:34.402.
+Test Suite 'SmokeTests' passed at 2026-06-11 17:26:11.564.
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
-Test Suite 'URLNormalizerTests' started at 2026-06-11 12:02:34.402.
+Test Suite 'URLNormalizerTests' started at 2026-06-11 17:26:11.564.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testKeepsNonTrackingQuery]' started.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testKeepsNonTrackingQuery]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testNonPatreonURLReturnsNil]' started.
@@ -509,12 +241,12 @@ Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStringConvenience]' start
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStringConvenience]' passed (0.000 seconds).
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStripsTrackingParamsAndFragment]' started.
 Test Case '-[ChapterlyCoreTests.URLNormalizerTests testStripsTrackingParamsAndFragment]' passed (0.000 seconds).
-Test Suite 'URLNormalizerTests' passed at 2026-06-11 12:02:34.403.
+Test Suite 'URLNormalizerTests' passed at 2026-06-11 17:26:11.565.
 	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'ChapterlyCorePackageTests.xctest' passed at 2026-06-11 12:02:34.403.
-	 Executed 67 tests, with 0 failures (0 unexpected) in 2.338 (2.343) seconds
-Test Suite 'All tests' passed at 2026-06-11 12:02:34.403.
-	 Executed 67 tests, with 0 failures (0 unexpected) in 2.338 (2.344) seconds
+Test Suite 'ChapterlyCorePackageTests.xctest' passed at 2026-06-11 17:26:11.565.
+	 Executed 81 tests, with 0 failures (0 unexpected) in 3.021 (3.029) seconds
+Test Suite 'All tests' passed at 2026-06-11 17:26:11.565.
+	 Executed 81 tests, with 0 failures (0 unexpected) in 3.021 (3.030) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 1902
 ↳ Target Platform: arm64e-apple-macos14.0
