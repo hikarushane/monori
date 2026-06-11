@@ -166,12 +166,19 @@ function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
-function clickLoadMoreIfAny() {
-  var buttons = document.querySelectorAll("button");
-  for (var i = 0; i < buttons.length; i++) {
-    var label = compactText(buttons[i].textContent).toLowerCase();
-    if (/^(load|show|view)\s+more/.test(label)) { buttons[i].click(); return; }
+function findLoadMoreButton() {
+  var candidates = document.querySelectorAll('button, [role="button"]');
+  for (var i = 0; i < candidates.length; i++) {
+    var el = candidates[i];
+    var label = compactText(el.textContent || el.getAttribute("aria-label") || "").toLowerCase();
+    if (!label || label.length > 30) { continue; }
+    if (/^(load|show|view|see)\s+more/.test(label)
+        || /^(載入|载入|顯示|显示|查看)更多/.test(label)
+        || /^更多(貼文|帖子|文章|內容|内容)/.test(label)) {
+      return el;
+    }
   }
+  return null;
 }
 
 var seen = {};
@@ -202,22 +209,30 @@ function collectVisible() {
   }
 }
 
-// Patreon loads the collection list lazily. Scroll (and click any
-// "load more" button) until the set of post links stops growing, so the
-// import covers every chapter, not just the cards already rendered.
+// Patreon loads the collection list lazily: infinite scroll plus a
+// localized "load more" button between pages. The import is complete only
+// when no such button remains AND the set of post links has stopped
+// growing — long serials need many click-and-wait rounds.
 var previousCount = -1;
 var stableRounds = 0;
-for (var round = 0; round < 60 && stableRounds < 3; round++) {
+for (var round = 0; round < 240; round++) {
   collectVisible();
-  clickLoadMoreIfAny();
   window.scrollTo(0, document.documentElement.scrollHeight);
-  await sleep(500);
-  var count = document.querySelectorAll('a[href*="/posts/"]').length;
-  if (count === previousCount) {
-    stableRounds += 1;
+  var moreButton = findLoadMoreButton();
+  if (moreButton) {
+    moreButton.click();
+    stableRounds = 0;
+    await sleep(1200);
   } else {
+    await sleep(500);
+  }
+  var count = document.querySelectorAll('a[href*="/posts/"]').length;
+  if (count !== previousCount) {
     stableRounds = 0;
     previousCount = count;
+  } else if (!findLoadMoreButton()) {
+    stableRounds += 1;
+    if (stableRounds >= 3) { break; }
   }
 }
 collectVisible();

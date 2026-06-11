@@ -141,6 +141,16 @@ final class JSExtractionTests: XCTestCase {
         XCTAssertEqual(payloads.map(\.domOrder), [0, 1, 2, 3, 4])
     }
 
+    func testCollectionImportClicksLoadMoreUntilExhausted() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_load_more",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.title),
+                       ["20 最新章", "19 章", "18 章", "17 章", "16 章", "15 最舊章"])
+        XCTAssertEqual(payloads.map(\.domOrder), [0, 1, 2, 3, 4, 5])
+    }
+
     func testCollectionDetectFindsSeriesLink() async throws {
         let bodies = try await runScript(JSAssets.collectionDetect,
                                          fixture: "post_page",

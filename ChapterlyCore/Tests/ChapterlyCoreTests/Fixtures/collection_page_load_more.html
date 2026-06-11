@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head><title>【更新中】焚心 The Burning Heart | Patreon</title></head>
+<body>
+  <h1>【更新中】焚心 The Burning Heart</h1>
+  <main>
+    <article id="post-list">
+      <a href="https://www.patreon.com/posts/20-901">20 最新章</a>
+      <a href="https://www.patreon.com/posts/19-902">19 章</a>
+    </article>
+    <div style="height: 3000px;"></div>
+  </main>
+  <script>
+    // Mimics Patreon's collection list: scrolling appends one batch and then
+    // reveals a localized "load more" button; clicking it loads the final
+    // batch only after a network-like delay.
+    var list = document.getElementById("post-list");
+    function appendPosts(items) {
+      items.forEach(function (item) {
+        var a = document.createElement("a");
+        a.href = "https://www.patreon.com/posts/" + item[0];
+        a.textContent = item[1];
+        list.appendChild(a);
+      });
+    }
+
+    var scrolled = false;
+    window.addEventListener("scroll", function () {
+      if (scrolled) { return; }
+      scrolled = true;
+      appendPosts([["18-903", "18 章"], ["17-904", "17 章"]]);
+      var button = document.createElement("button");
+      button.id = "load-more";
+      button.textContent = "載入更多";
+      button.addEventListener("click", function () {
+        button.remove();
+        setTimeout(function () {
+          appendPosts([["16-905", "16 章"], ["15-906", "15 最舊章"]]);
+        }, 1500);
+      });
+      document.body.appendChild(button);
+    });
+  </script>
+</body>
+</html>
