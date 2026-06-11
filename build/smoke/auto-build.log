@@ -10,7 +10,7 @@ Resolve Package Graph
 Resolved source packages:
   ChapterlyCore: /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
 
-2026-06-11 18:25:13.232 xcodebuild[21095:2444449] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-06-12 00:02:06.074 xcodebuild[69727:2708894] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 ComputePackagePrebuildTargetDependencyGraph
 
 Prepare packages
@@ -37,6 +37,14 @@ GatherProvisioningInputs
 
 CreateBuildDescription
 
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 2043fcb60a698b51527429d9490d9b56
+Build description path: /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/XCBuildData/2043fcb60a698b51527429d9490d9b56.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache
     cd /Users/shane_yeh/Projects/Chapterly/Chapterly.xcodeproj
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /Users/shane_yeh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F73-6cfe768891a92b912361537c460fe42b.sdkstatcache
@@ -52,8 +60,8 @@ Ld /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewz
 ExtractAppIntentsMetadata (in target 'ChapterlyCore' from project 'ChapterlyCore')
     cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ChapterlyCore --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F42 --platform-family iOS --deployment-target 17.0 --bundle-identifier chapterlycore.ChapterlyCore --output /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.appintents --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o --dependency-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore_dependency_info.dat --stringsdata-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftFileList --metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/ChapterlyCore.DependencyMetadataFileList --static-metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/ChapterlyCore.DependencyStaticMetadataFileList --swift-const-vals-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/ChapterlyCore.build/Debug-iphonesimulator/ChapterlyCore.build/Objects-normal/arm64/ChapterlyCore.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-06-11 18:25:13.531 appintentsmetadataprocessor[21109:2444623] Starting appintentsmetadataprocessor export
-2026-06-11 18:25:13.543 appintentsmetadataprocessor[21109:2444623] Extracted no relevant App Intents symbols, skipping writing output
+2026-06-12 00:02:06.610 appintentsmetadataprocessor[69743:2709001] Starting appintentsmetadataprocessor export
+2026-06-12 00:02:06.620 appintentsmetadataprocessor[69743:2709001] Extracted no relevant App Intents symbols, skipping writing output
 
 RegisterExecutionPolicyException /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/ChapterlyCore.o (in target 'ChapterlyCore' from project 'ChapterlyCore')
     cd /Users/shane_yeh/Projects/Chapterly/ChapterlyCore
@@ -88,8 +96,8 @@ Ignoring --strip-bitcode because --sign was not passed
 ExtractAppIntentsMetadata (in target 'Chapterly' from project 'Chapterly')
     cd /Users/shane_yeh/Projects/Chapterly
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Chapterly --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F42 --platform-family iOS --deployment-target 17.0 --bundle-identifier dev.chapterly.Chapterly --output /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Products/Debug-iphonesimulator/Chapterly.app/Chapterly --dependency-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly_dependency_info.dat --stringsdata-file /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftFileList --metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly.DependencyMetadataFileList --static-metadata-file-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Chapterly.DependencyStaticMetadataFileList --swift-const-vals-list /Users/shane_yeh/Library/Developer/Xcode/DerivedData/Chapterly-ekoekowzpgqewzanaetwqgkjsoza/Build/Intermediates.noindex/Chapterly.build/Debug-iphonesimulator/Chapterly.build/Objects-normal/arm64/Chapterly.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-06-11 18:25:13.776 appintentsmetadataprocessor[21118:2444672] Starting appintentsmetadataprocessor export
-2026-06-11 18:25:13.777 appintentsmetadataprocessor[21118:2444672] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+2026-06-12 00:02:06.849 appintentsmetadataprocessor[69750:2709050] Starting appintentsmetadataprocessor export
+2026-06-12 00:02:06.850 appintentsmetadataprocessor[69750:2709050] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
 
 ** BUILD SUCCEEDED **
 
