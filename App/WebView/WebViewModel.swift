@@ -55,6 +55,22 @@ final class WebViewModel: NSObject {
         webView.load(URLRequest(url: url))
     }
 
+    /// Browse tab re-tap: when already on the home feed, scroll to top; otherwise
+    /// return to home, preferring the web view's own history entry so Patreon
+    /// restores the feed position the user left.
+    func handleBrowseTabReselect() {
+        if let url = currentURL, URLNormalizer.isPatreonHome(url) {
+            webView.evaluateJavaScript("window.scrollTo({ top: 0, behavior: 'smooth' });",
+                                       completionHandler: nil)
+        } else if let home = webView.backForwardList.backList.last(where: {
+            URLNormalizer.isPatreonHome($0.url)
+        }) {
+            webView.go(to: home)
+        } else {
+            load(URL(string: "https://www.patreon.com/home")!)
+        }
+    }
+
     func runCollectionDetect() {
         webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
     }

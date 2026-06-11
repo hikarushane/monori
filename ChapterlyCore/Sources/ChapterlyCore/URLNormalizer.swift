@@ -36,6 +36,12 @@ public enum URLNormalizer {
         return normalize(url)
     }
 
+    /// True when the URL is the Patreon home feed (patreon.com/home or the site root).
+    public static func isPatreonHome(_ url: URL) -> Bool {
+        guard let normalized = normalize(url) else { return false }
+        return normalized.path == "/" || normalized.path == "/home"
+    }
+
     public static func patreonPostID(_ string: String) -> String? {
         guard let url = normalize(string) else { return nil }
         let parts = url.path.split(separator: "/").map(String.init)

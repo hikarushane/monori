@@ -1,19 +1,32 @@
 import SwiftUI
 
 struct AppRootView: View {
+    private enum AppTab: Hashable { case browse, library, settings }
+
     @State private var env = AppEnvironment()
+    @State private var selectedTab = AppTab.browse
 
     var body: some View {
-        TabView {
+        TabView(selection: Binding(
+            get: { selectedTab },
+            set: { newTab in
+                if newTab == .browse, selectedTab == .browse {
+                    env.browse.handleBrowseTabReselect()
+                }
+                selectedTab = newTab
+            })) {
             BrowseView()
                 .tabItem { Label("Browse", systemImage: "globe") }
                 .accessibilityIdentifier("smoke.browseTab")
+                .tag(AppTab.browse)
             LibraryView()
                 .tabItem { Label("Library", systemImage: "books.vertical") }
                 .accessibilityIdentifier("smoke.libraryTab")
+                .tag(AppTab.library)
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
                 .accessibilityIdentifier("smoke.settingsTab")
+                .tag(AppTab.settings)
         }
         .environment(env)
         .modelContainer(env.store.container)

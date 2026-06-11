@@ -35,6 +35,20 @@ final class URLNormalizerTests: XCTestCase {
         XCTAssertNil(URLNormalizer.normalize("not a url ::"))
     }
 
+    func testIsPatreonHomeMatchesHomeAndRoot() {
+        XCTAssertTrue(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/home")!))
+        XCTAssertTrue(URLNormalizer.isPatreonHome(URL(string: "https://patreon.com/home/")!))
+        XCTAssertTrue(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/")!))
+        XCTAssertTrue(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/home?utm_source=x")!))
+    }
+
+    func testIsPatreonHomeRejectsOtherPages() {
+        XCTAssertFalse(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/posts/abc-123")!))
+        XCTAssertFalse(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/collection/2040508")!))
+        XCTAssertFalse(URLNormalizer.isPatreonHome(URL(string: "https://www.patreon.com/c/somecreator/home")!))
+        XCTAssertFalse(URLNormalizer.isPatreonHome(URL(string: "https://example.com/home")!))
+    }
+
     func testPatreonPostIDExtractsNumericAndSluggedPostURLs() {
         XCTAssertEqual(URLNormalizer.patreonPostID("https://www.patreon.com/posts/160628832"),
                        "160628832")
