@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 import ChapterlyCore
 
 struct ReaderView: View {
@@ -15,14 +16,20 @@ struct ReaderView: View {
         VStack(spacing: 0) {
             topBar
             PatreonWebView(model: env.reader)
+                .accessibilityIdentifier("smoke.readerWebView")
             bottomBar
         }
         .onAppear { open(current) }
-        .onChange(of: env.reader.currentURL) { _, _ in applyReaderTreatment() }
+        .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
     }
 
     private var neighbors: (previous: LocalChapterModel?, next: LocalChapterModel?) {
         env.store.neighbors(of: current)
+    }
+
+    private var currentTitle: String {
+        ChapterTextFormatter.presentation(storedTitle: current.title,
+                                          urlString: current.urlString).title
     }
 
     private func open(_ chapter: LocalChapterModel) {
@@ -40,20 +47,56 @@ struct ReaderView: View {
             webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
                                        completionHandler: nil)
         }
-        if let progress = current.readingProgress, progress > 0.02, progress < 0.97 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        repairCurrentTitleIfNeeded(webView)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            if let progress = current.readingProgress,
+               ReaderProgressPolicy.shouldRestore(progress) {
                 webView.evaluateJavaScript(
                     ReaderStyler.restoreScrollScript(progress: progress), completionHandler: nil)
+            } else {
+                webView.evaluateJavaScript(ReaderStyler.scrollToTopScript(), completionHandler: nil)
             }
         }
     }
+
+    private func repairCurrentTitleIfNeeded(_ webView: WKWebView) {
+        guard ChapterTextFormatter.isProbablyContaminatedTitle(current.title) else { return }
+        webView.evaluateJavaScript(Self.readerTitleScript) { result, _ in
+            guard let title = result as? String, !title.isEmpty,
+                  !ChapterTextFormatter.isProbablyContaminatedTitle(title)
+            else { return }
+            Task { @MainActor in
+                env.store.rename(current, to: title)
+            }
+        }
+    }
+
+    private static let readerTitleScript = """
+    (function () {
+      function compact(value) {
+        return (value || "").replace(/\\s+/g, " ").trim();
+      }
+      function candidate(value) {
+        var text = compact(value);
+        return text && text.length <= 180 ? text : "";
+      }
+      var selectors = ['[data-tag="post-title"]', '[data-testid="post-title"]', 'article h1', 'h1'];
+      for (var i = 0; i < selectors.length; i++) {
+        var node = document.querySelector(selectors[i]);
+        var title = candidate(node && node.textContent);
+        if (title) { return title; }
+      }
+      return candidate((document.title || "").replace(/\\s*\\|\\s*Patreon.*$/i, ""));
+    })();
+    """
 
     private var topBar: some View {
         HStack {
             Button { dismiss() } label: { Image(systemName: "chevron.down") }
                 .accessibilityLabel("Close reader")
             Spacer()
-            Text(current.title).font(.subheadline.weight(.medium)).lineLimit(1)
+            Text(currentTitle).font(.subheadline.weight(.medium)).lineLimit(1)
+                .accessibilityIdentifier("smoke.readerTitle")
             Spacer()
             Menu {
                 Button("Increase font") { prefs.fontSize = min(32, prefs.fontSize + 1) }
@@ -82,21 +125,28 @@ struct ReaderView: View {
     }
 
     private var bottomBar: some View {
-        HStack {
+        HStack(spacing: 8) {
             if let previous = neighbors.previous {
                 Button { open(previous) } label: {
-                    Label(previous.title, systemImage: "chevron.left")
-                        .lineLimit(1)
+                    Label("上一章", systemImage: "chevron.left")
                 }
+            } else {
+                Color.clear.frame(width: 72)
             }
-            Spacer()
+            Text(currentTitle)
+                .font(.caption.weight(.medium))
+                .lineLimit(1)
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
             if let next = neighbors.next {
                 Button { open(next) } label: {
                     HStack {
-                        Text(next.title).lineLimit(1)
+                        Text("下一章")
                         Image(systemName: "chevron.right")
                     }
                 }
+            } else {
+                Color.clear.frame(width: 72)
             }
         }
         .font(.subheadline)

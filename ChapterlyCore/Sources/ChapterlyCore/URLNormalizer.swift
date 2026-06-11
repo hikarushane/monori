@@ -35,4 +35,15 @@ public enum URLNormalizer {
         guard let url = URL(string: string) else { return nil }
         return normalize(url)
     }
+
+    public static func patreonPostID(_ string: String) -> String? {
+        guard let url = normalize(string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let postsIndex = parts.firstIndex(of: "posts"),
+              parts.indices.contains(postsIndex + 1) else { return nil }
+        let slug = parts[postsIndex + 1]
+        if slug.allSatisfy(\.isNumber) { return slug }
+        guard let range = slug.range(of: #"\d+$"#, options: .regularExpression) else { return nil }
+        return String(slug[range])
+    }
 }

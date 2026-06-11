@@ -34,4 +34,14 @@ final class URLNormalizerTests: XCTestCase {
                        "https://www.patreon.com/posts/x-1")
         XCTAssertNil(URLNormalizer.normalize("not a url ::"))
     }
+
+    func testPatreonPostIDExtractsNumericAndSluggedPostURLs() {
+        XCTAssertEqual(URLNormalizer.patreonPostID("https://www.patreon.com/posts/160628832"),
+                       "160628832")
+        XCTAssertEqual(URLNormalizer.patreonPostID("https://www.patreon.com/posts/chapter-title-160628832?utm_source=x"),
+                       "160628832")
+        XCTAssertEqual(URLNormalizer.patreonPostID("https://www.patreon.com/cw/ocean068/posts/chapter-title-160628832"),
+                       "160628832")
+        XCTAssertNil(URLNormalizer.patreonPostID("https://www.patreon.com/collection/2123904"))
+    }
 }

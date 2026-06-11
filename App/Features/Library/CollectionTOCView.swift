@@ -14,25 +14,25 @@ struct CollectionTOCView: View {
     @State private var newURL = ""
     @State private var renameTarget: LocalChapterModel?
     @State private var renameText = ""
+    @State private var expandedPreviewIDs: Set<String> = []
 
     private var chapters: [LocalChapterModel] { env.store.orderedChapters(of: collection) }
 
     var body: some View {
         List {
             ForEach(chapters) { chapter in
-                Button {
-                    readerTarget = ReaderTarget(id: chapter.id)
-                } label: {
-                    chapterRow(chapter)
-                }
-                .foregroundStyle(.primary)
-                .swipeActions {
-                    Button("Delete", role: .destructive) { env.store.delete(chapter) }
-                    Button("Rename") {
-                        renameTarget = chapter
-                        renameText = chapter.title
+                chapterRow(chapter)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        readerTarget = ReaderTarget(id: chapter.id)
                     }
-                }
+                    .swipeActions {
+                        Button("Delete", role: .destructive) { env.store.delete(chapter) }
+                        Button("Rename") {
+                            renameTarget = chapter
+                            renameText = chapter.title
+                        }
+                    }
             }
             .onMove { source, destination in
                 env.store.moveChapters(in: collection, from: source, to: destination)
@@ -97,25 +97,47 @@ struct CollectionTOCView: View {
     }
 
     private func chapterRow(_ chapter: LocalChapterModel) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.title).font(.body)
-                if let date = chapter.visibleDateText {
-                    Text(date).font(.caption).foregroundStyle(.secondary)
+        let text = ChapterTextFormatter.presentation(storedTitle: chapter.title,
+                                                     urlString: chapter.urlString)
+        let isExpanded = expandedPreviewIDs.contains(chapter.id)
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(text.title)
+                        .font(.body.weight(.medium))
+                    if let date = chapter.visibleDateText {
+                        Text(date).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Spacer()
+                if let progress = chapter.readingProgress {
+                    if progress >= 0.97 {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("Finished")
+                    } else {
+                        Text("\(Int(progress * 100))%")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("\(Int(progress * 100)) percent read")
+                    }
                 }
             }
-            Spacer()
-            if let progress = chapter.readingProgress {
-                if progress >= 0.97 {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.secondary)
-                        .accessibilityLabel("Finished")
-                } else {
-                    Text("\(Int(progress * 100))%")
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                        .accessibilityLabel("\(Int(progress * 100)) percent read")
+            if let preview = text.preview {
+                Text(preview)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(isExpanded ? nil : 5)
+                Button(isExpanded ? "收起" : "......查看更多") {
+                    if isExpanded {
+                        expandedPreviewIDs.remove(chapter.id)
+                    } else {
+                        expandedPreviewIDs.insert(chapter.id)
+                    }
                 }
+                .font(.caption.weight(.medium))
+                .buttonStyle(.borderless)
             }
         }
         .padding(.vertical, 4)

@@ -17,6 +17,11 @@ struct LibraryView: View {
                             NavigationLink(value: collection.id) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(collection.title).font(.headline)
+                                    if let creator = collection.creatorName, !creator.isEmpty {
+                                        Text("作者：\(creator)")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
                                     Text("\(collection.chapters.count) chapters")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)

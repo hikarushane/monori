@@ -1,0 +1,26 @@
+Timestamp               Ty Process[PID:TID]
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=<nil>
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=no_url_loaded
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
+2026-06-11 02:40:44.587 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===
+2026-06-11 02:40:49.000 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] step=progress_restore result=pass
+2026-06-11 02:40:49.000 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] autopilot=complete pass=1 fail=0
+2026-06-11 02:40:49.238 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] progress_payload_received matched=true value=0.880723
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] === Smoke Diagnostics ===
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] current_screen=Browse (initial tab)
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] browse_url=https://www.patreon.com/home
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] is_on_collection_page=false
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] detected_collection=false
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_button_visible=false
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_hidden_reason=url_path_does_not_contain_/collection/
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] imported_count_this_session=0
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] import_rejected_count=0
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] library_collection_count=1
+2026-06-11 02:40:49.698 Df Chapterly[9392:141ad4] [dev.chapterly:smoke-diagnostics] [SMOKE] === End Smoke Diagnostics ===

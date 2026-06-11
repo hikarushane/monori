@@ -6,20 +6,24 @@ import ChapterlyCore
 @Observable
 final class WebViewModel: NSObject {
     let webView: WKWebView
-    let router = ScriptMessageRouter()
+    let router: ScriptMessageRouter
     var currentURL: URL?
+    var finishedNavigationCount = 0
     var detectedCollection: CollectionLinkPayload?
     var isOnCollectionPage: Bool {
         guard let url = currentURL else { return false }
         return url.path.contains("/collection/")
     }
 
+    private var urlObservation: NSKeyValueObservation?
+
     override init() {
+        let router = ScriptMessageRouter()
+        self.router = router
+
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
         config.defaultWebpagePreferences.preferredContentMode = .mobile
-        webView = WKWebView(frame: .zero, configuration: config)
-        super.init()
 
         for name in ScriptMessageRouter.allHandlerNames {
             config.userContentController.add(MessageShim(router: router), name: name)
@@ -27,8 +31,24 @@ final class WebViewModel: NSObject {
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.progressTracker,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+
+        webView = WKWebView(frame: .zero, configuration: config)
+        super.init()
+
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+
+        urlObservation = webView.observe(\.url, options: [.new]) { [weak self] _, change in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                let newURL = change.newValue ?? nil
+                if newURL != self.currentURL {
+                    self.currentURL = newURL
+                    self.detectedCollection = nil
+                    self.runCollectionDetect()
+                }
+            }
+        }
     }
 
     func load(_ url: URL) {
@@ -41,6 +61,55 @@ final class WebViewModel: NSObject {
 
     func runCollectionImport() {
         webView.evaluateJavaScript(JSAssets.collectionImport, completionHandler: nil)
+    }
+
+    func dumpPageLinks(completion: @escaping (String) -> Void) {
+        let js = """
+        (function() {
+            var lines = [];
+            lines.push('URL: ' + location.href);
+            lines.push('Title: ' + document.title);
+
+            var allAnchors = document.querySelectorAll('a');
+            var withHref = document.querySelectorAll('a[href]');
+            var postsMatch = document.querySelectorAll('a[href*="/posts/"]');
+            lines.push('Total <a>: ' + allAnchors.length);
+            lines.push('Total <a>[href]: ' + withHref.length);
+            lines.push('Match a[href*="/posts/"]: ' + postsMatch.length);
+
+            var patterns = {};
+            for (var i = 0; i < withHref.length; i++) {
+                var href = withHref[i].href || '';
+                if (href.indexOf('patreon.com') === -1) continue;
+                try {
+                    var path = new URL(href).pathname;
+                    var parts = path.split('/').filter(Boolean);
+                    var key = parts.length > 0 ? '/' + parts.slice(0, Math.min(parts.length, 3)).join('/') : '/';
+                    patterns[key] = (patterns[key] || 0) + 1;
+                } catch(e) {}
+            }
+            lines.push('--- URL path patterns ---');
+            var keys = Object.keys(patterns).sort(function(a,b){ return patterns[b]-patterns[a]; });
+            for (var k = 0; k < keys.length; k++) {
+                lines.push('  ' + keys[k] + ' (' + patterns[keys[k]] + ')');
+            }
+
+            lines.push('--- Sample patreon hrefs (first 30) ---');
+            var count = 0;
+            for (var j = 0; j < withHref.length && count < 30; j++) {
+                var h = withHref[j].href || '';
+                if (h.indexOf('patreon.com') === -1) continue;
+                var t = (withHref[j].textContent || '').trim().substring(0, 60);
+                lines.push('  ' + h + ' | ' + t);
+                count++;
+            }
+
+            return lines.join('\\n');
+        })();
+        """
+        webView.evaluateJavaScript(js) { result, _ in
+            completion((result as? String) ?? "<no output>")
+        }
     }
 }
 
@@ -75,6 +144,7 @@ extension WebViewModel: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         currentURL = webView.url
+        finishedNavigationCount += 1
         detectedCollection = nil
         runCollectionDetect()
     }

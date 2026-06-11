@@ -63,6 +63,50 @@ final class JSExtractionTests: XCTestCase {
         XCTAssertEqual(merged.map(\.title), ["3 試探", "4 愛", "5 脣瓣", "6 浴室的紅櫻桃(R18+)"])
     }
 
+    func testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_empty_anchor_text",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.title), [
+            "11 aria title",
+            "12 title attribute",
+            "13 slug fallback"
+        ])
+        let allText = payloads.flatMap { [$0.title, $0.url, $0.collectionName, $0.collectionURL,
+                                          $0.visibleDateText ?? ""] }.joined()
+        XCTAssertFalse(allText.contains("FAKE_BODY_TEXT_MUST_NEVER_LEAK"))
+    }
+
+    func testCollectionImportCapsLargeCardTextBeforeValidation() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_large_card_text",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.count, 1)
+        XCTAssertLessThanOrEqual(payloads[0].title.utf8.count, PayloadValidator.maxFieldLength)
+        XCTAssertLessThanOrEqual(payloads[0].collectionName.utf8.count, PayloadValidator.maxFieldLength)
+    }
+
+    func testCollectionImportPrefersCardTitleOverExcerptText() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_card_excerpt",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.title), ["真正的文章標題", "第二篇標題"])
+        let allText = payloads.flatMap { [$0.title, $0.url, $0.collectionName, $0.collectionURL,
+                                          $0.visibleDateText ?? ""] }.joined()
+        XCTAssertFalse(allText.contains("FAKE_BODY_TEXT_MUST_NEVER_LEAK"))
+    }
+
+    func testCollectionImportIncludesCreatorNameFromPageTitle() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_card_excerpt",
+                                         handlerName: "chapterlyImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.map(\.creatorName), ["ocean", "ocean"])
+    }
+
     func testCollectionDetectFindsSeriesLink() async throws {
         let bodies = try await runScript(JSAssets.collectionDetect,
                                          fixture: "post_page",

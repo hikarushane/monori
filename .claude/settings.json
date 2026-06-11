@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "if": "Bash(git commit *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/verify.sh > /dev/null 2>&1 || printf '{\"continue\":false,\"stopReason\":\"verify.sh failed – fix errors before committing. See build/xcodebuild.log\"}'",
+            "timeout": 300,
+            "statusMessage": "Running verify.sh (build + tests)..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -53,4 +53,8 @@ public enum ReaderStyler {
         })();
         """
     }
+
+    public static func scrollToTopScript() -> String {
+        "window.scrollTo(0, 0);"
+    }
 }

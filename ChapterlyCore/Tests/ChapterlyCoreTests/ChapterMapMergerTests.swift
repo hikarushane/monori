@@ -37,6 +37,23 @@ final class ChapterMapMergerTests: XCTestCase {
         XCTAssertEqual(merged[2].orderIndex, 2)
     }
 
+    func testReimportReplacesContaminatedCardTextTitle() {
+        let contaminated = """
+        FAKE_BODY_TEXT_MUST_NEVER_LEAK 這是一行被 Patreon 卡片連結混進來的內文。
+        第二行內文。
+        第三行內文。
+        """
+        let existing = [
+            ChapterRecord(title: contaminated, urlString: "https://www.patreon.com/posts/3-1",
+                          visibleDateText: nil, orderIndex: 0)
+        ]
+        let merged = ChapterMapMerger.merge(existing: existing, incoming: [
+            payload("真正的文章標題", "https://patreon.com/posts/3-1?utm_source=x", order: 0)
+        ])
+        XCTAssertEqual(merged.count, 1)
+        XCTAssertEqual(merged[0].title, "真正的文章標題")
+    }
+
     func testDuplicateURLsWithinImportDeduped() {
         let merged = ChapterMapMerger.merge(existing: [], incoming: [
             payload("A", "https://patreon.com/posts/a-1", order: 0),

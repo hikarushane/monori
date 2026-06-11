@@ -19,6 +19,10 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(js.contains("21px"))
     }
 
+    func testScrollToTopScript() {
+        XCTAssertEqual(ReaderStyler.scrollToTopScript(), "window.scrollTo(0, 0);")
+    }
+
     func testRulesetEscapedForTemplateLiteral() {
         XCTAssertFalse(ReaderStyler.ruleset().contains("`"))
         XCTAssertFalse(ReaderStyler.ruleset().contains("${"))

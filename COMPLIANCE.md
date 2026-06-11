@@ -24,7 +24,7 @@ remembers chapter links and reading position locally.
 ## What is stored locally
 
 Chapter titles, Patreon post URLs, visible date strings, manual ordering,
-collection names/URLs, reading progress percentages, font preferences.
+collection names/URLs, creator names, reading progress percentages, font preferences.
 Nothing else.
 
 ## Data deletion

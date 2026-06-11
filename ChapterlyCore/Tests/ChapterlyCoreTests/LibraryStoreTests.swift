@@ -12,6 +12,7 @@ final class LibraryStoreTests: XCTestCase {
 
     private func payload(_ title: String, _ url: String, order: Int) -> ImporterChapterPayload {
         ImporterChapterPayload(title: title, url: url, visibleDateText: nil,
+                               creatorName: "ocean",
                                collectionName: "【更新中】焚心 The Burning Heart",
                                collectionURL: "https://www.patreon.com/collection/9999",
                                domOrder: order)
@@ -25,6 +26,7 @@ final class LibraryStoreTests: XCTestCase {
         let collections = try store.collections()
         XCTAssertEqual(collections.count, 1)
         XCTAssertEqual(collections[0].title, "【更新中】焚心 The Burning Heart")
+        XCTAssertEqual(collections[0].creatorName, "ocean")
         XCTAssertEqual(store.orderedChapters(of: collections[0]).map(\.title), ["4 愛", "5 脣瓣"])
     }
 
@@ -69,12 +71,28 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertNotNil(chapter?.lastReadAt)
     }
 
+    func testProgressSavedByMatchingPatreonPostIDWhenSlugChanges() throws {
+        try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
+        store.setProgress(forPageURL: "https://www.patreon.com/posts/chapter-title-160628832?utm_source=share",
+                          progress: 0.4)
+        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/160628832")
+        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.4, accuracy: 0.001)
+    }
+
+    func testFooterScrollDoesNotOverwriteReadingProgress() throws {
+        try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
+        store.setProgress(forPageURL: "https://patreon.com/posts/160628832", progress: 0.5)
+        store.setProgress(forPageURL: "https://patreon.com/posts/160628832", progress: 0.98)
+        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/160628832")
+        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.5, accuracy: 0.001)
+    }
+
     func testManualAddRenameDelete() throws {
         try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
         let collection = try store.collections()[0]
         try store.addManualChapter(to: collection, title: "Extra",
                                    urlString: "https://patreon.com/posts/extra-9")
-        var chapters = store.orderedChapters(of: collection)
+        let chapters = store.orderedChapters(of: collection)
         XCTAssertEqual(chapters.count, 2)
         store.rename(chapters[1], to: "Extra (fixed)")
         store.delete(chapters[0])

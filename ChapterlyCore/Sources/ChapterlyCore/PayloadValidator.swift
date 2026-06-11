@@ -11,13 +11,14 @@ public enum PayloadValidator {
 
     public static func validateImporterChapter(_ body: Any) -> Result<ImporterChapterPayload, PayloadError> {
         let required = ["title", "url", "collectionName", "collectionURL", "domOrder"]
-        let optional = ["visibleDateText"]
+        let optional = ["visibleDateText", "creatorName"]
         return checked(body, required: required, optional: optional).flatMap { dict in
             do {
                 return .success(ImporterChapterPayload(
                     title: try string(dict, "title", max: maxFieldLength),
                     url: try string(dict, "url", max: maxURLLength),
                     visibleDateText: try optionalString(dict, "visibleDateText", max: maxFieldLength),
+                    creatorName: try optionalString(dict, "creatorName", max: maxFieldLength),
                     collectionName: try string(dict, "collectionName", max: maxFieldLength),
                     collectionURL: try string(dict, "collectionURL", max: maxURLLength),
                     domOrder: try int(dict, "domOrder")))
@@ -77,7 +78,28 @@ public enum PayloadValidator {
     }
 
     private static func int(_ dict: [String: Any], _ key: String) throws -> Int {
-        guard let value = dict[key] as? Int else { throw PayloadError.wrongType(key) }
-        return value
+        if let value = dict[key] as? NSNumber {
+            guard CFGetTypeID(value) != CFBooleanGetTypeID() else {
+                throw PayloadError.wrongType(key)
+            }
+            let doubleValue = value.doubleValue
+            if doubleValue.isFinite,
+               doubleValue.rounded(.towardZero) == doubleValue,
+               doubleValue >= Double(Int.min),
+               doubleValue <= Double(Int.max) {
+                return value.intValue
+            }
+        }
+        if let value = dict[key] as? Int {
+            return value
+        }
+        if let value = dict[key] as? Double,
+           value.isFinite,
+           value.rounded(.towardZero) == value,
+           value >= Double(Int.min),
+           value <= Double(Int.max) {
+            return Int(value)
+        }
+        throw PayloadError.wrongType(key)
     }
 }

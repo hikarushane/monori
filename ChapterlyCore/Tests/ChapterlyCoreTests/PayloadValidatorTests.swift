@@ -7,6 +7,7 @@ final class PayloadValidatorTests: XCTestCase {
             "title": "5 脣瓣",
             "url": "https://www.patreon.com/posts/5-123456",
             "visibleDateText": "June 1",
+            "creatorName": "ocean",
             "collectionName": "【更新中】焚心 The Burning Heart",
             "collectionURL": "https://www.patreon.com/collection/9999",
             "domOrder": 4
@@ -18,6 +19,21 @@ final class PayloadValidatorTests: XCTestCase {
         XCTAssertEqual(p.title, "5 脣瓣")
         XCTAssertEqual(p.domOrder, 4)
         XCTAssertEqual(p.visibleDateText, "June 1")
+        XCTAssertEqual(p.creatorName, "ocean")
+    }
+
+    func testNullCreatorNameBecomesNil() throws {
+        var body = validImporterBody()
+        body["creatorName"] = NSNull()
+        let p = try PayloadValidator.validateImporterChapter(body).get()
+        XCTAssertNil(p.creatorName)
+    }
+
+    func testImporterDomOrderAcceptsJavaScriptNumber() throws {
+        var body = validImporterBody()
+        body["domOrder"] = 4.0
+        let p = try PayloadValidator.validateImporterChapter(body).get()
+        XCTAssertEqual(p.domOrder, 4)
     }
 
     func testNullDateBecomesNil() throws {

@@ -17,7 +17,9 @@ struct SettingsView: View {
 
                 Section {
                     Button("Clear Library Data", role: .destructive) { confirmClearLibrary = true }
+                        .accessibilityIdentifier("smoke.clearDataButton")
                     Button("Logout from Patreon", role: .destructive) { confirmLogout = true }
+                        .accessibilityIdentifier("smoke.logoutButton")
                 } header: {
                     Text("Data")
                 } footer: {

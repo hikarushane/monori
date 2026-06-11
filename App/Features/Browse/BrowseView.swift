@@ -1,5 +1,8 @@
 import SwiftUI
 import ChapterlyCore
+import os
+
+private let browseLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
 
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
@@ -38,15 +41,25 @@ struct BrowseView: View {
                     env.browse.runCollectionImport()
                     Task {
                         try? await Task.sleep(for: .milliseconds(800))
+                        if AppEnvironment.isSmokeMode && env.importedCountThisSession == 0 {
+                            browseLog.notice("[SMOKE] Import found 0 chapters — dumping page structure")
+                            env.browse.dumpPageLinks { dump in
+                                for line in dump.split(separator: "\n") {
+                                    browseLog.notice("[SMOKE] \(String(line), privacy: .public)")
+                                }
+                            }
+                        }
                         showImportConfirmation = true
                     }
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
+                .accessibilityIdentifier("smoke.importChaptersButton")
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
             .background(.bar)
+            .accessibilityIdentifier("smoke.collectionBanner")
         } else if let link = env.browse.detectedCollection {
             HStack {
                 Text("Series: \(link.collectionName)")
@@ -59,10 +72,12 @@ struct BrowseView: View {
                     }
                 }
                 .controlSize(.small)
+                .accessibilityIdentifier("smoke.openCollectionButton")
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
             .background(.bar)
+            .accessibilityIdentifier("smoke.detectedCollectionBanner")
         }
     }
 }

@@ -1,7 +1,7 @@
-# CLAUDE.md
+# AGENTS.md
 ## Debugging and Testing Rules
 
-This project is an iOS app developed with Claude Code, superpowers, and subagent-driven-development.
+This project is an iOS app developed with Codex, superpowers, and subagent-driven-development.
 
 The user is not a professional iOS developer. Do not rely on the user to interpret raw Xcode errors, inspect internal app state, or manually describe screens when the project can collect diagnostics itself.
 
@@ -79,7 +79,7 @@ The correct workflow is:
 ```
 
 5. The script collects screenshots, logs, UI hierarchy, and app diagnostics.
-6. Claude analyzes those outputs and fixes the app if needed.
+6. Codex analyzes those outputs and fixes the app if needed.
 
 Do not ask the user repeatedly: “What page are you on?” or “Do you see the button?”
 
@@ -93,43 +93,6 @@ Instead, improve diagnostics so the app can report:
 * why the import action is hidden
 * detected chapter count
 * relevant non-secret URL or article identifier, if safe
-
----
-
-### Automated Smoke Loop Command
-
-Use this for the full MVP smoke loop after the Simulator is already manually logged into Patreon and `.env` contains `SMOKE_TEST_URL`:
-
-```bash
-./scripts/smoke-auto.sh
-```
-
-`smoke-auto.sh` drives the logged-in Simulator through:
-
-* auth check
-* collection page detection
-* chapter import
-* reader open
-* reader CSS check
-* progress save
-* progress restore after relaunch
-
-Exit codes:
-
-* `0` means all smoke steps passed
-* `1` means a build, smoke step, or timeout failed
-* `2` means Patreon login is missing
-* `3` means configuration or preflight failed
-
-The script must preserve Patreon login state. Do not uninstall the app, erase the Simulator, reset Simulator contents, or automate Patreon login for this command.
-
-Artifacts are written under:
-
-```text
-build/smoke/
-```
-
-Always inspect `build/smoke/auto-report.md`, `build/smoke/auto-phase1.log`, `build/smoke/auto-phase2.log`, and `build/smoke/app.log` before changing code after a failure.
 
 ---
 

@@ -27,6 +27,7 @@ final class ScriptMessageRouterTests: XCTestCase {
         ] as [String: Any])
         XCTAssertTrue(received.isEmpty)
         XCTAssertEqual(router.rejectedCount, 1)
+        XCTAssertEqual(router.lastRejectedReason, "forbiddenKey_innerhtml")
     }
 
     func testRoutesProgressAndCollectionLink() {
@@ -48,5 +49,6 @@ final class ScriptMessageRouterTests: XCTestCase {
         let router = ScriptMessageRouter()
         router.route(name: "somethingElse", body: ["a": 1])
         XCTAssertEqual(router.rejectedCount, 1)
+        XCTAssertEqual(router.lastRejectedReason, "unknown_handler")
     }
 }
