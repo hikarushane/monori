@@ -1,47 +1,47 @@
 # HANDOFF
 
-> 上次 session: 2026-06-11
+> 上次 session: 2026-06-11（session 3）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-MVP bug fix rounds 1–4 全部完成並 committed；等待 Simulator 手動驗證。
+4 個 bug 全部修完（3 個待修 + 1 個新發現的 import 問題）；verify.sh 84/84 pass。
+smoke-auto 卡在 **Patreon 的 Cloudflare 人類驗證**（與程式碼無關），需手動處理後重跑。
 
 ## ✅ 本次完成
-- **Reader 自動滑到底部** → `enforceScrollScript` 4s/400ms interval 強制回 target；`ProgressTracker.js` 加 user-interaction gate（`touchstart`/`wheel` 才存 progress）
-- **章節標題顯示內文** → `ChapterTextFormatter.looksLikeBodyText()` 縮減至只檢查 `。`；`presentation()` 加 `firstLineIsTitle` 判斷，fallback URL slug
-- **Prev/Next 按鈕反向** → `neighbors()` 改用 descending `orderIndex`（Patreon DOM 最新 = orderIndex 0 = 故事順序最舊）
-- **Library 無 teaser 文字** → `excerptFromCard()` 三層搜尋：anchor 內 → anchor 文字行 → 向上爬最多 4 層父節點（多 post 容器前停止）；`excerpt` 欄位貫穿 Payloads → Models → ChapterMapMerger → LibraryStore → CollectionTOCView
-- **"From the collection" 導航後 banner/title 不更新** → `ReaderView.swift` 加 `.onChange(of: env.reader.currentURL)` → `syncCurrentChapter(to:)`
-- 全部 unit tests pass（`2026-06-11 16:33:25.882`）
-- 新增 fixtures 及對應測試（sibling teaser、enforceScroll、excerpt merge）
-- Committed: `fix(reader,library): fix scroll position, teaser extraction, SPA navigation sync`
+- **Bug 1（scroll 回歸）**：root cause 是 `1f29d51` 在 `applyReaderTreatment()` 加了 `guard foreignPageTitle == nil else { return }`，foreign 頁面從此不跑 `enforceScrollScript`；另外 `syncCurrentChapter` 同 id 早退路徑在 SPA 返回已知章節時也跳過 treatment（SPA 無 didFinish）。修法：enforce 永遠執行（foreign 釘在頂部、known 還原進度）；found 分支 `wasForeign` 時重新套用 treatment；foreign 分支進入時就套用，並用 `foreignPageKey`（postID）防同頁 URL 重寫重複釘頂
+- **Bug 2（Browse banner 殘留）**：root cause 不是 reselect 沒清 `detectedCollection`（KVO 本來就清），是 `runCollectionDetect()` 在 SPA 返回首頁時對舊 DOM 跑、偵測結果又把 banner 設回來。修法：`runCollectionDetect()` 限定 post 頁（`URLNormalizer.patreonPostID != nil`）+ `onCollectionLink` 收訊時再驗一次 `isOnPostPage`（擋 race）
+- **Bug 3（Browse menu 可拖動）**：全 codebase 沒有 `.onMove`/`.draggable`——是 WKWebView 給 `<a>` 的原生 drag interaction。修法：user script `dragstart` preventDefault（兩個 WebViewModel 都吃到）
+- **Bug 4（import 只匯入可見章節）**：`CollectionImport.js` 重寫成 async function body（`callAsyncJavaScript`）：捲動展開 lazy 清單直到 post 連結數穩定 3 輪（每輪 500ms、上限 60 輪），逐輪累積擷取（容忍虛擬化清單）、`domOrder` = 首見順序，最後一次性 postMessage。按鈕改「Import all chapters」+ 匯入中 ProgressView；alert 文案同步更新；`runCollectionImport()` 改 async 回傳數量
+- TDD：新 fixture `collection_page_lazy.html`（捲動後才追加 3 個 post）+ `testCollectionImportLoadsLazyContentBeforeScraping`，RED→GREEN；測試 harness 改用 `callAsyncJavaScript`
+- `./scripts/verify.sh`：build ✓ + **84/84 tests pass**
 
-## ⚡ 接手要做的事
-1. 在 iOS Simulator 重新 import collection（例：patreon.com/collection/2040508）→ 驗證 Library TOC 出現 teaser 文字
-2. 開啟文章，確認從頂部或已存 progress 開始，不滑到底
-3. 點 "From the collection" 連結，確認 banner 和底部標題更新
-4. （可選）跑 `./scripts/verify.sh` 確認 build + unit tests 仍過
+## 🚧 卡住的事：Cloudflare 人類驗證
+smoke-auto 兩次都在 `import` 步驟 fail（`no_post_links_found`）。截圖證實 Patreon 對 Simulator 出了 **Cloudflare「驗證您是人類」checkbox**（頁面 title「請稍候...」、collection 清單永遠不渲染）。CAPTCHA 屬於手動步驟（CLAUDE.md 禁止自動化）。
+
+## ⚡ 接手要做的事（優先順序）
+1. **使用者手動**：開 Simulator → 在 Patreon 頁面勾 Cloudflare「驗證您是人類」→ 確認頁面正常顯示
+2. 重跑 `./scripts/smoke-auto.sh`，預期 7/7（上次失敗純粹是 CAPTCHA 擋住）
+3. 手動驗證 4 個修復：①Library 集合點進文章不再捲到底（含從 collection 頁點進去）②Browse 開文章→按 Browse tab 回首頁，banner 消失 ③Patreon 左上 menu 項目不可拖動 ④collection 頁按「Import all chapters」，匯入數 = 整個 collection 章節數（會自動捲動，等它跑完）
+4. **README.md:48 待使用者確認後更新**：「Import visible chapters」→「Import all chapters」，並補一句「匯入會自動捲動載入整個清單」（README gate：需使用者同意才改）
+5. 舊章節 `excerpt` nil → 現在重按一次 import 就會全部補齊（Bug 4 修復順帶解決）
 
 ## ⚠️ 注意事項
-- 舊 progress 若被 Patreon auto-scroll 污染（值接近 1.0），第一次開文章可能仍跳到接近底部 — 手動滾一下即覆蓋
-- Re-import 必要：現有 chapter 的 `excerpt` 欄位是 nil，需重新 import 才填入 teaser
-- `smoke-auto.sh` 尚未驗證此批改動
+- smoke artifacts（build/smoke/*）目前是失敗 run 的狀態，等 CAPTCHA 解掉重跑後再 commit
+- `JSExtractionTests` 每個 import 測試現在 ~2s（捲動穩定判定），整包 21s 屬正常
+- commit 順序刻意拆成可獨立 build 的三份：reader fix → browse/webview fix → import feature
 
 ## 📁 本次修改的檔案
-- `App/Features/Reader/ReaderView.swift` — 加 SPA navigation sync（`syncCurrentChapter`）、`applyReaderTreatment` 改用 `enforceScrollScript`
-- `App/Features/Library/CollectionTOCView.swift` — 顯示 `chapter.excerpt`，移除展開/收合按鈕
-- `ChapterlyCore/Sources/ChapterlyCore/Assets/CollectionImport.js` — 新增 `excerptFromCard()` 三層 DOM 搜尋
-- `ChapterlyCore/Sources/ChapterlyCore/Assets/ProgressTracker.js` — 加 user-interaction gate
-- `ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` — 新增 `enforceScrollScript(progress:)`
-- `ChapterlyCore/Sources/ChapterlyCore/ChapterTextFormatter.swift` — `looksLikeBodyText()` 縮減
-- `ChapterlyCore/Sources/ChapterlyCore/Models.swift` — `LocalChapterModel.excerpt: String?`
-- `ChapterlyCore/Sources/ChapterlyCore/Payloads.swift` — `ImporterChapterPayload.excerpt: String?`
-- `ChapterlyCore/Sources/ChapterlyCore/PayloadValidator.swift` — `"excerpt"` 加入 optional fields
-- `ChapterlyCore/Sources/ChapterlyCore/ChapterMapMerger.swift` — excerpt merge 邏輯
-- `ChapterlyCore/Sources/ChapterlyCore/LibraryStore.swift` — `applyImport` 傳遞 excerpt；`neighbors()` descending orderIndex
-- Tests: `ChapterMapMergerTests`, `ChapterTextFormatterTests`, `JSExtractionTests`, `LibraryStoreTests`, `ReaderStylerTests`
+- `App/Features/Reader/ReaderView.swift` — enforce 不再被 foreign guard 擋掉；wasForeign 重套 treatment；foreignPageKey
+- `App/WebView/WebViewModel.swift` — `isOnPostPage`、detect gate、dragstart suppressor、async `runCollectionImport`
+- `App/AppEnvironment.swift` — `onCollectionLink` 收訊時驗 post 頁
+- `App/Features/Shared/WebCollectionBanner.swift` — Import all chapters、importing 狀態、alert 文案
+- `App/Features/Library/LibraryView.swift` — 空狀態提示文字同步
+- `App/SmokeAutopilot.swift` — `await runCollectionImport()`
+- `ChapterlyCore/Sources/ChapterlyCore/Assets/CollectionImport.js` — 全部重寫（async 展開迴圈）
+- `ChapterlyCore/Tests/ChapterlyCoreTests/JSExtractionTests.swift` — callAsyncJavaScript harness + lazy 測試
+- `ChapterlyCore/Tests/ChapterlyCoreTests/Fixtures/collection_page_lazy.html` — 新 fixture
 
 ## 🔗 相關資源
 - `scripts/verify.sh` — automated build + unit tests
 - `scripts/smoke-diagnostics.sh` — manual smoke test with Patreon login
-- `scripts/smoke-auto.sh` — full smoke loop (需先 Simulator 手動登入 Patreon)
+- `scripts/smoke-auto.sh` — full smoke loop（需先 Simulator 手動登入 Patreon + 解 CAPTCHA）
