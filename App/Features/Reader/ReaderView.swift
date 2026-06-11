@@ -139,7 +139,8 @@ struct ReaderView: View {
                     Label("上一章", systemImage: "chevron.left")
                 }
             } else {
-                Color.clear.frame(width: 72)
+                // Color is greedy in both axes; without a height the bar grows to fill the screen.
+                Color.clear.frame(width: 72, height: 0)
             }
             Text(currentTitle)
                 .font(.caption.weight(.medium))
@@ -154,7 +155,7 @@ struct ReaderView: View {
                     }
                 }
             } else {
-                Color.clear.frame(width: 72)
+                Color.clear.frame(width: 72, height: 0)
             }
         }
         .font(.subheadline)
