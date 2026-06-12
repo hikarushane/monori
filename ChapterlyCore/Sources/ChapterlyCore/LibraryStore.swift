@@ -143,17 +143,6 @@ public final class LibraryStore {
         try? context.save()
     }
 
-    public func addManualChapter(to collection: LocalCollectionModel,
-                                 title: String, urlString: String) throws {
-        guard let normalized = URLNormalizer.normalize(urlString)?.absoluteString else { return }
-        guard !collection.chapters.contains(where: { $0.urlString == normalized }) else { return }
-        let nextIndex = (collection.chapters.map(\.orderIndex).max() ?? -1) + 1
-        let chapter = LocalChapterModel(title: title, urlString: normalized, orderIndex: nextIndex)
-        chapter.collection = collection
-        context.insert(chapter)
-        try context.save()
-    }
-
     public func clearLibrary() throws {
         for collection in try collections() { context.delete(collection) }
         try context.save()

@@ -9,13 +9,35 @@ struct CollectionTOCView: View {
     @Environment(AppEnvironment.self) private var env
     let collection: LocalCollectionModel
     @State private var readerTarget: ReaderTarget?
-    @State private var showAddSheet = false
-    @State private var newTitle = ""
-    @State private var newURL = ""
+    @State private var refreshing = false
+    @State private var refreshOutcome: CollectionRefreshOutcome?
+    @State private var showRefreshResult = false
     @State private var renameTarget: LocalChapterModel?
     @State private var renameText = ""
 
     private var chapters: [LocalChapterModel] { env.store.orderedChapters(of: collection) }
+
+    private var refreshAlertTitle: String {
+        switch refreshOutcome {
+        case .newChapters: return "New chapters imported"
+        case .upToDate: return "Up to date"
+        case .needsLogin: return "Login required"
+        case .failed, nil: return "Could not check"
+        }
+    }
+
+    private var refreshAlertMessage: String {
+        switch refreshOutcome {
+        case .newChapters(let count):
+            return "Imported \(count) new chapter\(count == 1 ? "" : "s")."
+        case .upToDate:
+            return "Your library already matches this collection."
+        case .needsLogin:
+            return "Patreon asked for login. Open the Browse tab, log in, then try again."
+        case .failed, nil:
+            return "Could not load the collection page. Check your connection and try again."
+        }
+    }
 
     var body: some View {
         List {
@@ -46,8 +68,23 @@ struct CollectionTOCView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
                 .accessibilityLabel("Reverse chapter order")
-                Button { showAddSheet = true } label: { Image(systemName: "plus") }
-                    .accessibilityLabel("Add chapter manually")
+                Button {
+                    refreshing = true
+                    Task {
+                        refreshOutcome = await env.refreshCollection(collection)
+                        refreshing = false
+                        showRefreshResult = true
+                    }
+                } label: {
+                    if refreshing {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+                .disabled(refreshing)
+                .accessibilityLabel("Check for new chapters")
+                .accessibilityIdentifier("smoke.refreshChaptersButton")
             }
         }
         .fullScreenCover(item: $readerTarget) { target in
@@ -65,29 +102,10 @@ struct CollectionTOCView: View {
             }
             Button("Cancel", role: .cancel) { renameTarget = nil }
         }
-        .sheet(isPresented: $showAddSheet) {
-            NavigationStack {
-                Form {
-                    TextField("Title", text: $newTitle)
-                    TextField("Patreon post URL", text: $newURL)
-                        .keyboardType(.URL)
-                        .textInputAutocapitalization(.never)
-                }
-                .navigationTitle("Add chapter")
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Add") {
-                            try? env.store.addManualChapter(to: collection, title: newTitle, urlString: newURL)
-                            newTitle = ""; newURL = ""; showAddSheet = false
-                        }
-                        .disabled(newTitle.isEmpty || URLNormalizer.normalize(newURL) == nil)
-                    }
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") { showAddSheet = false }
-                    }
-                }
-            }
-            .presentationDetents([.medium])
+        .alert(refreshAlertTitle, isPresented: $showRefreshResult) {
+            Button("OK") {}
+        } message: {
+            Text(refreshAlertMessage)
         }
     }
 

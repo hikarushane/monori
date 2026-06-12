@@ -145,17 +145,17 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(chapter?.readingProgress ?? -1, 0.5, accuracy: 0.001)
     }
 
-    func testManualAddRenameDelete() throws {
-        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+    func testRenameAndDelete() throws {
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+        ])
         let collection = try store.collections()[0]
-        try store.addManualChapter(to: collection, title: "Extra",
-                                   urlString: "https://patreon.com/posts/extra-9")
         let chapters = store.orderedChapters(of: collection)
-        XCTAssertEqual(chapters.count, 2)
-        store.rename(chapters[1], to: "Extra (fixed)")
+        store.rename(chapters[1], to: "5 脣瓣 (fixed)")
         store.delete(chapters[0])
         let remaining = store.orderedChapters(of: collection)
-        XCTAssertEqual(remaining.map(\.title), ["Extra (fixed)"])
+        XCTAssertEqual(remaining.map(\.title), ["5 脣瓣 (fixed)"])
     }
 
     func testClearLibraryRemovesEverything() throws {

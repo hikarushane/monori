@@ -21,7 +21,7 @@ struct WebCollectionBanner: View {
                 Button("OK") {}
             } message: {
                 if env.importedCountThisSession == 0 {
-                    Text("No chapter links were found on this page. Patreon's markup may have changed — you can add chapters manually from the collection's page in Library.")
+                    Text("No chapter links were found on this page. Make sure the collection page finished loading, then try again. Patreon's markup may also have changed.")
                 } else {
                     Text("Imported \(env.importedCountThisSession) chapters. Already-imported chapters are merged, not duplicated.")
                 }

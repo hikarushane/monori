@@ -6,12 +6,21 @@ import os
 
 private let smokeLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
 
+enum CollectionRefreshOutcome: Equatable {
+    case newChapters(Int)
+    case upToDate
+    case needsLogin
+    case failed
+}
+
 @MainActor
 @Observable
 final class AppEnvironment {
     let store: LibraryStore
     let browse = WebViewModel()
     let reader = WebViewModel()
+    /// Offscreen web view used to re-crawl a collection page for new chapters.
+    let refresher = WebViewModel()
 
     var importedCountThisSession = 0
     private var didStartSmokeTools = false
@@ -41,6 +50,7 @@ final class AppEnvironment {
         }
         wire(browse)
         wire(reader)
+        wire(refresher)
     }
 
     func startSmokeToolsIfNeeded() {
@@ -147,6 +157,41 @@ final class AppEnvironment {
                 smokeLog.notice("[SMOKE] progress_payload_received matched=\(matched) value=\(payload.scrollProgress)")
             }
         }
+    }
+
+    /// Loads the collection's source page in the offscreen refresher web view and
+    /// re-runs the chapter import. `applyImport` merges by normalized URL, so
+    /// already-imported chapters are untouched and only genuinely new posts land.
+    func refreshCollection(_ collection: LocalCollectionModel) async -> CollectionRefreshOutcome {
+        guard let url = URL(string: collection.sourceURLString) else { return .failed }
+        // An offscreen WKWebView needs a real frame for layout-driven lazy lists.
+        if refresher.webView.frame.isEmpty {
+            refresher.webView.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+        }
+        let countBefore = collection.chapters.count
+        let baseline = refresher.finishedNavigationCount
+        refresher.load(url)
+        let loaded = await waitUntil(timeout: .seconds(30)) { [refresher] in
+            refresher.finishedNavigationCount > baseline && !refresher.webView.isLoading
+        }
+        guard loaded else { return .failed }
+        if refresher.currentURL?.path.contains("/login") == true { return .needsLogin }
+        await refresher.runCollectionImport()
+        // applyImport flushes 300 ms after the last chapter message lands;
+        // wait it out before counting.
+        try? await Task.sleep(for: .milliseconds(600))
+        let delta = collection.chapters.count - countBefore
+        return delta > 0 ? .newChapters(delta) : .upToDate
+    }
+
+    private func waitUntil(timeout: Duration,
+                           _ condition: @MainActor () -> Bool) async -> Bool {
+        let deadline = ContinuousClock.now + timeout
+        while ContinuousClock.now < deadline {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(500))
+        }
+        return false
     }
 
     func logoutFromPatreon() async {
