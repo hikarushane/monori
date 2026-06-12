@@ -12,7 +12,7 @@ struct AutopilotReaderTarget: Identifiable {
 /// Debug-only smoke autopilot. Activated by the `--smoke-autopilot` /
 /// `--smoke-autopilot-phase2` launch arguments (see scripts/smoke-auto.sh).
 /// Performs the same actions a user performs manually: loads the user-supplied
-/// test URL, imports chapters, opens the reader, scrolls, and logs one
+/// test URL, imports chapters, opens the reader, toggles a bookmark, and logs one
 /// `[SMOKE] step=...` line per step. Never touches cookies, tokens, or page content.
 @MainActor
 final class SmokeAutopilot {
@@ -39,7 +39,7 @@ final class SmokeAutopilot {
         }
     }
 
-    // MARK: - Phase 1: auth -> collection -> import -> reader -> css -> progress save
+    // MARK: - Phase 1: auth -> collection -> import -> reader -> css -> bookmark save
 
     private func runPhase1() async {
         guard let testURL = Self.testURL() else {
@@ -118,49 +118,40 @@ final class SmokeAutopilot {
         }
         pass("reader_css")
 
-        // ProgressTracker only saves after a user gesture (touchstart/wheel); fire a
-        // synthetic wheel event first so the gate treats this scroll as user-driven.
-        env.reader.webView.evaluateJavaScript("""
-        window.dispatchEvent(new Event('wheel'));
-        \(ReaderStyler.restoreScrollScript(progress: 0.5))
-        window.dispatchEvent(new Event('scroll'));
-        """, completionHandler: nil)
-        let saved = await waitUntil {
-            guard let p = chapter.readingProgress else { return false }
-            return SmokeCheck.approximatelyEqual(p, 0.5, tolerance: 0.1)
+        env.store.toggleBookmark(chapter)
+        let bookmarked = await waitUntil { [env] in
+            env.store.chapter(withPageURL: chapter.urlString)?.isBookmarked == true
         }
-        guard saved else {
-            let actual = chapter.readingProgress.map { String(format: "%.2f", $0) } ?? "nil"
-            fail("progress_save", "stored_progress=\(actual)")
+        guard bookmarked else {
+            fail("bookmark_save", "isBookmarked_still_false")
             return
         }
-        pass("progress_save")
+        pass("bookmark_save")
     }
 
-    // MARK: - Phase 2: progress restore on relaunch
+    // MARK: - Phase 2: bookmark persists across relaunch + reader opens at top
 
     private func runPhase2() async {
-        guard let chapter = firstChapterWithProgress(),
-              let expected = chapter.readingProgress else {
-            fail("progress_restore", "no_saved_progress_found")
+        guard let chapter = firstBookmarkedChapter() else {
+            fail("bookmark_restore", "no_bookmarked_chapter_found")
             return
         }
-        guard await openReader(chapter, stepName: "progress_restore") else { return }
+        pass("bookmark_restore")
 
-        // ReaderView schedules the scroll restore 0.6 s after load; poll until the
-        // actual scroll position approaches the stored progress.
-        let restored = await waitUntil { [env] in
-            guard let actual = await Self.scrollProgress(of: env.reader.webView) else { return false }
-            return SmokeCheck.approximatelyEqual(actual, expected, tolerance: 0.1)
+        guard await openReader(chapter, stepName: "reader_top") else { return }
+        // ReaderView pins the scroll to the top for a few seconds after load;
+        // poll until the page actually sits at (or extremely near) the top.
+        let atTop = await waitUntil { [env] in
+            guard let p = await Self.scrollProgress(of: env.reader.webView) else { return false }
+            return p <= 0.05
         }
-        guard restored else {
+        guard atTop else {
             let actual = (await Self.scrollProgress(of: env.reader.webView))
                 .map { String(format: "%.2f", $0) } ?? "nil"
-            let want = String(format: "%.2f", expected)
-            fail("progress_restore", "scroll=\(actual)_expected=\(want)")
+            fail("reader_top", "scroll=\(actual)_expected<=0.05")
             return
         }
-        pass("progress_restore")
+        pass("reader_top")
     }
 
     // MARK: - Shared steps
@@ -194,9 +185,9 @@ final class SmokeAutopilot {
         return env.store.orderedChapters(of: collection).first
     }
 
-    private func firstChapterWithProgress() -> LocalChapterModel? {
+    private func firstBookmarkedChapter() -> LocalChapterModel? {
         guard let collection = (try? env.store.collections())?.first else { return nil }
-        return env.store.orderedChapters(of: collection).first { $0.readingProgress != nil }
+        return env.store.orderedChapters(of: collection).first { $0.isBookmarked }
     }
 
     private static func testURL() -> URL? {

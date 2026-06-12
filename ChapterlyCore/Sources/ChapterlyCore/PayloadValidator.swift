@@ -37,17 +37,6 @@ public enum PayloadValidator {
         }
     }
 
-    public static func validateProgress(_ body: Any) -> Result<ProgressPayload, PayloadError> {
-        return checked(body, required: ["url", "scrollProgress"], optional: []).flatMap { dict in
-            do {
-                let url = try string(dict, "url", max: maxURLLength)
-                guard let raw = dict["scrollProgress"] as? Double ?? (dict["scrollProgress"] as? Int).map(Double.init)
-                else { return .failure(.wrongType("scrollProgress")) }
-                return .success(ProgressPayload(url: url, scrollProgress: min(1.0, max(0.0, raw))))
-            } catch let e as PayloadError { return .failure(e) } catch { return .failure(.notADictionary) }
-        }
-    }
-
     private static func checked(_ body: Any, required: [String], optional: [String])
         -> Result<[String: Any], PayloadError> {
         guard let dict = body as? [String: Any] else { return .failure(.notADictionary) }

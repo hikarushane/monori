@@ -30,19 +30,15 @@ final class ScriptMessageRouterTests: XCTestCase {
         XCTAssertEqual(router.lastRejectedReason, "forbiddenKey_innerhtml")
     }
 
-    func testRoutesProgressAndCollectionLink() {
-        var progress: [ProgressPayload] = []
+    func testRoutesCollectionLink() {
         var links: [CollectionLinkPayload] = []
         let router = ScriptMessageRouter()
-        router.onProgress = { progress.append($0) }
         router.onCollectionLink = { links.append($0) }
-        router.route(name: ScriptMessageRouter.progressName,
-                     body: ["url": "https://patreon.com/posts/x", "scrollProgress": 0.3] as [String: Any])
         router.route(name: ScriptMessageRouter.collectionLinkName,
                      body: ["collectionName": "焚心",
                             "collectionURL": "https://patreon.com/collection/9"] as [String: Any])
-        XCTAssertEqual(progress.count, 1)
         XCTAssertEqual(links.count, 1)
+        XCTAssertEqual(router.rejectedCount, 0)
     }
 
     func testUnknownHandlerNameIgnored() {

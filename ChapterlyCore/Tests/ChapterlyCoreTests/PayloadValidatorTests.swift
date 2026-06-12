@@ -93,30 +93,6 @@ final class PayloadValidatorTests: XCTestCase {
         }
     }
 
-    func testValidProgressPayload() throws {
-        let p = try PayloadValidator.validateProgress(
-            ["url": "https://www.patreon.com/posts/5-123456", "scrollProgress": 0.42]).get()
-        XCTAssertEqual(p.scrollProgress, 0.42, accuracy: 0.001)
-    }
-
-    func testProgressClampedToUnitRange() throws {
-        let p = try PayloadValidator.validateProgress(
-            ["url": "https://www.patreon.com/posts/x", "scrollProgress": 7.5]).get()
-        XCTAssertEqual(p.scrollProgress, 1.0)
-    }
-
-    func testProgressRejectsForbiddenExtraField() {
-        guard case .failure(.forbiddenKey("html")) = PayloadValidator.validateProgress(
-            ["url": "https://www.patreon.com/posts/x", "scrollProgress": 0.5, "html": "<p>"])
-        else { return XCTFail("accepted forbidden field") }
-    }
-
-    func testProgressRejectsUnknownExtraField() {
-        guard case .failure(.unknownKey("extra")) = PayloadValidator.validateProgress(
-            ["url": "https://www.patreon.com/posts/x", "scrollProgress": 0.5, "extra": 1])
-        else { return XCTFail("accepted unknown field") }
-    }
-
     func testValidCollectionLinkPayload() throws {
         let p = try PayloadValidator.validateCollectionLink(
             ["collectionName": "焚心", "collectionURL": "https://www.patreon.com/collection/9999"]).get()

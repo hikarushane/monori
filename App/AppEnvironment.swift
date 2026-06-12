@@ -149,14 +149,6 @@ final class AppEnvironment {
             guard let model, model.isOnPostPage else { return }
             model.detectedCollection = payload
         }
-        model.router.onProgress = { [weak self] payload in
-            guard let self else { return }
-            let matched = self.store.chapter(withPageURL: payload.url) != nil
-            self.store.setProgress(forPageURL: payload.url, progress: payload.scrollProgress)
-            if Self.isSmokeMode {
-                smokeLog.notice("[SMOKE] progress_payload_received matched=\(matched) value=\(payload.scrollProgress)")
-            }
-        }
     }
 
     /// Loads the collection's source page in the offscreen refresher web view and

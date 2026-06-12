@@ -115,14 +115,6 @@ public final class LibraryStore {
 
     // MARK: edits
 
-    public func setProgress(forPageURL pageURL: String, progress: Double) {
-        guard ReaderProgressPolicy.shouldStore(progress) else { return }
-        guard let chapter = chapter(withPageURL: pageURL) else { return }
-        chapter.readingProgress = min(1.0, max(0.0, progress))
-        chapter.lastReadAt = Date()
-        try? context.save()
-    }
-
     public func toggleBookmark(_ chapter: LocalChapterModel) {
         chapter.isBookmarked.toggle()
         try? context.save()

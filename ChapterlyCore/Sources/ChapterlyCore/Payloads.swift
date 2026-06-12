@@ -35,16 +35,6 @@ public struct CollectionLinkPayload: Equatable {
     }
 }
 
-public struct ProgressPayload: Equatable {
-    public let url: String
-    public let scrollProgress: Double
-
-    public init(url: String, scrollProgress: Double) {
-        self.url = url
-        self.scrollProgress = scrollProgress
-    }
-}
-
 public enum PayloadError: Error, Equatable {
     case notADictionary
     case forbiddenKey(String)   // lowercased key name

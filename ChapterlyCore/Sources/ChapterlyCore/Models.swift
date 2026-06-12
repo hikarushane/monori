@@ -44,8 +44,6 @@ public final class LocalChapterModel {
     public var visibleDateText: String?
     public var excerpt: String?
     public var isBookmarked: Bool = false
-    public var readingProgress: Double?
-    public var lastReadAt: Date?
     public var collection: LocalCollectionModel?
 
     public init(id: String = UUID().uuidString,

@@ -40,10 +40,6 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(ReaderStyler.ruleset().contains("var(--chapterly-line-height"))
     }
 
-    func testScrollToTopScript() {
-        XCTAssertEqual(ReaderStyler.scrollToTopScript(), "window.scrollTo(0, 0);")
-    }
-
     func testEnforceScrollScriptEmbedsTargetAndUserInteractionGuard() {
         let js = ReaderStyler.enforceScrollScript(progress: 0.5)
         XCTAssertTrue(js.contains("var target = 0.5"))

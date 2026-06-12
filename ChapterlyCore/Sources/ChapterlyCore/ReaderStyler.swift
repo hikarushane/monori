@@ -49,25 +49,9 @@ public enum ReaderStyler {
         return "document.documentElement.style.setProperty('--chapterly-line-height', '\(formatted)');"
     }
 
-    public static func restoreScrollScript(progress: Double) -> String {
-        let clamped = min(1.0, max(0.0, progress))
-        return """
-        (function () {
-          var doc = document.documentElement;
-          var max = doc.scrollHeight - window.innerHeight;
-          if (max > 0) { window.scrollTo(0, max * \(clamped)); }
-        })();
-        """
-    }
-
-    public static func scrollToTopScript() -> String {
-        "window.scrollTo(0, 0);"
-    }
-
     /// Pins the scroll position to `progress` (or top when nil) for a few seconds,
-    /// re-applying every 400ms to defeat Patreon's own auto-scroll. Stops as soon as
-    /// the user touches or wheel-scrolls the page. Also resets the shared interaction
-    /// flag so ProgressTracker ignores non-user scrolls after each navigation.
+    /// re-applying every 400ms to defeat Patreon's own auto-scroll. Stops as soon
+    /// as the user touches or wheel-scrolls the page.
     public static func enforceScrollScript(progress: Double?) -> String {
         let target = progress.map { min(1.0, max(0.0, $0)) } ?? 0.0
         return """

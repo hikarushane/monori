@@ -15,7 +15,7 @@ PROJECT="Chapterly.xcodeproj"
 BUNDLE_ID="dev.chapterly.Chapterly"
 PHASE1_TIMEOUT=180
 PHASE2_TIMEOUT=90
-EXPECTED_STEPS=7
+EXPECTED_STEPS=8
 LOG_PREDICATE='subsystem == "dev.chapterly" AND category == "smoke-diagnostics"'
 
 mkdir -p "$SMOKE_DIR"

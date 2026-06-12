@@ -22,18 +22,18 @@ struct SettingsView: View {
                 } header: {
                     Text("Data")
                 } footer: {
-                    Text("Clear Library Data deletes collections, chapters, and reading progress stored on this device. Logout from Patreon ends the website session in the built-in browser. The two are independent.")
+                    Text("Clear Library Data deletes collections, chapters, and bookmarks stored on this device. Logout from Patreon ends the website session in the built-in browser. The two are independent.")
                 }
 
                 Section("About") {
                     LabeledContent("Version", value: ChapterlyCore.version)
-                    Text("Chapterly is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and reading progress on this device — never post content. Patreon controls all access to posts.")
+                    Text("Chapterly is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and bookmarks on this device — never post content. Patreon controls all access to posts.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Settings")
-            .confirmationDialog("Delete all collections, chapters, and reading progress?",
+            .confirmationDialog("Delete all collections, chapters, and bookmarks?",
                                 isPresented: $confirmClearLibrary, titleVisibility: .visible) {
                 Button("Clear Library Data", role: .destructive) { env.clearLibraryData() }
             }

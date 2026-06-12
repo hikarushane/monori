@@ -97,14 +97,6 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(n.next?.title, "5 脣瓣")
     }
 
-    func testProgressSavedByNormalizedURL() throws {
-        try store.applyImport([payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0)])
-        store.setProgress(forPageURL: "https://www.patreon.com/posts/5-3?utm_source=share", progress: 0.6)
-        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/5-3/")
-        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.6, accuracy: 0.001)
-        XCTAssertNotNil(chapter?.lastReadAt)
-    }
-
     func testToggleBookmarkPersistsAndTogglesBack() throws {
         let storeURL = try temporaryStoreURL()
         var diskStore = try onDiskStore(at: storeURL)
@@ -129,20 +121,11 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(diskStore.chapter(withPageURL: pageURL)?.isBookmarked, false)
     }
 
-    func testProgressSavedByMatchingPatreonPostIDWhenSlugChanges() throws {
+    func testChapterLookupMatchesByPatreonPostIDWhenSlugChanges() throws {
         try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
-        store.setProgress(forPageURL: "https://www.patreon.com/posts/chapter-title-160628832?utm_source=share",
-                          progress: 0.4)
-        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/160628832")
-        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.4, accuracy: 0.001)
-    }
-
-    func testFooterScrollDoesNotOverwriteReadingProgress() throws {
-        try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
-        store.setProgress(forPageURL: "https://patreon.com/posts/160628832", progress: 0.5)
-        store.setProgress(forPageURL: "https://patreon.com/posts/160628832", progress: 0.98)
-        let chapter = store.chapter(withPageURL: "https://patreon.com/posts/160628832")
-        XCTAssertEqual(chapter?.readingProgress ?? -1, 0.5, accuracy: 0.001)
+        let chapter = store.chapter(
+            withPageURL: "https://www.patreon.com/posts/chapter-title-160628832?utm_source=share")
+        XCTAssertEqual(chapter?.title, "Chapter")
     }
 
     func testRenameAndDelete() throws {
