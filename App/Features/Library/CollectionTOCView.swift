@@ -107,6 +107,20 @@ struct CollectionTOCView: View {
         } message: {
             Text(refreshAlertMessage)
         }
+        .overlay(alignment: .bottom) {
+            if refreshing {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Checking for new chapters… long collections can take a few minutes.")
+                        .font(.footnote)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(.bar, in: Capsule())
+                .padding(.bottom, 12)
+                .accessibilityIdentifier("smoke.refreshStatusBanner")
+            }
+        }
     }
 
     private func chapterRow(_ chapter: LocalChapterModel) -> some View {
