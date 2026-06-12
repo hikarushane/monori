@@ -3,36 +3,85 @@ import WebKit
 
 struct PatreonWebView: UIViewRepresentable {
     let model: WebViewModel
+    /// Called when the user taps the page. The Bool is true when the tap landed
+    /// in the central region (middle 50% horizontally, middle 40% vertically),
+    /// which the reader uses to toggle its chrome without firing on link taps
+    /// near the edges.
+    var onContentTap: ((Bool) -> Void)? = nil
+    /// When set, the left-edge swipe calls this instead of the default
+    /// goBack() behavior. The reader uses it to leave the reader.
+    var backSwipeOverride: (() -> Void)? = nil
 
     private static let backSwipeName = "chapterly.backSwipe"
+    private static let contentTapName = "chapterly.contentTap"
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = model.webView
-        if !(webView.gestureRecognizers ?? []).contains(where: { $0.name == Self.backSwipeName }) {
-            let edge = UIScreenEdgePanGestureRecognizer(
-                target: context.coordinator,
-                action: #selector(Coordinator.handleBackSwipe(_:)))
-            edge.edges = .left
-            edge.name = Self.backSwipeName
-            webView.addGestureRecognizer(edge)
+        context.coordinator.onContentTap = onContentTap
+        context.coordinator.backSwipeOverride = backSwipeOverride
+        // The web view is shared and outlives this representable; re-attach the
+        // gestures to the current coordinator so closures never go stale.
+        for gesture in webView.gestureRecognizers ?? []
+        where gesture.name == Self.backSwipeName || gesture.name == Self.contentTapName {
+            webView.removeGestureRecognizer(gesture)
         }
+        let edge = UIScreenEdgePanGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleBackSwipe(_:)))
+        edge.edges = .left
+        edge.name = Self.backSwipeName
+        webView.addGestureRecognizer(edge)
+
+        let tap = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleContentTap(_:)))
+        tap.name = Self.contentTapName
+        tap.cancelsTouchesInView = false
+        tap.delegate = context.coordinator
+        webView.addGestureRecognizer(tap)
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        context.coordinator.onContentTap = onContentTap
+        context.coordinator.backSwipeOverride = backSwipeOverride
+    }
 
     /// Patreon navigates client-side (same-document history entries), which
     /// WKWebView's built-in back gesture ignores even though goBack() handles
     /// them fine — so drive goBack() from our own left-edge swipe.
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onContentTap: ((Bool) -> Void)?
+        var backSwipeOverride: (() -> Void)?
+
         @objc func handleBackSwipe(_ gesture: UIScreenEdgePanGestureRecognizer) {
             guard gesture.state == .ended,
                   let webView = gesture.view as? WKWebView,
-                  gesture.translation(in: webView).x > 60,
-                  webView.canGoBack else { return }
-            webView.goBack()
+                  gesture.translation(in: webView).x > 60 else { return }
+            if let backSwipeOverride {
+                backSwipeOverride()
+            } else if webView.canGoBack {
+                webView.goBack()
+            }
+        }
+
+        @objc func handleContentTap(_ gesture: UITapGestureRecognizer) {
+            guard gesture.state == .ended,
+                  let view = gesture.view,
+                  let onContentTap else { return }
+            let point = gesture.location(in: view)
+            let bounds = view.bounds
+            let isCenter = point.x > bounds.width * 0.25 && point.x < bounds.width * 0.75
+                && point.y > bounds.height * 0.30 && point.y < bounds.height * 0.70
+            onContentTap(isCenter)
+        }
+
+        // The web view must keep receiving the same touches (links, scrolling).
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+            true
         }
     }
 }
