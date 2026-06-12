@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import os
 
 struct PatreonWebView: UIViewRepresentable {
     let model: WebViewModel
@@ -56,14 +57,31 @@ struct PatreonWebView: UIViewRepresentable {
         var onContentTap: ((Bool) -> Void)?
         var backSwipeOverride: (() -> Void)?
 
+        private static let log = Logger(subsystem: "dev.chapterly",
+                                        category: "smoke-diagnostics")
+
         @objc func handleBackSwipe(_ gesture: UIScreenEdgePanGestureRecognizer) {
             guard gesture.state == .ended,
-                  let webView = gesture.view as? WKWebView,
-                  gesture.translation(in: webView).x > 60 else { return }
+                  let webView = gesture.view as? WKWebView else { return }
+            let dx = gesture.translation(in: webView).x
+            #if DEBUG
+            // Paths only — never query strings or full URLs with parameters.
+            let backPaths = webView.backForwardList.backList.suffix(5)
+                .map { $0.url.path }.joined(separator: " <- ")
+            Self.log.notice("[SMOKE] back_swipe dx=\(Int(dx)) canGoBack=\(webView.canGoBack) current=\(webView.url?.path ?? "nil", privacy: .public) back5=[\(backPaths, privacy: .public)]")
+            #endif
+            guard dx > 60 else { return }
             if let backSwipeOverride {
                 backSwipeOverride()
             } else if webView.canGoBack {
+                #if DEBUG
+                Self.log.notice("[SMOKE] back_swipe action=goBack target=\(webView.backForwardList.backItem?.url.path ?? "nil", privacy: .public)")
+                #endif
                 webView.goBack()
+            } else {
+                #if DEBUG
+                Self.log.notice("[SMOKE] back_swipe action=noop reason=canGoBack_false")
+                #endif
             }
         }
 
