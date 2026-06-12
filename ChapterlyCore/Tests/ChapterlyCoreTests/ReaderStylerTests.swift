@@ -19,6 +19,21 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(js.contains("21px"))
     }
 
+    func testLineHeightScriptSetsVariable() {
+        let js = ReaderStyler.lineHeightScript(value: 1.9)
+        XCTAssertTrue(js.contains("--chapterly-line-height"))
+        XCTAssertTrue(js.contains("1.90"))
+    }
+
+    func testLineHeightScriptClampsRange() {
+        XCTAssertTrue(ReaderStyler.lineHeightScript(value: 9.0).contains("2.40"))
+        XCTAssertTrue(ReaderStyler.lineHeightScript(value: 0.1).contains("1.20"))
+    }
+
+    func testRulesetUsesLineHeightVariable() {
+        XCTAssertTrue(ReaderStyler.ruleset().contains("var(--chapterly-line-height"))
+    }
+
     func testScrollToTopScript() {
         XCTAssertEqual(ReaderStyler.scrollToTopScript(), "window.scrollTo(0, 0);")
     }

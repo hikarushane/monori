@@ -24,7 +24,7 @@ article {
   margin-right: auto !important;
   font-family: Georgia, "Noto Serif TC", "Songti TC", serif !important;
   font-size: var(--chapterly-font-size, 19px) !important;
-  line-height: 1.75 !important;
+  line-height: var(--chapterly-line-height, 1.75) !important;
 }
 
 [data-tag="post-title"],

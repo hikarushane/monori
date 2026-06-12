@@ -43,6 +43,12 @@ public enum ReaderStyler {
         return "document.documentElement.style.setProperty('--chapterly-font-size', '\(clamped)px');"
     }
 
+    public static func lineHeightScript(value: Double) -> String {
+        let clamped = min(2.4, max(1.2, value))
+        let formatted = String(format: "%.2f", clamped)
+        return "document.documentElement.style.setProperty('--chapterly-line-height', '\(formatted)');"
+    }
+
     public static func restoreScrollScript(progress: Double) -> String {
         let clamped = min(1.0, max(0.0, progress))
         return """
