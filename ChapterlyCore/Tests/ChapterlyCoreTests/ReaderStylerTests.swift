@@ -25,6 +25,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(js.contains("1.90"))
     }
 
+    func testLineHeightScriptUsesCSSDecimalSeparator() {
+        let js = ReaderStyler.lineHeightScript(value: 1.9)
+        XCTAssertEqual(js, "document.documentElement.style.setProperty('--chapterly-line-height', '1.90');")
+        XCTAssertFalse(js.contains("1,90"))
+    }
+
     func testLineHeightScriptClampsRange() {
         XCTAssertTrue(ReaderStyler.lineHeightScript(value: 9.0).contains("2.40"))
         XCTAssertTrue(ReaderStyler.lineHeightScript(value: 0.1).contains("1.20"))

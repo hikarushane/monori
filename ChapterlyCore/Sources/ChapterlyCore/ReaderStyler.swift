@@ -45,7 +45,7 @@ public enum ReaderStyler {
 
     public static func lineHeightScript(value: Double) -> String {
         let clamped = min(2.4, max(1.2, value))
-        let formatted = String(format: "%.2f", clamped)
+        let formatted = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), clamped)
         return "document.documentElement.style.setProperty('--chapterly-line-height', '\(formatted)');"
     }
 
