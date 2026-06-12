@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 import SwiftData
 @testable import ChapterlyCore
@@ -18,6 +19,24 @@ final class LibraryStoreTests: XCTestCase {
                                collectionName: "【更新中】焚心 The Burning Heart",
                                collectionURL: "https://www.patreon.com/collection/9999",
                                domOrder: order)
+    }
+
+    private func temporaryStoreURL() throws -> URL {
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("LibraryStoreTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directoryURL,
+                                                withIntermediateDirectories: true)
+        addTeardownBlock {
+            try? FileManager.default.removeItem(at: directoryURL)
+        }
+        return directoryURL.appendingPathComponent("Library.store")
+    }
+
+    private func onDiskStore(at storeURL: URL) throws -> LibraryStore {
+        let config = ModelConfiguration("LibraryStoreTests", url: storeURL)
+        let container = try ModelContainer(for: LocalCollectionModel.self, LocalChapterModel.self,
+                                           configurations: config)
+        return LibraryStore(container: container)
     }
 
     func testImportCreatesCollectionAndChapters() throws {
@@ -87,16 +106,27 @@ final class LibraryStoreTests: XCTestCase {
     }
 
     func testToggleBookmarkPersistsAndTogglesBack() throws {
-        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
-        let chapter = store.orderedChapters(of: try store.collections()[0])[0]
+        let storeURL = try temporaryStoreURL()
+        var diskStore = try onDiskStore(at: storeURL)
+
+        try diskStore.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let chapter = diskStore.orderedChapters(of: try diskStore.collections()[0])[0]
+        let pageURL = chapter.urlString
         XCTAssertFalse(chapter.isBookmarked)
 
-        store.toggleBookmark(chapter)
-        // Re-fetch through the store to prove the change was saved, not just mutated in memory.
-        XCTAssertEqual(store.chapter(withPageURL: chapter.urlString)?.isBookmarked, true)
+        diskStore.toggleBookmark(chapter)
+        // Keep the original page URL re-fetch check, then verify across a fresh store boundary.
+        XCTAssertEqual(diskStore.chapter(withPageURL: pageURL)?.isBookmarked, true)
 
-        store.toggleBookmark(chapter)
-        XCTAssertEqual(store.chapter(withPageURL: chapter.urlString)?.isBookmarked, false)
+        diskStore = try onDiskStore(at: storeURL)
+        let reloadedBookmarkedChapter = try XCTUnwrap(diskStore.chapter(withPageURL: pageURL))
+        XCTAssertTrue(reloadedBookmarkedChapter.isBookmarked)
+
+        diskStore.toggleBookmark(reloadedBookmarkedChapter)
+        XCTAssertEqual(diskStore.chapter(withPageURL: pageURL)?.isBookmarked, false)
+
+        diskStore = try onDiskStore(at: storeURL)
+        XCTAssertEqual(diskStore.chapter(withPageURL: pageURL)?.isBookmarked, false)
     }
 
     func testProgressSavedByMatchingPatreonPostIDWhenSlugChanges() throws {
