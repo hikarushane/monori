@@ -123,6 +123,11 @@ public final class LibraryStore {
         try? context.save()
     }
 
+    public func toggleBookmark(_ chapter: LocalChapterModel) {
+        chapter.isBookmarked.toggle()
+        try? context.save()
+    }
+
     public func rename(_ chapter: LocalChapterModel, to title: String) {
         chapter.title = String(title.prefix(PayloadValidator.maxFieldLength))
         try? context.save()

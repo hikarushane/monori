@@ -86,6 +86,19 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertNotNil(chapter?.lastReadAt)
     }
 
+    func testToggleBookmarkPersistsAndTogglesBack() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let chapter = store.orderedChapters(of: try store.collections()[0])[0]
+        XCTAssertFalse(chapter.isBookmarked)
+
+        store.toggleBookmark(chapter)
+        // Re-fetch through the store to prove the change was saved, not just mutated in memory.
+        XCTAssertEqual(store.chapter(withPageURL: chapter.urlString)?.isBookmarked, true)
+
+        store.toggleBookmark(chapter)
+        XCTAssertEqual(store.chapter(withPageURL: chapter.urlString)?.isBookmarked, false)
+    }
+
     func testProgressSavedByMatchingPatreonPostIDWhenSlugChanges() throws {
         try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
         store.setProgress(forPageURL: "https://www.patreon.com/posts/chapter-title-160628832?utm_source=share",

@@ -43,6 +43,7 @@ public final class LocalChapterModel {
     public var orderIndex: Int                // explicit, never derived at query time
     public var visibleDateText: String?
     public var excerpt: String?
+    public var isBookmarked: Bool = false
     public var readingProgress: Double?
     public var lastReadAt: Date?
     public var collection: LocalCollectionModel?
