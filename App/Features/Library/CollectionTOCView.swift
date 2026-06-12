@@ -106,18 +106,17 @@ struct CollectionTOCView: View {
                     }
                 }
                 Spacer()
-                if let progress = chapter.readingProgress {
-                    if progress >= 0.97 {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel("Finished")
-                    } else {
-                        Text("\(Int(progress * 100))%")
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel("\(Int(progress * 100)) percent read")
-                    }
+                Button {
+                    env.store.toggleBookmark(chapter)
+                } label: {
+                    Image(systemName: chapter.isBookmarked ? "bookmark.fill" : "bookmark")
+                        .foregroundStyle(chapter.isBookmarked ? Color.accentColor : Color.secondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(chapter.isBookmarked ? "Remove bookmark" : "Bookmark this chapter")
+                .accessibilityIdentifier("smoke.chapterBookmarkButton")
             }
             if let preview = previewText {
                 Text(preview)
