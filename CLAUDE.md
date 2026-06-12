@@ -111,10 +111,11 @@ Use this for the full MVP smoke loop after the Simulator is already manually log
 * chapter import
 * reader open
 * reader CSS check
-* progress save
-* progress restore after relaunch
+* bookmark save
+* bookmark restore after relaunch
+* reader opens at top
 
-Exit codes:
+`EXPECTED_STEPS=8`. Exit codes:
 
 * `0` means all smoke steps passed
 * `1` means a build, smoke step, or timeout failed
@@ -317,7 +318,7 @@ Allowed diagnostics:
 * reason why import chapters is hidden
 * detected chapter count
 * reader CSS applied or not
-* progress save/restore state
+* bookmark state
 * independent data clearing status
 
 Forbidden diagnostics:
@@ -354,7 +355,10 @@ smoke.collectionBanner
 smoke.importChaptersButton
 smoke.readerTitle
 smoke.readerWebView
-smoke.progressIndicator
+smoke.chapterBookmarkButton
+smoke.readerBookmarkButton
+smoke.readerPrefsButton
+smoke.refreshChaptersButton
 smoke.clearDataButton
 ```
 
@@ -420,18 +424,19 @@ Do not rely only on visual inspection.
 
 If possible, add a test fixture with local HTML and verify CSS behavior without Patreon login.
 
+Reader mode is always enabled for library chapters (`foreignPageTitle == nil`). The "Reader mode by default" toggle was removed from Settings — there is no per-chapter opt-out.
+
 ---
 
-### Progress Save / Restore Debugging
+### Bookmark Debugging
 
-When debugging progress save and restore:
+When debugging bookmark save and restore:
 
-* use a deterministic local test where possible
-* verify the storage key
-* verify save timing
-* verify restore timing
-* verify the article identifier is stable
-* verify the test does not depend on real Patreon content unless it is a manual smoke test
+* Storage field: `isBookmarked: Bool` on `LocalChapterModel`
+* Toggle method: `store.toggleBookmark(_:)` in `LibraryStore`
+* Deterministic test: `testToggleBookmarkPersistsAndTogglesBack` in `LibraryStoreTests`
+* Bookmark icon in TOC rows (`smoke.chapterBookmarkButton`) and reader top bar (`smoke.readerBookmarkButton`) share the same model — toggling one updates the other immediately
+* No simulator erase needed; bookmark state is local SwiftData
 
 Do not erase the Simulator if the goal is to preserve login state.
 
@@ -450,8 +455,8 @@ When debugging independent data clearing:
 Example safe diagnostics:
 
 ```text
-readerProgressEntriesBeforeClear = 12
-readerProgressEntriesAfterClear = 0
+bookmarkedChapterCountBeforeClear = 3
+bookmarkedChapterCountAfterClear = 0
 patreonSessionPreserved = true
 ```
 

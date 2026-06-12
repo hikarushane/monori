@@ -3,7 +3,7 @@
 A calm, local-only reading shell for your own Patreon session. Log into
 patreon.com inside the app, import a series' chapter list from its collection
 page, and read with clean typography, previous/next chapter navigation, and
-locally saved reading progress.
+bookmarks you can set per chapter.
 
 Chapterly is **not** a Patreon client or API consumer. It never bypasses
 access control, never stores post content, and has no backend. See
@@ -45,17 +45,19 @@ in with their own Patreon account.
 1. **Browse** tab → log into patreon.com (email login; third-party SSO that
    leaves patreon.com opens in Safari by design — prefer email login).
 2. Open a post in a series → tap **Open collection** when the series banner
-   appears → on the collection page tap **Import visible chapters**.
-   Scroll to load more chapters and import again; re-imports merge.
-3. **Library** tab → pick the collection → tap a chapter to read.
-4. Reader: font size and reader-mode toggle in the top-right menu;
-   previous/next chapter in the bottom bar.
+   appears → on the collection page tap **Import all chapters** (the script
+   scrolls automatically; re-imports merge without duplicates).
+3. **Library** tab → pick the collection → tap a chapter to read. Tap ↻ in
+   the toolbar to check for newly released chapters.
+4. Reader: chrome hidden by default — tap the page center to show/hide bars.
+   Bookmark top-left; font size + line spacing in the preferences panel
+   (⊤T button, top-right). Left-edge swipe to leave. Previous/next chapter
+   in the bottom bar.
 
 ## Known limitations
 
 - Patreon markup changes can break reader styling and import — both degrade
-  gracefully; chapter lists can always be edited or entered manually.
-- Reading progress is approximate (lazy-loaded images shift page height).
+  gracefully; chapter lists can always be re-imported from the Browse tab.
 - No offline reading, by design.
 
 ## What not to implement

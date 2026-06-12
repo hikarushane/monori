@@ -4,3 +4,6 @@ DerivedData/
 .build/
 *.xcodeproj
 .env
+*.log
+docs/
+WIKI_SYNC.md
