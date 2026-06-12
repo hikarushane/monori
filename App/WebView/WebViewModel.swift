@@ -9,6 +9,8 @@ final class WebViewModel: NSObject {
     let router: ScriptMessageRouter
     var currentURL: URL?
     var finishedNavigationCount = 0
+    /// Mirrors WKWebView.estimatedProgress (0...1; 1 when idle) for SwiftUI.
+    var loadingProgress: Double = 1
     var detectedCollection: CollectionLinkPayload?
     var isOnCollectionPage: Bool {
         guard let url = currentURL else { return false }
@@ -22,6 +24,7 @@ final class WebViewModel: NSObject {
     }
 
     private var urlObservation: NSKeyValueObservation?
+    private var progressObservation: NSKeyValueObservation?
 
     override init() {
         let router = ScriptMessageRouter()
@@ -64,6 +67,11 @@ final class WebViewModel: NSObject {
                     self.detectedCollection = nil
                     self.runCollectionDetect()
                 }
+            }
+        }
+        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] _, change in
+            Task { @MainActor [weak self] in
+                self?.loadingProgress = change.newValue ?? 1
             }
         }
     }

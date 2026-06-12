@@ -8,6 +8,12 @@ struct BrowseView: View {
         VStack(spacing: 0) {
             WebCollectionBanner(model: env.browse)
             PatreonWebView(model: env.browse)
+                .overlay(alignment: .top) {
+                    if env.browse.loadingProgress < 1 {
+                        ProgressView(value: env.browse.loadingProgress)
+                            .progressViewStyle(.linear)
+                    }
+                }
         }
         .onAppear {
             if env.browse.currentURL == nil {

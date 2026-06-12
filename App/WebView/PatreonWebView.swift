@@ -74,6 +74,7 @@ struct PatreonWebView: UIViewRepresentable {
             if let backSwipeOverride {
                 backSwipeOverride()
             } else if webView.canGoBack {
+                animateBackTransition(on: webView)
                 #if DEBUG
                 Self.log.notice("[SMOKE] back_swipe action=goBack target=\(webView.backForwardList.backItem?.url.path ?? "nil", privacy: .public)")
                 #endif
@@ -82,6 +83,21 @@ struct PatreonWebView: UIViewRepresentable {
                 #if DEBUG
                 Self.log.notice("[SMOKE] back_swipe action=noop reason=canGoBack_false")
                 #endif
+            }
+        }
+
+        /// goBack() swaps content in place with no transition. Slide a snapshot
+        /// of the outgoing page to the right so back-navigation reads as "pop",
+        /// like a native navigation stack. The snapshot is transient and
+        /// released when the animation completes.
+        private func animateBackTransition(on webView: WKWebView) {
+            guard let snapshot = webView.snapshotView(afterScreenUpdates: false) else { return }
+            snapshot.frame = webView.bounds
+            webView.addSubview(snapshot)
+            UIView.animate(withDuration: 0.28, delay: 0, options: [.curveEaseInOut]) {
+                snapshot.frame.origin.x = webView.bounds.width
+            } completion: { _ in
+                snapshot.removeFromSuperview()
             }
         }
 
