@@ -12,7 +12,6 @@ struct SettingsView: View {
             Form {
                 Section("Reading") {
                     Stepper("Font size: \(prefs.fontSize)", value: $prefs.fontSize, in: 14...32)
-                    Toggle("Reader mode by default", isOn: $prefs.readerModeEnabled)
                 }
 
                 Section {

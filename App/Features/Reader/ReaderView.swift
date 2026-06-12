@@ -7,7 +7,10 @@ struct ReaderView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var current: LocalChapterModel
     @State private var prefs = ReaderPreferences()
-    @State private var targetProgress: Double?
+    /// Reader chrome (top/bottom bars) is hidden by default; tapping the
+    /// center of the page toggles it.
+    @State private var chromeVisible = false
+    @State private var showPrefsPanel = false
     /// Non-nil while the web view shows a page outside the library (e.g. a related
     /// post from a collection that has not been imported). Holds the display title.
     @State private var foreignPageTitle: String?
@@ -21,20 +24,72 @@ struct ReaderView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            topBar
-            if foreignPageTitle != nil {
-                WebCollectionBanner(model: env.reader)
+        PatreonWebView(model: env.reader,
+                       onContentTap: handleContentTap(isCenter:),
+                       backSwipeOverride: handleBackSwipe)
+            .accessibilityIdentifier("smoke.readerWebView")
+            .overlay(alignment: .top) { topChrome }
+            .overlay(alignment: .bottom) { bottomChrome }
+            .onAppear { open(current) }
+            .onDisappear { foreignTitleTask?.cancel() }
+            .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
+            .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
+            .onChange(of: prefs.fontSize) { _, size in
+                env.reader.webView.evaluateJavaScript(
+                    ReaderStyler.fontSizeScript(points: size), completionHandler: nil)
             }
-            PatreonWebView(model: env.reader)
-                .accessibilityIdentifier("smoke.readerWebView")
-            bottomBar
-        }
-        .onAppear { open(current) }
-        .onDisappear { foreignTitleTask?.cancel() }
-        .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
-        .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
+            .onChange(of: prefs.lineSpacing) { _, spacing in
+                env.reader.webView.evaluateJavaScript(
+                    ReaderStyler.lineHeightScript(value: spacing), completionHandler: nil)
+            }
     }
+
+    // MARK: - Chrome
+
+    @ViewBuilder private var topChrome: some View {
+        if chromeVisible {
+            VStack(spacing: 0) {
+                topBar
+                if foreignPageTitle != nil {
+                    WebCollectionBanner(model: env.reader)
+                }
+                if showPrefsPanel {
+                    ReaderPreferencesPanel(prefs: prefs)
+                }
+            }
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+
+    @ViewBuilder private var bottomChrome: some View {
+        if chromeVisible {
+            bottomBar
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+
+    private func handleContentTap(isCenter: Bool) {
+        withAnimation(.easeInOut(duration: 0.25)) {
+            if showPrefsPanel {
+                // Any tap on the page outside the panel closes just the panel.
+                showPrefsPanel = false
+            } else if isCenter {
+                chromeVisible.toggle()
+            }
+        }
+    }
+
+    /// Left-edge swipe: a foreign page first goes back toward the chapter it
+    /// was opened from; on a library chapter the swipe leaves the reader.
+    private func handleBackSwipe() {
+        if foreignPageTitle != nil && env.reader.webView.canGoBack {
+            env.reader.webView.goBack()
+        } else {
+            dismiss()
+        }
+    }
+
+    // MARK: - Navigation / state sync
 
     private var neighbors: (previous: LocalChapterModel?, next: LocalChapterModel?) {
         foreignPageTitle == nil ? env.store.neighbors(of: current) : (nil, nil)
@@ -51,7 +106,6 @@ struct ReaderView: View {
         foreignPageTitle = nil
         foreignPageKey = nil
         current = chapter
-        targetProgress = chapter.readingProgress
         if let url = URL(string: chapter.urlString) {
             env.reader.load(url)
         }
@@ -60,8 +114,8 @@ struct ReaderView: View {
     /// Patreon navigates between posts client-side (SPA), so didFinish may never fire.
     /// Keep `current` in sync with whatever article the web view actually shows.
     /// Pages outside the library (e.g. not-yet-imported related posts) get a
-    /// "foreign" state: the title comes from the page itself, prev/next navigation
-    /// is hidden, and no stored progress is applied to them.
+    /// "foreign" state: the title comes from the page itself and prev/next
+    /// navigation is hidden.
     private func syncCurrentChapter(to url: URL?) {
         guard let url else { return }
         if let chapter = env.store.chapter(withPageURL: url.absoluteString) {
@@ -71,12 +125,10 @@ struct ReaderView: View {
             foreignPageKey = nil
             if chapter.id != current.id {
                 current = chapter
-                targetProgress = chapter.readingProgress
                 applyReaderTreatment()
             } else if wasForeign {
                 // SPA return to the chapter we were already on: didFinish never fires,
                 // so re-apply treatment here or the page keeps Patreon's auto-scroll.
-                targetProgress = chapter.readingProgress
                 applyReaderTreatment()
             }
         } else {
@@ -85,7 +137,6 @@ struct ReaderView: View {
                 ?? url.absoluteString
             let samePage = foreignPageTitle != nil && key == foreignPageKey
             foreignPageKey = key
-            targetProgress = nil
             guard !samePage else { return }
             let staleTitles: Set<String> = [current.title, currentTitle]
             let slugTitle = ChapterTextFormatter.presentation(storedTitle: "",
@@ -120,29 +171,26 @@ struct ReaderView: View {
         }
     }
 
+    // MARK: - Page treatment
+
     private func applyReaderTreatment() {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
-        if prefs.readerModeEnabled {
-            if foreignPageTitle == nil {
-                webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
-                webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
-                                           completionHandler: nil)
-            } else {
-                // The ruleset is post-page specific: on creator/collection pages it
-                // hides the chrome and squeezes the feed, so strip it there.
-                webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
-            }
-        }
-        // Foreign pages have no library chapter to repair or restore progress for,
-        // but they still need the scroll pinned (to the top) or Patreon's own
-        // auto-scroll drags every unimported page to the bottom.
-        var restorable: Double?
         if foreignPageTitle == nil {
+            webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+            webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
+                                       completionHandler: nil)
+            webView.evaluateJavaScript(ReaderStyler.lineHeightScript(value: prefs.lineSpacing),
+                                       completionHandler: nil)
             repairCurrentTitleIfNeeded(webView)
-            restorable = targetProgress.flatMap { ReaderProgressPolicy.shouldRestore($0) ? $0 : nil }
+        } else {
+            // The ruleset is post-page specific: on creator/collection pages it
+            // hides the chrome and squeezes the feed, so strip it there.
+            webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
         }
-        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: restorable),
+        // Every page opens at the top; the enforcer also defeats Patreon's own
+        // auto-scroll on freshly loaded pages.
+        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: nil),
                                    completionHandler: nil)
     }
 
@@ -177,37 +225,41 @@ struct ReaderView: View {
     })();
     """
 
+    // MARK: - Bars
+
     private var topBar: some View {
         HStack {
-            Button { dismiss() } label: { Image(systemName: "chevron.down") }
-                .accessibilityLabel("Close reader")
+            if foreignPageTitle == nil {
+                Button {
+                    env.store.toggleBookmark(current)
+                } label: {
+                    Image(systemName: current.isBookmarked ? "bookmark.fill" : "bookmark")
+                        .foregroundStyle(current.isBookmarked ? Color.accentColor : Color.secondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(current.isBookmarked ? "Remove bookmark" : "Bookmark this chapter")
+                .accessibilityIdentifier("smoke.readerBookmarkButton")
+            } else {
+                Color.clear.frame(width: 44, height: 44)
+            }
             Spacer()
             Text(currentTitle).font(.subheadline.weight(.medium)).lineLimit(1)
                 .accessibilityIdentifier("smoke.readerTitle")
             Spacer()
-            Menu {
-                Button("Increase font") { prefs.fontSize = min(32, prefs.fontSize + 1) }
-                Button("Decrease font") { prefs.fontSize = max(14, prefs.fontSize - 1) }
-                Toggle("Reader mode", isOn: $prefs.readerModeEnabled)
-                if let url = env.reader.currentURL ?? URL(string: current.urlString) {
-                    Link("Open on Patreon", destination: url)
-                }
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) { showPrefsPanel.toggle() }
             } label: {
                 Image(systemName: "textformat.size")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .accessibilityLabel("Reading options")
-            .onChange(of: prefs.fontSize) { _, size in
-                env.reader.webView.evaluateJavaScript(
-                    ReaderStyler.fontSizeScript(points: size), completionHandler: nil)
-            }
-            .onChange(of: prefs.readerModeEnabled) { _, enabled in
-                env.reader.webView.evaluateJavaScript(
-                    enabled ? ReaderStyler.injectionScript() : ReaderStyler.removalScript(),
-                    completionHandler: nil)
-            }
+            .accessibilityIdentifier("smoke.readerPrefsButton")
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 4)
         .background(.bar)
     }
 
