@@ -1,15 +1,15 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-11（session 3）
+> 最後更新：2026-06-13（session 4）
 
 ## 專案概覽
-Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、追蹤閱讀進度。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
+Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
 
 ## 架構決策
 | 決策 | 選擇 | 原因 | 狀態 | 日期 |
 |------|------|------|------|------|
 | 章節資料儲存 | SwiftData | iOS native，無需 server，schema migration 內建 | active | 2026-06 |
-| 進度追蹤 | JS ProgressTracker.js injection + WKScriptMessageHandler | 不需 native scroll view，直接讀 DOM scroll | active | 2026-06 |
+| 進度追蹤 | JS ProgressTracker.js injection + WKScriptMessageHandler | 不需 native scroll view，直接讀 DOM scroll | superseded → 移除進度功能 | 2026-06 |
 | 章節 import | JS CollectionImport.js postMessage → Swift PayloadValidator | 在 WebView context 執行 DOM 解析，結果傳回 Swift 驗證 | active | 2026-06 |
 | Scroll 回復 | enforceScrollScript interval 4s/400ms | Patreon 自帶 auto-scroll 會搶奪控制，需 interval 贏回 | active | 2026-06-11 |
 | Tab 重選行為 | `AppTab` enum + custom `Binding` 攔截重選事件 | 標準 `TabView(selection:)` 無法偵測重選同一 tab；custom Binding 攔截後呼叫 `handleBrowseTabReselect()` | active | 2026-06-11 |
@@ -18,6 +18,10 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 | Import 全章節 | `callAsyncJavaScript` + JS 捲動展開迴圈：捲底→找「Load more」按鈕（中英 matcher）→點擊後等 1200ms；結束條件 = 無按鈕 AND 連結數穩定 3 輪（500ms/輪、上限 240 輪）| Patreon collection 清單 = 無限捲動 + 分頁按鈕混合；點擊後網路載入有延遲，穩定判定必須同時看按鈕存在性 | active | 2026-06-12 |
 | Scroll enforce 範圍 | known 和 foreign 頁都跑 `enforceScrollScript`（foreign 釘頂部）| foreign 不跑就被 Patreon auto-scroll 拖到底；只有 progress 還原限 known | active | 2026-06-11 |
 | Post card 整卡可點 | `CardTreatment.js` user script（兩個 webview 都注入）：`[data-tag="post-card"]` 整卡 click→title link、user-select none、隱藏中英 Show more、teaser 加 mask 漸層 | Patreon 卡片只有標題可點、文字可被選取、Show more 展開佔版面；MutationObserver 300ms throttle 跟 SPA 重渲染 | active | 2026-06-12 |
+| 閱讀進度功能 | 整個移除（ProgressTracker.js / ReaderProgressPolicy / readingProgress 欄位全刪）；章節固定開頂部 `enforceScrollScript(progress: nil)` | 使用者要求；lazy-load 圖片讓進度值不準；書籤取代「讀到哪」需求；輕量 SwiftData migration 靜默丟舊值 | active | 2026-06-12 |
+| 章節書籤 | `isBookmarked: Bool` on `LocalChapterModel` + `store.toggleBookmark(_:)` | TOC 列與 reader top bar 同 model 同 context → 圖示即時同步；migration 輕量 | active | 2026-06-12 |
+| 檢查新章節 | 第三個離屏 `WebViewModel`（`env.refresher`）載入 collection 來源頁重跑 CollectionImport | 共用 default data store = 登入 cookie 直接有效；`applyImport` 以 normalized URL merge 不重複；chapter count delta = 新章數 | active | 2026-06-12 |
+| Reader UX | chrome 預設隱藏+中央點擊切換（上滑下/下滑上）；reader mode 永遠開（Settings toggle 移除）；左緣滑離開；偏好面板全寬、按鈕連點不關 | 沉浸式閱讀 overhaul（commit b4b8a99） | active | 2026-06-12 |
 
 ## 規範
 ### Patreon DOM
@@ -36,10 +40,16 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - `isProbablyContaminatedTitle()`：2+ 行 OR >100 chars OR body text
 - `firstLineIsTitle`：≤100 chars AND NOT body text
 
-### 進度儲存
+### 進度儲存（已廢止 2026-06-12 — 進度功能整個移除，以下僅歷史參考）
 - `ProgressTracker.js` 只在 `__chapterlyUserInteracted === true` 後存 progress
 - `touchstart` / `wheel` 事件設 flag
-- `enforceScrollScript` 每次執行先 reset `__chapterlyUserInteracted = false`
+- `enforceScrollScript` 每次執行先 reset `__chapterlyUserInteracted = false`（此 script 仍在用，只是固定 progress: nil = 頂部）
+
+### 書籤（更新自 2026-06-12）
+- 儲存欄位：`isBookmarked: Bool` on `LocalChapterModel`；切換：`store.toggleBookmark(_:)`
+- TOC 列（`smoke.chapterBookmarkButton`）與 reader top bar（`smoke.readerBookmarkButton`）同 model 即時同步
+- 決定性測試：`testToggleBookmarkPersistsAndTogglesBack`（暫存 on-disk store + 重載新 LibraryStore 驗證真持久化）
+- smoke loop 現為 8 步：phase 1 末 = `bookmark_save`；phase 2 = `bookmark_restore` + `reader_top`；`EXPECTED_STEPS=8`
 
 ### SPA Navigation
 - Patreon 是 SPA：article-to-article navigation 不觸發 WKWebView `didFinish`
@@ -80,6 +90,11 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 - **WKWebView 原生返回手勢不支援 SPA entry**（2026-06-12）：`allowsBackForwardNavigationGestures` 對 Patreon same-document（pushState）歷史項目不會觸發，但 `goBack()` API 可以。解法：關掉原生手勢、PatreonWebView 裝自訂 `UIScreenEdgePanGestureRecognizer`（左緣、translation>60pt）呼叫 `goBack()`；兩者並存會在真導航時 double-back。
 
+- **@Observable didSet 自我賦值無限遞迴**（2026-06-12）：reader 偏好面板任一按鈕（或 Settings Stepper）讓 app 凍結 → `@Observable` macro 把 stored property 改寫成 computed accessor，didSet 內 `fontSize = clamp(…)` 重入 setter → didSet → setter… 無限遞迴。plain class 同寫法是安全 idiom，**@Observable 下不是**（scratch test 證實兩者差異）。修法：private tracked storage + computed property 在 setter 內 clamp 一次（見 2026-06-13 計畫 Task 1）。
+  📍 出現位置：`App/Features/Reader/ReaderPreferences.swift` 的 `fontSize` / `lineSpacing`（commit b4b8a99 引入）
+
+- **`git add -A` 掃進工件 + gitignore 不影響已追蹤檔**（2026-06-12）：T7 commit 把 `WIKI_SYNC.md`、`build/xcodebuild.log`、`docs/` 掃進版控。`.gitignore` 已加 `docs/`、`*.log`、`WIKI_SYNC.md`，但已追蹤檔案要另外 `git rm --cached` 才會解除。commit 時列明檔案、不要 `git add -A`。
+
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險
 - 用 `scrollApplied: Bool` guard 防止重複 scroll：Patreon 自帶 scroll 在 guard 後才執行，無效 → 改用 enforceScrollScript interval
@@ -91,8 +106,13 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 ## 未解決的問題
 - [ ] **Cloudflare CAPTCHA**：Simulator 的 Patreon session 被 Cloudflare 出題，使用者需手動勾「驗證您是人類」後重跑 `./scripts/smoke-auto.sh`（程式碼修復已完成、verify.sh 84/84）
-- [ ] README.md:48「Import visible chapters」待使用者確認後改為「Import all chapters」
+- ~~[ ] README.md:48「Import visible chapters」待使用者確認後改為「Import all chapters」~~（已解決 2026-06-13，commit c10dd62）
 - [ ] 舊 chapter 的 `excerpt` 欄位是 nil → 重按一次 Import all chapters 即可補齊（待使用者操作）
+- [ ] **Reader 偏好面板凍結（P0）**：根因已確認（@Observable didSet 遞迴），修復 = `docs/superpowers/plans/2026-06-13-ux-sweep-fixes-browse-nav.md` Task 1
+- [ ] **Browse 集合頁左滑無反應**（UX sweep #5/#6）：三假說 H1（canGoBack=false）/ H2（same-document 洗版）/ H3（跨文件重載過慢），需計畫 Task 2 診斷 log 判定後選 Task 5 分支
+- [ ] **Browse 返回動畫生硬 + 載入慢**（#2/#8/#9）：計畫 Task 3（snapshot 滑出 + estimatedProgress 進度條）；深層解法 webview stack 見計畫 Appendix A（暫緩）
+- [ ] **Refresh 匯入新章節結果未驗證**：等追蹤的 collection 真的出新章後按 ↻ 確認「Imported 1 new chapter.」
+- [ ] **smoke-auto.sh（8 步版）尚未實跑**：T7 改造後待使用者協助執行（= overhaul 計畫 T8 step 2 / 新計畫 Task 6 step 2）
 - ~~[ ] Bug regression：Library collection 點進文章自動卷到底部~~（已修 2026-06-11 session 3）
 - ~~[ ] Browse banner 殘留~~（已修 2026-06-11 session 3：detect 限 post 頁，非 reselect 清空問題）
 - ~~[ ] Browse menu 項目可拖動~~（已修 2026-06-11 session 3：WKWebView dragstart suppressor，非 `.onMove`）
