@@ -42,7 +42,7 @@ else
 fi
 
 if xcrun simctl io booted screenshot "$UI_DIR/baseline.png" >/dev/null 2>&1; then
-  log "baseline: build/smoke/ui/baseline.png"
+  log "baseline: $UI_DIR/baseline.png"
 else
   fail "Could not take a device screenshot."
 fi
