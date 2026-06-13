@@ -136,29 +136,36 @@ passes):
 brew tap facebook/fb
 brew install idb-companion
 brew install pipx && pipx ensurepath
-pipx install fb-idb
+# fb-idb 1.1.7 needs Python <= 3.12 (see resolved issue below); pin it.
+pipx install fb-idb --python python3.12
 ```
 
 `idb` lands in `~/.local/bin`; the project scripts add that to PATH
 themselves. Verify with `idb list-targets` (the booted Simulator should
 appear) and `./scripts/ui-driver.sh doctor`.
 
-### Known install issues (2026-06-13)
+### Install issues — RESOLVED 2026-06-13
 
-- **idb-companion**: failed to install — Homebrew requires "Command Line
-  Tools for Xcode 26.3" (current CLT are too outdated). Fix: update CLT
-  from System Settings → Software Update, then re-run `brew install
-  idb-companion`.
-- **fb-idb 1.1.7**: incompatible with Python 3.14 — `asyncio.get_event_loop()`
-  raises `RuntimeError: There is no current event loop in thread 'MainThread'`.
-  Fix: install Python ≤ 3.12 via pyenv or brew, then `pipx install fb-idb`
-  with that Python. Until both issues are resolved, driver B is unavailable
-  on this machine; use driver A (computer-use MCP) or manual steps.
+Driver B is working on this machine (`idb-companion` 1.1.8 + `fb-idb`
+1.1.7 on Python 3.12.13; `./scripts/ui-driver.sh doctor` returns `OK:
+driver B ready`). The two original blockers and their fixes, kept for
+the record and for any fresh machine setup:
 
-If install or runtime fails against the current Xcode (fb-idb is in
-maintenance mode), record the failure here with the date and exact
-error, drive with driver A or manual fallback, and leave driver B alone
-until a dedicated follow-up plan addresses it.
+- **idb-companion**: originally failed — Homebrew required newer Command
+  Line Tools. Fixed by updating CLT (now Xcode 26.5 / build 17F42) from
+  System Settings → Software Update, then `brew install idb-companion`.
+- **fb-idb 1.1.7**: originally failed under Python 3.14 —
+  `asyncio.get_event_loop()` raises `RuntimeError: There is no current
+  event loop in thread 'MainThread'` (3.14 removed implicit loop
+  creation). Fixed by pinning the install to Python 3.12:
+  `pipx uninstall fb-idb && pipx install fb-idb --python python3.12`.
+  On 3.12 `get_event_loop()` only emits a DeprecationWarning, so the
+  client runs.
+
+If a future Xcode or Python bump breaks driver B again (fb-idb is in
+maintenance mode), record the date and exact error here, drive with
+driver A (computer-use MCP) or manual fallback, and leave driver B
+alone until a dedicated follow-up plan addresses it.
 
 ## Human-verification handoff
 
