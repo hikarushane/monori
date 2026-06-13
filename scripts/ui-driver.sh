@@ -123,6 +123,7 @@ print(f"scale: {den}")
   back)
     require_target
     read -r WP HP SCALE <<<"$(screen_info)"
+    [ -n "$HP" ] && [ "$HP" -gt 0 ] || fail "Could not read screen dimensions from idb."
     MIDY=$(( HP / 2 ))
     idb ui swipe --udid "$UDID" --delta 20 0 "$MIDY" 260 "$MIDY"
     echo "back-swipe issued (0,$MIDY -> 260,$MIDY)"
