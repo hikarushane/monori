@@ -134,6 +134,11 @@ than the defaults above, the row here wins.
 | 2026-06-13 | B | R7 text input | not calibrated | No safe text field in MVP smoke flow. |
 | 2026-06-13 | A | (all) | pending | computer-use MCP not available in this CLI session. |
 
+Last full zero-touch rehearsal (driver B, shell-only): 2026-06-13 — PASS
+(Library → TOC → reader → bookmark on → relaunch → verify on TOC → restore;
+reader exit via relaunch per R5; no user input). Initial ch65 state was BOOKMARKED; flow inverted (Step E toggled OFF, Step G toggled back ON); persistence confirmed via describe after relaunch.
+Last full zero-touch rehearsal (driver A, computer-use): pending — no computer-use MCP in this session.
+
 ## Driver B setup
 
 One-time machine setup (already done if `./scripts/ui-driver.sh doctor`
