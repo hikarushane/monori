@@ -364,6 +364,7 @@ smoke.readerWebView
 smoke.chapterBookmarkButton
 smoke.readerBookmarkButton
 smoke.readerPrefsButton
+smoke.readerDismissButton
 smoke.refreshChaptersButton
 smoke.refreshStatusBanner
 smoke.clearDataButton

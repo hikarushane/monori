@@ -229,6 +229,23 @@ struct ReaderView: View {
 
     private var topBar: some View {
         HStack {
+            #if DEBUG
+            // Debug-only exit hatch for automated UI agents: idb cannot fire the
+            // left-edge UIScreenEdgePanGestureRecognizer that dismisses this
+            // .fullScreenCover, so expose a tappable close button. Never shipped
+            // in Release. No `chromeVisible` check needed — the whole top bar is
+            // rendered only when `chromeVisible == true` (see `topChrome`).
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Close reader")
+            .accessibilityIdentifier("smoke.readerDismissButton")
+            #endif
             if foreignPageTitle == nil {
                 Button {
                     env.store.toggleBookmark(current)
