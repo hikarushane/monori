@@ -111,7 +111,7 @@ point size from `./scripts/ui-driver.sh info`.
 | R2 | Tap a list row | `left_click` on the row's title text, x ≈ 30% of content width | `tap` at the center of the row's frame from `describe` |
 | R3 | Back edge-swipe | `left_click_drag` from (content left edge + 3 px, content vertical middle) to (content left edge + 260 px, same y) | `./scripts/ui-driver.sh back` (swipe 0,H/2 → 260,H/2, delta 20) |
 | R4 | Reader center-tap (chrome toggle) | `left_click` at the exact center of the content area | `tap W/2 H/2` |
-| R5 | Reader swipe-to-leave | Same motion as R3 — the reader uses a left-edge gesture | Same as R3 (`back`) |
+| R5 | Reader swipe-to-leave | Same motion as R3 — the reader uses a left-edge gesture | ⚠️ NOT `back` — in the reader `back` taps the bookmark button. Driver B cannot exit the reader; relaunch (`simctl terminate` + `launch`). See verified log R5. |
 | R6 | Scroll | `scroll` with the pointer over the content area | `swipe W/2 0.7×H W/2 0.3×H` (drag up = scroll content down) |
 | R7 | Type into a focused field | `type` tool | `text <string>` — NEVER credentials |
 
