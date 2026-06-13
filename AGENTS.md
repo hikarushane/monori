@@ -81,6 +81,11 @@ The correct workflow is:
 5. The script collects screenshots, logs, UI hierarchy, and app diagnostics.
 6. Codex analyzes those outputs and fixes the app if needed.
 
+Steps 1 and 3 may be performed by Codex itself via
+`./scripts/ui-driver.sh` (see “Simulator UI Automation” below and
+`SIMULATOR_PLAYBOOK.md`). Step 2 (Patreon login) and any CAPTCHA /
+Cloudflare human verification are always manual user steps.
+
 Do not ask the user repeatedly: “What page are you on?” or “Do you see the button?”
 
 Instead, improve diagnostics so the app can report:
@@ -225,6 +230,45 @@ Only restart the Simulator when:
 Only erase the Simulator when explicitly testing fresh install behavior.
 
 Do not erase the Simulator during Patreon smoke testing unless the user explicitly asks for it.
+
+---
+
+### Simulator UI Automation (idb driver)
+
+When a debugging, reproduction, or verification step needs someone to
+interact with the running app (navigate, tap, swipe, visually confirm a
+screen), Codex performs it via `./scripts/ui-driver.sh` instead of
+asking the user. Codex sessions do not have the computer-use MCP; the
+idb-based driver script is the only sanctioned way to drive the
+Simulator from a shell.
+
+Before driving, read `SIMULATOR_PLAYBOOK.md` at the repo root and
+follow its driver B instructions. It defines the session bootstrap,
+gesture recipes (device-point coordinates), verification loop,
+human-verification handoff, and artifact paths.
+
+Rules:
+
+* Bootstrap first: `./scripts/ui-preflight.sh`, then
+  `./scripts/ui-driver.sh doctor`. Exit 3 = not ready; report why and
+  fall back to asking the user — never force-boot or erase a Simulator
+  to make a check pass.
+* Verify every action with a device screenshot
+  (`./scripts/ui-driver.sh shot <desc>`) and view it; if you cannot
+  view images, use `./scripts/ui-driver.sh describe` (accessibility
+  tree with element frames in device points) as the state check.
+* Prefer tap coordinates computed from `describe` frames — the app's
+  `smoke.*` accessibility identifiers appear there — over guessing
+  from pixels.
+* Patreon login, CAPTCHA, Cloudflare human verification, 2FA, and
+  email verification are always manual user steps. When one appears on
+  screen, stop all input immediately, tell the user, and wait. All
+  Patreon Login Rules below apply unchanged. Never type credentials
+  with `ui-driver.sh text`.
+* `verify.sh` stays headless and deterministic. Never call
+  `ui-driver.sh` from `verify.sh`, other scripts, or CI.
+* Never erase or reset the Simulator, never delete the app — same as
+  everywhere else in this document.
 
 ---
 
@@ -457,6 +501,7 @@ Do not:
 * remove tests because they fail
 * disable diagnostics instead of fixing the underlying issue
 * ask the user to inspect Xcode manually before checking available logs
+* ask the user to perform Simulator UI steps that scripts/ui-driver.sh can perform (login, CAPTCHA, Cloudflare, and 2FA excepted)
 * automate real Patreon login
 * read `.env`
 * read credentials
