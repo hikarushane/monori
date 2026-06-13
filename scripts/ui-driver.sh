@@ -122,11 +122,26 @@ print(f"scale: {den}")
     ;;
   back)
     require_target
-    read -r WP HP SCALE <<<"$(screen_info)"
-    [ -n "$HP" ] && [ "$HP" -gt 0 ] || fail "Could not read screen dimensions from idb."
-    MIDY=$(( HP / 2 ))
-    idb ui swipe --udid "$UDID" --delta 20 0 "$MIDY" 260 "$MIDY"
-    echo "back-swipe issued (0,$MIDY -> 260,$MIDY)"
+    # Live calibration 2026-06-13: idb edge-swipe (x=0,5; delta=1,5,10,20,30)
+    # did NOT trigger iOS back navigation on iPhone 17 Pro.  UIScreenEdgePan-
+    # GestureRecognizer (used by ReaderView) and SwiftUI NavigationStack both
+    # ignore idb's synthetic swipe events — idb sends UIPanGestureRecognizer
+    # touches, not true edge-pan touches.
+    #
+    # CONTEXT-DEPENDENT behaviour:
+    #   • NavigationStack screens (Library list, TOC): tapping the native "<"
+    #     back button at (20, 79) works reliably.  smoke.readerBookmarkButton
+    #     also lives near x=4-48 in the reader top bar, so (20, 79) hits the
+    #     bookmark when chrome is visible there — avoid calling `back` with
+    #     chrome visible in the reader.
+    #   • ReaderView (.fullScreenCover, no native back button): the only
+    #     programmatic exit is the left-edge UIScreenEdgePanGestureRecognizer
+    #     wired to dismiss().  idb cannot fire it.  Workaround: xcrun simctl
+    #     terminate + launch (relaunch resets nav to Library without erasing
+    #     Patreon login).  A future smoke.readerDismissButton accessibility
+    #     element would let us tap-dismiss from here.
+    idb ui tap --udid "$UDID" 20 79
+    echo "back: tapped nav-bar back button (20, 79)"
     ;;
   text)
     [ $# -ge 1 ] || usage

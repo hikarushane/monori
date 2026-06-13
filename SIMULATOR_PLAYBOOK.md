@@ -125,7 +125,14 @@ than the defaults above, the row here wins.
 
 | Date | Driver | Recipe | Result | Notes |
 |------|--------|--------|--------|-------|
-| (pending first calibration) | | | | |
+| 2026-06-13 | B | R1 tap tab | PASS | `idb describe-all --json` gives exact row frames; Library tab center (201, 832) reliable when native tab bar is visible. Tab is covered by full-screen web views — tap Library tab immediately after relaunch before Browse web content loads. |
+| 2026-06-13 | B | R2 tap list row | PASS | Must use `describe-all --json` (not plain `describe`) to get child element frames. Row 1 "《目標：惡魔》" actual frame: y=168 h=102 → center tap (201, 219). Plain visual estimation was off by ~110 pt — always use describe frames. |
+| 2026-06-13 | B | R3 back nav-button | PASS (workaround) | idb `swipe` (x=0/5, delta=1/5/10/20/30) does NOT trigger `UIScreenEdgePanGestureRecognizer` or SwiftUI NavigationStack back — all variants failed. Workaround: tap native `<` back button at (20, 79). Works reliably on NavigationStack screens (Library list, TOC). Does NOT work inside ReaderView (no native back button there — see R5). |
+| 2026-06-13 | B | R4 reader chrome toggle | PASS | Reader opens with chrome hidden by default (`chromeVisible = false`). Tap body text (avoid web links) to show chrome → `smoke.readerBookmarkButton`, `smoke.readerTitle`, `smoke.readerPrefsButton` appear in describe. Tap body text again to hide. Safe tap zone: y=400–650 in plain paragraph text. Avoid y=130–200 (creator header links) and y=280–380 (Patreon UI cards). |
+| 2026-06-13 | B | R5 reader dismiss | FAIL — workaround required | ReaderView is a `.fullScreenCover` dismissed by `UIScreenEdgePanGestureRecognizer` → `dismiss()`. idb cannot fire edge-pan. No native `<` button. (20, 79) taps `smoke.readerBookmarkButton` instead. Workaround: `xcrun simctl terminate booted <bundle-id> && xcrun simctl launch booted <bundle-id>` — resets nav stack to Library, preserves Patreon login. Future fix: add `smoke.readerDismissButton` to ReaderView top bar. |
+| 2026-06-13 | B | R6 scroll | PASS | `swipe 201 750 201 100 5` (long travel, delta=5) scrolls WKWebView content reliably. Short swipes (y:612→262, delta=15/25) moved too little. Chrome must be hidden before scrolling; a scroll with chrome visible may trigger the chrome-toggle tap gesture instead. |
+| 2026-06-13 | B | R7 text input | not calibrated | No safe text field in MVP smoke flow. |
+| 2026-06-13 | A | (all) | pending | computer-use MCP not available in this CLI session. |
 
 ## Driver B setup
 
