@@ -81,6 +81,11 @@ The correct workflow is:
 5. The script collects screenshots, logs, UI hierarchy, and app diagnostics.
 6. Claude analyzes those outputs and fixes the app if needed.
 
+Steps 1 and 3 may be performed by Claude itself — via the computer-use
+MCP or `./scripts/ui-driver.sh` (see “Simulator UI Automation” below and
+`SIMULATOR_PLAYBOOK.md`). Step 2 (Patreon login) and any CAPTCHA /
+Cloudflare human verification are always manual user steps.
+
 Do not ask the user repeatedly: “What page are you on?” or “Do you see the button?”
 
 Instead, improve diagnostics so the app can report:
@@ -263,6 +268,47 @@ Only restart the Simulator when:
 Only erase the Simulator when explicitly testing fresh install behavior.
 
 Do not erase the Simulator during Patreon smoke testing unless the user explicitly asks for it.
+
+---
+
+### Simulator UI Automation (computer-use MCP / idb)
+
+When a debugging, reproduction, or verification step needs someone to
+interact with the running app (navigate, tap, swipe, visually confirm a
+screen), Claude performs it instead of asking the user. Two drivers
+exist; read `SIMULATOR_PLAYBOOK.md` at the repo root before driving —
+it defines the session bootstrap, gesture recipes, verification loop,
+human-verification handoff, and artifact paths.
+
+* Driver B (preferred): `./scripts/ui-driver.sh` — idb-based,
+  device-point coordinates, works in any session with shell access.
+  Run `./scripts/ui-preflight.sh` and `./scripts/ui-driver.sh doctor`
+  before the first UI action.
+* Driver A: the computer-use MCP (tools named `mcp__computer-use__*`),
+  available in Claude Code desktop sessions only. Use it when idb is
+  unavailable or broken, or for anything outside the device screen
+  (Simulator menus, macOS dialogs). Load the tools with ToolSearch;
+  call `request_access` for "Simulator" once per session.
+* Non-Claude agents (Codex, etc.) get the same workflow through
+  `AGENTS.md` and driver B.
+
+Rules:
+
+* Patreon login, CAPTCHA, Cloudflare human verification, 2FA, and email
+  verification are always manual user steps. When one appears on
+  screen, stop all input immediately, tell the user, and wait. All
+  Patreon Login Rules below apply unchanged.
+* Verify app state after every action with a device screenshot
+  (`./scripts/ui-driver.sh shot <desc>` or `xcrun simctl io booted
+  screenshot`); with driver B, prefer tap points computed from
+  `./scripts/ui-driver.sh describe` frames.
+* If neither driver is available or working, fall back to the old
+  workflow and ask the user to perform the UI steps manually.
+* `verify.sh` stays headless and deterministic. Never call computer-use
+  or `ui-driver.sh` from scripts, `verify.sh`, or CI — they are for
+  interactive agent sessions only.
+* Never erase or reset the Simulator, never delete the app, never type
+  credentials — same as everywhere else in this document.
 
 ---
 
@@ -499,6 +545,7 @@ Do not:
 * remove tests because they fail
 * disable diagnostics instead of fixing the underlying issue
 * ask the user to inspect Xcode manually before checking available logs
+* ask the user to perform Simulator UI steps that an available driver (computer-use MCP or scripts/ui-driver.sh) can perform (login, CAPTCHA, Cloudflare, and 2FA excepted)
 * automate real Patreon login
 * read `.env`
 * read credentials
