@@ -405,6 +405,7 @@ smoke.chapterBookmarkButton
 smoke.readerBookmarkButton
 smoke.readerPrefsButton
 smoke.refreshChaptersButton
+smoke.refreshStatusBanner
 smoke.clearDataButton
 ```
 

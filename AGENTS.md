@@ -361,7 +361,11 @@ smoke.collectionBanner
 smoke.importChaptersButton
 smoke.readerTitle
 smoke.readerWebView
-smoke.progressIndicator
+smoke.chapterBookmarkButton
+smoke.readerBookmarkButton
+smoke.readerPrefsButton
+smoke.refreshChaptersButton
+smoke.refreshStatusBanner
 smoke.clearDataButton
 ```
 
