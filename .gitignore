@@ -7,3 +7,4 @@ DerivedData/
 *.log
 docs/
 WIKI_SYNC.md
+build/smoke/ui/
