@@ -23,6 +23,13 @@ article {
   margin-left: auto !important;
   margin-right: auto !important;
   font-family: Georgia, "Noto Serif TC", "Songti TC", serif !important;
+}
+
+/* Size/spacing must hit the text nodes themselves — Patreon sets per-paragraph
+   font-size, so a value only on the container never reaches the prose (Bug 1). */
+[data-tag="post-content"], [data-tag="post-content"] p, [data-tag="post-content"] li,
+[data-tag="post-content"] blockquote, [data-tag="post-content"] span,
+article p, article li, article blockquote {
   font-size: var(--chapterly-font-size, 19px) !important;
   line-height: var(--chapterly-line-height, 1.75) !important;
 }

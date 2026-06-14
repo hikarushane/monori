@@ -61,4 +61,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertFalse(ReaderStyler.ruleset().contains("`"))
         XCTAssertFalse(ReaderStyler.ruleset().contains("${"))
     }
+
+    func testRulesetSizesParagraphDescendants() {
+        let css = ReaderStyler.ruleset()
+        // The size/line-height rule must reach the text nodes, not just the
+        // container, or Patreon's per-paragraph font-size wins (Bug 1).
+        XCTAssertTrue(css.contains("post-content\"] p"))
+        XCTAssertTrue(css.contains("post-content\"] li"))
+    }
 }
