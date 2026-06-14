@@ -37,6 +37,7 @@ struct PatreonWebView: UIViewRepresentable {
             action: #selector(Coordinator.handleBackSwipe(_:)))
         edge.edges = .left
         edge.name = Self.backSwipeName
+        edge.delegate = context.coordinator
         webView.addGestureRecognizer(edge)
 
         let tap = UITapGestureRecognizer(
@@ -128,6 +129,16 @@ struct PatreonWebView: UIViewRepresentable {
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                                shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
             true
+        }
+
+        // Give the app-level left-edge gesture priority over horizontal web
+        // content gestures such as collection carousels.
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard gestureRecognizer.name == PatreonWebView.backSwipeName,
+                  let edgeView = gestureRecognizer.view,
+                  let otherView = otherGestureRecognizer.view else { return false }
+            return otherView.isDescendant(of: edgeView)
         }
     }
 }
