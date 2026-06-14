@@ -12,6 +12,9 @@ struct PatreonWebView: UIViewRepresentable {
     /// When set, the left-edge swipe calls this instead of the default
     /// goBack() behavior. The reader uses it to leave the reader.
     var backSwipeOverride: (() -> Void)? = nil
+    /// When set, the default left-edge swipe path only goes back if this
+    /// returns true. Overrides still own their full behavior.
+    var allowBackSwipe: (() -> Bool)? = nil
 
     private static let backSwipeName = "chapterly.backSwipe"
     private static let contentTapName = "chapterly.contentTap"
@@ -22,6 +25,7 @@ struct PatreonWebView: UIViewRepresentable {
         let webView = model.webView
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
+        context.coordinator.allowBackSwipe = allowBackSwipe
         // The web view is shared and outlives this representable; re-attach the
         // gestures to the current coordinator so closures never go stale.
         for gesture in webView.gestureRecognizers ?? []
@@ -48,6 +52,7 @@ struct PatreonWebView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
+        context.coordinator.allowBackSwipe = allowBackSwipe
     }
 
     /// Patreon navigates client-side (same-document history entries), which
@@ -56,6 +61,7 @@ struct PatreonWebView: UIViewRepresentable {
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var onContentTap: ((Bool) -> Void)?
         var backSwipeOverride: (() -> Void)?
+        var allowBackSwipe: (() -> Bool)?
 
         private static let log = Logger(subsystem: "dev.chapterly",
                                         category: "smoke-diagnostics")
@@ -74,6 +80,12 @@ struct PatreonWebView: UIViewRepresentable {
             if let backSwipeOverride {
                 backSwipeOverride()
             } else if webView.canGoBack {
+                if let allowBackSwipe, !allowBackSwipe() {
+                    #if DEBUG
+                    Self.log.notice("[SMOKE] back_swipe action=noop reason=blocked_at_root")
+                    #endif
+                    return
+                }
                 animateBackTransition(on: webView)
                 #if DEBUG
                 Self.log.notice("[SMOKE] back_swipe action=goBack target=\(webView.backForwardList.backItem?.url.path ?? "nil", privacy: .public)")

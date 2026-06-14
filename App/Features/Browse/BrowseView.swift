@@ -7,7 +7,10 @@ struct BrowseView: View {
     var body: some View {
         VStack(spacing: 0) {
             WebCollectionBanner(model: env.browse)
-            PatreonWebView(model: env.browse)
+            PatreonWebView(model: env.browse, allowBackSwipe: {
+                BackSwipePolicy.browseDecision(currentURL: env.browse.currentURL,
+                                               canGoBack: env.browse.webView.canGoBack) == .goBack
+            })
                 .overlay(alignment: .top) {
                     if env.browse.loadingProgress < 1 {
                         ProgressView(value: env.browse.loadingProgress)
