@@ -40,6 +40,22 @@ article h1 {
   line-height: 1.3 !important;
 }
 
+/* --- hide cross-promo sections (keep article + comment thread) --- */
+/* Tokens captured from the live logged-in reader (Opt1). Explicit data-tags,
+   not Patreon's per-deploy hashed Card-module classes, so they degrade
+   gracefully if markup changes. The comment-thread container is deliberately
+   NOT listed here so it stays visible.
+   "From the collection" = PostCollectionPlaylistCard (stable section token).
+   "Related posts" has no section-level data-tag; its cards carry
+   launcher-post-card (absent from the article body and comment thread).
+   BACKUP PLAN: if launcher-post-card ever hides wanted content or stops
+   matching, drop that selector and keep only PostCollectionPlaylistCard
+   ("From the collection" only) — see Task 4 notes. */
+[data-tag="PostCollectionPlaylistCard"],
+[data-tag="launcher-post-card"] {
+  display: none !important;
+}
+
 body {
   background-color: #faf8f5 !important;
 }

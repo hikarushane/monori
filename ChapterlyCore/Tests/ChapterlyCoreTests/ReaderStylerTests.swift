@@ -69,4 +69,16 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(css.contains("post-content\"] p"))
         XCTAssertTrue(css.contains("post-content\"] li"))
     }
+
+    func testRulesetHidesPromoSectionsButKeepsComments() {
+        let css = ReaderStyler.ruleset()
+        // Real Patreon tokens captured from the live logged-in reader (Opt1).
+        // "From the collection" carousel:
+        XCTAssertTrue(css.contains("PostCollectionPlaylistCard"))
+        // "Related posts" cards (Patreon exposes no section data-tag; the cards
+        // themselves carry launcher-post-card):
+        XCTAssertTrue(css.contains("launcher-post-card"))
+        // The comment thread must stay visible — never hidden.
+        XCTAssertFalse(css.contains("content-card-comment-thread-container"))
+    }
 }
