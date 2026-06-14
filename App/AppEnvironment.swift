@@ -173,6 +173,13 @@ final class AppEnvironment {
         // wait it out before counting.
         try? await Task.sleep(for: .milliseconds(600))
         let delta = collection.chapters.count - countBefore
+        // Free the (~200 MB measured) collection DOM the offscreen refresher
+        // rendered while crawling the whole collection. Leaving it resident keeps
+        // the app near the jetsam threshold, so when the TOC redraws after the
+        // refresh the OS can kill + relaunch the app — the "bounce to Library
+        // root, then auto re-enter the collection ~5 s later" the user reported.
+        // Runs only after the import flush has landed, so it can't drop chapters.
+        refresher.webView.loadHTMLString("", baseURL: nil)
         return delta > 0 ? .newChapters(delta) : .upToDate
     }
 
