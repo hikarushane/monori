@@ -111,7 +111,7 @@ point size from `./scripts/ui-driver.sh info`.
 | R2 | Tap a list row | `left_click` on the row's title text, x ≈ 30% of content width | `tap` at the center of the row's frame from `describe` |
 | R3 | Back edge-swipe | `left_click_drag` from (content left edge + 3 px, content vertical middle) to (content left edge + 260 px, same y) | `./scripts/ui-driver.sh back` (swipe 0,H/2 → 260,H/2, delta 20) |
 | R4 | Reader center-tap (chrome toggle) | `left_click` at the exact center of the content area | `tap W/2 H/2` |
-| R5 | Reader swipe-to-leave | Same motion as R3 — the reader uses a left-edge gesture | ⚠️ NOT `back` — in the reader `back` taps the bookmark button. Driver B cannot exit the reader; relaunch (`simctl terminate` + `launch`). See verified log R5. |
+| R5 | Reader dismiss | `left_click` `smoke.readerDismissButton` at desktop (878, 180) after showing chrome with body-text `left_click` at (1013, 563); calibration: content_left≈858 top≈115 scale≈0.769×0.773 (2026-06-14, Simulator right side of screen) | tap `smoke.readerDismissButton` center (26, 84) — show chrome first with body-text tap y≈650; relaunch (`simctl terminate` + `launch`) remains fallback if button unavailable |
 | R6 | Scroll | `scroll` with the pointer over the content area | `swipe W/2 0.7×H W/2 0.3×H` (drag up = scroll content down) |
 | R7 | Type into a focused field | `type` tool | `text <string>` — NEVER credentials |
 
@@ -129,15 +129,30 @@ than the defaults above, the row here wins.
 | 2026-06-13 | B | R2 tap list row | PASS | `./scripts/ui-driver.sh describe` exposes native list-row frames; row 1 「《目標：惡魔》」: y=168 h=102 → center tap (201, 219). Visual estimation was off by ~110 pt — always tap describe frames. Note: native SwiftUI screens expose rows, WKWebView screens (Browse, reader body) expose few elements — this depends on the screen, NOT on any `--json` flag (verified identical). Always go through `ui-driver.sh describe`. |
 | 2026-06-13 | B | R3 back nav-button | PASS (workaround) | idb `swipe` (x=0/5, delta=1/5/10/20/30) does NOT trigger `UIScreenEdgePanGestureRecognizer` or SwiftUI NavigationStack back — all variants failed. Workaround: tap native `<` back button at (20, 79). Works reliably on NavigationStack screens (Library list, TOC). Does NOT work inside ReaderView (no native back button there — see R5). |
 | 2026-06-13 | B | R4 reader chrome toggle | PASS | Reader opens with chrome hidden by default (`chromeVisible = false`). Tap body text (avoid web links) to show chrome → `smoke.readerBookmarkButton`, `smoke.readerTitle`, `smoke.readerPrefsButton` appear in describe. Tap body text again to hide. Safe tap zone: y=400–650 in plain paragraph text. Avoid y=130–200 (creator header links) and y=280–380 (Patreon UI cards). |
-| 2026-06-13 | B | R5 reader dismiss | FAIL — workaround required | ReaderView is a `.fullScreenCover` dismissed by `UIScreenEdgePanGestureRecognizer` → `dismiss()`. idb cannot fire edge-pan. No native `<` button. (20, 79) taps `smoke.readerBookmarkButton` instead. Workaround: `xcrun simctl terminate booted <bundle-id> && xcrun simctl launch booted <bundle-id>` — resets nav stack to Library, preserves Patreon login. Future fix: add `smoke.readerDismissButton` to ReaderView top bar. |
+| 2026-06-14 | B | R5 reader dismiss | PASS | `smoke.readerDismissButton` (Debug build) at device (x=4, y=62, w=44, h=44), tap center (26, 84). Show chrome first: body-text tap y≈650 (safe zone). Original FAIL reason: idb edge-pan cannot fire `UIScreenEdgePanGestureRecognizer`; (20,79) taps `smoke.readerBookmarkButton`. Relaunch (`simctl terminate` + `launch`) is fallback when button unavailable. |
 | 2026-06-13 | B | R6 scroll | PASS | `swipe 201 750 201 100 5` (long travel, delta=5) scrolls WKWebView content reliably. Short swipes (y:612→262, delta=15/25) moved too little. Chrome must be hidden before scrolling; a scroll with chrome visible may trigger the chrome-toggle tap gesture instead. |
 | 2026-06-13 | B | R7 text input | not calibrated | No safe text field in MVP smoke flow. |
-| 2026-06-13 | A | (all) | pending | computer-use MCP not available in this CLI session. |
+| 2026-06-13 | A | R1 tap control | PASS | `left_click` at the control center in the latest desktop screenshot. Verified on the native tab bar (Library tab ≈ (304, 763) desktop px) and a NavigationStack toolbar button (sort ↑↓ ≈ (385, 187)). Direct and reliable. Content-area calibration this run: white screen left≈153, right≈455 (W≈302 px), screen top≈130, bottom≈786; scale ≈0.75 desktop-px per device-pt. |
+| 2026-06-13 | A | R2 tap list row | PASS | `left_click` on the row's title text, x≈210 (≈20–30% of content width), y = row vertical center. Tapped 《目標：惡魔》65 at (215, 234) → opened reader; tapped book row at (210, 285) → pushed TOC. Landed correctly every time. |
+| 2026-06-13 | A | R3 back edge-swipe (NavigationStack) | PASS (continuous drag) | Use a CONTINUOUS stepped drag, not a single `left_click_drag`: `mouse_move` to (left+2, midY) → `left_mouse_down` → 6× `mouse_move` stepping to ≈(left+267, midY) → `left_mouse_up` (this run: (155,458)→(420,458) over 6 steps). Fired `interactivePopGesture`, popped TOC→Library. **Driver A succeeds here where driver B's idb swipe FAILED (B must tap the native `<` button).** |
+| 2026-06-13 | A | R4 reader chrome toggle | PASS | `left_click` at content center (304, 458). Toggles app chrome on/off reliably both directions. Tap plain paragraph text; avoid the Patreon site nav (y<200) and creator/card links. |
+| 2026-06-14 | A | R5 reader dismiss | PASS | `smoke.readerDismissButton` at desktop (878, 180) = device (26, 84). Chrome toggle: `left_click` body at desktop (1013, 563) = device (201, 580). Calibration: content_left≈858, top≈115, scale≈0.769×0.773 (Simulator right side of screen). Use `computer_batch`: click body → wait 0.8s → click dismiss. Final desktop screenshot captures mid-animation TOC+reader; device screenshot confirms TOC. Cloudflare human check on first chapter open is expected — stop all input, wait user, resume. Original FAIL: both edge-drag variants cannot dismiss `.fullScreenCover`; relaunch remains fallback. |
+| 2026-06-13 | A | R6 scroll | PASS via drag (wheel FAIL) | The `scroll` tool (mouse wheel) at amount 5 AND 15 → NO movement on the WKWebView reader. Working recipe: `left_click_drag` (304,620)→(304,230) — a ≈Δ390 px vertical swipe-up scrolls ~1 screen of content down. Hide chrome before scrolling. |
+| 2026-06-13 | A | R7 text input | not calibrated | No safe text field in the MVP smoke flow. |
 
 Last full zero-touch rehearsal (driver B, shell-only): 2026-06-13 — PASS
 (Library → TOC → reader → bookmark on → relaunch → verify on TOC → restore;
 reader exit via relaunch per R5; no user input). Initial ch65 state was BOOKMARKED; flow inverted (Step E toggled OFF, Step G toggled back ON); persistence confirmed via describe after relaunch.
-Last full zero-touch rehearsal (driver A, computer-use): pending — no computer-use MCP in this session.
+Driver A calibration (computer-use MCP, Claude Code desktop): 2026-06-13 —
+R1/R2/R3/R4/R6 PASS, R5 FAIL (relaunch workaround). NOT fully zero-touch:
+opening the first chapter loaded `www.patreon.com` and hit a Cloudflare
+human-verification interstitial — stopped all input per handoff protocol,
+user cleared it manually, then resumed. Treat a one-time Cloudflare check
+on first reader open as an expected manual step for driver A runs.
+R5 recalibration (driver B + A, 2026-06-14): PASS both drivers via
+`smoke.readerDismissButton` tap. Driver B: tap (26, 84). Driver A:
+`computer_batch` body click (1013, 563) → wait 0.8s → dismiss click (878, 180).
+Relaunch remains fallback.
 
 ## Driver B setup
 

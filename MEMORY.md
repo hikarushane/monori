@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-13（session 4）
+> 最後更新：2026-06-14（session 9 — R5 reader dismiss 重校準）
 
 ## 專案概覽
 Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -22,6 +22,11 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 | 章節書籤 | `isBookmarked: Bool` on `LocalChapterModel` + `store.toggleBookmark(_:)` | TOC 列與 reader top bar 同 model 同 context → 圖示即時同步；migration 輕量 | active | 2026-06-12 |
 | 檢查新章節 | 第三個離屏 `WebViewModel`（`env.refresher`）載入 collection 來源頁重跑 CollectionImport | 共用 default data store = 登入 cookie 直接有效；`applyImport` 以 normalized URL merge 不重複；chapter count delta = 新章數 | active | 2026-06-12 |
 | Reader UX | chrome 預設隱藏+中央點擊切換（上滑下/下滑上）；reader mode 永遠開（Settings toggle 移除）；左緣滑離開；偏好面板全寬、按鈕連點不關 | 沉浸式閱讀 overhaul（commit b4b8a99） | active | 2026-06-12 |
+| ReaderPreferences clamping | private tracked storage + computed setters | `@Observable` 下 `didSet` 自我賦值會重入 setter 並無限遞迴；computed setter clamp 一次可保留 SwiftUI observation 與 UserDefaults persistence | active | 2026-06-13 |
+| Browse 返回感知 | default Browse webview back path 加 transient snapshot slide animation；慢載入用 `WKWebView.estimatedProgress` top progress bar | `goBack()` 原本原地換內容沒有 native transition，Patreon SPA/跨文件 reload 又慢；不做自訂 cache/webview stack，先用低風險感知性修正 | active | 2026-06-13 |
+| Collection refresh visibility | refresh 時保留 toolbar spinner，另加 bottom capsule status banner `smoke.refreshStatusBanner` | 長 collection check 可能跑數分鐘，單 toolbar spinner 太不明顯；banner 明確告知正在檢查 | active | 2026-06-13 |
+| Agent-driven simulator workflow | `SIMULATOR_PLAYBOOK.md` + `scripts/ui-preflight.sh` + `scripts/ui-driver.sh` | 使用者不是專業 iOS dev；agent 應先用 script/driver 收集可重現診斷，不要求使用者口述 Xcode/畫面狀態 | active | 2026-06-13 |
+| Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
 
 ## 規範
 ### Patreon DOM
@@ -60,6 +65,12 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 ### SwiftUI Layout
 - `Color.clear` 在 VStack 沒有 `height:` 限制時會貪婪展開；佔位用 `Color.clear.frame(width: 72, height: 0)`，不要只寫 `frame(width: 72)`
 
+### Agent / Smoke 流程
+- `CLAUDE.md` 與 `AGENTS.md` 的 smoke accessibility identifier list 要同步維護；新增 diagnostic identifier 時兩邊都更新。
+- `smoke.readerDismissButton` 是 Debug-only；只在 ReaderView chrome 顯示時出現。自動化驗證時先進 reader、center tap 顯示 chrome，再用 `describe` 找 frame 並 tap center。
+- `scripts/smoke-auto.sh` 會 `source "$PROJECT_DIR/.env"`；若 session 明確禁止讀 `.env`，agent 不能直接執行它，需使用者允許或改用不讀 `.env` 的注入方式。
+- `smoke-diagnostics.sh` 會重新 launch app 並 `log show --last 2m`；若要捕捉人工手勢 log，必須在 launch 後重現，或使用 live log capture。
+
 ## 踩過的坑
 - **Linker error after derived data corrupt**（2026-06-11）：刪舊 test bundle 後 `ld: symbol(s) not found for ImporterChapterPayload.init`，XCTest 快取舊 binary → `find ~/Library/Developer/Xcode/DerivedData -maxdepth 1 -name "Chapterly-*" -exec rm -rf {} +`
   📍 出現位置：clean rebuild 後 `xcodebuild test`
@@ -95,6 +106,28 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 - **`git add -A` 掃進工件 + gitignore 不影響已追蹤檔**（2026-06-12）：T7 commit 把 `WIKI_SYNC.md`、`build/xcodebuild.log`、`docs/` 掃進版控。`.gitignore` 已加 `docs/`、`*.log`、`WIKI_SYNC.md`，但已追蹤檔案要另外 `git rm --cached` 才會解除。commit 時列明檔案、不要 `git add -A`。
 
+- **`smoke-diagnostics.sh` 重新 launch 會漏掉 launch 前手勢 log**（2026-06-13）：使用者先在 simulator 手動左滑，再跑 script；`grep back_swipe build/smoke/app.log` 無命中，因 script 重新 launch 並只收 `--last 2m` 的 `dev.chapterly/smoke-diagnostics` log，最後只有 launch-time smoke state。修法：需要手勢 log 時，在 script launch 後重現，或改用 live log capture；不要把「無 back_swipe log」誤判成 H1/H2/H3。
+
+- **`smoke-auto.sh` 會讀 `.env`**（2026-06-13）：腳本開頭會 `source "$PROJECT_DIR/.env"` 取得 `SMOKE_TEST_URL`。若 agent session 有「嚴禁讀 `.env`」約束，就不能直接跑此腳本。修法：請使用者明確允許、由使用者自行跑，或新增/使用不讀 `.env` 的安全參數化入口。
+
+- **fb-idb 1.1.7 在 Python 3.14 崩潰**（2026-06-13）：`asyncio.get_event_loop()` 在 Python 3.14 丟出 `RuntimeError: There is no current event loop in thread 'MainThread'`（3.14 移除了隱式 event loop 建立）。修：`pipx uninstall fb-idb && pipx install fb-idb --python python3.12`。Python 3.12 只有 DeprecationWarning，正常執行。
+  📍 出現位置：任何呼叫 `idb` CLI 的地方（此為 cross-project 坑，見 WIKI_SYNC.md）
+
+- **idb `swipe` 無法觸發 NavigationStack back**（2026-06-13）：所有 edge-swipe 變體（x=0/5, delta=1/5/10/20/30）都無法合成 `UIScreenEdgePanGestureRecognizer`。NavigationStack 畫面唯一 idb 出路：tap nav bar `<` 按鈕 (20, 79)。**ReaderView 禁用**：Reader 是 `.fullScreenCover`，(20,79) 是 `smoke.readerBookmarkButton`，沒有 native back 按鈕。
+  📍 出現位置：`scripts/ui-driver.sh` `back)` 指令；SIMULATOR_PLAYBOOK.md R3/R5
+
+- **ReaderView `.fullScreenCover` 無法 idb 關閉**（2026-06-13→2026-06-14 已解）：`.fullScreenCover` 由 `UIScreenEdgePanGestureRecognizer` dismiss；idb 無法合成，edge-swipe 全失敗。已加 Debug-only `smoke.readerDismissButton`（commit `e2c0181`）。2026-06-14 重校準：Driver B tap (26,84) PASS；Driver A `computer_batch` body (1013,563)→dismiss (878,180) PASS。Playbook R5 已更新；relaunch 僅為 fallback。
+  📍 出現位置：SIMULATOR_PLAYBOOK.md R5
+
+- **Driver A（computer-use MCP）滑鼠滾輪在 WKWebView 不捲動**（2026-06-13）：`mcp__computer-use__scroll`（滑鼠滾輪）amount 5 與 15 對 reader WKWebView 完全無位移。改用 `left_click_drag` (304,620)→(304,230) 模擬觸控上滑才捲動 ~1 屏。Driver A reader scroll 一律用 drag，不要用 wheel。
+  📍 出現位置：SIMULATOR_PLAYBOOK.md R6（Driver A 欄）
+
+- **Driver A edge-drag 能觸發 NavigationStack pop 但不能 dismiss reader**（2026-06-13）：同一個「連續拖曳」（`left_mouse_down` + 多次 `mouse_move` + `left_mouse_up`，左緣→右）在 NavigationStack 畫面成功 pop（R3 PASS，**Driver B 的 idb swipe 在此失敗**），但在 ReaderView `.fullScreenCover` 上完全 dismiss 不了（R5 FAIL，與 Driver B 同類）。結論：reader 的自訂 edge-pan recognizer 比 NavigationStack `interactivePopGesture` 嚴格；`smoke.readerDismissButton` 已實作，但 R5 要等安裝 Debug build 並實測 tap-dismiss 後才更新 playbook。另注意 Driver A 首次開章載入 patreon.com 可能撞 Cloudflare 人類驗證（預期人工步驟）。
+  📍 出現位置：SIMULATOR_PLAYBOOK.md R3/R5（Driver A 欄）
+
+- **Reader dismiss button screenshot check 不等於自動成功**（2026-06-13）：button code 已經 `./scripts/verify.sh` 編譯通過；但本次 Task 3 booted Simulator 不在 ReaderView，`describe` 沒有 `smoke.reader*` identifiers，嘗試從列表進 reader 進到 Patreon web content。不要把這次當作 R5 pass；下一輪需先確保 app 已安裝 `e2c0181` Debug build 並進 ReaderView，再用 `describe`/screenshot 驗證 button。
+  📍 出現位置：reader dismiss plan Task 3；SIMULATOR_PLAYBOOK.md R5 follow-up
+
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險
 - 用 `scrollApplied: Bool` guard 防止重複 scroll：Patreon 自帶 scroll 在 guard 後才執行，無效 → 改用 enforceScrollScript interval
@@ -108,11 +141,14 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - [ ] **Cloudflare CAPTCHA**：Simulator 的 Patreon session 被 Cloudflare 出題，使用者需手動勾「驗證您是人類」後重跑 `./scripts/smoke-auto.sh`（程式碼修復已完成、verify.sh 84/84）
 - ~~[ ] README.md:48「Import visible chapters」待使用者確認後改為「Import all chapters」~~（已解決 2026-06-13，commit c10dd62）
 - [ ] 舊 chapter 的 `excerpt` 欄位是 nil → 重按一次 Import all chapters 即可補齊（待使用者操作）
-- [ ] **Reader 偏好面板凍結（P0）**：根因已確認（@Observable didSet 遞迴），修復 = `docs/superpowers/plans/2026-06-13-ux-sweep-fixes-browse-nav.md` Task 1
-- [ ] **Browse 集合頁左滑無反應**（UX sweep #5/#6）：三假說 H1（canGoBack=false）/ H2（same-document 洗版）/ H3（跨文件重載過慢），需計畫 Task 2 診斷 log 判定後選 Task 5 分支
-- [ ] **Browse 返回動畫生硬 + 載入慢**（#2/#8/#9）：計畫 Task 3（snapshot 滑出 + estimatedProgress 進度條）；深層解法 webview stack 見計畫 Appendix A（暫緩）
+- ~~[ ] **Reader 偏好面板凍結（P0）**：根因已確認（@Observable didSet 遞迴），修復 = `docs/superpowers/plans/2026-06-13-ux-sweep-fixes-browse-nav.md` Task 1~~（已解決 2026-06-13，commit 95ffd71）
+- ~~[ ] **Browse 集合頁左滑無反應**（UX sweep #5/#6）：三假說 H1（canGoBack=false）/ H2（same-document 洗版）/ H3（跨文件重載過慢），需計畫 Task 2 診斷 log 判定後選 Task 5 分支~~（2026-06-13 使用者手動確認 Browse Collections 左滑可成功回上一頁；未實作 Task 5 A/B 分支）
+- ~~[ ] **Browse 返回動畫生硬 + 載入慢**（#2/#8/#9）：計畫 Task 3（snapshot 滑出 + estimatedProgress 進度條）；深層解法 webview stack 見計畫 Appendix A（暫緩）~~（已做低風險感知性修正 2026-06-13，commit ed7ca1f；webview stack 仍暫緩）
 - [ ] **Refresh 匯入新章節結果未驗證**：等追蹤的 collection 真的出新章後按 ↻ 確認「Imported 1 new chapter.」
 - [ ] **smoke-auto.sh（8 步版）尚未實跑**：T7 改造後待使用者協助執行（= overhaul 計畫 T8 step 2 / 新計畫 Task 6 step 2）
+- ~~[ ] **Driver A 校準 pending**~~（已完成 2026-06-13 session 7）：R1/R2/R3/R4/R6 PASS、R5 FAIL（relaunch workaround）。結果記入 SIMULATOR_PLAYBOOK.md verified log（Driver A 欄）。R6 wheel 失敗改 drag；R3 須連續拖曳；R5 兩 driver 皆無法自動離開 reader
+- ~~[ ] **`smoke.readerDismissButton`**：在 `ReaderView.swift` top bar 加關閉按鈕，讓 idb 可 tap 退出 reader~~（已實作 2026-06-13，commit `e2c0181`；`verify.sh` Debug build + 84/84 通過）
+- ~~[ ] **R5 reader dismiss playbook 重校準**~~（已完成 2026-06-14）：Driver B tap (26,84) PASS；Driver A `computer_batch` body (1013,563)→dismiss (878,180) PASS。`SIMULATOR_PLAYBOOK.md` R5 已更新。
 - ~~[ ] Bug regression：Library collection 點進文章自動卷到底部~~（已修 2026-06-11 session 3）
 - ~~[ ] Browse banner 殘留~~（已修 2026-06-11 session 3：detect 限 post 頁，非 reselect 清空問題）
 - ~~[ ] Browse menu 項目可拖動~~（已修 2026-06-11 session 3：WKWebView dragstart suppressor，非 `.onMove`）
