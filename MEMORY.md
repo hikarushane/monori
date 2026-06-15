@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-15（session 10 — reader/nav/refresh 五項 bugfix sweep）
+> 最後更新：2026-06-15（session 11 — verify hook 還原；修正 verify.sh IOERR 根因為 step race 非沙箱）
 
 ## 專案概覽
 Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -134,8 +134,8 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **Reader dismiss button screenshot check 不等於自動成功**（2026-06-13）：button code 已經 `./scripts/verify.sh` 編譯通過；但本次 Task 3 booted Simulator 不在 ReaderView，`describe` 沒有 `smoke.reader*` identifiers，嘗試從列表進 reader 進到 Patreon web content。不要把這次當作 R5 pass；下一輪需先確保 app 已安裝 `e2c0181` Debug build 並進 ReaderView，再用 `describe`/screenshot 驗證 button。
   📍 出現位置：reader dismiss plan Task 3；SIMULATOR_PLAYBOOK.md R5 follow-up
 
-- **`verify.sh` 在 agent 沙箱內必 `disk I/O error`（2026-06-15，非程式問題）**：`verify.sh` Step 1 `xcodebuild build` 緊接 Step 2 `swift test`，兩步共用 `ChapterlyCore/.build`；在 Claude/Codex 的 Bash 沙箱下 SQLite `build.db` 會 `SQLITE_IOERR`（link 階段印 `accessing build database: disk I/O error`）→ `swift test` 非零退出 → `set -e` 讓 verify.sh 整體失敗。**單獨跑任一步乾淨**（`cd ChapterlyCore && swift test` exit 0；`xcodebuild build` BUILD SUCCEEDED），使用者在無沙箱終端機跑 verify.sh 也正常。修法：agent 跑 build/test/commit 一律加 `dangerouslyDisableSandbox`，且把 verify 拆兩步分別跑；別把此 IOERR 當程式錯誤、別 `rm .build`（重建仍會 IOERR）。`/bin/rm`/`\rm` 才能繞過使用者包過的 `rm`。
-  📍 出現位置：`.claude/settings.json` 的 verify PreToolUse hook（會對所有 Bash 先跑沙箱化 verify.sh，過不了就擋住一切）
+- **`verify.sh` 內部 race → SQLITE_IOERR（2026-06-15，非程式問題，非沙箱問題）**：`verify.sh` Step 1 `xcodebuild build` 緊接 Step 2 `swift test`，兩步共用 `ChapterlyCore/.build`；xcodebuild 留下的 package build 狀態 / 背景鎖讓隨後的 `swift test` 在 `build.db` 印 `accessing build database: disk I/O error`（SQLITE_IOERR）→ `set -e` 讓 verify.sh 整體失敗。**單獨跑任一步乾淨**（`cd ChapterlyCore && swift test` exit 0；`xcodebuild build` BUILD SUCCEEDED）。使用者那 6 次 probe 重建把它從偶發變成穩定觸發。**根因是 verify.sh 的 step race，與沙箱無關**；無沙箱終端機也會觸發。修法：把 verify 拆兩步分別跑；別把此 IOERR 當程式錯誤、別 `rm .build`（重建仍會 IOERR）。`/bin/rm`/`\rm` 才能繞過使用者包過的 `rm`。
+  📍 出現位置：`ChapterlyCore/.build` 被兩個步驟競用；`.claude/settings.json` PreToolUse hook 在 commit 前跑 verify.sh（`if: "Bash(git commit *)"`）
 
 - **xcodegen 2.45.4 不再 default 關鍵 build settings**（2026-06-15）：舊版 xcodegen 會 default `SWIFT_VERSION`、`PRODUCT_NAME`、Debug 的 `SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG`；2.45.4 全不 default。本專案 `project.yml` 原本沒明寫這些，靠舊版 default。結果 `xcodegen generate`（smoke-auto preflight 每次都跑）產生：(1) build 失敗 `SWIFT_VERSION '' is unsupported` + `Multiple commands produce '.app'`（空 PRODUCT_NAME）；(2) 即使 build 過，Debug 也沒定義 DEBUG → 所有 `#if DEBUG`（smoke autopilot、reader dismiss button、debug 診斷）被靜默編譯掉。修法：`project.yml` 的 `settings.base` 明寫 SWIFT_VERSION/PRODUCT_NAME，`settings.configs.Debug` 明寫 SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG + GCC_PREPROCESSOR_DEFINITIONS（commit `37c78ba`）。
   📍 出現位置：任何 `xcodegen generate` 後的 build；`Chapterly.xcodeproj` 是 generated（未進 git），重生會覆蓋，不能靠 git restore，只能修 project.yml。
