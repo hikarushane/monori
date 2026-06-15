@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/verify.sh > /dev/null 2>&1 || printf '{\"continue\":false,\"stopReason\":\"verify.sh failed – fix errors before committing. See build/xcodebuild.log\"}'",
+            "command": "mkdir -p build; ./scripts/verify.sh > build/verify-hook.log 2>&1 || { { echo 'verify.sh failed - fix errors before committing, then retry the commit. Tail of build/verify-hook.log (full build log: build/xcodebuild.log):'; tail -n 40 build/verify-hook.log; } >&2; exit 2; }",
             "timeout": 300,
             "statusMessage": "Running verify.sh (build + tests)..."
           }
