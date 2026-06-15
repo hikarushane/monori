@@ -474,6 +474,10 @@ If possible, add a test fixture with local HTML and verify CSS behavior without 
 
 Reader mode is always enabled for library chapters (`foreignPageTitle == nil`). The "Reader mode by default" toggle was removed from Settings — there is no per-chapter opt-out.
 
+#### Post-footer verification is a manual user step
+
+The post footer — the comment thread, "Related posts", and "From the collection" — sits at the very bottom of long chapters. Synthetic scrolling (idb swipe / `ui-driver.sh swipe`) is slow and unreliable over a long article and often never reaches it. **When a check requires scrolling to the post footer (e.g. confirming the comment thread loads, "Load more comments" works, or the promo sections are hidden), do not auto-scroll for a long time. Ask the user to manually scroll to that section and report what they see.** Everything above the footer (Library, TOC, reader top half, prefs panel) is still driven normally by the agent. This rule also applies to the smoke scripts: they stay headless and never try to drive to the footer.
+
 ---
 
 ### Bookmark Debugging
@@ -585,3 +589,13 @@ Use `verify.sh` for automated correctness.
 Use `smoke-diagnostics.sh` for manual-login smoke test support.
 
 When debugging, do not ask the user to manually inspect app state until you have first checked scripts, logs, screenshots, simulator state, and UI hierarchy diagnostics.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
