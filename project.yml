@@ -3,6 +3,19 @@ options:
   bundleIdPrefix: dev.chapterly
   deploymentTarget:
     iOS: "17.0"
+# Set explicitly: xcodegen 2.45.x no longer defaults these, and without them
+# the generated project builds with an empty SWIFT_VERSION and an empty
+# PRODUCT_NAME (".app"), which fails the build. It also no longer defines
+# DEBUG for the Debug config, which silently compiles out every `#if DEBUG`
+# feature (the smoke autopilot, the reader dismiss button, debug diagnostics).
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    PRODUCT_NAME: "$(TARGET_NAME)"
+  configs:
+    Debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      GCC_PREPROCESSOR_DEFINITIONS: "DEBUG=1 $(inherited)"
 packages:
   ChapterlyCore:
     path: ChapterlyCore
