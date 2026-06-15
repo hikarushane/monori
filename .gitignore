@@ -3,8 +3,17 @@ xcuserdata/
 DerivedData/
 .build/
 *.xcodeproj
-.env
 *.log
-docs/
-WIKI_SYNC.md
 build/smoke/ui/
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# vendor docs
+docs/superpowers/
+
+# Claude Code local state (team settings tracked at .claude/ root)
+.claude/worktrees/
+.claude/settings.local.json

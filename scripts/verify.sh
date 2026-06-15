@@ -15,6 +15,16 @@ DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro,OS=latest"
 mkdir -p "$BUILD_DIR"
 rm -rf "$RESULT_BUNDLE"
 
+echo "=== Step 0: Ensure Xcode project (XcodeGen) ==="
+if [ ! -d "$PROJECT" ]; then
+  echo "$PROJECT missing — generating with xcodegen"
+  if ! command -v xcodegen >/dev/null 2>&1; then
+    echo "ERROR: xcodegen not installed. Run: brew install xcodegen" | tee "$LOG_FILE"
+    exit 1
+  fi
+  xcodegen generate
+fi
+
 echo "=== Step 1: Build ==="
 xcodebuild build \
   -project "$PROJECT" \
