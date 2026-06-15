@@ -80,5 +80,10 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(css.contains("launcher-post-card"))
         // The comment thread must stay visible — never hidden.
         XCTAssertFalse(css.contains("content-card-comment-thread-container"))
+        // The thread must be fully readable: the reader ruleset must not hide
+        // individual comments or the reply field, or "Load more comments" loads
+        // rows that are display:none and looks like it failed.
+        XCTAssertFalse(css.contains("comment-row"))
+        XCTAssertFalse(css.contains("comment-field"))
     }
 }

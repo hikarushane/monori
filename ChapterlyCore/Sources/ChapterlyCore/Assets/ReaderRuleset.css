@@ -4,12 +4,13 @@
    Patreon (graceful degradation, spec §3.2). */
 
 /* --- hide chrome --- */
+/* Comments stay readable: the comment rows and the reply field are
+   intentionally NOT hidden here, or "Load more comments" loads entries that
+   are display:none and looks like it failed. Keep the whole comment thread. */
 nav,
 aside,
 footer,
 [data-tag="post-actions"],
-[data-tag="comment-row"],
-[data-tag="comment-field"],
 [data-tag="creator-header"],
 [aria-label="Search"],
 div[class*="sidebar"] {
