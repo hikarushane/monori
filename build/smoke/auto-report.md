@@ -1,6 +1,6 @@
 # Smoke Auto Report
 
-Date: 2026年 6月12日 星期五 21時51分19秒 CEST
+Date: Mon Jun 15 12:00:09 CEST 2026
 
 ```
 step=auth result=pass
