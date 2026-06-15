@@ -29,11 +29,23 @@ MVP branch `feat/mvp-implementation`。執行計畫 `docs/superpowers/plans/2026
 
 ## 🔄 進行中 / 未完成
 - **verify hook 還原**：本次為解封移除了 `.claude/settings.json` 的 verify PreToolUse hook block（`settings.json` 開 session 時本就是 `M`）。**收尾須把該 block 還原回 session 起始內容**（只是 Edit，不需 commit；settings.json 不進 PR）。
-- **Task 6 Step 2 `smoke-auto.sh` 未跑**：8 步全流程回歸（需登入 + `.env` 的 `SMOKE_TEST_URL`）。本次逐項已驗，未跑整合 loop。建議下次或使用者自行跑。
+- ~~**Task 6 Step 2 `smoke-auto.sh` 未跑**~~（已跑，8/8 通過）：見下「ux-sweep plan 收尾」。
 - **Task 4 後續（使用者 2026-06-15 回報，待決定）**：
   1. **留言載入失敗 / collapsed comment**：root cause = reader ruleset 藏 `comment-row`/`comment-field`。修法 = 從 hide-chrome 移除這兩個 selector，讓留言真正可讀（符合 Opt1「保留留言串」意圖）。需使用者確認要不要連 `comment-field`（回覆輸入框）一起顯示，還是只顯示既有留言（`comment-row`）。**屬行為變更，等使用者拍板**。
   2. **「Related posts」孤兒標題**：只藏了卡片（`launcher-post-card`），標題無穩定 data-tag。低優先；要補可試 `:has()` 或標題層 heuristic（風險：誤藏）。
 - **驗證新規則**：post-footer（留言 / Related / From-collection）的驗證一律請使用者手動捲動回報，agent 不長捲。已寫入 `CLAUDE.md` + `AGENTS.md`（Reader CSS Debugging 段）。
+
+## 🧹 ux-sweep plan 收尾（2026-06-15，使用者要求先做完再還原 hook）
+完成 `docs/superpowers/plans/2026-06-13-ux-sweep-fixes-browse-nav.md` 全部 task：
+- T1（prefs freeze）`95ffd71`、T2（back-swipe 診斷）`9452e88`、T3（slide + progress bar）`ed7ca1f`、T4（refresh banner）`422aeea`、T7（identifier docs）= 皆已落地（前次 session）。確認 reader-nav 的 BrowseView 改動沒回歸 T3 progress bar（兩者共存）。
+- T5（collection back-swipe DECISION task）= Branch C：使用者先前已確認 Browse collection 左滑可回上頁，無需 code。
+- T6 final verification：build + 90 ChapterlyCore tests 綠；**`smoke-auto.sh` 8/8 全綠、連兩次穩定**。
+- 過程修兩個 blocker（見下方 commit + MEMORY 踩坑）：
+  - `37c78ba` **xcodegen 2.45.4 regression**：`project.yml` 補 SWIFT_VERSION/PRODUCT_NAME + Debug 的 SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG。沒這個，regen 出的 project build 不過、且所有 `#if DEBUG`（含 smoke autopilot）被編掉 → smoke-auto 永遠跑不起來。
+  - `1ffdd7a` **autopilot bookmark_save flaky**：改 ensure-bookmarked + 直接讀 toggle 後的物件（原本 re-fetch by URL race SwiftData save）。
+- 額外：`f3a8f81` 留言可讀性修正（移除 hide-chrome 的 comment-row/comment-field，使用者回報 Load more comments 失敗）。
+
+新增 commits：`f3a8f81`（留言）、`37c78ba`（xcodegen）、`1ffdd7a`（autopilot），加上更早的 `c1c59ff`（docs）、Task 3/4/5 的 `2277be5`/`f775c66`/`dea7229`。
 
 ## ⚡ 接手要做的事
 1. **還原 verify hook**（若尚未還原）：把 `.claude/settings.json` 第一個 PreToolUse block 補回（matcher `Bash` + `if: "Bash(git commit *)"` + verify.sh command）。

@@ -137,6 +137,9 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **`verify.sh` 在 agent 沙箱內必 `disk I/O error`（2026-06-15，非程式問題）**：`verify.sh` Step 1 `xcodebuild build` 緊接 Step 2 `swift test`，兩步共用 `ChapterlyCore/.build`；在 Claude/Codex 的 Bash 沙箱下 SQLite `build.db` 會 `SQLITE_IOERR`（link 階段印 `accessing build database: disk I/O error`）→ `swift test` 非零退出 → `set -e` 讓 verify.sh 整體失敗。**單獨跑任一步乾淨**（`cd ChapterlyCore && swift test` exit 0；`xcodebuild build` BUILD SUCCEEDED），使用者在無沙箱終端機跑 verify.sh 也正常。修法：agent 跑 build/test/commit 一律加 `dangerouslyDisableSandbox`，且把 verify 拆兩步分別跑；別把此 IOERR 當程式錯誤、別 `rm .build`（重建仍會 IOERR）。`/bin/rm`/`\rm` 才能繞過使用者包過的 `rm`。
   📍 出現位置：`.claude/settings.json` 的 verify PreToolUse hook（會對所有 Bash 先跑沙箱化 verify.sh，過不了就擋住一切）
 
+- **xcodegen 2.45.4 不再 default 關鍵 build settings**（2026-06-15）：舊版 xcodegen 會 default `SWIFT_VERSION`、`PRODUCT_NAME`、Debug 的 `SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG`；2.45.4 全不 default。本專案 `project.yml` 原本沒明寫這些，靠舊版 default。結果 `xcodegen generate`（smoke-auto preflight 每次都跑）產生：(1) build 失敗 `SWIFT_VERSION '' is unsupported` + `Multiple commands produce '.app'`（空 PRODUCT_NAME）；(2) 即使 build 過，Debug 也沒定義 DEBUG → 所有 `#if DEBUG`（smoke autopilot、reader dismiss button、debug 診斷）被靜默編譯掉。修法：`project.yml` 的 `settings.base` 明寫 SWIFT_VERSION/PRODUCT_NAME，`settings.configs.Debug` 明寫 SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG + GCC_PREPROCESSOR_DEFINITIONS（commit `37c78ba`）。
+  📍 出現位置：任何 `xcodegen generate` 後的 build；`Chapterly.xcodeproj` 是 generated（未進 git），重生會覆蓋，不能靠 git restore，只能修 project.yml。
+
 - **PreToolUse hook 的 `if:` 似乎不生效、對所有 Bash 都跑**（2026-06-15）：`.claude/settings.json` 第一個 hook 寫 `if: "Bash(git commit *)"` 想只在 commit 跑 verify，實際對每個 Bash 都先跑（verify 過才放行，靜默；過不了就擋並印 log）。配合上面的沙箱 IOERR → 擋住所有操作。解封法：暫時移除該 hook block（Edit settings.json），收尾再還原。
 
 ## 排除的方向
@@ -156,7 +159,7 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - ~~[ ] **Browse 集合頁左滑無反應**（UX sweep #5/#6）：三假說 H1（canGoBack=false）/ H2（same-document 洗版）/ H3（跨文件重載過慢），需計畫 Task 2 診斷 log 判定後選 Task 5 分支~~（2026-06-13 使用者手動確認 Browse Collections 左滑可成功回上一頁；未實作 Task 5 A/B 分支）
 - ~~[ ] **Browse 返回動畫生硬 + 載入慢**（#2/#8/#9）：計畫 Task 3（snapshot 滑出 + estimatedProgress 進度條）；深層解法 webview stack 見計畫 Appendix A（暫緩）~~（已做低風險感知性修正 2026-06-13，commit ed7ca1f；webview stack 仍暫緩）
 - ~~[ ] **Refresh 匯入新章節結果未驗證**~~（已驗證 2026-06-15）：《目標：惡魔》按 ↻ 顯示「Imported 1 new chapter.」（67→68），再按一次顯示「Up to date」。同 session 修了 refresh 把 app 彈回桌面的 bug（H2a memory pressure，commit `dea7229`：爬完釋放離屏 refresher DOM）。
-- [ ] **smoke-auto.sh（8 步版）尚未實跑**：T7 改造後待使用者協助執行（= overhaul 計畫 T8 step 2 / 新計畫 Task 6 step 2）
+- ~~[ ] **smoke-auto.sh（8 步版）尚未實跑**~~（已實跑並通過 2026-06-15）：8/8 全綠、連兩次穩定。過程修了兩個 blocker：(1) xcodegen 2.45.4 不再 default `SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG` 導致 autopilot（`#if DEBUG`）被編譯掉、根本沒跑；(2) autopilot `bookmark_save` 用 `chapter(withPageURL:)` re-fetch 斷言會 race SwiftData save + toggle 跨 run 有狀態 → 改成 ensure-bookmarked + 直接讀剛 toggle 的物件（commit `1ffdd7a`）。
 - ~~[ ] **Driver A 校準 pending**~~（已完成 2026-06-13 session 7）：R1/R2/R3/R4/R6 PASS、R5 FAIL（relaunch workaround）。結果記入 SIMULATOR_PLAYBOOK.md verified log（Driver A 欄）。R6 wheel 失敗改 drag；R3 須連續拖曳；R5 兩 driver 皆無法自動離開 reader
 - ~~[ ] **`smoke.readerDismissButton`**：在 `ReaderView.swift` top bar 加關閉按鈕，讓 idb 可 tap 退出 reader~~（已實作 2026-06-13，commit `e2c0181`；`verify.sh` Debug build + 84/84 通過）
 - ~~[ ] **R5 reader dismiss playbook 重校準**~~（已完成 2026-06-14）：Driver B tap (26,84) PASS；Driver A `computer_batch` body (1013,563)→dismiss (878,180) PASS。`SIMULATOR_PLAYBOOK.md` R5 已更新。
