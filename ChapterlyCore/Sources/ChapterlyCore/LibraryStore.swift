@@ -85,15 +85,22 @@ public final class LibraryStore {
     }
 
     public func orderedChapters(of collection: LocalCollectionModel) -> [LocalChapterModel] {
-        let asc = collection.chapters.sorted { $0.orderIndex < $1.orderIndex }
-        return collection.sortDirection == .oldestToNewest ? asc : asc.reversed()
+        let oldestToNewest = collection.chapters.sorted {
+            ChapterOrdering.sortKey(urlString: $0.urlString, orderIndex: $0.orderIndex)
+                < ChapterOrdering.sortKey(urlString: $1.urlString, orderIndex: $1.orderIndex)
+        }
+        return collection.sortDirection == .oldestToNewest ? oldestToNewest : oldestToNewest.reversed()
     }
 
     public func neighbors(of chapter: LocalChapterModel)
         -> (previous: LocalChapterModel?, next: LocalChapterModel?) {
         guard let collection = chapter.collection else { return (nil, nil) }
-        // orderIndex 0 = newest (first in Patreon DOM). Story order = descending orderIndex.
-        let storyOrder = collection.chapters.sorted { $0.orderIndex > $1.orderIndex }
+        // One source of truth with orderedChapters: oldest → newest by post ID.
+        // previous == the older chapter, next == the newer chapter.
+        let storyOrder = collection.chapters.sorted {
+            ChapterOrdering.sortKey(urlString: $0.urlString, orderIndex: $0.orderIndex)
+                < ChapterOrdering.sortKey(urlString: $1.urlString, orderIndex: $1.orderIndex)
+        }
         guard let i = storyOrder.firstIndex(where: { $0.id == chapter.id }) else { return (nil, nil) }
         return (i > 0 ? storyOrder[i - 1] : nil,
                 i < storyOrder.count - 1 ? storyOrder[i + 1] : nil)

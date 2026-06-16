@@ -78,7 +78,48 @@ final class LibraryStoreTests: XCTestCase {
         ])
         let collection = try store.collections()[0]
         collection.sortDirection = .newestToOldest
-        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), ["oldest", "newest"])
+        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), ["newest", "oldest"])
+    }
+
+    func testReimportKeepsPublishOrderRegardlessOfScrapeDirection() throws {
+        // Reproduces the field bug: a collection first imported up to ch14, then
+        // refreshed once ch15-17 were posted. Patreon lists newest-first, so the
+        // crawl sees ch17 before ch15 and the merger appends them as 17,16,15 after
+        // ch14. Post IDs increase with publish time (intro oldest == smallest ID).
+        func post(_ id: Int) -> String { "https://patreon.com/posts/c-\(id)" }
+        func title(_ id: Int) -> String { id == 100 ? "人物介紹" : "守護著妳 \(id - 100)" }
+
+        // First import: intro(100) + ch1(101)...ch14(114), crawled newest-first.
+        let firstIDs = Array((100...114).reversed())            // 114,113,...,101,100
+        try store.applyImport(firstIDs.enumerated().map { dom, id in
+            payload(title(id), post(id), order: dom)
+        })
+
+        // Refresh: full list ch17(117)...intro(100), crawled newest-first.
+        let secondIDs = Array((100...117).reversed())           // 117,...,100
+        try store.applyImport(secondIDs.enumerated().map { dom, id in
+            payload(title(id), post(id), order: dom)
+        })
+
+        let collection = try store.collections()[0]
+        collection.sortDirection = .oldestToNewest
+
+        // Default (oldest → newest) must be true publish order: intro, 1, 2, ... 17.
+        let expected = ["人物介紹"] + (1...17).map { "守護著妳 \($0)" }
+        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), expected)
+
+        // ⇅ shows newest first.
+        collection.sortDirection = .newestToOldest
+        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), expected.reversed())
+
+        // Neighbors follow publish order (previous == older, next == newer).
+        func chapter(_ t: String) -> LocalChapterModel {
+            store.orderedChapters(of: collection).first { $0.title == t }!
+        }
+        XCTAssertNil(store.neighbors(of: chapter("人物介紹")).previous)            // oldest: no 上一章
+        XCTAssertEqual(store.neighbors(of: chapter("守護著妳 14")).next?.title,
+                       "守護著妳 15")                                            // ch14 → 下一章 ch15
+        XCTAssertNil(store.neighbors(of: chapter("守護著妳 17")).next)            // newest: no 下一章
     }
 
     func testNeighborsFollowStoryOrder() throws {
