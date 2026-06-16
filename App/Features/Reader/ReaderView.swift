@@ -49,7 +49,7 @@ struct ReaderView: View {
                     WebCollectionBanner(model: env.reader)
                 }
                 if showPrefsPanel {
-                    ReaderPreferencesPanel(prefs: prefs) { applyTypography() }
+                    ReaderPreferencesPanel(prefs: prefs)
                 }
             }
             .transition(.move(edge: .top).combined(with: .opacity))
@@ -187,9 +187,10 @@ struct ReaderView: View {
     }
 
     /// Applies the current font-size/line-spacing prefs to the web view. Called
-    /// on every prefs-panel tap (via the panel's `onChange` closure) so the text
-    /// resizes immediately, and from `applyReaderTreatment()` on every fresh
-    /// page load/navigation so a newly opened chapter reflects the saved prefs.
+    /// via the `.onChange(of: prefs.fontSize/lineSpacing)` modifiers below on
+    /// every prefs-panel tap (or Settings stepper change) so the text resizes
+    /// immediately, and from `applyReaderTreatment()` on every fresh page
+    /// load/navigation so a newly opened chapter reflects the saved prefs.
     private func applyTypography() {
         let webView = env.reader.webView
         webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),

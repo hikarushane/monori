@@ -70,6 +70,16 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(css.contains("post-content\"] li"))
     }
 
+    func testRulesetTargetsPatreonPostContentClass() {
+        let css = ReaderStyler.ruleset()
+        // Patreon's post-detail page dropped data-tag="post-content"/<article>
+        // (Task 2 probe, 2026-06); the live container is now .patreon-post-content.
+        // Pin this selector so a future accidental revert is caught by `swift test`
+        // instead of silently shipping a reader where typography never applies.
+        XCTAssertTrue(css.contains(".patreon-post-content"))
+        XCTAssertTrue(css.contains(".patreon-post-content p"))
+    }
+
     func testRulesetHidesPromoSectionsButKeepsComments() {
         let css = ReaderStyler.ruleset()
         // Real Patreon tokens captured from the live logged-in reader (Opt1).
