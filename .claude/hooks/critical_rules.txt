@@ -1,0 +1,10 @@
+Chapterly 關鍵規則（每回合 / 壓縮前重申，防 mid-session drift；完整版見 CLAUDE.md）：
+1. Patreon 登入 / CAPTCHA / Cloudflare / 2FA / email 驗證永遠是手動使用者步驟。絕不自動化、讀取或列印密碼、cookie、token、auth header、session。
+2. 一般 code 改動不重啟 / erase / reset Simulator、不刪 app — 需保留 Patreon 登入狀態。只有明確測試全新安裝才 erase。
+3. 失敗先收 log / screenshot / UI 階層再改 code，不要猜。先定位失敗階段（XcodeGen→build→unit→UI→simulator→runtime→login→smoke）。
+4. verify.sh = headless 自動正確性（CI 可重複）；smoke-*.sh = 需登入煙霧測試。真 Patreon 登入、CAPTCHA、付費內容不可進 verify.sh。
+5. 不為了讓腳本通過而 skip 或刪除失敗測試；不關閉診斷代替修 bug。
+6. Debug 期間不做大架構改動、不加新功能。最小安全修復後重跑同一腳本。
+7. Reader mode 對 library chapters（foreignPageTitle == nil）永遠開，無 per-chapter 開關。
+8. Post-footer（留言串 / Related posts / From the collection）需捲到底 = 手動使用者步驟，不長時間自動捲。
+9. 不讀 .env、credentials、provisioning profile；不在 log 印任何 secret。
