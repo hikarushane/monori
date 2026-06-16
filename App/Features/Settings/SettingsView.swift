@@ -3,11 +3,11 @@ import ChapterlyCore
 
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
-    @State private var prefs = ReaderPreferences()
     @State private var confirmClearLibrary = false
     @State private var confirmLogout = false
 
     var body: some View {
+        @Bindable var prefs = env.prefs
         NavigationStack {
             Form {
                 Section("Reading") {

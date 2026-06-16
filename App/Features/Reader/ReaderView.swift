@@ -6,7 +6,6 @@ struct ReaderView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
     @State private var current: LocalChapterModel
-    @State private var prefs = ReaderPreferences()
     /// Reader chrome (top/bottom bars) is hidden by default; tapping the
     /// center of the page toggles it.
     @State private var chromeVisible = false
@@ -23,6 +22,8 @@ struct ReaderView: View {
         _current = State(initialValue: chapter)
     }
 
+    private var prefs: ReaderPreferences { env.prefs }
+
     var body: some View {
         PatreonWebView(model: env.reader,
                        onContentTap: handleContentTap(isCenter:),
@@ -34,14 +35,8 @@ struct ReaderView: View {
             .onDisappear { foreignTitleTask?.cancel() }
             .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
             .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
-            .onChange(of: prefs.fontSize) { _, size in
-                env.reader.webView.evaluateJavaScript(
-                    ReaderStyler.fontSizeScript(points: size), completionHandler: nil)
-            }
-            .onChange(of: prefs.lineSpacing) { _, spacing in
-                env.reader.webView.evaluateJavaScript(
-                    ReaderStyler.lineHeightScript(value: spacing), completionHandler: nil)
-            }
+            .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
+            .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
     }
 
     // MARK: - Chrome
@@ -54,7 +49,7 @@ struct ReaderView: View {
                     WebCollectionBanner(model: env.reader)
                 }
                 if showPrefsPanel {
-                    ReaderPreferencesPanel(prefs: prefs)
+                    ReaderPreferencesPanel(prefs: prefs) { applyTypography() }
                 }
             }
             .transition(.move(edge: .top).combined(with: .opacity))
@@ -178,10 +173,7 @@ struct ReaderView: View {
         let webView = env.reader.webView
         if foreignPageTitle == nil {
             webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
-            webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
-                                       completionHandler: nil)
-            webView.evaluateJavaScript(ReaderStyler.lineHeightScript(value: prefs.lineSpacing),
-                                       completionHandler: nil)
+            applyTypography()
             repairCurrentTitleIfNeeded(webView)
         } else {
             // The ruleset is post-page specific: on creator/collection pages it
@@ -191,6 +183,18 @@ struct ReaderView: View {
         // Every page opens at the top; the enforcer also defeats Patreon's own
         // auto-scroll on freshly loaded pages.
         webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: nil),
+                                   completionHandler: nil)
+    }
+
+    /// Applies the current font-size/line-spacing prefs to the web view. Called
+    /// on every prefs-panel tap (via the panel's `onChange` closure) so the text
+    /// resizes immediately, and from `applyReaderTreatment()` on every fresh
+    /// page load/navigation so a newly opened chapter reflects the saved prefs.
+    private func applyTypography() {
+        let webView = env.reader.webView
+        webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
+                                   completionHandler: nil)
+        webView.evaluateJavaScript(ReaderStyler.lineHeightScript(value: prefs.lineSpacing),
                                    completionHandler: nil)
     }
 

@@ -18,8 +18,12 @@ div[class*="sidebar"] {
 }
 
 /* --- reading column --- */
+/* .patreon-post-content is the current (2026-06) live container — Patreon
+   dropped data-tag="post-content" from the post-detail page. Keep the old
+   selectors for graceful degradation if Patreon reverts or A/B tests. */
 [data-tag="post-content"],
-article {
+article,
+.patreon-post-content {
   max-width: 42em !important;
   margin-left: auto !important;
   margin-right: auto !important;
@@ -30,7 +34,9 @@ article {
    font-size, so a value only on the container never reaches the prose (Bug 1). */
 [data-tag="post-content"], [data-tag="post-content"] p, [data-tag="post-content"] li,
 [data-tag="post-content"] blockquote, [data-tag="post-content"] span,
-article p, article li, article blockquote {
+article p, article li, article blockquote,
+.patreon-post-content, .patreon-post-content p, .patreon-post-content li,
+.patreon-post-content blockquote, .patreon-post-content span {
   font-size: var(--chapterly-font-size, 19px) !important;
   line-height: var(--chapterly-line-height, 1.75) !important;
 }

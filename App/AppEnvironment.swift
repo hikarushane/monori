@@ -21,6 +21,7 @@ final class AppEnvironment {
     let reader = WebViewModel()
     /// Offscreen web view used to re-crawl a collection page for new chapters.
     let refresher = WebViewModel()
+    let prefs = ReaderPreferences()
 
     var importedCountThisSession = 0
     private var didStartSmokeTools = false
