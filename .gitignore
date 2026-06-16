@@ -17,3 +17,9 @@ docs/superpowers/
 # Claude Code local state (team settings tracked at .claude/ root)
 .claude/worktrees/
 .claude/settings.local.json
+
+# Generated knowledge-graph artifacts — regenerable derived caches.
+# Kept local (not tracked) to avoid merge conflicts on feature branches.
+# Regenerate with `graphify update .` / `/understand` (autoUpdate runs on commit).
+graphify-out/
+.understand-anything/
