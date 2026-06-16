@@ -45,6 +45,7 @@ Use this for deterministic automated checks:
 
 It may run:
 
+* hook config regression check (`scripts/check-hooks.sh`, guards fa5bb64)
 * XcodeGen, if needed
 * build
 * unit tests

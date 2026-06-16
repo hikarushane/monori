@@ -7,8 +7,9 @@
           {
             "type": "command",
             "command": "mkdir -p build; ./scripts/verify.sh > build/verify-hook.log 2>&1 || { { echo 'verify.sh failed - fix errors before committing, then retry the commit. Tail of build/verify-hook.log (full build log: build/xcodebuild.log):'; tail -n 40 build/verify-hook.log; } >&2; exit 2; }",
+            "_comment": "fa5bb64 regression guard: keep `if` INSIDE this command object (next to `command`/`timeout`), never up at the `matcher` level — there Claude Code ignores it and verify.sh fires on every Bash command. Enforced by scripts/check-hooks.sh (verify.sh Step 0).",
             "if": "Bash(git commit *)",
-            "timeout": 300,
+            "timeout": 600,
             "statusMessage": "Running verify.sh (build + tests)..."
           }
         ]

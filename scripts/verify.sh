@@ -15,7 +15,11 @@ DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro,OS=latest"
 mkdir -p "$BUILD_DIR"
 rm -rf "$RESULT_BUNDLE"
 
-echo "=== Step 0: Ensure Xcode project (XcodeGen) ==="
+echo "=== Step 0: Hook config regression check (guards fa5bb64) ==="
+"$PROJECT_DIR/scripts/check-hooks.sh"
+
+echo ""
+echo "=== Step 1: Ensure Xcode project (XcodeGen) ==="
 if [ ! -d "$PROJECT" ]; then
   echo "$PROJECT missing — generating with xcodegen"
   if ! command -v xcodegen >/dev/null 2>&1; then
@@ -25,7 +29,7 @@ if [ ! -d "$PROJECT" ]; then
   xcodegen generate
 fi
 
-echo "=== Step 1: Build ==="
+echo "=== Step 2: Build ==="
 xcodebuild build \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
@@ -35,7 +39,7 @@ xcodebuild build \
   2>&1 | tee "$LOG_FILE"
 
 echo ""
-echo "=== Step 2: Unit tests (ChapterlyCore Swift Package) ==="
+echo "=== Step 3: Unit tests (ChapterlyCore Swift Package) ==="
 cd "$PROJECT_DIR/ChapterlyCore"
 swift test 2>&1 | tee -a "$LOG_FILE"
 cd "$PROJECT_DIR"
