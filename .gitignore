@@ -17,6 +17,7 @@ docs/superpowers/
 # Claude Code local state (team settings tracked at .claude/ root)
 .claude/worktrees/
 .claude/settings.local.json
+.claude/settings.json.bak.*
 
 # Generated knowledge-graph artifacts — regenerable derived caches.
 # Kept local (not tracked) to avoid merge conflicts on feature branches.
