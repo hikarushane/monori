@@ -74,13 +74,38 @@ struct ReaderView: View {
         }
     }
 
-    /// Left-edge swipe: a foreign page first goes back toward the chapter it
-    /// was opened from; on a library chapter the swipe leaves the reader.
+    /// Left-edge swipe: a foreign page first goes back toward the chapter it was
+    /// opened from; on a library chapter the swipe leaves the reader, sliding the
+    /// page off to the right so it reads as a "pop" matching the gesture
+    /// direction instead of the cover's default downward collapse.
     private func handleBackSwipe() {
         if foreignPageTitle != nil && env.reader.webView.canGoBack {
             env.reader.webView.goBack()
         } else {
+            dismissSlidingRight()
+        }
+    }
+
+    private func dismissSlidingRight() {
+        guard let window = env.reader.webView.window,
+              let snapshot = window.snapshotView(afterScreenUpdates: false) else {
             dismiss()
+            return
+        }
+        // The snapshot lives on the window, so it survives the cover teardown and
+        // can slide over the Library list revealed underneath.
+        snapshot.frame = window.bounds
+        window.addSubview(snapshot)
+
+        // Collapse the full-screen cover instantly; the snapshot carries the motion.
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { dismiss() }
+
+        UIView.animate(withDuration: 0.28, delay: 0, options: [.curveEaseInOut]) {
+            snapshot.frame.origin.x = window.bounds.width
+        } completion: { _ in
+            snapshot.removeFromSuperview()
         }
     }
 
