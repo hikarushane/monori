@@ -16,6 +16,10 @@ public enum NavigationPolicy {
         if host == "patreon.com" || host.hasSuffix(".patreon.com") {
             return .allowInWebView
         }
+        let googleSuffixes = [".google.com", ".googleusercontent.com", ".gstatic.com"]
+        if host == "google.com" || googleSuffixes.contains(where: { host.hasSuffix($0) }) {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 }
