@@ -6,8 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "mkdir -p build; ./scripts/verify.sh > build/verify-hook.log 2>&1 || { { echo 'verify.sh failed - fix errors before committing, then retry the commit. Tail of build/verify-hook.log (full build log: build/xcodebuild.log):'; tail -n 40 build/verify-hook.log; } >&2; exit 2; }",
-            "_comment": "fa5bb64 regression guard: keep `if` INSIDE this command object (next to `command`/`timeout`), never up at the `matcher` level — there Claude Code ignores it and verify.sh fires on every Bash command. Enforced by scripts/check-hooks.sh (verify.sh Step 0).",
+            "command": "CMD=$(jq -r '.tool_input.command // empty' 2>/dev/null || true); printf '%s' \"$CMD\" | grep -qE '(^|[;&|][[:space:]]*)git[[:space:]]+commit([[:space:]]|$)' || exit 0; mkdir -p build; ./scripts/verify.sh > build/verify-hook.log 2>&1 || { { echo 'verify.sh failed - fix errors before committing, then retry the commit. Tail of build/verify-hook.log (full build log: build/xcodebuild.log):'; tail -n 40 build/verify-hook.log; } >&2; exit 2; }",
+            "_comment": "Defense-in-depth gate. `if` (Bash(git commit *)) is the fast-path that avoids spawning on simple commands, BUT Claude Code's `if` matcher fails OPEN on complex compound commands (for-loops / quoted inner `;`) — confirmed 2026-06-17 — so an internal stdin guard (jq .tool_input.command + grep for a real `git commit` subcommand) re-checks and exits 0 unless the command truly commits. Without the guard, verify.sh (full iOS build + tests, ~56s) wrongly fires on non-commit complex Bash and gets timeout-killed, injecting a false failure. Keep BOTH the `if` AND the internal guard. Enforced by scripts/check-hooks.sh (verify.sh Step 0).",
             "if": "Bash(git commit *)",
             "timeout": 600,
             "statusMessage": "Running verify.sh (build + tests)..."

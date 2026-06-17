@@ -55,6 +55,16 @@ else:
                 "verify.sh hook: expected `if` == 'Bash(git commit *)' inside the "
                 f"command object, got {gate!r}."
             )
+        # `if` alone fails OPEN on complex compound commands (for-loops / quoted
+        # inner `;`), so the command MUST also carry an internal stdin guard that
+        # re-checks for a real `git commit` before running the costly verify.sh.
+        cmd = h.get("command", "")
+        if "tool_input.command" not in cmd or "git" not in cmd:
+            errors.append(
+                "verify.sh hook: missing internal stdin git-commit guard. Expected the "
+                "command to read `.tool_input.command` (jq) and grep for a real `git "
+                "commit` subcommand, exiting 0 otherwise, BEFORE invoking verify.sh."
+            )
 
 if errors:
     print("HOOK CONFIG CHECK FAILED (see fa5bb64):")
