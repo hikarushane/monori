@@ -17,12 +17,30 @@ struct ReaderView: View {
     /// Identity of the foreign page currently shown (post ID when available),
     /// so SPA URL rewrites on the same page don't re-pin the scroll position.
     @State private var foreignPageKey: String?
+    /// True while the web view is showing a stored-HTML chapter (Google Docs import).
+    /// Prevents `syncCurrentChapter` from trying to match a URL that was never loaded.
+    @State private var renderingStoredHTML = false
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
     }
 
     private var prefs: ReaderPreferences { env.prefs }
+
+    private func wrappedHTML(_ inner: String) -> String {
+        """
+        <!doctype html><html><head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          :root { --chapterly-font-size: \(prefs.fontSize)px; --chapterly-line-height: \(String(format: "%.2f", prefs.lineSpacing)); }
+          body { margin: 0; padding: 16px 18px;
+                 font-size: var(--chapterly-font-size); line-height: var(--chapterly-line-height);
+                 font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
+                 word-break: break-word; }
+          img { max-width: 100%; height: auto; }
+        </style></head><body>\(inner)</body></html>
+        """
+    }
 
     var body: some View {
         PatreonWebView(model: env.reader,
@@ -126,8 +144,15 @@ struct ReaderView: View {
         foreignPageTitle = nil
         foreignPageKey = nil
         current = chapter
-        if let url = URL(string: chapter.urlString) {
-            env.reader.load(url)
+        if let html = chapter.contentHTML {
+            renderingStoredHTML = true
+            let base = URL(string: chapter.urlString.components(separatedBy: "#").first ?? chapter.urlString)
+            env.reader.webView.loadHTMLString(wrappedHTML(html), baseURL: base)
+        } else {
+            renderingStoredHTML = false
+            if let url = URL(string: chapter.urlString) {
+                env.reader.load(url)
+            }
         }
     }
 
@@ -137,6 +162,7 @@ struct ReaderView: View {
     /// "foreign" state: the title comes from the page itself and prev/next
     /// navigation is hidden.
     private func syncCurrentChapter(to url: URL?) {
+        if renderingStoredHTML { return }
         guard let url else { return }
         if let chapter = env.store.chapter(withPageURL: url.absoluteString) {
             foreignTitleTask?.cancel()
