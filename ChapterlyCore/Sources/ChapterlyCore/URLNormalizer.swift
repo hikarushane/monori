@@ -53,12 +53,16 @@ public enum URLNormalizer {
         return String(slug[range])
     }
 
-    /// Extracts the document id from any docs.google.com document URL form.
+    /// Extracts the document id from any docs.google.com **document** URL form
+    /// (`/document/d/<id>`, `/document/u/N/d/<id>`, with or without `/edit`,
+    /// `/mobilebasic`, query, or fragment). Returns nil for non-document editors
+    /// (Sheets/Slides/Forms/Drawings) and non-docs hosts.
     public static func googleDocID(_ string: String) -> String? {
         guard let url = URL(string: string),
               let host = url.host?.lowercased(), host == "docs.google.com" else { return nil }
         let parts = url.path.split(separator: "/").map(String.init)
-        guard let dIdx = parts.firstIndex(of: "d"), parts.indices.contains(dIdx + 1) else { return nil }
+        guard parts.first == "document",
+              let dIdx = parts.firstIndex(of: "d"), parts.indices.contains(dIdx + 1) else { return nil }
         let id = parts[dIdx + 1]
         return id.isEmpty ? nil : id
     }
@@ -67,5 +71,13 @@ public enum URLNormalizer {
     public static func canonicalGoogleDocURL(_ string: String) -> String? {
         guard let id = googleDocID(string) else { return nil }
         return "https://docs.google.com/document/d/\(id)"
+    }
+
+    /// True when the string is an importable Google Doc URL - any account-prefixed
+    /// (`/document/u/N/d/...`), `/edit`, or `/mobilebasic` form under
+    /// `docs.google.com/document/...`. Mirrors `googleDocID` so the import banner
+    /// appears exactly when `importGoogleDoc` can succeed.
+    public static func isGoogleDocURL(_ string: String) -> Bool {
+        googleDocID(string) != nil
     }
 }
