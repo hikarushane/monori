@@ -152,6 +152,21 @@ final class AppEnvironment {
         }
     }
 
+    /// Imports the Google Doc currently shown in `model` into the library.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importGoogleDoc(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL?.absoluteString,
+              let docID = URLNormalizer.googleDocID(url) else { return 0 }
+        guard let html = await model.fetchGoogleDocHTML() else { return 0 }
+        let docTitle = model.webView.title ?? "Google Doc"
+        let imported = GoogleDocsChapterSplitter.split(html: html, docID: docID, docTitle: docTitle)
+        guard !imported.chapters.isEmpty else { return 0 }
+        try? store.applyDocImport(imported)
+        importedCountThisSession = imported.chapters.count
+        return imported.chapters.count
+    }
+
     /// Loads the collection's source page in the offscreen refresher web view and
     /// re-runs the chapter import. `applyImport` merges by normalized URL, so
     /// already-imported chapters are untouched and only genuinely new posts land.
