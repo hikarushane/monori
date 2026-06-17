@@ -52,4 +52,22 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(joined.contains("a"))
         XCTAssertTrue(joined.contains("b"))
     }
+
+    func testSanitizeStripsJavascriptHrefsDataSrcAndMeta() {
+        let dirty = """
+        <a href="javascript:alert(1)">x</a>
+        <a href='javascript:void(0)'>y</a>
+        <img src="data:image/png;base64,ABC">
+        <img src='data:text/html,<h1>hi</h1>'>
+        <meta http-equiv="refresh" content="0;url=http://evil.com">
+        <a href="https://safe.com">z</a>
+        """
+        let clean = GoogleDocsChapterSplitter.sanitize(dirty)
+        XCTAssertFalse(clean.localizedCaseInsensitiveContains("javascript:"))
+        XCTAssertFalse(clean.localizedCaseInsensitiveContains("data:"))
+        XCTAssertFalse(clean.localizedCaseInsensitiveContains("<meta"))
+        XCTAssertTrue(clean.contains("https://safe.com"))
+        XCTAssertTrue(clean.contains(">x<"))
+        XCTAssertTrue(clean.contains(">y<"))
+    }
 }

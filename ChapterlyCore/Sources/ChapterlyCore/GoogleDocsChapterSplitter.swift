@@ -105,15 +105,29 @@ public enum GoogleDocsChapterSplitter {
 
     static func sanitize(_ html: String) -> String {
         var s = html
+        // Remove block tags with their content.
         for tag in ["script", "style"] {
             s = s.replacingOccurrences(
                 of: "<\(tag)\\b[^>]*>[\\s\\S]*?</\(tag)>",
                 with: "", options: [.regularExpression, .caseInsensitive])
         }
+        // Remove <meta> tags (can trigger redirects via http-equiv="refresh").
+        s = s.replacingOccurrences(of: "<meta\\b[^>]*/?>",
+                                   with: "", options: [.regularExpression, .caseInsensitive])
+        // Strip inline event handlers.
         s = s.replacingOccurrences(of: "\\son\\w+\\s*=\\s*\"[^\"]*\"",
                                    with: "", options: [.regularExpression, .caseInsensitive])
         s = s.replacingOccurrences(of: "\\son\\w+\\s*=\\s*'[^']*'",
                                    with: "", options: [.regularExpression, .caseInsensitive])
+        // Neutralise javascript: and data: URIs in href/src attributes.
+        for attr in ["href", "src"] {
+            s = s.replacingOccurrences(
+                of: "\\b\(attr)\\s*=\\s*\"(javascript|data):[^\"]*\"",
+                with: "\(attr)=\"\"", options: [.regularExpression, .caseInsensitive])
+            s = s.replacingOccurrences(
+                of: "\\b\(attr)\\s*=\\s*'(javascript|data):[^']*'",
+                with: "\(attr)=''", options: [.regularExpression, .caseInsensitive])
+        }
         return s
     }
 }
