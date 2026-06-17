@@ -22,6 +22,10 @@ final class WebViewModel: NSObject {
         guard let url = currentURL else { return false }
         return URLNormalizer.patreonPostID(url.absoluteString) != nil
     }
+    var isOnGoogleDocPage: Bool {
+        guard let url = currentURL, let host = url.host?.lowercased() else { return false }
+        return host == "docs.google.com" && url.path.contains("/document/d/")
+    }
 
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
@@ -99,6 +103,22 @@ final class WebViewModel: NSObject {
     func runCollectionDetect() {
         guard isOnPostPage else { return }
         webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
+    }
+
+    /// Fetches the current Google Doc's `/mobilebasic` HTML using the page's
+    /// authenticated session and returns it directly (not via the postMessage
+    /// importer channel, which forbids page content). Returns nil on non-OK.
+    func fetchGoogleDocHTML() async -> String? {
+        let js = """
+        // Strip a trailing /edit OR /mobilebasic so we never build /mobilebasic/mobilebasic
+        // when the page is already on the mobilebasic view (Drive can land there directly).
+        const base = location.pathname.replace(/\\/(edit|mobilebasic).*$/, '');
+        const r = await fetch(base + '/mobilebasic', { credentials: 'include' });
+        if (!r.ok) { return null; }
+        return await r.text();
+        """
+        let result = try? await webView.callAsyncJavaScript(js, contentWorld: .page)
+        return result as? String
     }
 
     /// Expands the lazily-loaded collection list (scrolling until no new post
