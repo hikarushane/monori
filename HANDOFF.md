@@ -69,6 +69,25 @@ MVP branch `feat/mvp-implementation`。執行計畫 `docs/superpowers/plans/2026
 - `.claude/settings.json`（暫時移除 verify hook，待還原；不進 PR）
 - `HANDOFF.md` / `MEMORY.md`（本次更新）
 
+## WebKit / WebContent device-log triage
+
+Lines observed in device logs during development. Grouped by action required.
+
+### Benign — no action needed
+
+- `Could not create a sandbox extension for '…Chapterly.app'` — standard WKWebView message on sideloaded/dev builds; not present in App Store builds.
+- `xpc_user_sessions_get_foreground_uid() failed … Operation not permitted` — XPC session bootstrap noise on simulator and dev-signed device; harmless.
+- `Unable to hide/filter query parameters (missing data)` — WebKit internal URL logging; no impact on functionality.
+- `Process took N seconds to launch` (multi-second) — cold-start cost of WKWebView on first launch; subsequent launches are faster.
+
+### Content-side — not app-fixable
+
+- `makeImagePlus … 'WEBP' … err=-50` — WebKit failing to decode some of Patreon's WebP images. Does not affect chapter text; page renders without those images.
+
+### Actionable signal
+
+- `WebProcessProxy::didBecomeUnresponsive` — correlates with the heavy collection-import crawl (240-round scroll loop over a ~200 MB collection DOM in the offscreen `refresher`). The code already frees the DOM after import (`AppEnvironment.swift` near `runCollectionImport`). If this becomes frequent on very large collections, consider lowering the round cap in `CollectionImport.js` (currently 240) after measuring with the specific collection.
+
 ## 🔗 相關資源
 - 本次計畫：`docs/superpowers/plans/2026-06-13-reader-nav-refresh-bugfixes.md`
 - Simulator 操作手冊：`SIMULATOR_PLAYBOOK.md`
