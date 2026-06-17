@@ -52,4 +52,20 @@ public enum URLNormalizer {
         guard let range = slug.range(of: #"\d+$"#, options: .regularExpression) else { return nil }
         return String(slug[range])
     }
+
+    /// Extracts the document id from any docs.google.com document URL form.
+    public static func googleDocID(_ string: String) -> String? {
+        guard let url = URL(string: string),
+              let host = url.host?.lowercased(), host == "docs.google.com" else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let dIdx = parts.firstIndex(of: "d"), parts.indices.contains(dIdx + 1) else { return nil }
+        let id = parts[dIdx + 1]
+        return id.isEmpty ? nil : id
+    }
+
+    /// Canonical collection key for a Google Doc: scheme+host+/document/d/<id>, no /edit, tab, or fragment.
+    public static func canonicalGoogleDocURL(_ string: String) -> String? {
+        guard let id = googleDocID(string) else { return nil }
+        return "https://docs.google.com/document/d/\(id)"
+    }
 }
