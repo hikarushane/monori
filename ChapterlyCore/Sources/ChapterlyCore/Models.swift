@@ -13,6 +13,7 @@ public final class LocalCollectionModel {
     public var sourceURLString: String        // normalized
     public var creatorName: String?
     public var sortDirectionRaw: String
+    public var sourceKindRaw: String = SourceKind.patreon.rawValue
     @Relationship(deleteRule: .cascade, inverse: \LocalChapterModel.collection)
     public var chapters: [LocalChapterModel]
 
@@ -21,16 +22,23 @@ public final class LocalCollectionModel {
         set { sortDirectionRaw = newValue.rawValue }
     }
 
+    public var sourceKind: SourceKind {
+        get { SourceKind(rawValue: sourceKindRaw) ?? .patreon }
+        set { sourceKindRaw = newValue.rawValue }
+    }
+
     public init(id: String = UUID().uuidString,
                 title: String,
                 sourceURLString: String,
                 creatorName: String? = nil,
-                sortDirection: CollectionSortDirection = .oldestToNewest) {
+                sortDirection: CollectionSortDirection = .oldestToNewest,
+                sourceKind: SourceKind = .patreon) {
         self.id = id
         self.title = title
         self.sourceURLString = sourceURLString
         self.creatorName = creatorName
         self.sortDirectionRaw = sortDirection.rawValue
+        self.sourceKindRaw = sourceKind.rawValue
         self.chapters = []
     }
 }
@@ -44,6 +52,7 @@ public final class LocalChapterModel {
     public var visibleDateText: String?
     public var excerpt: String?
     public var isBookmarked: Bool = false
+    public var contentHTML: String?
     public var collection: LocalCollectionModel?
 
     public init(id: String = UUID().uuidString,
