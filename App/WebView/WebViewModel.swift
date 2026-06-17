@@ -23,8 +23,8 @@ final class WebViewModel: NSObject {
         return URLNormalizer.patreonPostID(url.absoluteString) != nil
     }
     var isOnGoogleDocPage: Bool {
-        guard let url = currentURL, let host = url.host?.lowercased() else { return false }
-        return host == "docs.google.com" && url.path.contains("/document/d/")
+        guard let url = currentURL else { return false }
+        return URLNormalizer.isGoogleDocURL(url.absoluteString)
     }
 
     private var urlObservation: NSKeyValueObservation?
