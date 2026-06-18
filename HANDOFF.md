@@ -1,12 +1,17 @@
 # HANDOFF
 
-> 上次 session: 2026-06-17（Google Docs import — 全 14 tasks 完成 + XSS 修補）
+> 上次 session: 2026-06-18（Google 2FA 登入 redirect 修正）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Feature branch `feat/google-docs-import`（off `main`）。計畫 `docs/superpowers/plans/2026-06-15-google-docs-import.md`（gitignored）全部 14 tasks 完成（Task 1–13 自動化 + Task 14 手動模擬器驗證待使用者執行）。ChapterlyCore 由 90 → 114 tests，全綠。
+Feature branch `feat/google-docs-import`（off `main`）。Google Docs import 全 14 tasks 完成 + XSS 修補。本次修正 Google 2FA 登入後 redirect 到 Safari 的 bug。ChapterlyCore 118 tests，全綠。
 
-## ✅ 本次完成（commit 順序）
+## ✅ 2026-06-18 完成
+
+- **`27ea497` fix(core)** — `NavigationPolicy.isGoogleDomain()`：支援 Google 國家代碼 TLD（`google.com.tw`、`google.co.jp` 等）+ `googleapis.com`。Google 2FA 登入後 `accounts.google.com.tw` 的 SetSID redirect 不再被送往 Safari。+ 2 新 tests。
+- **`7afa5bc` fix(webview)** — 對 Google 域名使用 `allowWithoutTryingAppLink` policy 防止 Universal Links 劫持；加入 `#if DEBUG` 導航決策 log（`[NAV]` 前綴）。
+
+## ✅ 2026-06-17 完成（commit 順序）
 
 - **`51e1305` fix(ci)** — verify.sh 處理 `build.db` race：`swift test` exit code 以 `set +e` + `PIPESTATUS[0]` 捕捉，非零但無真實 test failure 時記錄並繼續，不再因 SWBBuildService I/O 碰撞中斷 hook。
 - **`51e1305` Task 1** — `SourceKind.swift`：`enum SourceKind(.patreon/.googleDocs)` + `SourceProvider` struct + `SourceRegistry`（patreon startURL/icon + googleDrive startURL/icon）+ 3 tests。
