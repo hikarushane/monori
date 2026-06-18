@@ -5,24 +5,40 @@ struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
     @State private var activeKind: SourceKind = .patreon
 
+    /// The web view shown for the selected source. Each source owns a distinct
+    /// WebViewModel -- and thus a distinct WKWebView and back/forward history --
+    /// so navigating or back-swiping inside one source can never cross into the
+    /// other. `.patreon` -> `env.browse`; `.googleDocs` -> `env.googleBrowse`.
+    private var activeModel: WebViewModel {
+        activeKind == .googleDocs ? env.googleBrowse : env.browse
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             sourcePicker
-            WebCollectionBanner(model: env.browse)
-            PatreonWebView(model: env.browse, allowBackSwipe: {
-                BackSwipePolicy.browseDecision(currentURL: env.browse.currentURL,
-                                               canGoBack: env.browse.webView.canGoBack) == .goBack
+            WebCollectionBanner(model: activeModel)
+            PatreonWebView(model: activeModel, allowBackSwipe: {
+                BackSwipePolicy.browseDecision(currentURL: activeModel.currentURL,
+                                               canGoBack: activeModel.webView.canGoBack) == .goBack
             })
+            // Force a fresh representable (and makeUIView) when the source flips,
+            // so the displayed WKWebView swaps to the active model's web view.
+            .id(activeKind)
             .overlay(alignment: .top) {
-                if env.browse.loadingProgress < 1 {
-                    ProgressView(value: env.browse.loadingProgress).progressViewStyle(.linear)
+                if activeModel.loadingProgress < 1 {
+                    ProgressView(value: activeModel.loadingProgress).progressViewStyle(.linear)
                 }
             }
         }
-        .onAppear {
-            if env.browse.currentURL == nil {
-                env.browse.load(SourceRegistry.patreon.startURL)
-            }
+        .onAppear { ensureLoaded(activeKind) }
+    }
+
+    /// Loads a source's start page the first time it is shown. A source the user
+    /// already visited keeps its place (no reload) when switched back to.
+    private func ensureLoaded(_ kind: SourceKind) {
+        let model = kind == .googleDocs ? env.googleBrowse : env.browse
+        if model.currentURL == nil {
+            model.load(SourceRegistry.provider(for: kind).startURL)
         }
     }
 
@@ -31,7 +47,7 @@ struct BrowseView: View {
             ForEach(SourceRegistry.all) { provider in
                 Button {
                     activeKind = provider.kind
-                    env.browse.load(provider.startURL)
+                    ensureLoaded(provider.kind)
                 } label: {
                     Label(provider.displayName, systemImage: provider.iconSystemName)
                         .font(.subheadline)
