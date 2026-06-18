@@ -194,15 +194,44 @@ private final class MessageShim: NSObject, WKScriptMessageHandler {
 }
 
 extension WebViewModel: WKNavigationDelegate {
+    /// `.allow` without triggering Universal Links. Google Drive registers
+    /// Universal Links for `drive.google.com`; after 2FA the auth server
+    /// redirects there and iOS intercepts, opening Safari instead of letting
+    /// the in-app web view receive the navigation. Raw value `allow + 2`
+    /// maps to WebKit's internal "allow without trying app link" policy.
+    private static func allowPolicy(for url: URL) -> WKNavigationActionPolicy {
+        guard let host = url.host?.lowercased(),
+              NavigationPolicy.isGoogleDomain(host) else {
+            return .allow
+        }
+        return WKNavigationActionPolicy(rawValue: WKNavigationActionPolicy.allow.rawValue + 2) ?? .allow
+    }
+
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else { return decisionHandler(.cancel) }
         let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
-        switch NavigationPolicy.decide(url: url, isMainFrame: isMainFrame) {
+        let decision = NavigationPolicy.decide(url: url, isMainFrame: isMainFrame)
+        #if DEBUG
+        let navType: String = switch navigationAction.navigationType {
+        case .linkActivated: "link"
+        case .formSubmitted: "form"
+        case .backForward: "back/fwd"
+        case .reload: "reload"
+        case .formResubmitted: "resubmit"
+        case .other: "other"
+        @unknown default: "unknown"
+        }
+        print("[NAV] \(navType) main=\(isMainFrame) → \(decision) | \(url.absoluteString.prefix(120))")
+        #endif
+        switch decision {
         case .allowInWebView:
-            decisionHandler(.allow)
+            decisionHandler(Self.allowPolicy(for: url))
         case .openInSafari:
+            #if DEBUG
+            print("[NAV] ⚠️ OPENING IN SAFARI: \(url.absoluteString)")
+            #endif
             decisionHandler(.cancel)
             UIApplication.shared.open(url)
         case .block:
@@ -227,10 +256,15 @@ extension WebViewModel: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
         if let url = navigationAction.request.url {
-            switch NavigationPolicy.decide(url: url, isMainFrame: true) {
+            let decision = NavigationPolicy.decide(url: url, isMainFrame: true)
+            #if DEBUG
+            print("[NAV] window.open / _blank → \(decision) | \(url.absoluteString.prefix(120))")
+            #endif
+            switch decision {
             case .allowInWebView:
                 webView.load(navigationAction.request)
             case .openInSafari:
+                print("[NAV] ⚠️ OPENING IN SAFARI (popup): \(url.absoluteString)")
                 UIApplication.shared.open(url)
             case .block:
                 break
