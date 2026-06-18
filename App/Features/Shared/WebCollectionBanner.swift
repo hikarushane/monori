@@ -47,7 +47,7 @@ struct WebCollectionBanner: View {
                     if importing {
                         HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("Importing…") }
                     } else {
-                        Text("Import all chapters")
+                        Text("Import")
                     }
                 }
                 .buttonStyle(.borderedProminent)
