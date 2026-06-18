@@ -18,6 +18,9 @@ enum CollectionRefreshOutcome: Equatable {
 final class AppEnvironment {
     let store: LibraryStore
     let browse = WebViewModel()
+    /// Separate web view + back/forward history for the Google Docs source, so
+    /// Browse can fully isolate it from the Patreon session (`browse`).
+    let googleBrowse = WebViewModel()
     let reader = WebViewModel()
     /// Offscreen web view used to re-crawl a collection page for new chapters.
     let refresher = WebViewModel()
@@ -50,6 +53,7 @@ final class AppEnvironment {
             store = (try? LibraryStore.inMemory()) ?? { fatalError("SwiftData unavailable") }()
         }
         wire(browse)
+        wire(googleBrowse)
         wire(reader)
         wire(refresher)
     }
