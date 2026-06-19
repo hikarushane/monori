@@ -62,6 +62,7 @@ public enum ReaderStyler {
         return """
         <!doctype html><html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light">
         <style>
           :root { color-scheme: light; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
           html { background: #ffffff; }

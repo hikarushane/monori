@@ -23,6 +23,7 @@ struct PatreonWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = model.webView
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe

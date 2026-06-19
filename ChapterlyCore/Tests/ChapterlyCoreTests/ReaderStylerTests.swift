@@ -133,6 +133,7 @@ final class ReaderStylerTests: XCTestCase {
     func testWrappedDocumentPinsLightSchemeAndOpaqueBackground() {
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
                                                 fontSizePoints: 18, lineHeight: 1.6)
+        XCTAssertTrue(html.contains(#"<meta name="color-scheme" content="light">"#))
         XCTAssertTrue(html.contains("color-scheme: light"))
         XCTAssertTrue(html.contains("background: #ffffff"))
         XCTAssertTrue(html.contains("color: #111111"))

@@ -214,6 +214,10 @@ struct ReaderView: View {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
         if foreignPageTitle == nil {
+            #if DEBUG
+            let sv = webView.scrollView
+            print("[READER-DIAG2] scrollBG=\(sv.backgroundColor?.description ?? "nil") inset=\(sv.contentInset) adjInset=\(sv.adjustedContentInset) webViewBG=\(webView.backgroundColor?.description ?? "nil")")
+            #endif
             webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
             applyTypography()
             repairCurrentTitleIfNeeded(webView)
