@@ -101,12 +101,12 @@ struct ReaderView: View {
             dismiss()
             return
         }
-        // The snapshot lives on the window, so it survives the cover teardown and
-        // can slide over the Library list revealed underneath.
+        // Defensive: drop any snapshot a previous dismissal left behind.
+        window.viewWithTag(Self.slideSnapshotTag)?.removeFromSuperview()
+        snapshot.tag = Self.slideSnapshotTag
         snapshot.frame = window.bounds
         window.addSubview(snapshot)
 
-        // Collapse the full-screen cover instantly; the snapshot carries the motion.
         var transaction = Transaction()
         transaction.disablesAnimations = true
         withTransaction(transaction) { dismiss() }
@@ -132,6 +132,8 @@ struct ReaderView: View {
 
     private func open(_ chapter: LocalChapterModel) {
         foreignTitleTask?.cancel()
+        // Clear any leftover slide-dismiss snapshot before presenting fresh content.
+        env.reader.webView.window?.viewWithTag(Self.slideSnapshotTag)?.removeFromSuperview()
         foreignPageTitle = nil
         foreignPageKey = nil
         current = chapter
@@ -252,6 +254,11 @@ struct ReaderView: View {
             }
         }
     }
+
+    /// Tag for the transient slide-dismiss snapshot, so a leftover one (a
+    /// device-only teardown race) can be found and removed before it veils the
+    /// next reader open.
+    private static let slideSnapshotTag = 778_899
 
     private static let readerTitleScript = """
     (function () {
