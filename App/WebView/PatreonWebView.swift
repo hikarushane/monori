@@ -18,11 +18,15 @@ struct PatreonWebView: UIViewRepresentable {
 
     private static let backSwipeName = "chapterly.backSwipe"
     private static let contentTapName = "chapterly.contentTap"
+    #if DEBUG
+    private static let diagLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    #endif
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = model.webView
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
@@ -40,13 +44,24 @@ struct PatreonWebView: UIViewRepresentable {
         edge.delegate = context.coordinator
         webView.addGestureRecognizer(edge)
 
-        let tap = UITapGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(Coordinator.handleContentTap(_:)))
-        tap.name = Self.contentTapName
-        tap.cancelsTouchesInView = false
-        tap.delegate = context.coordinator
-        webView.addGestureRecognizer(tap)
+        // Only the Reader uses center-tap-to-toggle-chrome. Attaching this
+        // recognizer to the Browse/login web view is unnecessary and adds gesture
+        // pressure to the WKWebView text-input session, so install it only when a
+        // handler is set.
+        if onContentTap != nil {
+            let tap = UITapGestureRecognizer(
+                target: context.coordinator,
+                action: #selector(Coordinator.handleContentTap(_:)))
+            tap.name = Self.contentTapName
+            tap.cancelsTouchesInView = false
+            tap.delegate = context.coordinator
+            webView.addGestureRecognizer(tap)
+        }
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            Self.diagLog.notice("[DRAWER] native makeUIView bounds=\(NSCoder.string(for: webView.bounds), privacy: .public)")
+        }
+        #endif
         return webView
     }
 
@@ -54,6 +69,11 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            Self.diagLog.notice("[DRAWER] native updateUIView bounds=\(NSCoder.string(for: uiView.bounds), privacy: .public)")
+        }
+        #endif
     }
 
     /// Patreon navigates client-side (same-document history entries), which

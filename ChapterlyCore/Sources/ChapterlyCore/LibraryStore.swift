@@ -73,6 +73,39 @@ public final class LibraryStore {
         try context.save()
     }
 
+    public func applyDocImport(_ imported: ImportedCollection) throws {
+        let collection: LocalCollectionModel
+        if let existing = try findCollection(sourceURLString: imported.sourceURLString) {
+            collection = existing
+        } else {
+            let c = LocalCollectionModel(title: imported.title,
+                                         sourceURLString: imported.sourceURLString,
+                                         creatorName: imported.creatorName,
+                                         sourceKind: .googleDocs)
+            context.insert(c)
+            collection = c
+        }
+
+        var existingByURL: [String: LocalChapterModel] = [:]
+        for chapter in collection.chapters where existingByURL[chapter.urlString] == nil {
+            existingByURL[chapter.urlString] = chapter
+        }
+        for ic in imported.chapters {
+            if let chapter = existingByURL[ic.urlString] {
+                chapter.title = ic.title
+                chapter.orderIndex = ic.orderIndex
+                chapter.contentHTML = ic.contentHTML
+            } else {
+                let chapter = LocalChapterModel(title: ic.title, urlString: ic.urlString,
+                                                orderIndex: ic.orderIndex)
+                chapter.contentHTML = ic.contentHTML
+                chapter.collection = collection
+                context.insert(chapter)
+            }
+        }
+        try context.save()
+    }
+
     // MARK: queries
 
     public func collections() throws -> [LocalCollectionModel] {

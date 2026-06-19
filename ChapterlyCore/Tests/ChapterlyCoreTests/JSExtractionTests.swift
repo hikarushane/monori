@@ -202,6 +202,15 @@ final class JSExtractionTests: XCTestCase {
                        "tapping teaser did not open the card's post")
     }
 
+    func testDrawerDiagnosticsScriptLoadsAndPostsMessages() {
+        let js = JSAssets.drawerDiagnostics
+        XCTAssertFalse(js.isEmpty, "DrawerDiagnostics.js must be bundled")
+        XCTAssertTrue(js.contains("chapterlyDrawerDiag"),
+                      "must post to the chapterlyDrawerDiag message handler")
+        XCTAssertTrue(js.contains("resize") && js.contains("visibilitychange"),
+                      "must log resize and visibilitychange")
+    }
+
     func testCollectionDetectFindsSeriesLink() async throws {
         let bodies = try await runScript(JSAssets.collectionDetect,
                                          fixture: "post_page",

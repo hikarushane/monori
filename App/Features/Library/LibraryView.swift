@@ -15,16 +15,23 @@ struct LibraryView: View {
                     List {
                         ForEach(collections) { collection in
                             NavigationLink(value: collection.id) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(collection.title).font(.headline)
-                                    if let creator = collection.creatorName, !creator.isEmpty {
-                                        Text("作者：\(creator)")
+                                HStack(alignment: .center, spacing: 12) {
+                                    Image(systemName: SourceRegistry.provider(for: collection.sourceKind).iconSystemName)
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 28)
+                                        .accessibilityIdentifier("smoke.collectionSourceIcon")
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(collection.title).font(.headline)
+                                        if let creator = collection.creatorName, !creator.isEmpty {
+                                            Text("作者：\(creator)")
+                                                .font(.subheadline)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        Text("\(collection.chapters.count) chapters")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                     }
-                                    Text("\(collection.chapters.count) chapters")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
                                 }
                                 .padding(.vertical, 4)
                             }

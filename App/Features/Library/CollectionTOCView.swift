@@ -68,23 +68,25 @@ struct CollectionTOCView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
                 .accessibilityLabel("Reverse chapter order")
-                Button {
-                    refreshing = true
-                    Task {
-                        refreshOutcome = await env.refreshCollection(collection)
-                        refreshing = false
-                        showRefreshResult = true
+                if collection.sourceKind == .patreon {
+                    Button {
+                        refreshing = true
+                        Task {
+                            refreshOutcome = await env.refreshCollection(collection)
+                            refreshing = false
+                            showRefreshResult = true
+                        }
+                    } label: {
+                        if refreshing {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                        }
                     }
-                } label: {
-                    if refreshing {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    }
+                    .disabled(refreshing)
+                    .accessibilityLabel("Check for new chapters")
+                    .accessibilityIdentifier("smoke.refreshChaptersButton")
                 }
-                .disabled(refreshing)
-                .accessibilityLabel("Check for new chapters")
-                .accessibilityIdentifier("smoke.refreshChaptersButton")
             }
         }
         .fullScreenCover(item: $readerTarget) { target in

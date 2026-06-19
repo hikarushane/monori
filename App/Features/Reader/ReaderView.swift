@@ -17,12 +17,21 @@ struct ReaderView: View {
     /// Identity of the foreign page currently shown (post ID when available),
     /// so SPA URL rewrites on the same page don't re-pin the scroll position.
     @State private var foreignPageKey: String?
+    /// True while the web view is showing a stored-HTML chapter (Google Docs import).
+    /// Prevents `syncCurrentChapter` from trying to match a URL that was never loaded.
+    @State private var renderingStoredHTML = false
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
     }
 
     private var prefs: ReaderPreferences { env.prefs }
+
+    private func wrappedHTML(_ inner: String) -> String {
+        ReaderStyler.wrappedDocument(inner: inner,
+                                     fontSizePoints: prefs.fontSize,
+                                     lineHeight: prefs.lineSpacing)
+    }
 
     var body: some View {
         PatreonWebView(model: env.reader,
@@ -92,12 +101,12 @@ struct ReaderView: View {
             dismiss()
             return
         }
-        // The snapshot lives on the window, so it survives the cover teardown and
-        // can slide over the Library list revealed underneath.
+        // Defensive: drop any snapshot a previous dismissal left behind.
+        window.viewWithTag(Self.slideSnapshotTag)?.removeFromSuperview()
+        snapshot.tag = Self.slideSnapshotTag
         snapshot.frame = window.bounds
         window.addSubview(snapshot)
 
-        // Collapse the full-screen cover instantly; the snapshot carries the motion.
         var transaction = Transaction()
         transaction.disablesAnimations = true
         withTransaction(transaction) { dismiss() }
@@ -126,8 +135,15 @@ struct ReaderView: View {
         foreignPageTitle = nil
         foreignPageKey = nil
         current = chapter
-        if let url = URL(string: chapter.urlString) {
-            env.reader.load(url)
+        if let html = chapter.contentHTML {
+            renderingStoredHTML = true
+            let base = URL(string: chapter.urlString.components(separatedBy: "#").first ?? chapter.urlString)
+            env.reader.webView.loadHTMLString(wrappedHTML(html), baseURL: base)
+        } else {
+            renderingStoredHTML = false
+            if let url = URL(string: chapter.urlString) {
+                env.reader.load(url)
+            }
         }
     }
 
@@ -137,6 +153,7 @@ struct ReaderView: View {
     /// "foreign" state: the title comes from the page itself and prev/next
     /// navigation is hidden.
     private func syncCurrentChapter(to url: URL?) {
+        if renderingStoredHTML { return }
         guard let url else { return }
         if let chapter = env.store.chapter(withPageURL: url.absoluteString) {
             foreignTitleTask?.cancel()
@@ -197,7 +214,13 @@ struct ReaderView: View {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
         if foreignPageTitle == nil {
-            webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+            // Skip the Patreon reader ruleset for stored-HTML chapters: ReaderRuleset.css
+            // has a dark-mode body background (#1c1b19 !important) designed for Patreon's
+            // page chrome, which overrides wrappedDocument's white background and creates
+            // a gray veil on Google Docs chapters in dark mode.
+            if !renderingStoredHTML {
+                webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+            }
             applyTypography()
             repairCurrentTitleIfNeeded(webView)
         } else {
@@ -235,6 +258,11 @@ struct ReaderView: View {
             }
         }
     }
+
+    /// Tag for the transient slide-dismiss snapshot, so a leftover one (a
+    /// device-only teardown race) can be found and removed before it veils the
+    /// next reader open.
+    private static let slideSnapshotTag = 778_899
 
     private static let readerTitleScript = """
     (function () {

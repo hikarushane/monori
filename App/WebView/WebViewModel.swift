@@ -1,5 +1,6 @@
 import Foundation
 import WebKit
+import os
 import ChapterlyCore
 
 @MainActor
@@ -21,6 +22,10 @@ final class WebViewModel: NSObject {
     var isOnPostPage: Bool {
         guard let url = currentURL else { return false }
         return URLNormalizer.patreonPostID(url.absoluteString) != nil
+    }
+    var isOnGoogleDocPage: Bool {
+        guard let url = currentURL else { return false }
+        return URLNormalizer.isGoogleDocURL(url.absoluteString)
     }
 
     private var urlObservation: NSKeyValueObservation?
@@ -47,7 +52,22 @@ final class WebViewModel: NSObject {
             source: JSAssets.cardTreatment,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            config.userContentController.add(DrawerDiagShim(), name: "chapterlyDrawerDiag")
+            config.userContentController.addUserScript(WKUserScript(
+                source: JSAssets.drawerDiagnostics,
+                injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
+        #endif
+
         webView = WKWebView(frame: .zero, configuration: config)
+        // Render on a defined opaque surface. Without this, in dark mode the web
+        // view's backdrop shows through un-backgrounded page margins as a gray
+        // veil over the content (Bug 4).
+        webView.isOpaque = true
+        webView.backgroundColor = .systemBackground
+        webView.scrollView.backgroundColor = .systemBackground
         super.init()
 
         webView.navigationDelegate = self
@@ -99,6 +119,22 @@ final class WebViewModel: NSObject {
     func runCollectionDetect() {
         guard isOnPostPage else { return }
         webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
+    }
+
+    /// Fetches the current Google Doc's `/mobilebasic` HTML using the page's
+    /// authenticated session and returns it directly (not via the postMessage
+    /// importer channel, which forbids page content). Returns nil on non-OK.
+    func fetchGoogleDocHTML() async -> String? {
+        let js = """
+        // Strip a trailing /edit OR /mobilebasic so we never build /mobilebasic/mobilebasic
+        // when the page is already on the mobilebasic view (Drive can land there directly).
+        const base = location.pathname.replace(/\\/(edit|mobilebasic).*$/, '');
+        const r = await fetch(base + '/mobilebasic', { credentials: 'include' });
+        if (!r.ok) { return null; }
+        return await r.text();
+        """
+        let result = try? await webView.callAsyncJavaScript(js, contentWorld: .page)
+        return result as? String
     }
 
     /// Expands the lazily-loaded collection list (scrolling until no new post
@@ -173,16 +209,65 @@ private final class MessageShim: NSObject, WKScriptMessageHandler {
     }
 }
 
+#if DEBUG
+/// DEBUG-only: logs DrawerDiagnostics.js events to os.Logger so smoke runs
+/// capture which page event precedes the Google Drive drawer retract.
+private final class DrawerDiagShim: NSObject, WKScriptMessageHandler {
+    private static let log = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let d = message.body as? [String: Any] else { return }
+        let kind = d["kind"] as? String ?? "?"
+        let t = d["t"] as? Int ?? -1
+        let w = d["w"] as? Int ?? -1
+        let h = d["h"] as? Int ?? -1
+        let vis = d["vis"] as? String ?? "?"
+        let dpr = d["dpr"] as? Double ?? -1
+        let sw = d["sw"] as? Int ?? -1
+        let sh = d["sh"] as? Int ?? -1
+        Self.log.notice("[DRAWER] page kind=\(kind, privacy: .public) t=\(t)ms size=\(w)x\(h) dpr=\(dpr, privacy: .public) screen=\(sw)x\(sh) vis=\(vis, privacy: .public)")
+    }
+}
+#endif
+
 extension WebViewModel: WKNavigationDelegate {
+    /// `.allow` without triggering Universal Links. Google Drive registers
+    /// Universal Links for `drive.google.com`; after 2FA the auth server
+    /// redirects there and iOS intercepts, opening Safari instead of letting
+    /// the in-app web view receive the navigation. Raw value `allow + 2`
+    /// maps to WebKit's internal "allow without trying app link" policy.
+    private static func allowPolicy(for url: URL) -> WKNavigationActionPolicy {
+        guard let host = url.host?.lowercased(),
+              NavigationPolicy.isGoogleDomain(host) else {
+            return .allow
+        }
+        return WKNavigationActionPolicy(rawValue: WKNavigationActionPolicy.allow.rawValue + 2) ?? .allow
+    }
+
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else { return decisionHandler(.cancel) }
         let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
-        switch NavigationPolicy.decide(url: url, isMainFrame: isMainFrame) {
+        let decision = NavigationPolicy.decide(url: url, isMainFrame: isMainFrame)
+        #if DEBUG
+        let navType: String = switch navigationAction.navigationType {
+        case .linkActivated: "link"
+        case .formSubmitted: "form"
+        case .backForward: "back/fwd"
+        case .reload: "reload"
+        case .formResubmitted: "resubmit"
+        case .other: "other"
+        @unknown default: "unknown"
+        }
+        print("[NAV] \(navType) main=\(isMainFrame) → \(decision) | \(url.absoluteString.prefix(120))")
+        #endif
+        switch decision {
         case .allowInWebView:
-            decisionHandler(.allow)
+            decisionHandler(Self.allowPolicy(for: url))
         case .openInSafari:
+            #if DEBUG
+            print("[NAV] ⚠️ OPENING IN SAFARI: \(url.absoluteString)")
+            #endif
             decisionHandler(.cancel)
             UIApplication.shared.open(url)
         case .block:
@@ -207,10 +292,15 @@ extension WebViewModel: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
         if let url = navigationAction.request.url {
-            switch NavigationPolicy.decide(url: url, isMainFrame: true) {
+            let decision = NavigationPolicy.decide(url: url, isMainFrame: true)
+            #if DEBUG
+            print("[NAV] window.open / _blank → \(decision) | \(url.absoluteString.prefix(120))")
+            #endif
+            switch decision {
             case .allowInWebView:
                 webView.load(navigationAction.request)
             case .openInSafari:
+                print("[NAV] ⚠️ OPENING IN SAFARI (popup): \(url.absoluteString)")
                 UIApplication.shared.open(url)
             case .block:
                 break

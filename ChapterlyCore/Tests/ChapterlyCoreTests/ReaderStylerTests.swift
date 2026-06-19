@@ -96,4 +96,46 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertFalse(css.contains("comment-row"))
         XCTAssertFalse(css.contains("comment-field"))
     }
+
+    func testWrappedDocumentEmbedsPrefsVariables() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 21, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("--chapterly-font-size: 21px"))
+        XCTAssertTrue(html.contains("--chapterly-line-height: 1.90"))
+        XCTAssertTrue(html.contains("<p>x</p>"))
+    }
+
+    func testWrappedDocumentOverridesInlineStylesOnProseDescendants() {
+        // Google Docs put font-size/line-height inline on every paragraph and its
+        // spans; the wrapper must override the prose descendants with !important,
+        // not just body — but must NOT flatten headings (those keep their size).
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.75)
+        XCTAssertTrue(html.contains("body p *"))
+        XCTAssertTrue(html.contains("font-size: var(--chapterly-font-size) !important"))
+        XCTAssertTrue(html.contains("line-height: var(--chapterly-line-height) !important"))
+        // Headings are not in the override list, so chapter sub-headings keep
+        // their relative size (Google headings wrap text in <span>, which a bare
+        // `body span` rule would otherwise flatten).
+        XCTAssertFalse(html.contains("body h1"))
+        XCTAssertFalse(html.contains("body span "))
+    }
+
+    func testWrappedDocumentClampsAndFormats() {
+        let big = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 99, lineHeight: 9.0)
+        XCTAssertTrue(big.contains("--chapterly-font-size: 32px"))
+        XCTAssertTrue(big.contains("--chapterly-line-height: 2.40"))
+        let small = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 1, lineHeight: 0.1)
+        XCTAssertTrue(small.contains("--chapterly-font-size: 14px"))
+        XCTAssertTrue(small.contains("--chapterly-line-height: 1.20"))
+    }
+
+    func testWrappedDocumentSupportsLightAndDarkScheme() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 18, lineHeight: 1.6)
+        XCTAssertTrue(html.contains(#"<meta name="color-scheme" content="light dark">"#))
+        XCTAssertTrue(html.contains("color-scheme: light dark"))
+        XCTAssertTrue(html.contains("background: Canvas"))
+        XCTAssertTrue(html.contains("color: CanvasText"))
+    }
 }

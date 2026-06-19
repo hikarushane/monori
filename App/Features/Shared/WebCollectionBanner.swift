@@ -30,7 +30,35 @@ struct WebCollectionBanner: View {
 
     @ViewBuilder
     private var banner: some View {
-        if model.isOnCollectionPage {
+        if model.isOnGoogleDocPage {
+            HStack {
+                Label("Google Doc", systemImage: "doc.richtext")
+                    .font(.subheadline)
+                Spacer()
+                Button {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importGoogleDoc(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+                } label: {
+                    if importing {
+                        HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("Importing…") }
+                    } else {
+                        Text("Import")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(importing)
+                .accessibilityIdentifier("smoke.importChaptersButton")
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(.bar)
+            .accessibilityIdentifier("smoke.collectionBanner")
+        } else if model.isOnCollectionPage {
             HStack {
                 Label("Collection page", systemImage: "books.vertical")
                     .font(.subheadline)

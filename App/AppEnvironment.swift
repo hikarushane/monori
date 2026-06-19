@@ -19,8 +19,21 @@ final class AppEnvironment {
     let store: LibraryStore
     let browse = WebViewModel()
     let reader = WebViewModel()
-    /// Offscreen web view used to re-crawl a collection page for new chapters.
-    let refresher = WebViewModel()
+    // @Observable does not support lazy var — use @ObservationIgnored backing optionals
+    // so these two web processes are not spun up until first access.
+    @ObservationIgnored private var _googleBrowse: WebViewModel?
+    /// Built on first use (Browse → Google Drive) so launch spins up fewer
+    /// WKWebViews. Isolated from the Patreon `browse` session.
+    var googleBrowse: WebViewModel {
+        if _googleBrowse == nil { let m = WebViewModel(); wire(m); _googleBrowse = m }
+        return _googleBrowse!
+    }
+    @ObservationIgnored private var _refresher: WebViewModel?
+    /// Offscreen collection re-crawler, built on first refresh.
+    var refresher: WebViewModel {
+        if _refresher == nil { let m = WebViewModel(); wire(m); _refresher = m }
+        return _refresher!
+    }
     let prefs = ReaderPreferences()
 
     var importedCountThisSession = 0
@@ -51,7 +64,7 @@ final class AppEnvironment {
         }
         wire(browse)
         wire(reader)
-        wire(refresher)
+        // googleBrowse and refresher wire themselves on first access.
     }
 
     func startSmokeToolsIfNeeded() {
@@ -150,6 +163,21 @@ final class AppEnvironment {
             guard let model, model.isOnPostPage else { return }
             model.detectedCollection = payload
         }
+    }
+
+    /// Imports the Google Doc currently shown in `model` into the library.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importGoogleDoc(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL?.absoluteString,
+              let docID = URLNormalizer.googleDocID(url) else { return 0 }
+        guard let html = await model.fetchGoogleDocHTML() else { return 0 }
+        let docTitle = model.webView.title ?? "Google Doc"
+        let imported = GoogleDocsChapterSplitter.split(html: html, docID: docID, docTitle: docTitle)
+        guard !imported.chapters.isEmpty else { return 0 }
+        try? store.applyDocImport(imported)
+        importedCountThisSession = imported.chapters.count
+        return imported.chapters.count
     }
 
     /// Loads the collection's source page in the offscreen refresher web view and

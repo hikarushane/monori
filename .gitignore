@@ -4,7 +4,7 @@ DerivedData/
 .build/
 *.xcodeproj
 *.log
-build/smoke/ui/
+build/smoke/
 
 # secrets
 .env
