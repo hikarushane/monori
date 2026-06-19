@@ -49,6 +49,41 @@ public enum ReaderStyler {
         return "document.documentElement.style.setProperty('--chapterly-line-height', '\(formatted)');"
     }
 
+    /// Full HTML document wrapper for stored chapter HTML (Google Docs import).
+    /// Google Docs export inline `font-size`/`line-height` on every paragraph and
+    /// span, which beats a plain `body` rule — so the reader's prefs never reach
+    /// the prose. The descendant rules below use `!important` so the CSS
+    /// variables (also updated live by `fontSizeScript`/`lineHeightScript`) win
+    /// over Google's inline styles. Headings keep their own size for hierarchy.
+    public static func wrappedDocument(inner: String, fontSizePoints: Int, lineHeight: Double) -> String {
+        let size = min(32, max(14, fontSizePoints))
+        let lh = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"),
+                        min(2.4, max(1.2, lineHeight)))
+        return """
+        <!doctype html><html><head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          :root { --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
+          body { margin: 0; padding: 16px 18px;
+                 font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
+                 word-break: break-word; }
+          /* Resize prose and everything inside it, but NOT <h1>-<h6> or their
+             children, so chapter sub-headings keep their relative size. A bare
+             `body span` rule would flatten Google headings, whose text is
+             wrapped in <span> (<h2><span style="font-size:12pt">…). */
+          body,
+          body p, body p *,
+          body li, body li *,
+          body blockquote, body blockquote *,
+          body td, body td * {
+            font-size: var(--chapterly-font-size) !important;
+            line-height: var(--chapterly-line-height) !important;
+          }
+          img { max-width: 100%; height: auto; }
+        </style></head><body>\(inner)</body></html>
+        """
+    }
+
     /// Pins the scroll position to `progress` (or top when nil) for a few seconds,
     /// re-applying every 400ms to defeat Patreon's own auto-scroll. Stops as soon
     /// as the user touches or wheel-scrolls the page.
