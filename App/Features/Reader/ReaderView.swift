@@ -217,6 +217,19 @@ struct ReaderView: View {
             #if DEBUG
             let sv = webView.scrollView
             print("[READER-DIAG2] scrollBG=\(sv.backgroundColor?.description ?? "nil") inset=\(sv.contentInset) adjInset=\(sv.adjustedContentInset) webViewBG=\(webView.backgroundColor?.description ?? "nil")")
+            webView.evaluateJavaScript("""
+            (function(){
+              var h=document.documentElement,b=document.body;
+              return JSON.stringify({
+                htmlBG:getComputedStyle(h).backgroundColor,
+                bodyBG:getComputedStyle(b).backgroundColor,
+                bodyPT:getComputedStyle(b).paddingTop,
+                bodyMT:getComputedStyle(b).marginTop
+              });
+            })()
+            """) { result, _ in
+                print("[READER-DIAG3] \(result as? String ?? "nil")")
+            }
             #endif
             webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
             applyTypography()
