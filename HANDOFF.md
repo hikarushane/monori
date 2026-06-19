@@ -1,12 +1,12 @@
 # HANDOFF
 
-> 上次 session: 2026-06-19（Bug 4 gray veil 修復 + Google Docs dark mode 支援）
+> 上次 session: 2026-06-19（Task 3 + 4：tap recognizer guard + 文件修正）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）完全解決，Google Docs 章節 light/dark mode 皆正確顯示。ChapterlyCore 124 tests，全綠。
+Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）✅、Task 3（tap recognizer）✅、Task 4（文件）✅。ChapterlyCore 124 tests，全綠。
 - 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認）
-- 分支 ＠ 最後 commit：`feat/google-docs-import @ db68224`
+- 分支 ＠ 最後 commit：`feat/google-docs-import @ 4ab9ea6`
 - 工作樹：`build/smoke/current-screen.png` unstaged（截圖工件，不影響 code）
 
 ## ✅ 本次完成（2026-06-19）
@@ -20,15 +20,15 @@ Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）�
 - **單元測試更新**：`testWrappedDocumentSupportsLightAndDarkScheme` 改斷言 `"light dark"` / `Canvas` / `CanvasText`（`ChapterlyCore/Tests/ChapterlyCoreTests/ReaderStylerTests.swift`）
 - 使用者實機驗證：light mode 白底深字 ✅、dark mode 深底白字 ✅
 
+## ✅ 本次完成（2026-06-19 Task 3 + 4）
+
+- **Task 3**：`PatreonWebView.makeUIView()` 的 content-tap `UITapGestureRecognizer` 改為只在 `onContentTap != nil` 時安裝（`App/WebView/PatreonWebView.swift` commit `c6ec681`）
+- **Task 4**：HANDOFF.md 新增正確 Google AutoFill 說明（非 bug，iOS QuickType heuristic，無公開 API 可強制）；補 Console log 條目（`0.5` = 網頁 JS、`unsafeForcedSync` = 系統框架、`RTIInputSystemClient` / `WebContent` 啟動成本）（commit `4ab9ea6`）
+- `verify.sh` 124/124 ✅
+
 ## 🔄 進行中
 
-- **`docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`**
-  - Task 1 ✅（DEBUG hierarchy dump）
-  - Task 2 ✅（WKWebView opacity + CSS dark mode）
-  - **Task 3 未做**：移除 Browse/Login tab 的 `PatreonWebView` 中無條件安裝的 content-tap recognizer。目前所有 tab 都裝了 `UITapGestureRecognizer`，但 Browse/Login 不傳 `onContentTap` closure；應只在 `onContentTap != nil` 時安裝。位置：`App/WebView/PatreonWebView.swift` `makeUIView()` 的 tap recognizer 安裝段。
-  - Task 4 未做：更新 HANDOFF.md 文件（本次 handoff 已覆蓋）
-  - Task 5 未開始：lazy web view 構建（可選，需使用者確認才做）
-  - **完成判準 Task 3**：`verify.sh` 124/124 通過；Browse tab 點擊頁面不觸發任何 `onContentTap` 行為
+- **Task 5（可選，未開始）**：`App/AppEnvironment.swift` lazy web view 構建（`googleBrowse` / `refresher`）——縮短 7–10 s 冷啟動。需使用者明確同意才動。
 
 ## 🚧 試過但行不通（避免重踩）
 
@@ -38,10 +38,10 @@ Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）�
 
 ## ⚡ 接手要做的事（優先順序）
 
-1. 讀取 plan 確認 Task 3 原始描述：`cat docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`
-2. **Task 3**：在 `App/WebView/PatreonWebView.swift` `makeUIView()` 中，把 tap recognizer 安裝改成 `if onContentTap != nil { ... }`；Browse/Login tab 不傳 closure，即不安裝
-3. 跑 `./scripts/verify.sh` 確認 124/124
-4. （可選）問使用者是否要做 Task 5（lazy web view）
+1. **裝置回歸**（使用者手動）：
+   - Reader 章節中央點擊仍切換上下 chrome ✓
+   - Browse 頁面點擊不觸發任何行為 ✓
+2. （可選）Task 5：`App/AppEnvironment.swift` lazy web view——問使用者是否要做
 
 ## ⚠️ 注意事項
 
