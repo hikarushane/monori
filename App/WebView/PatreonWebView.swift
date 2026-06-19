@@ -18,6 +18,9 @@ struct PatreonWebView: UIViewRepresentable {
 
     private static let backSwipeName = "chapterly.backSwipe"
     private static let contentTapName = "chapterly.contentTap"
+    #if DEBUG
+    private static let diagLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    #endif
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -54,6 +57,11 @@ struct PatreonWebView: UIViewRepresentable {
             tap.delegate = context.coordinator
             webView.addGestureRecognizer(tap)
         }
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            Self.diagLog.notice("[DRAWER] native makeUIView bounds=\(NSCoder.string(for: webView.bounds), privacy: .public)")
+        }
+        #endif
         return webView
     }
 
@@ -61,6 +69,11 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            Self.diagLog.notice("[DRAWER] native updateUIView bounds=\(NSCoder.string(for: uiView.bounds), privacy: .public)")
+        }
+        #endif
     }
 
     /// Patreon navigates client-side (same-document history entries), which
