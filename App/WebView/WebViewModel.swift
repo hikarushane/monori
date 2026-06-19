@@ -1,5 +1,6 @@
 import Foundation
 import WebKit
+import os
 import ChapterlyCore
 
 @MainActor
@@ -50,6 +51,15 @@ final class WebViewModel: NSObject {
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.cardTreatment,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+
+        #if DEBUG
+        if AppEnvironment.isSmokeMode {
+            config.userContentController.add(DrawerDiagShim(), name: "chapterlyDrawerDiag")
+            config.userContentController.addUserScript(WKUserScript(
+                source: JSAssets.drawerDiagnostics,
+                injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
+        #endif
 
         webView = WKWebView(frame: .zero, configuration: config)
         // Render on a defined opaque surface. Without this, in dark mode the web
@@ -198,6 +208,26 @@ private final class MessageShim: NSObject, WKScriptMessageHandler {
         route(message.name, message.body)
     }
 }
+
+#if DEBUG
+/// DEBUG-only: logs DrawerDiagnostics.js events to os.Logger so smoke runs
+/// capture which page event precedes the Google Drive drawer retract.
+private final class DrawerDiagShim: NSObject, WKScriptMessageHandler {
+    private static let log = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let d = message.body as? [String: Any] else { return }
+        let kind = d["kind"] as? String ?? "?"
+        let t = d["t"] as? Int ?? -1
+        let w = d["w"] as? Int ?? -1
+        let h = d["h"] as? Int ?? -1
+        let vis = d["vis"] as? String ?? "?"
+        let dpr = d["dpr"] as? Double ?? -1
+        let sw = d["sw"] as? Int ?? -1
+        let sh = d["sh"] as? Int ?? -1
+        Self.log.notice("[DRAWER] page kind=\(kind, privacy: .public) t=\(t)ms size=\(w)x\(h) dpr=\(dpr) screen=\(sw)x\(sh) vis=\(vis, privacy: .public)")
+    }
+}
+#endif
 
 extension WebViewModel: WKNavigationDelegate {
     /// `.allow` without triggering Universal Links. Google Drive registers
