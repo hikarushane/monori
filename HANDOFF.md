@@ -1,12 +1,12 @@
 # HANDOFF
 
-> 上次 session: 2026-06-19（Task 3 + 4：tap recognizer guard + 文件修正）
+> 上次 session: 2026-06-19（Task 3/4/5：tap guard + 文件 + lazy web views）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）✅、Task 3（tap recognizer）✅、Task 4（文件）✅。ChapterlyCore 124 tests，全綠。
+Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（Task 1–5）。ChapterlyCore 124 tests，全綠。
 - 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認）
-- 分支 ＠ 最後 commit：`feat/google-docs-import @ 4ab9ea6`
+- 分支 ＠ 最後 commit：`feat/google-docs-import @ 1cf69f5`
 - 工作樹：`build/smoke/current-screen.png` unstaged（截圖工件，不影響 code）
 
 ## ✅ 本次完成（2026-06-19）
@@ -26,9 +26,13 @@ Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）�
 - **Task 4**：HANDOFF.md 新增正確 Google AutoFill 說明（非 bug，iOS QuickType heuristic，無公開 API 可強制）；補 Console log 條目（`0.5` = 網頁 JS、`unsafeForcedSync` = 系統框架、`RTIInputSystemClient` / `WebContent` 啟動成本）（commit `4ab9ea6`）
 - `verify.sh` 124/124 ✅
 
+## ✅ 本次完成（2026-06-19 Task 5）
+
+- **Task 5**：`AppEnvironment` 的 `googleBrowse` + `refresher` 改為 `@ObservationIgnored` backing optional + computed property（`lazy var` 在 `@Observable` class 不支援）；`init()` 只 wire `browse`/`reader`——冷啟動 WKWebView 從 4 降為 2（commit `1cf69f5`）
+
 ## 🔄 進行中
 
-- **Task 5（可選，未開始）**：`App/AppEnvironment.swift` lazy web view 構建（`googleBrowse` / `refresher`）——縮短 7–10 s 冷啟動。需使用者明確同意才動。
+無。Plan 全部完成。
 
 ## 🚧 試過但行不通（避免重踩）
 
@@ -38,10 +42,13 @@ Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）�
 
 ## ⚡ 接手要做的事（優先順序）
 
-1. **裝置回歸**（使用者手動）：
-   - Reader 章節中央點擊仍切換上下 chrome ✓
-   - Browse 頁面點擊不觸發任何行為 ✓
-2. （可選）Task 5：`App/AppEnvironment.swift` lazy web view——問使用者是否要做
+1. **裝置回歸**（使用者手動，verify.sh 無法驗）：
+   - Reader 章節中央點擊仍切換 chrome
+   - Browse 頁面點擊不觸發任何行為
+   - Browse → Google Drive → Google 登入正常
+   - 集合頁 → 重新整理章節正常
+   - 冷啟動 `WebContent` 進程行數減少（Xcode console）
+2. **下一個 feature**：與使用者討論 `feat/google-docs-import` 的後續工作或 PR 準備
 
 ## ⚠️ 注意事項
 
