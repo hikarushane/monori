@@ -11,6 +11,12 @@ Feature branch `feat/google-docs-import`（off `main`）。Google Docs import �
 - **`27ea497` fix(core)** — `NavigationPolicy.isGoogleDomain()`：支援 Google 國家代碼 TLD（`google.com.tw`、`google.co.jp` 等）+ `googleapis.com`。Google 2FA 登入後 `accounts.google.com.tw` 的 SetSID redirect 不再被送往 Safari。+ 2 新 tests。
 - **`7afa5bc` fix(webview)** — 對 Google 域名使用 `allowWithoutTryingAppLink` policy 防止 Universal Links 劫持；加入 `#if DEBUG` 導航決策 log（`[NAV]` 前綴）。
 
+## 已知限制
+
+- iOS Simulator 無 iCloud Keychain 同步，Google 登入頁不會出現密碼 AutoFill 建議列。
+  非 app bug（WebView 用 `.default()` 持久 store、無 `inputAccessoryView` 覆寫）。
+  需在實機（已登入 iCloud 且 Keychain 存有 Google 密碼）驗證。
+
 ## ✅ 2026-06-17 完成（commit 順序）
 
 - **`51e1305` fix(ci)** — verify.sh 處理 `build.db` race：`swift test` exit code 以 `set +e` + `PIPESTATUS[0]` 捕捉，非零但無真實 test failure 時記錄並繼續，不再因 SWBBuildService I/O 碰撞中斷 hook。
