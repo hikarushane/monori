@@ -17,6 +17,20 @@ Feature branch `feat/google-docs-import`（off `main`）。Google Docs import �
   非 app bug（WebView 用 `.default()` 持久 store、無 `inputAccessoryView` 覆寫）。
   需在實機（已登入 iCloud 且 Keychain 存有 Google 密碼）驗證。
 
+## Console log 噪音分類（非 bug，勿再追）
+
+這些 Xcode console 訊息都是 Apple/Simulator/WebKit 噪音，無 app 缺陷：
+- `CHHapticPattern … hapticpatternlibrary.plist … No such file`：Simulator 無觸覺硬體。
+- `'WEBP' … initImage failed err=-50`：Simulator WebP 解碼器；實機正常顯示圖片。
+- `Could not register system wide server: -25204`、`_AXAddToElementCache`、重複的
+  `WebKit.axbundle`/`WebCore.axbundle` class、`Unable to hide query parameters`：WebKit/AX 噪音。
+- `Unable to simultaneously satisfy constraints`（`_UIKBCompatInputView`、`_UIButtonBarButton`）：
+  系統鍵盤 + SwiftUI `.toolbar` 內部，會自動 recover，無可見影響。
+- `web-browser-engine` entitlement / `XPCConnectionTerminationWatchdog` / `No such process`：
+  任何第三方 app 嵌入 `WKWebView` 都會有（只有 Safari 持有該 entitlement）。
+- `CoreData … incremental_vacuum` / `WAL checkpoint`：我們的 SwiftData，正常；代表 import 已存檔。
+- `[NAV] …`：我們自己的 debug log。
+
 ## ✅ 2026-06-17 完成（commit 順序）
 
 - **`51e1305` fix(ci)** — verify.sh 處理 `build.db` race：`swift test` exit code 以 `set +e` + `PIPESTATUS[0]` 捕捉，非零但無真實 test failure 時記錄並繼續，不再因 SWBBuildService I/O 碰撞中斷 hook。
