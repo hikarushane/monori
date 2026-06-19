@@ -224,7 +224,7 @@ private final class DrawerDiagShim: NSObject, WKScriptMessageHandler {
         let dpr = d["dpr"] as? Double ?? -1
         let sw = d["sw"] as? Int ?? -1
         let sh = d["sh"] as? Int ?? -1
-        Self.log.notice("[DRAWER] page kind=\(kind, privacy: .public) t=\(t)ms size=\(w)x\(h) dpr=\(dpr) screen=\(sw)x\(sh) vis=\(vis, privacy: .public)")
+        Self.log.notice("[DRAWER] page kind=\(kind, privacy: .public) t=\(t)ms size=\(w)x\(h) dpr=\(dpr, privacy: .public) screen=\(sw)x\(sh) vis=\(vis, privacy: .public)")
     }
 }
 #endif

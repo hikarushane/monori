@@ -46,10 +46,17 @@
     for (var i = 0; i < muts.length; i++) {
       var m = muts[i];
       for (var a = 0; a < m.addedNodes.length; a++) {
-        if (looksLikeScrim(m.addedNodes[a])) { send("scrim-added"); }
+        var n = m.addedNodes[a];
+        if (looksLikeScrim(n)) {
+          n.setAttribute("data-chap-scrim", "1");
+          send("scrim-added");
+        }
       }
       for (var r = 0; r < m.removedNodes.length; r++) {
-        if (looksLikeScrim(m.removedNodes[r])) { send("scrim-removed"); }
+        var rn = m.removedNodes[r];
+        if (rn && rn.nodeType === 1 && rn.getAttribute("data-chap-scrim") === "1") {
+          send("scrim-removed");
+        }
       }
     }
   }).observe(document.documentElement, { childList: true, subtree: true });
