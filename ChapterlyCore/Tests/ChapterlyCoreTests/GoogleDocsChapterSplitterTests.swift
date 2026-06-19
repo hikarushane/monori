@@ -70,4 +70,30 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(clean.contains(">x<"))
         XCTAssertTrue(clean.contains(">y<"))
     }
+
+    func testSplitsChaptersWhenOnlySomeTitlesAreHeadingStyled() throws {
+        // Real-world Google Doc: 第一章/第四章 are Heading 2, 第二章/第三章 are plain
+        // paragraphs. All four must import, not just the two heading-styled ones.
+        let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-mixed-headings"),
+                                                docID: "MIX", docTitle: "Mixed")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第二章", "第三章 🔥", "第四章"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha one body"))
+        XCTAssertFalse(r.chapters[0].contentHTML.contains("第二章"))
+        XCTAssertFalse(r.chapters[0].contentHTML.contains("beta two body"))
+        XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3])
+    }
+
+    func testTOCParagraphWithLineBreaksIsNotSplitIntoChapters() {
+        // A table-of-contents row packs several entries with <br>. It must not be
+        // mistaken for a chapter title (would create spurious chapters).
+        let html = """
+        <html><body>
+        <h2>第一章</h2><p>a</p>
+        <p>第二章<br>第三章</p>
+        <h2>第四章</h2><p>d</p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "TOC", docTitle: "TOC")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第四章"])
+    }
 }
