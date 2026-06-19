@@ -62,11 +62,11 @@ public enum ReaderStyler {
         return """
         <!doctype html><html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="color-scheme" content="light">
+        <meta name="color-scheme" content="light dark">
         <style>
-          :root { color-scheme: light; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
-          html { background: #ffffff; }
-          body { margin: 0; padding: 16px 18px; background: #ffffff; color: #111111;
+          :root { color-scheme: light dark; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
+          html { background: Canvas; }
+          body { margin: 0; padding: 16px 18px; background: Canvas; color: CanvasText;
                  font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
                  word-break: break-word; }
           /* Resize prose and everything inside it, but NOT <h1>-<h6> or their

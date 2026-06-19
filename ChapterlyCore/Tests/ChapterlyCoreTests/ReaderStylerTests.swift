@@ -130,12 +130,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(small.contains("--chapterly-line-height: 1.20"))
     }
 
-    func testWrappedDocumentPinsLightSchemeAndOpaqueBackground() {
+    func testWrappedDocumentSupportsLightAndDarkScheme() {
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
                                                 fontSizePoints: 18, lineHeight: 1.6)
-        XCTAssertTrue(html.contains(#"<meta name="color-scheme" content="light">"#))
-        XCTAssertTrue(html.contains("color-scheme: light"))
-        XCTAssertTrue(html.contains("background: #ffffff"))
-        XCTAssertTrue(html.contains("color: #111111"))
+        XCTAssertTrue(html.contains(#"<meta name="color-scheme" content="light dark">"#))
+        XCTAssertTrue(html.contains("color-scheme: light dark"))
+        XCTAssertTrue(html.contains("background: Canvas"))
+        XCTAssertTrue(html.contains("color: CanvasText"))
     }
 }
