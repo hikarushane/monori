@@ -65,10 +65,15 @@ public enum ReaderStyler {
         <meta name="color-scheme" content="light dark">
         <style>
           :root { color-scheme: light dark; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
-          html { background: Canvas; }
-          body { margin: 0; padding: 16px 18px; background: Canvas; color: CanvasText;
+          html, body { background: Canvas; }
+          body { margin: 0; padding: 16px 18px; color: CanvasText;
                  font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
                  word-break: break-word; }
+          /* Google Docs mobilebasic exports inline color:#000000 and
+             background-color:#ffffff on every paragraph and span.
+             Override them so the page adapts to light/dark mode. */
+          * { color: CanvasText !important; background-color: transparent !important; }
+          html, body { background: Canvas !important; }
           /* Resize prose and everything inside it, but NOT <h1>-<h6> or their
              children, so chapter sub-headings keep their relative size. A bare
              `body span` rule would flatten Google headings, whose text is
