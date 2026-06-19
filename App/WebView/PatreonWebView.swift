@@ -41,13 +41,19 @@ struct PatreonWebView: UIViewRepresentable {
         edge.delegate = context.coordinator
         webView.addGestureRecognizer(edge)
 
-        let tap = UITapGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(Coordinator.handleContentTap(_:)))
-        tap.name = Self.contentTapName
-        tap.cancelsTouchesInView = false
-        tap.delegate = context.coordinator
-        webView.addGestureRecognizer(tap)
+        // Only the Reader uses center-tap-to-toggle-chrome. Attaching this
+        // recognizer to the Browse/login web view is unnecessary and adds gesture
+        // pressure to the WKWebView text-input session, so install it only when a
+        // handler is set.
+        if onContentTap != nil {
+            let tap = UITapGestureRecognizer(
+                target: context.coordinator,
+                action: #selector(Coordinator.handleContentTap(_:)))
+            tap.name = Self.contentTapName
+            tap.cancelsTouchesInView = false
+            tap.delegate = context.coordinator
+            webView.addGestureRecognizer(tap)
+        }
         return webView
     }
 
