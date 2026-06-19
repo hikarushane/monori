@@ -1,13 +1,13 @@
 # HANDOFF
 
-> 上次 session: 2026-06-19（Task 3/4/5：tap guard + 文件 + lazy web views）
+> 上次 session: 2026-06-19（drawer retract 診斷 — 問題已自行修復）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（Task 1–5）。ChapterlyCore 124 tests，全綠。
+Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（Task 1–5）。ChapterlyCore 125 tests，全綠。
 - 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認）
-- 分支 ＠ 最後 commit：`feat/google-docs-import @ 1cf69f5`
-- 工作樹：`build/smoke/current-screen.png` unstaged（截圖工件，不影響 code）
+- 分支 ＠ 最後 commit：`feat/google-docs-import @ 485c91c`
+- 工作樹：`build/smoke/` 工件 unstaged（截圖/log，不影響 code）
 
 ## ✅ 本次完成（2026-06-19）
 
@@ -30,9 +30,32 @@ Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（T
 
 - **Task 5**：`AppEnvironment` 的 `googleBrowse` + `refresher` 改為 `@ObservationIgnored` backing optional + computed property（`lazy var` 在 `@Observable` class 不支援）；`init()` 只 wire `browse`/`reader`——冷啟動 WKWebView 從 4 降為 2（commit `1cf69f5`）
 
+## ✅ 本次完成（2026-06-19 Drawer 診斷 session）
+
+**問題**：Library 看完文章後回 Browse → Google Drive 按漢堡選單，drawer 開了 ~0.5s 後自動縮回。
+
+**診斷工具新增**（全部 `#if DEBUG` + `isSmokeMode`，不影響 production）：
+- `ChapterlyCore/Sources/ChapterlyCore/Assets/DrawerDiagnostics.js`：頁面側事件 reporter（`resize`/`visibilitychange`/`focus`/`blur`/`pageshow`/`pagehide`/`scrim-added`/`scrim-removed`）（commit `b070310`）
+- `ChapterlyCore/Sources/ChapterlyCore/JSAssets.swift`：加 `drawerDiagnostics` 屬性（commit `b070310`）
+- `App/WebView/WebViewModel.swift`：加 `DrawerDiagShim` + `WKUserScript` 注入（commit `b070310`）
+- `App/WebView/PatreonWebView.swift`：native `makeUIView`/`updateUIView` bounds log（commit `a59239c`）
+- `ChapterlyCore/Tests/ChapterlyCoreTests/JSExtractionTests.swift`：加 `testDrawerDiagnosticsScriptLoadsAndPostsMessages`（commit `b070310`）
+
+**Bug 修正**（commit `485c91c`）：
+- `DrawerDiagnostics.js` 的 `scrim-removed` 偵測用 `getBoundingClientRect()` 在 detached DOM 上回 zeros → 改為標記 `data-chap-scrim="1"` attribute
+- `DrawerDiagShim` log line 中 `dpr` 缺 `privacy: .public`
+
+**診斷結果**（一次完整 repro：Library → 章節 → 關閉 reader → Browse → Google Drive → 漢堡）：
+- Drawer **沒有**縮回（bug 不再重現）
+- 整個 fullScreenCover 週期中，Google Drive 頁面**沒有** `resize` 事件
+- `updateUIView bounds={0,0}` 的 transient 確實發生，但 WebKit 不把它傳給頁面 JS
+- 結論：**commit `1cf69f5`（lazy googleBrowse init）間接修復了此 bug**。原因：`googleBrowse` WKWebView 現在一旦建立就保持存活，fullScreenCover 不再觸發重建 → 不再有 zero-size viewport pass → Google Drive drawer 無法被迫縮回
+
+**下一步**：bug 已修復，診斷 code 留在 `#if DEBUG` + smoke 條件下（對 production 零影響），不需另行 revert。
+
 ## 🔄 進行中
 
-無。Plan 全部完成。
+無。Plan 全部完成，drawer bug 已確認修復。
 
 ## 🚧 試過但行不通（避免重踩）
 
@@ -48,6 +71,7 @@ Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（T
    - Browse → Google Drive → Google 登入正常
    - 集合頁 → 重新整理章節正常
    - 冷啟動 `WebContent` 進程行數減少（Xcode console）
+   - **Library → 章節 → 關閉 reader → Browse → Google Drive → 漢堡選單不縮回** ✅（已由 Simulator 驗證）
 2. **下一個 feature**：與使用者討論 `feat/google-docs-import` 的後續工作或 PR 準備
 
 ## ⚠️ 注意事項
@@ -70,10 +94,13 @@ Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（T
 ## 📁 本次修改的檔案
 
 - `App/Features/Reader/ReaderView.swift` — `applyReaderTreatment()` 跳過 stored HTML 的 `injectionScript`
-- `App/WebView/WebViewModel.swift` — `webView.isOpaque`/`backgroundColor`/`scrollView.backgroundColor`
-- `App/WebView/PatreonWebView.swift` — `scrollView.contentInsetAdjustmentBehavior = .never`
+- `App/WebView/WebViewModel.swift` — `webView.isOpaque`/`backgroundColor`/`scrollView.backgroundColor`；drawer 診斷：`DrawerDiagShim` + `JSAssets.drawerDiagnostics` 注入（`#if DEBUG` + `isSmokeMode`）
+- `App/WebView/PatreonWebView.swift` — `scrollView.contentInsetAdjustmentBehavior = .never`；drawer native bounds log（`#if DEBUG` + `isSmokeMode`）
 - `ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` — dark mode CSS (`Canvas`/`CanvasText`/`*` color override)
 - `ChapterlyCore/Tests/ChapterlyCoreTests/ReaderStylerTests.swift` — 更新 dark mode 斷言
+- `ChapterlyCore/Sources/ChapterlyCore/Assets/DrawerDiagnostics.js` — 新增：頁面側 drawer 診斷腳本（`#if DEBUG` + `isSmokeMode` 注入）
+- `ChapterlyCore/Sources/ChapterlyCore/JSAssets.swift` — 新增：`drawerDiagnostics` 屬性
+- `ChapterlyCore/Tests/ChapterlyCoreTests/JSExtractionTests.swift` — 新增：`testDrawerDiagnosticsScriptLoadsAndPostsMessages`
 
 ## Console log 噪音分類（非 bug，勿再追）
 
@@ -104,6 +131,7 @@ Feature branch `feat/google-docs-import`（off `main`）。Plan 全部完成（T
 ## 🔗 相關資源
 
 - Plan（本次）：`docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`
+- Drawer 診斷計畫：`docs/superpowers/plans/2026-06-19-google-drive-drawer-retract-fix.md`（gitignored）
 - 實作計畫（Google Docs import）：`docs/superpowers/plans/2026-06-15-google-docs-import.md`（gitignored）
 - Simulator 操作手冊：`SIMULATOR_PLAYBOOK.md`
 - Standard verification：`./scripts/verify.sh`
