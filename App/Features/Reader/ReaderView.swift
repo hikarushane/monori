@@ -214,24 +214,13 @@ struct ReaderView: View {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
         if foreignPageTitle == nil {
-            #if DEBUG
-            let sv = webView.scrollView
-            print("[READER-DIAG2] scrollBG=\(sv.backgroundColor?.description ?? "nil") inset=\(sv.contentInset) adjInset=\(sv.adjustedContentInset) webViewBG=\(webView.backgroundColor?.description ?? "nil")")
-            webView.evaluateJavaScript("""
-            (function(){
-              var h=document.documentElement,b=document.body;
-              return JSON.stringify({
-                htmlBG:getComputedStyle(h).backgroundColor,
-                bodyBG:getComputedStyle(b).backgroundColor,
-                bodyPT:getComputedStyle(b).paddingTop,
-                bodyMT:getComputedStyle(b).marginTop
-              });
-            })()
-            """) { result, _ in
-                print("[READER-DIAG3] \(result as? String ?? "nil")")
+            // Skip the Patreon reader ruleset for stored-HTML chapters: ReaderRuleset.css
+            // has a dark-mode body background (#1c1b19 !important) designed for Patreon's
+            // page chrome, which overrides wrappedDocument's white background and creates
+            // a gray veil on Google Docs chapters in dark mode.
+            if !renderingStoredHTML {
+                webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
             }
-            #endif
-            webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
             applyTypography()
             repairCurrentTitleIfNeeded(webView)
         } else {
