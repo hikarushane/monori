@@ -40,7 +40,13 @@ struct ReaderView: View {
             .accessibilityIdentifier("smoke.readerWebView")
             .overlay(alignment: .top) { topChrome }
             .overlay(alignment: .bottom) { bottomChrome }
-            .onAppear { open(current) }
+            .onAppear {
+                open(current)
+                #if DEBUG
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { dumpReaderHierarchy("appear+0.6s") }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { dumpReaderHierarchy("appear+2.5s") }
+                #endif
+            }
             .onDisappear { foreignTitleTask?.cancel() }
             .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
             .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
@@ -242,6 +248,43 @@ struct ReaderView: View {
         webView.evaluateJavaScript(ReaderStyler.lineHeightScript(value: prefs.lineSpacing),
                                    completionHandler: nil)
     }
+
+    #if DEBUG
+    /// One-shot diagnostic: dumps the reader web view's appearance and the full
+    /// window subview tree, flagging any view that could read as a gray veil
+    /// (0 < alpha < 1, or a non-clear background while not the web view).
+    /// Removed once Bug 4's veiling view is identified.
+    private func dumpReaderHierarchy(_ tag: String) {
+        let webView = env.reader.webView
+        func desc(_ v: UIView) -> String {
+            let bg = v.backgroundColor.map { "\($0)" } ?? "nil"
+            return "\(type(of: v)) frame=\(v.frame) alpha=\(v.alpha) "
+                + "hidden=\(v.isHidden) opaque=\(v.isOpaque) bg=\(bg)"
+        }
+        guard let window = webView.window else {
+            print("[READER-DIAG \(tag)] webView has NO window yet")
+            return
+        }
+        print("[READER-DIAG \(tag)] webView: \(desc(webView)) "
+            + "scrollBG=\(webView.scrollView.backgroundColor.map { "\($0)" } ?? "nil") "
+            + "uiStyle=\(webView.traitCollection.userInterfaceStyle.rawValue)")
+        var suspects: [String] = []
+        func walk(_ v: UIView, _ depth: Int) {
+            for sub in v.subviews {
+                print("[READER-DIAG \(tag)] \(String(repeating: "· ", count: depth))\(desc(sub))")
+                let a = sub.alpha
+                let hasGrayish = sub.backgroundColor != nil && sub.backgroundColor != .clear
+                if (a > 0.01 && a < 0.99) || (hasGrayish && sub !== webView) {
+                    suspects.append(desc(sub))
+                }
+                if depth < 4 { walk(sub, depth + 1) }
+            }
+        }
+        walk(window, 0)
+        print("[READER-DIAG \(tag)] SUSPECTS (translucent or colored, not the web view):")
+        suspects.forEach { print("[READER-DIAG \(tag)]   • \($0)") }
+    }
+    #endif
 
     private func repairCurrentTitleIfNeeded(_ webView: WKWebView) {
         guard ChapterTextFormatter.isProbablyContaminatedTitle(current.title) else { return }
