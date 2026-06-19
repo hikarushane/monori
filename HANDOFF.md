@@ -1,25 +1,76 @@
 # HANDOFF
 
-> 上次 session: 2026-06-18（Google 2FA 登入 redirect 修正）
+> 上次 session: 2026-06-19（Bug 4 gray veil 修復 + Google Docs dark mode 支援）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Feature branch `feat/google-docs-import`（off `main`）。Google Docs import 全 14 tasks 完成 + XSS 修補。本次修正 Google 2FA 登入後 redirect 到 Safari 的 bug。ChapterlyCore 118 tests，全綠。
+Feature branch `feat/google-docs-import`（off `main`）。Bug 4（gray veil）完全解決，Google Docs 章節 light/dark mode 皆正確顯示。ChapterlyCore 124 tests，全綠。
+- 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認）
+- 分支 ＠ 最後 commit：`feat/google-docs-import @ db68224`
+- 工作樹：`build/smoke/current-screen.png` unstaged（截圖工件，不影響 code）
 
-## ✅ 2026-06-18 完成
+## ✅ 本次完成（2026-06-19）
 
-- **`27ea497` fix(core)** — `NavigationPolicy.isGoogleDomain()`：支援 Google 國家代碼 TLD（`google.com.tw`、`google.co.jp` 等）+ `googleapis.com`。Google 2FA 登入後 `accounts.google.com.tw` 的 SetSID redirect 不再被送往 Safari。+ 2 新 tests。
-- **`7afa5bc` fix(webview)** — 對 Google 域名使用 `allowWithoutTryingAppLink` policy 防止 Universal Links 劫持；加入 `#if DEBUG` 導航決策 log（`[NAV]` 前綴）。
+- **Bug 4 根本原因確認**：`ReaderRuleset.css` dark-mode `body { background-color: #1c1b19 !important }` 被 `injectionScript()` 注入 Google Docs 章節，蓋掉 `wrappedDocument` 的白底
+- **修復 gray veil**：`applyReaderTreatment()` 對 `renderingStoredHTML == true` 跳過 `injectionScript()`（`App/Features/Reader/ReaderView.swift`）
+- **WKWebView opacity 修復**：`webView.isOpaque = true` + `.backgroundColor = .systemBackground`（`App/WebView/WebViewModel.swift`）
+- **contentInsetAdjustmentBehavior**：`.fullScreenCover` 中改為 `.never`（`App/WebView/PatreonWebView.swift`）
+- **Dark mode 支援**：`wrappedDocument()` 改用 `Canvas`/`CanvasText` + `color-scheme: light dark`（`ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift`）
+- **Google Docs inline color 覆蓋**：加 `* { color: CanvasText !important; background-color: transparent !important; }` 蓋掉 Google Docs 每個 `<p>/<span>` 的 hardcoded `#000000`/`#ffffff`（`ReaderStyler.swift`）
+- **單元測試更新**：`testWrappedDocumentSupportsLightAndDarkScheme` 改斷言 `"light dark"` / `Canvas` / `CanvasText`（`ChapterlyCore/Tests/ChapterlyCoreTests/ReaderStylerTests.swift`）
+- 使用者實機驗證：light mode 白底深字 ✅、dark mode 深底白字 ✅
+
+## 🔄 進行中
+
+- **`docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`**
+  - Task 1 ✅（DEBUG hierarchy dump）
+  - Task 2 ✅（WKWebView opacity + CSS dark mode）
+  - **Task 3 未做**：移除 Browse/Login tab 的 `PatreonWebView` 中無條件安裝的 content-tap recognizer。目前所有 tab 都裝了 `UITapGestureRecognizer`，但 Browse/Login 不傳 `onContentTap` closure；應只在 `onContentTap != nil` 時安裝。位置：`App/WebView/PatreonWebView.swift` `makeUIView()` 的 tap recognizer 安裝段。
+  - Task 4 未做：更新 HANDOFF.md 文件（本次 handoff 已覆蓋）
+  - Task 5 未開始：lazy web view 構建（可選，需使用者確認才做）
+  - **完成判準 Task 3**：`verify.sh` 124/124 通過；Browse tab 點擊頁面不觸發任何 `onContentTap` 行為
+
+## 🚧 試過但行不通（避免重踩）
+
+- **`webView.scrollView.backgroundColor = .systemBackground`** → WKWebView 每次 `loadHTMLString` 後自行 reset `scrollView.backgroundColor`，UI layer 正確但 veil 仍在；真正根因是 CSS injection，不是 UIKit layer
+- **`color-scheme: light` + `background: #ffffff` 強制白底** → 解決了 gray veil，但 dark mode 下顯示白底黑字，使用者要求支援 dark mode 自適應
+- **`[READER-DIAG3]` 放在 `injectionScript()` 之前** → 診斷 JS 先執行，顯示「白底」是注入前狀態，誤導分析；診斷要放在注入後
+
+## ⚡ 接手要做的事（優先順序）
+
+1. 讀取 plan 確認 Task 3 原始描述：`cat docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`
+2. **Task 3**：在 `App/WebView/PatreonWebView.swift` `makeUIView()` 中，把 tap recognizer 安裝改成 `if onContentTap != nil { ... }`；Browse/Login tab 不傳 closure，即不安裝
+3. 跑 `./scripts/verify.sh` 確認 124/124
+4. （可選）問使用者是否要做 Task 5（lazy web view）
+
+## ⚠️ 注意事項
+
+- `ReaderRuleset.css`（`ChapterlyCore/Sources/ChapterlyCore/Assets/`）**不需要修改**：其 dark-mode body rule 是為 Patreon 頁面設計，只要 Google Docs 章節不注入即可
+- Patreon 登入狀態需保留，不能 erase/reset Simulator
+- `build/smoke/current-screen.png` 是截圖工件，不需 commit
 
 ## 已知限制
 
-- iOS Simulator 無 iCloud Keychain 同步，Google 登入頁不會出現密碼 AutoFill 建議列。
-  非 app bug（WebView 用 `.default()` 持久 store、無 `inputAccessoryView` 覆寫）。
-  需在實機（已登入 iCloud 且 Keychain 存有 Google 密碼）驗證。
+- **Google 登入只顯示 🔑「密碼」鍵、鍵盤上方不自動列出帳號 — 非 app bug，AutoFill 正常運作。**
+  實機驗證：點該鑰匙鍵會列出已存的 Google 帳號（AutoFill 已生效）。鍵盤上方的
+  inline 帳號建議列是 iOS QuickType 的啟發式行為，依頁面 `autocomplete` 屬性與
+  Keychain 域名比對決定，**無公開 API 可強制顯示**。app 設定皆正確：持久
+  `WKWebsiteDataStore.default()`、stock `WKWebView`、無 `inputAccessoryView` 覆寫、
+  `CardTreatment.js` 在登入頁完全 inert（`<style>` 只 scope 到 `[data-tag="post-card"]`，
+  `scan()` 只查該 Patreon selector，click handler 對 input/textarea/select 直接 bail）。
+  （更正 2026-06-18 的「Simulator-only」說法：該 bug 在實機同樣出現，且其實不是 bug。）
+
+## 📁 本次修改的檔案
+
+- `App/Features/Reader/ReaderView.swift` — `applyReaderTreatment()` 跳過 stored HTML 的 `injectionScript`
+- `App/WebView/WebViewModel.swift` — `webView.isOpaque`/`backgroundColor`/`scrollView.backgroundColor`
+- `App/WebView/PatreonWebView.swift` — `scrollView.contentInsetAdjustmentBehavior = .never`
+- `ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` — dark mode CSS (`Canvas`/`CanvasText`/`*` color override)
+- `ChapterlyCore/Tests/ChapterlyCoreTests/ReaderStylerTests.swift` — 更新 dark mode 斷言
 
 ## Console log 噪音分類（非 bug，勿再追）
 
-這些 Xcode console 訊息都是 Apple/Simulator/WebKit 噪音，無 app 缺陷：
+（繼承自 2026-06-18）
 - `CHHapticPattern … hapticpatternlibrary.plist … No such file`：Simulator 無觸覺硬體。
 - `'WEBP' … initImage failed err=-50`：Simulator WebP 解碼器；實機正常顯示圖片。
 - `Could not register system wide server: -25204`、`_AXAddToElementCache`、重複的
@@ -30,131 +81,23 @@ Feature branch `feat/google-docs-import`（off `main`）。Google Docs import �
   任何第三方 app 嵌入 `WKWebView` 都會有（只有 Safari 持有該 entitlement）。
 - `CoreData … incremental_vacuum` / `WAL checkpoint`：我們的 SwiftData，正常；代表 import 已存檔。
 - `[NAV] …`：我們自己的 debug log。
-
-## ✅ 2026-06-17 完成（commit 順序）
-
-- **`51e1305` fix(ci)** — verify.sh 處理 `build.db` race：`swift test` exit code 以 `set +e` + `PIPESTATUS[0]` 捕捉，非零但無真實 test failure 時記錄並繼續，不再因 SWBBuildService I/O 碰撞中斷 hook。
-- **`51e1305` Task 1** — `SourceKind.swift`：`enum SourceKind(.patreon/.googleDocs)` + `SourceProvider` struct + `SourceRegistry`（patreon startURL/icon + googleDrive startURL/icon）+ 3 tests。
-- **`e302853` Task 2** — `Models.swift`：`LocalCollectionModel.sourceKindRaw`（default `.patreon`）+ computed `sourceKind` get/set；`LocalChapterModel.contentHTML: String?`；SwiftData lightweight migration（有 default，無需 SchemaMigrationPlan）+ 2 tests。
-- **`d6054a7` Task 3** — `URLNormalizer.googleDocID()` + `canonicalGoogleDocURL()` + 3 tests。
-- **`95d22c2` Task 4** — `GoogleDocsChapterSplitter`：`split(html:docID:docTitle:)` → `ImportedCollection`；h1→h2→h3 heading split；TOC filter（目錄/目次/contents/table of contents）；no-heading fallback；`sanitize()`（script/style/事件處理器）；HTML fixtures（3-chapter/TOC+2-chapter/no-heading）+ 5 tests。
-- **`6bf9c57` Task 5** — `LibraryStore.applyDocImport(_:)`：找或建 `.googleDocs` collection，upsert chapters（URL 為 key），`context.save()`；`orderIndex = i`（0-based 閱讀順序）+ 3 tests。
-- **`55549ef` Task 6** — `NavigationPolicy`：允許 `google.com` / `.google.com` / `.googleusercontent.com` / `.gstatic.com` in-app + 2 tests。
-- **`064a8e6` Task 7** — `WebViewModel.isOnGoogleDocPage`（`docs.google.com` + `/document/d/` path）；`fetchGoogleDocHTML()`（JS `fetch` → `/mobilebasic`，`credentials:'include'`）。
-- **`de4b3be` Task 8** — `AppEnvironment.importGoogleDoc(from:)`：URL → docID → fetch HTML → split → `applyDocImport` → `importedCountThisSession`。
-- **`e8c0a04` Task 9** — `WebCollectionBanner`：Google Doc 偵測分支（`isOnGoogleDocPage` → "Import all chapters" button，`smoke.importChaptersButton`）；Patreon 分支改為 `else if`。
-- **`131b877` Task 10** — `BrowseView` source selector：`HStack` ForEach `SourceRegistry.all`，border button，`smoke.sourceEntry.<kind>` accessibility ID；`.onAppear` URL 改用 `SourceRegistry.patreon.startURL`。
-- **`ce984d6` Task 11** — `ReaderView`：`renderingStoredHTML` flag；`wrappedHTML(_:)` 包 CSS vars（fontSize/lineSpacing）；`open(_:)` branch — `contentHTML` 有值走 `loadHTMLString`，無值走 `env.reader.load(url)`；`syncCurrentChapter` guard。
-- **`59886d1` Task 12** — `LibraryView`：collection row 加 leading source icon（`SourceRegistry.provider(for:).iconSystemName`，`smoke.collectionSourceIcon`）。
-- **`9ee0793` Task 13** — `CollectionTOCView`：refresh button 包 `if collection.sourceKind == .patreon`（Google Docs collections 沒有 refresh）。
-- **`a64fd6d` fix(security)** — `sanitize()` XSS 補強：新增 `href`/`src` 的 `javascript:`/`data:` URI strip（雙引號 + 單引號各一道 regex）；`<meta>` tags wholesale 移除（防 `http-equiv="refresh"` redirect）+ 1 新 test（`testSanitizeStripsJavascriptHrefsDataSrcAndMeta`）。
-
-## ✅ Suggested task from Claude — completed this session (`a64fd6d`)
-
-原始建議文字（已完成，供參考）：
-
-**Add sanitize() XSS hardening for javascript: URLs and data: URIs**
-
-In /Users/shane_yeh/Projects/Chapterly on branch feat/google-docs-import, the HTML sanitizer in GoogleDocsChapterSplitter.sanitize() (ChapterlyCore/Sources/ChapterlyCore/GoogleDocsChapterSplitter.swift) strips `<script>`/`<style>` tags and inline event handlers (onclick= etc.), but it does NOT strip:
-1. href="javascript:..." on anchor tags
-2. src="data:..." on img/iframe tags
-3. The `<meta>` tag (which can set http-equiv refresh or CSP)
-
-These are rendered via WKWebView loadHTMLString with a docs.google.com baseURL, so javascript: hrefs are a real XSS vector even without `<script>`. The fix should add regex passes to sanitize() that:
-- Strip href="javascript:[^"]*" (and single-quoted variant)
-- Strip src="data:[^"]*" on any tag (and single-quoted variant)
-- Strip `<meta>` tags wholesale
-
-Add a unit test in ChapterlyCoreTests/GoogleDocsChapterSplitterTests.swift covering each new strip rule.
-
-**→ Done: commit `a64fd6d`. All three vectors patched. New test `testSanitizeStripsJavascriptHrefsDataSrcAndMeta` added. 114/114 tests green.**
-
-## ⏳ 待完成（手動）
-
-### Task 14 — 模擬器手動驗證（使用者執行）
-1. 開 iOS Simulator，手動登入 Google 帳號（Cloudflare/Google OAuth = 手動步驟）。
-2. Browse tab → 選 "Google Drive" source → 導航到 shared Google Doc。
-3. 確認頂部出現「Import all chapters」banner。
-4. 點 Import → Library 確認出現新 collection（書本圖示 = `doc.richtext`）。
-5. 進 collection → 確認 TOC 章節順序正確（閱讀順序 0, 1, 2…）。
-6. 點第一章進 reader → 確認文章正常顯示（stored HTML 路徑）。
-7. 前後章 prev/next navigation 正確。
-8. 書籤：TOC 行 + reader top bar 同步切換；relaunch 後書籤保留。
-9. （可選）跑 `./scripts/smoke-auto.sh` 做 8 步回歸（需先登入 Patreon + 設 `.env` 的 `SMOKE_TEST_URL`）。
-
-## ⚠️ 可選改進（不阻擋 merge，code review 旗標）
-- `ChapterOrdering.sortKey` Google Doc URL fallback `(1, orderIndex)` 加一行說明 comment。
-- `applyDocImport` 目前不刪除 reimport 後消失的章節（shrink case）——加 TODO 或處理。
-- `fetchGoogleDocHTML` 超大 doc（>5MB）加 size warning log。
-- `BrowseView.activeKind` 與實際 URL 目前不同步（使用者可手動導航離開）。
-- `importGoogleDoc` 的 `applyDocImport` 錯誤目前被 `try?` 吞掉——考慮 log 或 toast。
-- `SourceRegistry.provider(for:)` fallback 可加 `assertionFailure`。
-
-## ⚡ 接手要做的事
-1. **Task 14 手動模擬器驗證**（見上）。
-2. **PR 準備**（使用者說 go 才做）：push `feat/google-docs-import`，開 PR target `main`，body 摘要 14 tasks + 各自 commit。
-
-## ⚠️ 注意事項
-- **Patreon 登入必須保留**：不要 erase/reset/uninstall 模擬器。
-- Google OAuth / Cloudflare / CAPTCHA = 手動使用者步驟，agent 不自動化。
-- `build.db` IOERR 不是程式錯誤，是 SWBBuildService race（verify.sh 已有 guard）。
-- `GoogleDocsChapterSplitter.split()` 用 `/mobilebasic` 路由，不用 `/export`（403）、不用 postMessage（`PayloadValidator.forbiddenKeys` 擋住）。
-- `orderIndex = i`（0-based 閱讀順序）+ default `sortDirection: .oldestToNewest` → 正確 TOC 及 prev/next。若改 `newestToOldest` 或用 `N-1-i` 會讓 prev/next 反向。
-- Google Docs collection 無 refresh（`sourceKind == .patreon` guard 在 TOC view）。
-
-## 📁 本次新增/修改的檔案
-**ChapterlyCore（純 Swift Package，可 unit test）：**
-- `ChapterlyCore/Sources/ChapterlyCore/SourceKind.swift`（新增）
-- `ChapterlyCore/Sources/ChapterlyCore/Models.swift`（+sourceKindRaw/contentHTML）
-- `ChapterlyCore/Sources/ChapterlyCore/URLNormalizer.swift`（+googleDocID/canonicalGoogleDocURL）
-- `ChapterlyCore/Sources/ChapterlyCore/GoogleDocsChapterSplitter.swift`（新增）
-- `ChapterlyCore/Sources/ChapterlyCore/NavigationPolicy.swift`（+Google allowlist）
-- `ChapterlyCore/Sources/ChapterlyCore/LibraryStore.swift`（+applyDocImport）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/SourceKindTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/ModelMigrationTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/URLNormalizerGoogleDocsTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/GoogleDocsChapterSplitterTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/GoogleDocsImportStoreTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/NavigationPolicyGoogleTests.swift`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/Fixtures/gdoc-33chapter.html`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/Fixtures/gdoc-42chapter-toc.html`（新增）
-- `ChapterlyCore/Tests/ChapterlyCoreTests/Fixtures/gdoc-noheading.html`（新增）
-
-**App target（build 驗證，無 unit test）：**
-- `App/WebView/WebViewModel.swift`（+isOnGoogleDocPage/fetchGoogleDocHTML）
-- `App/AppEnvironment.swift`（+importGoogleDoc）
-- `App/Features/Shared/WebCollectionBanner.swift`（Google Doc 分支）
-- `App/Features/Browse/BrowseView.swift`（source selector）
-- `App/Features/Reader/ReaderView.swift`（stored HTML 路徑）
-- `App/Features/Library/LibraryView.swift`（source icon）
-- `App/Features/Library/CollectionTOCView.swift`（Patreon-only refresh）
-
-**CI：**
-- `scripts/verify.sh`（build.db race guard）
-
----
-
-## WebKit / WebContent device-log triage
-
-Lines observed in device logs during development. Grouped by action required.
-
-### Benign — no action needed
-
-- `Could not create a sandbox extension for '…Chapterly.app'` — standard WKWebView message on sideloaded/dev builds; not present in App Store builds.
-- `xpc_user_sessions_get_foreground_uid() failed … Operation not permitted` — XPC session bootstrap noise on simulator and dev-signed device; harmless.
-- `Unable to hide/filter query parameters (missing data)` — WebKit internal URL logging; no impact on functionality.
-- `Process took N seconds to launch` (multi-second) — cold-start cost of WKWebView on first launch; subsequent launches are faster.
-
-### Content-side — not app-fixable
-
-- `makeImagePlus … 'WEBP' … err=-50` — WebKit failing to decode some of Patreon's WebP images. Does not affect chapter text; page renders without those images.
-
-### Actionable signal
-
-- `WebProcessProxy::didBecomeUnresponsive` — correlates with the heavy collection-import crawl (240-round scroll loop over a ~200 MB collection DOM in the offscreen `refresher`). The code already frees the DOM after import (`AppEnvironment.swift` near `runCollectionImport`). If this becomes frequent on very large collections, consider lowering the round cap in `CollectionImport.js` (currently 240) after measuring with the specific collection.
+- `0.5`（單獨一行、無前綴）：**不是我們的 log**。`App/` 內唯一的 `print(` 是四行 `[NAV]`
+  （`WebViewModel.swift`）。`0.5` 是網頁自身 JavaScript `console.log`，因 Xcode debugger 附著
+  而出現在 console（Patreon `/home` 頁的 JS）。
+- `Potential Structural Swift Concurrency Issue: unsafeForcedSync called from Swift Concurrent context.`：
+  系統框架（SwiftUI-Observation / WebKit）發出，**非我們的 code**——`App/` 內無任何 `.sync` /
+  `assumeIsolated` / `DispatchSemaphore` / `.wait()` / `RunLoop`（已 grep 驗證）。啟動時偶發一次，無可見影響。
+- `RTIInputSystemClient … Can only set suggestions for an active session` / `requires a valid sessionID` /
+  `Snapshotting a view (UIKeyboardImpl) … requires afterScreenUpdates:YES`：鍵盤輸入 session 噪音，
+  第三方 app 嵌 `WKWebView` 常見；與 Bug 3 的 inline 建議列無直接因果（已移除登入頁多餘的 tap 手勢以降低 churn）。
+- `WebContent/GPU/Networking process took 7–10 seconds to launch`：實機冷啟動成本，部分源於
+  `AppEnvironment.init` 一次建立四個 `WKWebView`（browse/googleBrowse/reader/refresher）。
+  非 bug；若要改善見 plan 的 Task 5（可選，預設不做）。
 
 ## 🔗 相關資源
-- 實作計畫：`docs/superpowers/plans/2026-06-15-google-docs-import.md`（gitignored）
+
+- Plan（本次）：`docs/superpowers/plans/2026-06-19-reader-veil-autofill-console-fixes.md`
+- 實作計畫（Google Docs import）：`docs/superpowers/plans/2026-06-15-google-docs-import.md`（gitignored）
 - Simulator 操作手冊：`SIMULATOR_PLAYBOOK.md`
 - Standard verification：`./scripts/verify.sh`
 - Smoke auto（需登入 + `.env`）：`./scripts/smoke-auto.sh`
