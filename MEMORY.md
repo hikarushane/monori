@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-15（session 11 — verify hook 還原；修正 verify.sh IOERR 根因為 step race 非沙箱）
+> 最後更新：2026-06-19（Bug 4 gray veil + Google Docs dark mode 修復）
 
 ## 專案概覽
 Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -142,6 +142,15 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 - **PreToolUse hook 的 `if:` 似乎不生效、對所有 Bash 都跑**（2026-06-15）：`.claude/settings.json` 第一個 hook 寫 `if: "Bash(git commit *)"` 想只在 commit 跑 verify，實際對每個 Bash 都先跑（verify 過才放行，靜默；過不了就擋並印 log）。配合上面的沙箱 IOERR → 擋住所有操作。解封法：暫時移除該 hook block（Edit settings.json），收尾再還原。
 
+- **Bug 4 gray veil：ReaderRuleset.css `#1c1b19` 注入 Google Docs 章節**（2026-06-19）：`ReaderRuleset.css` dark-mode `body { background-color: #1c1b19 !important }` 是為 Patreon 頁面設計；`applyReaderTreatment()` 對所有 `foreignPageTitle == nil` 的章節都跑 `injectionScript()`，包括 Google Docs stored-HTML 章節 → 蓋掉 `wrappedDocument` 的白底 → gray veil。修：`if !renderingStoredHTML { webView.evaluateJavaScript(injectionScript()) }`。
+  📍 出現位置：`App/Features/Reader/ReaderView.swift` `applyReaderTreatment()`
+
+- **Google Docs mobilebasic inline color 覆蓋**（2026-06-19）：Google Docs mobilebasic HTML 每個 `<p>/<span>` 都有 inline `color: #000000` + `background-color: #ffffff`；CSS 變數 / `color: CanvasText` 在 body 層設沒用，specificity 輸給 inline style。需 `* { color: CanvasText !important; background-color: transparent !important; } html, body { background: Canvas !important; }` 才能蓋掉。
+  📍 出現位置：`ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` `wrappedDocument()`
+
+- **`evaluateJavaScript` 診斷排序陷阱**（2026-06-19）：診斷 JS 若排在 `injectionScript()` 之前，拿到的 computed style 是注入前狀態 → 顯示「白底」誤導分析。診斷要排在注入後才能看到 injected CSS 的效果。
+  📍 出現位置：`App/Features/Reader/ReaderView.swift` `applyReaderTreatment()`（debug probe 陷阱）
+
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險
 - 用 `scrollApplied: Bool` guard 防止重複 scroll：Patreon 自帶 scroll 在 guard 後才執行，無效 → 改用 enforceScrollScript interval
@@ -152,6 +161,7 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - Smoke test artifacts 寫入 `build/smoke/`
 
 ## 未解決的問題
+- [ ] **Task 3（2026-06-19-plan）**：`PatreonWebView.makeUIView()` 的 content-tap `UITapGestureRecognizer` 應只在 `onContentTap != nil` 時安裝；Browse/Login tab 不傳 closure，目前也安裝了（無害但多餘）。位置：`App/WebView/PatreonWebView.swift`。
 - [ ] **Cloudflare CAPTCHA**：Simulator 的 Patreon session 被 Cloudflare 出題，使用者需手動勾「驗證您是人類」後重跑 `./scripts/smoke-auto.sh`（程式碼修復已完成、verify.sh 84/84）
 - ~~[ ] README.md:48「Import visible chapters」待使用者確認後改為「Import all chapters」~~（已解決 2026-06-13，commit c10dd62）
 - [ ] 舊 chapter 的 `excerpt` 欄位是 nil → 重按一次 Import all chapters 即可補齊（待使用者操作）
