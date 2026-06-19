@@ -63,8 +63,9 @@ public enum ReaderStyler {
         <!doctype html><html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-          :root { --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
-          body { margin: 0; padding: 16px 18px;
+          :root { color-scheme: light; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
+          html { background: #ffffff; }
+          body { margin: 0; padding: 16px 18px; background: #ffffff; color: #111111;
                  font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
                  word-break: break-word; }
           /* Resize prose and everything inside it, but NOT <h1>-<h6> or their

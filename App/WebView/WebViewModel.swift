@@ -52,6 +52,12 @@ final class WebViewModel: NSObject {
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
         webView = WKWebView(frame: .zero, configuration: config)
+        // Render on a defined opaque surface. Without this, in dark mode the web
+        // view's backdrop shows through un-backgrounded page margins as a gray
+        // veil over the content (Bug 4).
+        webView.isOpaque = true
+        webView.backgroundColor = .systemBackground
+        webView.scrollView.backgroundColor = .systemBackground
         super.init()
 
         webView.navigationDelegate = self

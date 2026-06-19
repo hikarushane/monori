@@ -129,4 +129,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(small.contains("--chapterly-font-size: 14px"))
         XCTAssertTrue(small.contains("--chapterly-line-height: 1.20"))
     }
+
+    func testWrappedDocumentPinsLightSchemeAndOpaqueBackground() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 18, lineHeight: 1.6)
+        XCTAssertTrue(html.contains("color-scheme: light"))
+        XCTAssertTrue(html.contains("background: #ffffff"))
+        XCTAssertTrue(html.contains("color: #111111"))
+    }
 }
