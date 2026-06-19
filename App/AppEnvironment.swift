@@ -18,12 +18,22 @@ enum CollectionRefreshOutcome: Equatable {
 final class AppEnvironment {
     let store: LibraryStore
     let browse = WebViewModel()
-    /// Separate web view + back/forward history for the Google Docs source, so
-    /// Browse can fully isolate it from the Patreon session (`browse`).
-    let googleBrowse = WebViewModel()
     let reader = WebViewModel()
-    /// Offscreen web view used to re-crawl a collection page for new chapters.
-    let refresher = WebViewModel()
+    // @Observable does not support lazy var — use @ObservationIgnored backing optionals
+    // so these two web processes are not spun up until first access.
+    @ObservationIgnored private var _googleBrowse: WebViewModel?
+    /// Built on first use (Browse → Google Drive) so launch spins up fewer
+    /// WKWebViews. Isolated from the Patreon `browse` session.
+    var googleBrowse: WebViewModel {
+        if _googleBrowse == nil { let m = WebViewModel(); wire(m); _googleBrowse = m }
+        return _googleBrowse!
+    }
+    @ObservationIgnored private var _refresher: WebViewModel?
+    /// Offscreen collection re-crawler, built on first refresh.
+    var refresher: WebViewModel {
+        if _refresher == nil { let m = WebViewModel(); wire(m); _refresher = m }
+        return _refresher!
+    }
     let prefs = ReaderPreferences()
 
     var importedCountThisSession = 0
@@ -53,9 +63,8 @@ final class AppEnvironment {
             store = (try? LibraryStore.inMemory()) ?? { fatalError("SwiftData unavailable") }()
         }
         wire(browse)
-        wire(googleBrowse)
         wire(reader)
-        wire(refresher)
+        // googleBrowse and refresher wire themselves on first access.
     }
 
     func startSmokeToolsIfNeeded() {
