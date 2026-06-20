@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-19（Bug 4 gray veil + Google Docs dark mode 修復）
+> 最後更新：2026-06-20（Monori 視覺品牌 + 改名 Tier A/B 契約）
 
 ## 專案概覽
 Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -77,7 +77,19 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - `scripts/smoke-auto.sh` 會 `source "$PROJECT_DIR/.env"`；若 session 明確禁止讀 `.env`，agent 不能直接執行它，需使用者允許或改用不讀 `.env` 的注入方式。
 - `smoke-diagnostics.sh` 會重新 launch app 並 `log show --last 2m`；若要捕捉人工手勢 log，必須在 launch 後重現，或使用 live log capture。
 
+### 改名 Chapterly→Monori / 內部識別碼契約（2026-06-20）
+- **品牌名 = Monori**；`CFBundleDisplayName` 已改（2026-06-20），但模組/bundle id/專案名待全域改名。
+- **改名分兩層，禁止整包 `s/chapterly/monori/`**：
+  - **Tier A 可見身分（要改）**：`project.yml` name/bundleIdPrefix(`dev.chapterly`→`dev.monori`)/package/target、`ChapterlyCore`→`MonoriCore`（目錄+Package.swift+所有 `import`）、`ChapterlyApp`→`MonoriApp`、scripts 內 `Chapterly.xcodeproj`/`-scheme Chapterly`/`dev.chapterly.Chapterly`/log predicate/`Chapterly-*` DerivedData glob、文件文字。
+  - **Tier B 內部識別碼（不可改，跨檔契約，改了零使用者收益純風險）**：訊息 handler `chapterlyImport`/`chapterlyCollectionLink`（`ScriptMessageRouter.swift` ↔ `CollectionDetect.js`/`CollectionImport.js`/`DrawerDiagnostics.js`）、CSS 變數 `--chapterly-font-size`/`--chapterly-line-height`（`ReaderStyler.swift` ↔ `ReaderRuleset.css`）、`window.__chapterly*`/`chapterly-fade`/`chapterly-card-style`/`chapterly-reader-style`。
+- **`Chapterly.xcodeproj` 是 gitignored 產生物**：改名只動 `project.yml` 的 `name:` 再 `xcodegen generate`；腳本內硬寫的才手改。
+- **bundle id 一變 → 本機資料重置**：無 App Group、無具名 UserDefaults suite、SwiftData 用預設容器 → 沒有遷移碼，但書庫 + `reader.fontSize`/`reader.lineSpacing` 會清空，需重 import + 重登 Patreon。
+- **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
+
 ## 踩過的坑
+- **手寫 iOS launch storyboard 的 `targetRuntime` 寫成 macOS 值**（2026-06-20）：手刻 `LaunchScreen.storyboard` 用 `targetRuntime="AppleCocoa"` → ibtool `error -1`（IBDocument unarchive 失敗）。`AppleCocoa` 是 macOS runtime；iOS 必須 `iOS.CocoaTouch`，且 safe-area guide key 是 `safeArea` 不是 `safeAreaLayoutGuide`。驗證：`ibtool --errors --warnings --notices LaunchScreen.storyboard`；對照樣板 `iOS App Base.xctemplate/LaunchScreen.storyboard`。（cross-project 坑，見 WIKI_SYNC.md）
+  📍 出現位置：`App/LaunchScreen.storyboard`
+
 - **Linker error after derived data corrupt**（2026-06-11）：刪舊 test bundle 後 `ld: symbol(s) not found for ImporterChapterPayload.init`，XCTest 快取舊 binary → `find ~/Library/Developer/Xcode/DerivedData -maxdepth 1 -name "Chapterly-*" -exec rm -rf {} +`
   📍 出現位置：clean rebuild 後 `xcodebuild test`
 
