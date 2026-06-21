@@ -286,7 +286,7 @@ struct ReaderView: View {
     // MARK: - Bars
 
     private var topBar: some View {
-        HStack {
+        HStack(spacing: 0) {
             #if DEBUG
             // Debug-only exit hatch for automated UI agents: idb cannot fire the
             // left-edge UIScreenEdgePanGestureRecognizer that dismisses this
@@ -319,10 +319,7 @@ struct ReaderView: View {
             } else {
                 Color.clear.frame(width: 44, height: 44)
             }
-            Spacer()
-            Text(currentTitle).font(.subheadline.weight(.medium)).lineLimit(1)
-                .accessibilityIdentifier("smoke.readerTitle")
-            Spacer()
+            Spacer(minLength: 0)
             Button {
                 withAnimation(.easeInOut(duration: 0.25)) { showPrefsPanel.toggle() }
             } label: {
@@ -333,6 +330,17 @@ struct ReaderView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Reading options")
             .accessibilityIdentifier("smoke.readerPrefsButton")
+        }
+        // Title is centered to the bar's full width (== screen center / Dynamic
+        // Island), independent of the leading/trailing control widths. Horizontal
+        // padding keeps it clear of the side buttons; it never intercepts taps.
+        .overlay {
+            Text(currentTitle)
+                .font(.subheadline.weight(.medium))
+                .lineLimit(1)
+                .padding(.horizontal, 96)
+                .allowsHitTesting(false)
+                .accessibilityIdentifier("smoke.readerTitle")
         }
         .padding(.horizontal, 4)
         .background(.bar)
@@ -348,14 +356,10 @@ struct ReaderView: View {
                 // Color is greedy in both axes; without a height the bar grows to fill the screen.
                 Color.clear.frame(width: 72, height: 0)
             }
-            Text(currentTitle)
-                .font(.caption.weight(.medium))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity)
-                .multilineTextAlignment(.center)
+            Spacer(minLength: 0)
             if let next = neighbors.next {
                 Button { open(next) } label: {
-                    HStack {
+                    HStack(spacing: 4) {
                         Text("下一章")
                         Image(systemName: "chevron.right")
                     }
@@ -364,9 +368,20 @@ struct ReaderView: View {
                 Color.clear.frame(width: 72, height: 0)
             }
         }
+        // Center the title to the bar's full width (screen center), independent of
+        // the differing prev/next button widths. Padding keeps it clear of them.
+        .overlay {
+            Text(currentTitle)
+                .font(.caption.weight(.medium))
+                .lineLimit(1)
+                .padding(.horizontal, 96)
+                .allowsHitTesting(false)
+        }
         .font(.subheadline)
         .padding(.horizontal)
         .padding(.vertical, 10)
-        .background(.bar)
+        // Extend the bar material down through the home-indicator safe area so it
+        // reads as docked to the screen bottom; the buttons stay above the inset.
+        .background { Rectangle().fill(.bar).ignoresSafeArea(edges: .bottom) }
     }
 }
