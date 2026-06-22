@@ -146,4 +146,19 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "TOC", docTitle: "TOC")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第四章"])
     }
+
+    func testRealWorldTOCTableImportsInOrderWithContent() throws {
+        let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-toc-table"),
+                                                docID: "EBF", docTitle: "Everyone's Best Friend")
+        XCTAssertEqual(r.chapters.map(\.title),
+                       ["第一章 一些新的東西開始", "第二章 不是小女孩", "第三章 唯一的希望",
+                        "第四章 盛大開幕", "第五章 歡迎回家"])
+        XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha body one"))
+        XCTAssertTrue(r.chapters[4].contentHTML.contains("epsilon body five"))
+        for chapter in r.chapters {
+            XCTAssertFalse(chapter.contentHTML.contains("第三十五"),
+                           "no chapter should leak another chapter's title")
+        }
+    }
 }
