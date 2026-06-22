@@ -102,7 +102,7 @@ public enum GoogleDocsChapterSplitter {
                                                 options: .caseInsensitive) {
             for m in regex.matches(in: body, range: NSRange(location: 0, length: ns.length)) {
                 let rawInner = ns.substring(with: m.range(at: 1))
-                guard let title = chapterTitleParagraph(rawInner) else { continue }
+                guard let title = chapterTitleParagraph(rawInner) ?? largeFontTitle(rawInner) else { continue }
                 boundaries.append(Boundary(start: m.range.location,
                                            afterEnd: m.range.location + m.range.length,
                                            title: title))
@@ -149,6 +149,25 @@ public enum GoogleDocsChapterSplitter {
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
         guard chapterMarkerCount(text) <= 1 else { return nil }
+        return stripTrailingPunctuation(text)
+    }
+
+    private static func largeFontTitle(_ rawInner: String) -> String? {
+        let ns = rawInner as NSString
+        guard let sizeRegex = try? NSRegularExpression(
+            pattern: #"font-size:\s*(\d+(?:\.\d+)?)\s*pt"#,
+            options: .caseInsensitive),
+            let sizeMatch = sizeRegex.firstMatch(
+                in: rawInner,
+                range: NSRange(location: 0, length: ns.length)),
+            let sizeRange = Range(sizeMatch.range(at: 1), in: rawInner),
+            let size = Double(rawInner[sizeRange]),
+            size >= 18.0 else { return nil }
+
+        let lower = rawInner.lowercased()
+        if lower.contains("<a ") || lower.contains("<br") { return nil }
+        let text = cleanTitle(rawInner)
+        guard !text.isEmpty, text.count <= 40 else { return nil }
         return stripTrailingPunctuation(text)
     }
 

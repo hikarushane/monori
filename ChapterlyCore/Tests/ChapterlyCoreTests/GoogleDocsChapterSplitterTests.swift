@@ -174,4 +174,23 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
                            "no chapter should leak another chapter's title")
         }
     }
+
+    func testLargeFontParagraphsDetectedAsChapters() {
+        let html = """
+        <html><body>
+        <p><span style="font-size:26pt">第一章 開始</span></p>
+        <p><span>chapter one body content here</span></p>
+        <p><span style="font-size:26pt">作者的信</span></p>
+        <p><span>letter body content here</span></p>
+        <p><span style="font-size:26pt">特別篇一 模仿遊戲</span></p>
+        <p><span>special episode body content here</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "LF", docTitle: "LF")
+        XCTAssertEqual(r.chapters.map(\.title),
+                       ["第一章 開始", "作者的信", "特別篇一 模仿遊戲"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("letter body"))
+        XCTAssertTrue(r.chapters[2].contentHTML.contains("special episode body"))
+    }
 }
