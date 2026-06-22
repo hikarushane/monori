@@ -83,6 +83,20 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3])
     }
 
+    func testTitleWithMarkerCharInWordIsNotRejected() {
+        let html = """
+        <html><body>
+        <p><span>第一章 開始</span></p><p><span>alpha body</span></p>
+        <p><span>第二章 歡迎回家</span></p><p><span>beta body</span></p>
+        <p><span>第三章 盛大開幕</span></p><p><span>gamma body</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "MK", docTitle: "MK")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章 開始", "第二章 歡迎回家", "第三章 盛大開幕"])
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("beta body"))
+        XCTAssertFalse(r.chapters[1].contentHTML.contains("第三章"))
+    }
+
     func testTOCParagraphWithLineBreaksIsNotSplitIntoChapters() {
         // A table-of-contents row packs several entries with <br>. It must not be
         // mistaken for a chapter title (would create spurious chapters).

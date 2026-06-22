@@ -147,12 +147,12 @@ public enum GoogleDocsChapterSplitter {
         guard !text.isEmpty, text.count <= 40 else { return nil }
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
-        guard markerCount(text) <= 1 else { return nil }
+        guard chapterMarkerCount(text) <= 1 else { return nil }
         return text
     }
 
-    private static func markerCount(_ text: String) -> Int {
-        let pattern = "[章回卷節节話话篇幕部]|chapter"
+    private static func chapterMarkerCount(_ text: String) -> Int {
+        let pattern = #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|chapter\s+[0-9]+"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { return 0 }
         let ns = text as NSString
         return regex.numberOfMatches(in: text, range: NSRange(location: 0, length: ns.length))
