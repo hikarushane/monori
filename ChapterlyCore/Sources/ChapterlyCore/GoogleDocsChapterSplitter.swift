@@ -75,6 +75,14 @@ public enum GoogleDocsChapterSplitter {
         + #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|"#
         + #"chapter\s+[0-9]+|ch\.?\s*[0-9]+|prologue|epilogue)"#
 
+    private static let fontSizeRegex = try! NSRegularExpression(
+        pattern: #"font-size:\s*(\d+(?:\.\d+)?)\s*pt"#,
+        options: .caseInsensitive)
+
+    private static let chapterMarkerRegex = try! NSRegularExpression(
+        pattern: #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|特別篇[0-9０-９一二三四五六七八九十〇零]*|番外篇?[0-9０-９一二三四五六七八九十〇零]+|chapter\s+[0-9]+"#,
+        options: .caseInsensitive)
+
     private struct Boundary { let start: Int; let afterEnd: Int; let title: String }
 
     /// Detects chapter boundaries from real heading tags AND from plain
@@ -155,15 +163,12 @@ public enum GoogleDocsChapterSplitter {
 
     private static func largeFontTitle(_ rawInner: String) -> String? {
         let ns = rawInner as NSString
-        guard let sizeRegex = try? NSRegularExpression(
-            pattern: #"font-size:\s*(\d+(?:\.\d+)?)\s*pt"#,
-            options: .caseInsensitive),
-            let sizeMatch = sizeRegex.firstMatch(
+        guard let sizeMatch = fontSizeRegex.firstMatch(
                 in: rawInner,
                 range: NSRange(location: 0, length: ns.length)),
-            let sizeRange = Range(sizeMatch.range(at: 1), in: rawInner),
-            let size = Double(rawInner[sizeRange]),
-            size >= 18.0 else { return nil }
+              let sizeRange = Range(sizeMatch.range(at: 1), in: rawInner),
+              let size = Double(rawInner[sizeRange]),
+              size >= 18.0 else { return nil }
 
         let lower = rawInner.lowercased()
         if lower.contains("<a ") || lower.contains("<br") { return nil }
@@ -173,10 +178,8 @@ public enum GoogleDocsChapterSplitter {
     }
 
     private static func chapterMarkerCount(_ text: String) -> Int {
-        let pattern = #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|特別篇[0-9０-９一二三四五六七八九十〇零]*|番外篇?[0-9０-９一二三四五六七八九十〇零]+|chapter\s+[0-9]+"#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { return 0 }
         let ns = text as NSString
-        return regex.numberOfMatches(in: text, range: NSRange(location: 0, length: ns.length))
+        return chapterMarkerRegex.numberOfMatches(in: text, range: NSRange(location: 0, length: ns.length))
     }
 
     private static func bodyTextLength(_ html: String) -> Int {

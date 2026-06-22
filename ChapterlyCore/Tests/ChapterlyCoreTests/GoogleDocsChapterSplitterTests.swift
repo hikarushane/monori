@@ -227,6 +227,21 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         }
     }
 
+    func testLargeFontNonTitleTextAcceptedAsChapter() {
+        let html = """
+        <html><body>
+        <p><span style="font-size:24pt">重要提醒</span></p>
+        <p><span>reminder body content</span></p>
+        <p><span style="font-size:24pt">寫在最後</span></p>
+        <p><span>afterword body content</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "NTL", docTitle: "NTL")
+        XCTAssertEqual(r.chapters.map(\.title), ["重要提醒", "寫在最後"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("reminder body"))
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("afterword body"))
+    }
+
     func testLargeFontParagraphsDetectedAsChapters() {
         let html = """
         <html><body>
