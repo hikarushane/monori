@@ -200,6 +200,33 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.title), ["特別篇一 模仿遊戲", "特別篇二 趕上"])
     }
 
+    func testRealWorldSpecialChaptersImportComplete() throws {
+        let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-special-chapters"),
+                                                docID: "SC", docTitle: "Everyone's Best Friend")
+        XCTAssertEqual(r.chapters.map(\.title), [
+            "第四十九章 不同形式的空間",
+            "作者的信",
+            "特別篇一 模仿遊戲",
+            "第一幕：擁抱",
+            "第二幕：傳遞",
+            "第三幕：吊襪帶",
+            "特別篇二 趕上"
+        ])
+        XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4, 5, 6])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("ch49 body"))
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("author letter body"))
+        XCTAssertTrue(r.chapters[2].contentHTML.contains("special ep1 intro"))
+        XCTAssertTrue(r.chapters[3].contentHTML.contains("act1 body"))
+        XCTAssertTrue(r.chapters[6].contentHTML.contains("special ep2 body"))
+        // 幕 titles have trailing 。 stripped
+        XCTAssertFalse(r.chapters[3].title.hasSuffix("。"))
+        XCTAssertFalse(r.chapters[4].title.hasSuffix("。"))
+        // No TOC table entries leaked as chapters
+        for ch in r.chapters {
+            XCTAssertFalse(ch.contentHTML.isEmpty, "\(ch.title) should have body content")
+        }
+    }
+
     func testLargeFontParagraphsDetectedAsChapters() {
         let html = """
         <html><body>
