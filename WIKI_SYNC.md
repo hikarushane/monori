@@ -1,7 +1,7 @@
 # WIKI_SYNC
 
 > 來源 project: Chapterly
-> 產出日期: 2026-06-19
+> 產出日期: 2026-06-20（含 2026-06-19 未同步項目）
 > 同步目標: knowledge-wiki/wiki-pages/専案管理/
 
 使用方式：在 knowledge-wiki session 中執行「専案管理 update」，將以下內容分別寫入對應路徑。
@@ -66,6 +66,38 @@ injection 之後頁面變色，兩者結果不一致，產生誤導性診斷。
 
 ---
 
+**error_ios-launch-storyboard-targetruntime.md 建議內容：**
+```
+## 症狀
+手寫（非 Interface Builder 產出）的 iOS `LaunchScreen.storyboard` 編譯失敗：
+`The document "LaunchScreen.storyboard" could not be opened.
+(com.apple.InterfaceBuilder error -1.)`
+ibtool stack trace 停在 `IBDocument unarchivePlatformIndependentDataWithUnarchiver`。
+
+## 根因
+`<document targetRuntime="...">` 寫成 macOS 的值（`AppleCocoa` 或亂猜的
+`AppleCocoa.CocoaTouch`）。ibtool 印 `Unknown target runtime "AppleCocoa"` 後即 abort。
+iOS storyboard 的正確值是 `iOS.CocoaTouch`。次要陷阱：safe-area layout guide 的
+element key 是 `safeArea`，不是 `safeAreaLayoutGuide`。
+
+## 修法
+- `targetRuntime="iOS.CocoaTouch"`
+- safe area 用 `<viewLayoutGuide key="safeArea" id="..."/>`
+- 對照系統樣板（最可靠的格式來源）：
+  /Applications/Xcode.app/Contents/Developer/Library/Xcode/Templates/
+    Project Templates/MultiPlatform/Application/iOS App Base.xctemplate/LaunchScreen.storyboard
+
+## 預防措施
+手寫任何 .storyboard/.xib 後，先用
+`ibtool --errors --warnings --notices File.storyboard` 驗證（0 error 才算過），
+不要等 xcodebuild 才發現。格式從系統樣板複製，不要憑記憶寫 document header。
+
+## 出現過的專案
+- Chapterly/Monori（2026-06-20，手寫啟動畫面）
+```
+
+---
+
 ## patterns/（可複用模式）
 
 **pattern_wkwebview-dark-mode-css.md 建議內容：**
@@ -97,4 +129,33 @@ WKWebView 嵌入自訂 HTML 時，dark mode 下邊緣或頁面背景顯示系統
 
 ## 目前使用專案
 - Chapterly（ReaderStyler.wrappedDocument()，2026-06-19）
+```
+
+---
+
+**pattern_bundleid-rename-resets-local-data.md 建議內容：**
+```
+## 問題描述
+iOS app 改 bundle identifier（rebrand / 改名）後，使用者「資料不見了」：
+書庫、設定、登入狀態全部重置。誤以為是 migration bug。
+
+## 解法
+這不是 bug，是 sandbox 行為——改 bundle id = 系統視為新 app = 全新 container。
+規劃改名時要先盤點本機持久層，並把資料重置當作預期結果寫進交接：
+
+1. 盤點儲存載體：
+   - `UserDefaults.standard` → 綁 bundle id，會清空
+   - 具名 suite / App Group（`group.xxx`）→ 若 group id 不變則保留；改了就清空
+   - SwiftData/CoreData 預設 `ModelContainer` → 在 app container 內，清空
+   - Keychain → 用 access group；無 group 時綁 bundle id
+2. 若資料必須保留 → 需寫一次性遷移（舊→新 App Group），或乾脆不改 bundle id
+3. dev / 早期 app → 通常接受重置，交接寫明「使用者需重登 + 重建資料」
+4. WKWebView 登入態（cookie/`WKWebsiteDataStore`）綁 app container → 改 id 後需重登
+
+## 排查指令
+git grep -nE 'UserDefaults|suiteName|ModelContainer|appGroup|group\.|Keychain'
+無 App Group / 無具名 suite = 改 id 後本機資料必然全失。
+
+## 目前使用專案
+- Chapterly→Monori（2026-06-20，rebrand 規劃；`dev.chapterly`→`dev.monori`）
 ```

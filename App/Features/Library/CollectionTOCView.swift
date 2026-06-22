@@ -60,32 +60,40 @@ struct CollectionTOCView: View {
         .navigationTitle(collection.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    collection.sortDirection =
-                        collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
-                } label: {
-                    Image(systemName: "arrow.up.arrow.down")
-                }
-                .accessibilityLabel("Reverse chapter order")
-                if collection.sourceKind == .patreon {
-                    Button {
-                        refreshing = true
-                        Task {
-                            refreshOutcome = await env.refreshCollection(collection)
-                            refreshing = false
-                            showRefreshResult = true
+            ToolbarItem(placement: .topBarTrailing) {
+                // A single trailing control keeps the inline navigation title
+                // optically centered on the screen (Dynamic Island): one back
+                // button leading, one menu trailing. Reverse-order and check-for-
+                // chapters are occasional management actions — the primary action
+                // on this screen is tapping a chapter — so they live in the menu.
+                if refreshing {
+                    ProgressView().controlSize(.small)
+                        .accessibilityIdentifier("smoke.refreshChaptersButton")
+                } else {
+                    Menu {
+                        Button {
+                            collection.sortDirection =
+                                collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
+                        } label: {
+                            Label("Reverse order", systemImage: "arrow.up.arrow.down")
+                        }
+                        if collection.sourceKind == .patreon {
+                            Button {
+                                refreshing = true
+                                Task {
+                                    refreshOutcome = await env.refreshCollection(collection)
+                                    refreshing = false
+                                    showRefreshResult = true
+                                }
+                            } label: {
+                                Label("Check for new chapters", systemImage: "arrow.triangle.2.circlepath")
+                            }
+                            .accessibilityIdentifier("smoke.refreshChaptersButton")
                         }
                     } label: {
-                        if refreshing {
-                            ProgressView().controlSize(.small)
-                        } else {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        }
+                        Image(systemName: "ellipsis")
                     }
-                    .disabled(refreshing)
-                    .accessibilityLabel("Check for new chapters")
-                    .accessibilityIdentifier("smoke.refreshChaptersButton")
+                    .accessibilityLabel("Chapter options")
                 }
             }
         }

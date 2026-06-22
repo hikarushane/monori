@@ -47,8 +47,8 @@ in with their own Patreon account.
 2. Open a post in a series → tap **Open collection** when the series banner
    appears → on the collection page tap **Import all chapters** (the script
    scrolls automatically; re-imports merge without duplicates).
-3. **Library** tab → pick the collection → tap a chapter to read. Tap ↻ in
-   the toolbar to check for newly released chapters.
+3. **Library** tab → pick the collection → tap a chapter to read. Tap **•••**
+   in the toolbar → **Check for new chapters** to import newly released chapters.
 4. Reader: chrome hidden by default — tap the page center to show/hide bars.
    Bookmark top-left; font size + line spacing in the preferences panel
    (⊤T button, top-right). Left-edge swipe to leave. Previous/next chapter
