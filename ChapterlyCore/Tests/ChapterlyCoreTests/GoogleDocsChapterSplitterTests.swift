@@ -147,6 +147,19 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第四章"])
     }
 
+    func testTitleWithTrailingSentencePunctuationIsStripped() {
+        let html = """
+        <html><body>
+        <p><span>第一幕：擁抱。</span></p><p><span>act1 body text here</span></p>
+        <p><span>第二幕：傳遞！</span></p><p><span>act2 body text here</span></p>
+        <p><span>第三幕：吊襪帶？</span></p><p><span>act3 body text here</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "SP", docTitle: "SP")
+        XCTAssertEqual(r.chapters.map(\.title),
+                       ["第一幕：擁抱", "第二幕：傳遞", "第三幕：吊襪帶"])
+    }
+
     func testRealWorldTOCTableImportsInOrderWithContent() throws {
         let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-toc-table"),
                                                 docID: "EBF", docTitle: "Everyone's Best Friend")

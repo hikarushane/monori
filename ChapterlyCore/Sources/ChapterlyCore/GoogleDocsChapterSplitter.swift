@@ -91,7 +91,7 @@ public enum GoogleDocsChapterSplitter {
                 for m in matches {
                     boundaries.append(Boundary(start: m.range.location,
                                                afterEnd: m.range.location + m.range.length,
-                                               title: cleanTitle(ns.substring(with: m.range(at: 1)))))
+                                               title: stripTrailingPunctuation(cleanTitle(ns.substring(with: m.range(at: 1))))))
                 }
                 break
             }
@@ -149,7 +149,7 @@ public enum GoogleDocsChapterSplitter {
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
         guard chapterMarkerCount(text) <= 1 else { return nil }
-        return text
+        return stripTrailingPunctuation(text)
     }
 
     private static func chapterMarkerCount(_ text: String) -> Int {
@@ -190,6 +190,14 @@ public enum GoogleDocsChapterSplitter {
             kept.append(raw)
         }
         return kept
+    }
+
+    private static func stripTrailingPunctuation(_ text: String) -> String {
+        var s = text
+        while let last = s.last, "。！？.!?".contains(last) {
+            s = String(s.dropLast())
+        }
+        return s.trimmingCharacters(in: .whitespaces)
     }
 
     private static func cleanTitle(_ raw: String) -> String {
