@@ -71,6 +71,7 @@ public enum GoogleDocsChapterSplitter {
     /// that merely mentions a chapter does not match.
     private static let chapterTitlePattern =
         #"^\s*(?:序章?|楔子|引子|前言|尾聲|尾声|後記|后记|番外|外傳|外传|"#
+        + #"特別篇|番外篇|附[錄录]|結[語语]|结[語语]|作者(?:的)?[信話话]|"#
         + #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|"#
         + #"chapter\s+[0-9]+|ch\.?\s*[0-9]+|prologue|epilogue)"#
 
@@ -172,7 +173,7 @@ public enum GoogleDocsChapterSplitter {
     }
 
     private static func chapterMarkerCount(_ text: String) -> Int {
-        let pattern = #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|chapter\s+[0-9]+"#
+        let pattern = #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|特別篇[0-9０-９一二三四五六七八九十〇零]*|番外篇?[0-9０-９一二三四五六七八九十〇零]+|chapter\s+[0-9]+"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { return 0 }
         let ns = text as NSString
         return regex.numberOfMatches(in: text, range: NSRange(location: 0, length: ns.length))

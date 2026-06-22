@@ -175,6 +175,31 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         }
     }
 
+    func testSpecialChaptersDetectedByTextPatternWithoutFontSize() {
+        let html = """
+        <html><body>
+        <p><span>第一章 開始</span></p><p><span>chapter one body text</span></p>
+        <p><span>特別篇一 模仿遊戲</span></p><p><span>special ep body text</span></p>
+        <p><span>作者的信</span></p><p><span>author letter body text</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "TP", docTitle: "TP")
+        XCTAssertEqual(r.chapters.map(\.title),
+                       ["第一章 開始", "特別篇一 模仿遊戲", "作者的信"])
+    }
+
+    func testTOCRowWithMultipleSpecialChaptersIsRejected() {
+        let html = """
+        <html><body>
+        <p><span>特別篇一 模仿遊戲 特別篇二 趕上</span></p>
+        <p><span>特別篇一 模仿遊戲</span></p><p><span>ep1 body</span></p>
+        <p><span>特別篇二 趕上</span></p><p><span>ep2 body</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "MR", docTitle: "MR")
+        XCTAssertEqual(r.chapters.map(\.title), ["特別篇一 模仿遊戲", "特別篇二 趕上"])
+    }
+
     func testLargeFontParagraphsDetectedAsChapters() {
         let html = """
         <html><body>
