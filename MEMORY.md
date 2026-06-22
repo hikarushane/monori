@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-20（Monori 視覺品牌 + 改名 Tier A/B 契約）
+> 最後更新：2026-06-22（regex 靜態化重構 + largeFontTitle 測試補充）
 
 ## 專案概覽
 Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -27,6 +27,8 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 | Collection refresh visibility | refresh 時保留 toolbar spinner，另加 bottom capsule status banner `smoke.refreshStatusBanner` | 長 collection check 可能跑數分鐘，單 toolbar spinner 太不明顯；banner 明確告知正在檢查 | active | 2026-06-13 |
 | Agent-driven simulator workflow | `SIMULATOR_PLAYBOOK.md` + `scripts/ui-preflight.sh` + `scripts/ui-driver.sh` | 使用者不是專業 iOS dev；agent 應先用 script/driver 收集可重現診斷，不要求使用者口述 Xcode/畫面狀態 | active | 2026-06-13 |
 | Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
+| Google Docs 章節偵測：font-size 主、text pattern 副 | 雙層策略：`largeFontTitle` (≥18pt) 主、`chapterTitlePattern` 副 | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
+| Google Docs 標題去尾標點 | `stripTrailingPunctuation` 去除 。！？.!? | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
 
 ## 規範
 ### Patreon DOM
@@ -46,10 +48,19 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - `neighbors()` 用 descending orderIndex：`previous` = 更舊章節，`next` = 更新章節
 
 ### 標題清理
-- `looksLikeBodyText()` 只檢查 `。`（中文句號）和長英文中的 `. `
+- `looksLikeBodyText()` 只檢查 `。`（中文句號）和長英文中的 `. `——**無長度門檻**，任何含 "。" 的字串都回 true
 - 不檢查 `？！…」』`——這些符號正常出現在中文章節標題
 - `isProbablyContaminatedTitle()`：2+ 行 OR >100 chars OR body text
 - `firstLineIsTitle`：≤100 chars AND NOT body text
+- Google Docs splitter 產出的標題已去除尾部 。！？.!?（`stripTrailingPunctuation`），不會觸發 `looksLikeBodyText`
+
+### Google Docs 章節偵測（更新自 2026-06-22）
+- **主要機制**：`largeFontTitle` — paragraph 內 `<span style="font-size:Npt">` 且 N ≥ 18 → 視為章節邊界。不依賴文字內容，能偵測任何大字標題（作者的信、特別篇、任意藝術性標題）
+- **Fallback**：`chapterTitleParagraph` — 文字 match `chapterTitlePattern`（序章/第N章/特別篇/番外篇/附錄/結語/作者的信話/chapter N/prologue/epilogue）
+- **`??` 鏈**：`chapterTitleParagraph(rawInner) ?? largeFontTitle(rawInner)` — text pattern 優先，font-size 補漏
+- **TOC 拒絕**：含 `<a ` 或 `<br` 的 paragraph 兩條路都拒絕；`chapterMarkerCount` > 1 拒絕多章節 TOC 行
+- **`chapterMarkerCount`**：涵蓋 `第N[章回節话篇卷部幕]`、`特別篇N`、`番外篇?N`、`chapter N`
+- **`URLNormalizer.normalize`** 只支援 Patreon URL → Google Docs URL 回 nil → `fallbackTitle` 為空 → 顯示 "Patreon post"。此問題已由 `stripTrailingPunctuation` 間接修復（不觸發 contamination 路徑）
 
 ### 進度儲存（已廢止 2026-06-12 — 進度功能整個移除，以下僅歷史參考）
 - `ProgressTracker.js` 只在 `__chapterlyUserInteracted === true` 後存 progress
@@ -159,6 +170,9 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 - **Google Docs mobilebasic inline color 覆蓋**（2026-06-19）：Google Docs mobilebasic HTML 每個 `<p>/<span>` 都有 inline `color: #000000` + `background-color: #ffffff`；CSS 變數 / `color: CanvasText` 在 body 層設沒用，specificity 輸給 inline style。需 `* { color: CanvasText !important; background-color: transparent !important; } html, body { background: Canvas !important; }` 才能蓋掉。
   📍 出現位置：`ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` `wrappedDocument()`
+
+- **CWD drift 導致 pre-commit hook 失敗**（2026-06-22）：從 `ChapterlyCore/` 子目錄跑 `git commit`，pre-commit hook 執行 `./scripts/verify.sh` 找不到檔案（相對路徑基於 CWD）。修：commit 前先 `cd /Users/shane_yeh/Projects/Chapterly`。三次重現。
+  📍 出現位置：任何從子目錄執行 `git commit` 的場景
 
 - **`evaluateJavaScript` 診斷排序陷阱**（2026-06-19）：診斷 JS 若排在 `injectionScript()` 之前，拿到的 computed style 是注入前狀態 → 顯示「白底」誤導分析。診斷要排在注入後才能看到 injected CSS 的效果。
   📍 出現位置：`App/Features/Reader/ReaderView.swift` `applyReaderTreatment()`（debug probe 陷阱）
