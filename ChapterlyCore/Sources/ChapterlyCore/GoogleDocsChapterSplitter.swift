@@ -40,6 +40,7 @@ public enum GoogleDocsChapterSplitter {
 
         var raws = detectChapters(body)
         raws = raws.filter { !tocTitles.contains($0.title.lowercased()) && !$0.title.isEmpty }
+        raws = dedupedNonEmpty(raws)
 
         if raws.isEmpty {
             let whole = ImportedChapter(title: cleanDocTitle,
@@ -156,6 +157,39 @@ public enum GoogleDocsChapterSplitter {
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { return 0 }
         let ns = text as NSString
         return regex.numberOfMatches(in: text, range: NSRange(location: 0, length: ns.length))
+    }
+
+    private static func bodyTextLength(_ html: String) -> Int {
+        cleanTitle(html).count
+    }
+
+    private static func isEmptyBody(_ html: String) -> Bool {
+        if bodyTextLength(html) > 0 { return false }
+        let lower = html.lowercased()
+        return !lower.contains("<img") && !lower.contains("<figure") && !lower.contains("<picture")
+    }
+
+    private static func normalizedTitle(_ title: String) -> String {
+        title.replacingOccurrences(of: #"[\s\u{2060}\u{200B}\u{FEFF}]+"#,
+                                   with: "", options: .regularExpression)
+    }
+
+    private static func dedupedNonEmpty(_ raws: [RawChapter]) -> [RawChapter] {
+        let nonEmpty = raws.filter { !isEmptyBody($0.html) }
+        var bestLen: [String: Int] = [:]
+        for raw in nonEmpty {
+            let key = normalizedTitle(raw.title)
+            bestLen[key] = max(bestLen[key] ?? -1, bodyTextLength(raw.html))
+        }
+        var used: Set<String> = []
+        var kept: [RawChapter] = []
+        for raw in nonEmpty {
+            let key = normalizedTitle(raw.title)
+            guard !used.contains(key), bodyTextLength(raw.html) == bestLen[key] else { continue }
+            used.insert(key)
+            kept.append(raw)
+        }
+        return kept
     }
 
     private static func cleanTitle(_ raw: String) -> String {

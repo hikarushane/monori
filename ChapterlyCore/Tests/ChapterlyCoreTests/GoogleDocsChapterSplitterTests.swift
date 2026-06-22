@@ -97,6 +97,42 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertFalse(r.chapters[1].contentHTML.contains("第三章"))
     }
 
+    func testTOCGridAndDuplicateTitlesProduceOrderedNonEmptyChapters() {
+        let html = """
+        <html><body>
+        <table>
+        <tr><td><p>第一章 甲</p></td><td><p>第三章 丙</p></td><td><p>第五章 戊</p></td></tr>
+        <tr><td><p>第二章 乙</p></td><td><p>第四章 丁</p></td><td><p></p></td></tr>
+        </table>
+        <p>第一章 甲</p><p></p>
+        <p>第一章 甲</p><p>alpha body</p>
+        <p>第二章 乙</p><p>beta body</p>
+        <p>第三章 丙</p><p>gamma body</p>
+        <p>第四章 丁</p><p>delta body</p>
+        <p>第五章 戊</p><p>epsilon body</p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "TG", docTitle: "TG")
+        XCTAssertEqual(r.chapters.map(\.title),
+                       ["第一章 甲", "第二章 乙", "第三章 丙", "第四章 丁", "第五章 戊"])
+        XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha body"))
+        XCTAssertFalse(r.chapters[0].contentHTML.contains("第二章"))
+    }
+
+    func testDuplicateTitleKeepsRichestOccurrence() {
+        let html = """
+        <html><body>
+        <p>第一章 甲</p><p>this is the real and longer first chapter body</p>
+        <p>第二章 乙</p><p>second body</p>
+        <p>第一章 甲</p><p>x</p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "DUP", docTitle: "DUP")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章 甲", "第二章 乙"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("longer first chapter"))
+    }
+
     func testTOCParagraphWithLineBreaksIsNotSplitIntoChapters() {
         // A table-of-contents row packs several entries with <br>. It must not be
         // mistaken for a chapter title (would create spurious chapters).
