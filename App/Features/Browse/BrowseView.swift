@@ -26,7 +26,9 @@ struct BrowseView: View {
             .id(activeKind)
             .overlay(alignment: .top) {
                 if activeModel.loadingProgress < 1 {
-                    ProgressView(value: activeModel.loadingProgress).progressViewStyle(.linear)
+                    ProgressView(value: activeModel.loadingProgress)
+                        .progressViewStyle(.linear)
+                        .tint(Color.accentColor)
                 }
             }
         }
