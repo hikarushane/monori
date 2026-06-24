@@ -15,6 +15,10 @@ struct PatreonWebView: UIViewRepresentable {
     /// When set, the default left-edge swipe path only goes back if this
     /// returns true. Overrides still own their full behavior.
     var allowBackSwipe: (() -> Bool)? = nil
+    /// When true, attaches a UIRefreshControl to the scroll view so the user
+    /// can pull down to reload. Only BrowseView enables this; ReaderView does
+    /// not — pulling in the reader would discard partially-read content.
+    var enablePullToRefresh: Bool = false
 
     private static let backSwipeName = "monori.backSwipe"
     private static let contentTapName = "monori.contentTap"
@@ -27,6 +31,7 @@ struct PatreonWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let webView = model.webView
         webView.scrollView.contentInsetAdjustmentBehavior = .never
+        context.coordinator.model = model
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
@@ -43,6 +48,16 @@ struct PatreonWebView: UIViewRepresentable {
         edge.name = Self.backSwipeName
         edge.delegate = context.coordinator
         webView.addGestureRecognizer(edge)
+
+        // Pull-to-refresh: only enabled in Browse, not in the Reader where
+        // pulling down would discard the user's reading position.
+        if enablePullToRefresh {
+            let refreshControl = UIRefreshControl()
+            refreshControl.addTarget(context.coordinator,
+                                     action: #selector(Coordinator.handleRefresh(_:)),
+                                     for: .valueChanged)
+            webView.scrollView.refreshControl = refreshControl
+        }
 
         // Only the Reader uses center-tap-to-toggle-chrome. Attaching this
         // recognizer to the Browse/login web view is unnecessary and adds gesture
@@ -66,6 +81,7 @@ struct PatreonWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
+        context.coordinator.model = model
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
@@ -83,6 +99,9 @@ struct PatreonWebView: UIViewRepresentable {
         var onContentTap: ((Bool) -> Void)?
         var backSwipeOverride: (() -> Void)?
         var allowBackSwipe: (() -> Bool)?
+        /// Retained so handleRefresh can call reload() and observe isLoading.
+        var model: WebViewModel?
+        private var refreshObservation: NSKeyValueObservation?
 
         private static let log = Logger(subsystem: "dev.monori",
                                         category: "smoke-diagnostics")
@@ -131,6 +150,19 @@ struct PatreonWebView: UIViewRepresentable {
                 snapshot.frame.origin.x = webView.bounds.width
             } completion: { _ in
                 snapshot.removeFromSuperview()
+            }
+        }
+
+        @objc func handleRefresh(_ sender: UIRefreshControl) {
+            guard let model else {
+                sender.endRefreshing()
+                return
+            }
+            model.webView.reload()
+            refreshObservation = model.webView.observe(\.isLoading, options: [.new]) { [weak sender] _, change in
+                if change.newValue == false {
+                    DispatchQueue.main.async { sender?.endRefreshing() }
+                }
             }
         }
 

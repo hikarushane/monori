@@ -45,13 +45,17 @@ struct BrowseView: View {
         VStack(spacing: 0) {
             sourcePicker
             WebCollectionBanner(model: activeModel)
-            PatreonWebView(model: activeModel, allowBackSwipe: {
+            PatreonWebView(model: activeModel,
+                           allowBackSwipe: {
                 BackSwipePolicy.browseDecision(currentURL: activeModel.currentURL,
                                                canGoBack: activeModel.webView.canGoBack) == .goBack
-            })
+            }, enablePullToRefresh: true)
             // Force a fresh representable (and makeUIView) when the source flips,
             // so the displayed WKWebView swaps to the active model's web view.
             .id(activeKind)
+            // Cross-fade the old and new web view when the user switches sources.
+            .transition(.opacity)
+            .animation(.easeInOut(duration: 0.15), value: activeKind)
             .overlay(alignment: .top) {
                 if activeModel.loadingProgress < 1 {
                     ProgressView(value: activeModel.loadingProgress)
