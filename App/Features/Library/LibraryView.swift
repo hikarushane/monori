@@ -16,8 +16,8 @@ struct LibraryView: View {
                         ForEach(collections) { collection in
                             NavigationLink(value: collection.id) {
                                 HStack(alignment: .center, spacing: 12) {
-                                    Image(systemName: SourceRegistry.provider(for: collection.sourceKind).iconSystemName)
-                                        .font(.title3)
+                                    SourceGlyph(kind: collection.sourceKind)
+                                        .frame(width: 22, height: 22)
                                         .foregroundStyle(.secondary)
                                         .frame(width: 28)
                                         .accessibilityIdentifier("smoke.collectionSourceIcon")
@@ -56,7 +56,7 @@ struct LibraryView: View {
         ContentUnavailableView {
             Label("尚無收藏", systemImage: "books.vertical")
         } description: {
-            Text("在「瀏覽」分頁開啟 Patreon 文章的系列頁面，然後點選「匯入所有章節」。")
+            Text("在「瀏覽」分頁開啟 Patreon 文章的系列頁面，然後點選「匯入」。")
         }
     }
 }
