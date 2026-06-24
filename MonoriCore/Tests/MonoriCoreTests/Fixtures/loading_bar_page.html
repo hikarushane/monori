@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  /* Mirrors Patreon's seasonalPride loading bar: a thin, fixed, full-width
+     gradient pinned to the top of the viewport. */
+  .lb {
+    position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+    background-image: linear-gradient(to right,
+      rgb(234,31,68), rgb(251,121,14), rgb(245,180,0),
+      rgb(12,172,126), rgb(26,82,167));
+  }
+  .legit-header {
+    position: fixed; top: 0; left: 0; width: 100%; height: 56px;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>
+  <!-- The bar, with a hashed CSS-module class like Patreon ships. -->
+  <div id="bar" class="LoadingBar-module__EKugQq__enabled LoadingBar-module__EKugQq__seasonalPride lb"></div>
+  <!-- A normal tall top header that must NOT be hidden. -->
+  <div id="header" class="legit-header">Patreon</div>
+  <!-- Ordinary content that must NOT be hidden. -->
+  <p id="content">A post body that should remain visible.</p>
+</body>
+</html>

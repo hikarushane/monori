@@ -55,6 +55,15 @@ final class WebViewModel: NSObject {
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.cardTreatment,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        // Hide Patreon's own top gradient loading bar (web content, not the app's
+        // native ProgressView). Injected at document start so the suppressor is
+        // armed before the SPA mounts the bar on the first navigation.
+        config.userContentController.addUserScript(WKUserScript(
+            source: JSAssets.suppressLoadingBar,
+            injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        #if DEBUG
+        config.userContentController.add(LoadingBarDiagShim(), name: "monoriLoadingBarDiag")
+        #endif
 
         #if DEBUG
         if AppEnvironment.isSmokeMode {
@@ -246,6 +255,24 @@ private final class DrawerDiagShim: NSObject, WKScriptMessageHandler {
         let sw = d["sw"] as? Int ?? -1
         let sh = d["sh"] as? Int ?? -1
         Self.log.notice("[DRAWER] page kind=\(kind, privacy: .public) t=\(t)ms size=\(w)x\(h) dpr=\(dpr, privacy: .public) screen=\(sw)x\(sh) vis=\(vis, privacy: .public)")
+    }
+}
+
+/// Logs which page element the loading-bar suppressor hid, so the structural
+/// signature can be verified against the live Patreon DOM during debugging.
+private final class LoadingBarDiagShim: NSObject, WKScriptMessageHandler {
+    private static let log = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
+    func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let d = message.body as? [String: Any] else { return }
+        let tag = d["tag"] as? String ?? "?"
+        let id = d["id"] as? String ?? ""
+        let cls = d["cls"] as? String ?? ""
+        let role = d["role"] as? String ?? ""
+        let pos = d["pos"] as? String ?? ""
+        let h = d["h"] as? Int ?? -1
+        let bg = d["bg"] as? String ?? ""
+        let html = d["html"] as? String ?? ""
+        Self.log.notice("[LOADBAR] hid tag=\(tag, privacy: .public) id=\(id, privacy: .public) cls=\(cls, privacy: .public) role=\(role, privacy: .public) pos=\(pos, privacy: .public) h=\(h) bg=\(bg, privacy: .public) html=\(html, privacy: .public)")
     }
 }
 #endif

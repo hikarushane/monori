@@ -202,6 +202,38 @@ final class JSExtractionTests: XCTestCase {
                        "tapping teaser did not open the card's post")
     }
 
+    func testSuppressLoadingBarHidesPatreonBarButKeepsContent() async throws {
+        let config = WKWebViewConfiguration()
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 844),
+                                configuration: config)
+        let url = Bundle.module.url(forResource: "loading_bar_page", withExtension: "html")!
+        let html = try String(contentsOf: url, encoding: .utf8)
+        webView.loadHTMLString(html, baseURL: URL(string: "https://www.patreon.com/")!)
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+
+        // The asset runs a synchronous scan on injection, so the bar is hidden by
+        // the time callAsyncJavaScript resolves — no reliance on rAF firing.
+        _ = try? await webView.callAsyncJavaScript(JSAssets.suppressLoadingBar, contentWorld: .page)
+        try await Task.sleep(for: .milliseconds(100))
+
+        let checks = try await webView.evaluateJavaScript("""
+        (function () {
+          return [
+            getComputedStyle(document.getElementById("bar")).display === "none",
+            getComputedStyle(document.getElementById("header")).display !== "none",
+            getComputedStyle(document.getElementById("content")).display !== "none"
+          ];
+        })();
+        """)
+        let values = try XCTUnwrap(checks as? [Any])
+        XCTAssertEqual(values[0] as? Bool, true, "Patreon LoadingBar not hidden")
+        XCTAssertEqual(values[1] as? Bool, true, "legit 56px header was wrongly hidden")
+        XCTAssertEqual(values[2] as? Bool, true, "post content was wrongly hidden")
+    }
+
     func testDrawerDiagnosticsScriptLoadsAndPostsMessages() {
         let js = JSAssets.drawerDiagnostics
         XCTAssertFalse(js.isEmpty, "DrawerDiagnostics.js must be bundled")
