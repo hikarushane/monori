@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ReaderStyler {
-    public static let styleElementID = "chapterly-reader-style"
+    public static let styleElementID = "monori-reader-style"
 
     public static func ruleset() -> String {
         guard let url = Bundle.module.url(forResource: "ReaderRuleset", withExtension: "css"),
@@ -40,13 +40,13 @@ public enum ReaderStyler {
 
     public static func fontSizeScript(points: Int) -> String {
         let clamped = min(32, max(14, points))
-        return "document.documentElement.style.setProperty('--chapterly-font-size', '\(clamped)px');"
+        return "document.documentElement.style.setProperty('--monori-font-size', '\(clamped)px');"
     }
 
     public static func lineHeightScript(value: Double) -> String {
         let clamped = min(2.4, max(1.2, value))
         let formatted = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), clamped)
-        return "document.documentElement.style.setProperty('--chapterly-line-height', '\(formatted)');"
+        return "document.documentElement.style.setProperty('--monori-line-height', '\(formatted)');"
     }
 
     /// Full HTML document wrapper for stored chapter HTML (Google Docs import).
@@ -64,7 +64,7 @@ public enum ReaderStyler {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="color-scheme" content="light dark">
         <style>
-          :root { color-scheme: light dark; --chapterly-font-size: \(size)px; --chapterly-line-height: \(lh); }
+          :root { color-scheme: light dark; --monori-font-size: \(size)px; --monori-line-height: \(lh); }
           html, body { background: Canvas; }
           body { margin: 0; padding: 16px 18px; color: CanvasText;
                  font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
@@ -83,8 +83,8 @@ public enum ReaderStyler {
           body li, body li *,
           body blockquote, body blockquote *,
           body td, body td * {
-            font-size: var(--chapterly-font-size) !important;
-            line-height: var(--chapterly-line-height) !important;
+            font-size: var(--monori-font-size) !important;
+            line-height: var(--monori-line-height) !important;
           }
           img { max-width: 100%; height: auto; }
         </style></head><body>\(inner)</body></html>
@@ -100,15 +100,15 @@ public enum ReaderStyler {
         (function () {
           var target = \(target);
           var until = Date.now() + 4000;
-          if (!window.__chapterlyInteractionHook) {
-            window.__chapterlyInteractionHook = true;
-            var mark = function () { window.__chapterlyUserInteracted = true; };
+          if (!window.__monoriInteractionHook) {
+            window.__monoriInteractionHook = true;
+            var mark = function () { window.__monoriUserInteracted = true; };
             window.addEventListener("touchstart", mark, { passive: true });
             window.addEventListener("wheel", mark, { passive: true });
           }
-          window.__chapterlyUserInteracted = false;
-          if (window.__chapterlyScrollEnforcer) {
-            clearInterval(window.__chapterlyScrollEnforcer);
+          window.__monoriUserInteracted = false;
+          if (window.__monoriScrollEnforcer) {
+            clearInterval(window.__monoriScrollEnforcer);
           }
           function apply() {
             var doc = document.documentElement;
@@ -116,10 +116,10 @@ public enum ReaderStyler {
             window.scrollTo(0, max > 0 ? max * target : 0);
           }
           apply();
-          window.__chapterlyScrollEnforcer = setInterval(function () {
-            if (window.__chapterlyUserInteracted === true || Date.now() > until) {
-              clearInterval(window.__chapterlyScrollEnforcer);
-              window.__chapterlyScrollEnforcer = null;
+          window.__monoriScrollEnforcer = setInterval(function () {
+            if (window.__monoriUserInteracted === true || Date.now() > until) {
+              clearInterval(window.__monoriScrollEnforcer);
+              window.__monoriScrollEnforcer = null;
               return;
             }
             apply();

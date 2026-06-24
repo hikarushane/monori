@@ -37,7 +37,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportExtractsMetadataOnly() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         XCTAssertEqual(bodies.count, 5)
 
         var payloads: [ImporterChapterPayload] = []
@@ -58,7 +58,7 @@ final class JSExtractionTests: XCTestCase {
     func testExternalDecoySkippedAfterNormalization() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = bodies.compactMap { try? PayloadValidator.validateImporterChapter($0).get() }
         let merged = ChapterMapMerger.merge(existing: [], incoming: payloads)
         XCTAssertEqual(merged.count, 4)
@@ -68,7 +68,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportUsesSafeMetadataFallbacksWhenAnchorTextIsEmpty() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_empty_anchor_text",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.title), [
             "11 aria title",
@@ -83,7 +83,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportCapsLargeCardTextBeforeValidation() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_large_card_text",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.count, 1)
         XCTAssertLessThanOrEqual(payloads[0].title.utf8.count, PayloadValidator.maxFieldLength)
@@ -93,7 +93,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportPrefersCardTitleOverExcerptText() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_card_excerpt",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.title), ["真正的文章標題", "第二篇標題"])
         let allText = payloads.flatMap { [$0.title, $0.url, $0.collectionName, $0.collectionURL,
@@ -104,7 +104,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportExtractsSiblingTeaserAsExcerpt() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_sibling_teaser",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.title), ["陽光普照 19", "陽光普照 18"])
         XCTAssertEqual(payloads[0].excerpt,
@@ -116,7 +116,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportExtractsInAnchorExcerpt() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_card_excerpt",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.count, 2)
         XCTAssertNotNil(payloads[0].excerpt)
@@ -126,7 +126,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportIncludesCreatorNameFromPageTitle() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_card_excerpt",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.creatorName), ["ocean", "ocean"])
     }
@@ -134,7 +134,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportLoadsLazyContentBeforeScraping() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_lazy",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.title),
                        ["9 最新章", "8 次新章", "7 中段章", "6 更舊章", "5 最舊章"])
@@ -144,7 +144,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionImportClicksLoadMoreUntilExhausted() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_load_more",
-                                         handlerName: "chapterlyImport")
+                                         handlerName: "monoriImport")
         let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
         XCTAssertEqual(payloads.map(\.title),
                        ["20 最新章", "19 章", "18 章", "17 章", "16 章", "15 最舊章"])
@@ -183,11 +183,11 @@ final class JSExtractionTests: XCTestCase {
           var card = document.getElementById("card-1");
           document.getElementById("teaser-1").click();
           return [
-            !!document.getElementById("chapterly-card-style"),
+            !!document.getElementById("monori-card-style"),
             getComputedStyle(card).webkitUserSelect === "none",
             getComputedStyle(document.getElementById("more-1")).display === "none",
             getComputedStyle(document.getElementById("more-2")).display === "none",
-            document.querySelector("#card-1 .post-content").classList.contains("chapterly-fade"),
+            document.querySelector("#card-1 .post-content").classList.contains("monori-fade"),
             window.__clicked || ""
           ];
         })();
@@ -205,8 +205,8 @@ final class JSExtractionTests: XCTestCase {
     func testDrawerDiagnosticsScriptLoadsAndPostsMessages() {
         let js = JSAssets.drawerDiagnostics
         XCTAssertFalse(js.isEmpty, "DrawerDiagnostics.js must be bundled")
-        XCTAssertTrue(js.contains("chapterlyDrawerDiag"),
-                      "must post to the chapterlyDrawerDiag message handler")
+        XCTAssertTrue(js.contains("monoriDrawerDiag"),
+                      "must post to the monoriDrawerDiag message handler")
         XCTAssertTrue(js.contains("resize") && js.contains("visibilitychange"),
                       "must log resize and visibilitychange")
     }
@@ -214,7 +214,7 @@ final class JSExtractionTests: XCTestCase {
     func testCollectionDetectFindsSeriesLink() async throws {
         let bodies = try await runScript(JSAssets.collectionDetect,
                                          fixture: "post_page",
-                                         handlerName: "chapterlyCollectionLink")
+                                         handlerName: "monoriCollectionLink")
         XCTAssertEqual(bodies.count, 1)
         let p = try PayloadValidator.validateCollectionLink(bodies[0]).get()
         XCTAssertEqual(p.collectionName, "【更新中】焚心 The Burning Heart")

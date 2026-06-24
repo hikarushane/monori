@@ -3,7 +3,7 @@
 // top-level `await` and `return` are available. Returns the number of
 // chapters posted to the native side.
 var handler = window.webkit && window.webkit.messageHandlers
-  && window.webkit.messageHandlers.chapterlyImport;
+  && window.webkit.messageHandlers.monoriImport;
 if (!handler) { return 0; }
 
 function compactText(value) {

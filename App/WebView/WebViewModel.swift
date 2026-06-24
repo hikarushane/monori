@@ -54,7 +54,7 @@ final class WebViewModel: NSObject {
 
         #if DEBUG
         if AppEnvironment.isSmokeMode {
-            config.userContentController.add(DrawerDiagShim(), name: "chapterlyDrawerDiag")
+            config.userContentController.add(DrawerDiagShim(), name: "monoriDrawerDiag")
             config.userContentController.addUserScript(WKUserScript(
                 source: JSAssets.drawerDiagnostics,
                 injectionTime: .atDocumentStart, forMainFrameOnly: true))

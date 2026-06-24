@@ -16,8 +16,8 @@ struct PatreonWebView: UIViewRepresentable {
     /// returns true. Overrides still own their full behavior.
     var allowBackSwipe: (() -> Bool)? = nil
 
-    private static let backSwipeName = "chapterly.backSwipe"
-    private static let contentTapName = "chapterly.contentTap"
+    private static let backSwipeName = "monori.backSwipe"
+    private static let contentTapName = "monori.contentTap"
     #if DEBUG
     private static let diagLog = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
     #endif

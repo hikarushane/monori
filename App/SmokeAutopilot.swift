@@ -75,7 +75,7 @@ final class SmokeAutopilot {
         }
         let handlerReady = await Self.jsBool(
             env.browse.webView,
-            "!!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.chapterlyImport)")
+            "!!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.monoriImport)")
         guard handlerReady else {
             fail("import", "import_handler_missing")
             return

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var handler = window.webkit && window.webkit.messageHandlers
-    && window.webkit.messageHandlers.chapterlyCollectionLink;
+    && window.webkit.messageHandlers.monoriCollectionLink;
   if (!handler) { return; }
   var a = document.querySelector('a[href*="/collection/"]');
   if (!a) { return; }

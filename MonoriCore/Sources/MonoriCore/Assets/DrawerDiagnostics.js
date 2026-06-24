@@ -1,12 +1,12 @@
 (function () {
   "use strict";
-  if (window.__chapterlyDrawerDiag) { return; }
-  window.__chapterlyDrawerDiag = true;
+  if (window.__monoriDrawerDiag) { return; }
+  window.__monoriDrawerDiag = true;
 
   function send(kind, extra) {
     try {
       var mh = window.webkit && window.webkit.messageHandlers
-        && window.webkit.messageHandlers.chapterlyDrawerDiag;
+        && window.webkit.messageHandlers.monoriDrawerDiag;
       if (!mh) { return; }
       mh.postMessage({
         kind: kind,

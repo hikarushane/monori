@@ -5,7 +5,7 @@ final class ReaderStylerTests: XCTestCase {
     func testInjectionScriptEmbedsRulesetAndStyleId() {
         let js = ReaderStyler.injectionScript()
         XCTAssertTrue(js.contains(ReaderStyler.styleElementID))
-        XCTAssertTrue(js.contains("--chapterly-font-size"))
+        XCTAssertTrue(js.contains("--monori-font-size"))
         XCTAssertTrue(js.contains("data-tag")) // ruleset content embedded
     }
 
@@ -15,19 +15,19 @@ final class ReaderStylerTests: XCTestCase {
 
     func testFontSizeScriptSetsVariable() {
         let js = ReaderStyler.fontSizeScript(points: 21)
-        XCTAssertTrue(js.contains("--chapterly-font-size"))
+        XCTAssertTrue(js.contains("--monori-font-size"))
         XCTAssertTrue(js.contains("21px"))
     }
 
     func testLineHeightScriptSetsVariable() {
         let js = ReaderStyler.lineHeightScript(value: 1.9)
-        XCTAssertTrue(js.contains("--chapterly-line-height"))
+        XCTAssertTrue(js.contains("--monori-line-height"))
         XCTAssertTrue(js.contains("1.90"))
     }
 
     func testLineHeightScriptUsesCSSDecimalSeparator() {
         let js = ReaderStyler.lineHeightScript(value: 1.9)
-        XCTAssertEqual(js, "document.documentElement.style.setProperty('--chapterly-line-height', '1.90');")
+        XCTAssertEqual(js, "document.documentElement.style.setProperty('--monori-line-height', '1.90');")
         XCTAssertFalse(js.contains("1,90"))
     }
 
@@ -37,13 +37,13 @@ final class ReaderStylerTests: XCTestCase {
     }
 
     func testRulesetUsesLineHeightVariable() {
-        XCTAssertTrue(ReaderStyler.ruleset().contains("var(--chapterly-line-height"))
+        XCTAssertTrue(ReaderStyler.ruleset().contains("var(--monori-line-height"))
     }
 
     func testEnforceScrollScriptEmbedsTargetAndUserInteractionGuard() {
         let js = ReaderStyler.enforceScrollScript(progress: 0.5)
         XCTAssertTrue(js.contains("var target = 0.5"))
-        XCTAssertTrue(js.contains("__chapterlyUserInteracted"))
+        XCTAssertTrue(js.contains("__monoriUserInteracted"))
         XCTAssertTrue(js.contains("setInterval"))
     }
 
@@ -100,8 +100,8 @@ final class ReaderStylerTests: XCTestCase {
     func testWrappedDocumentEmbedsPrefsVariables() {
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
                                                 fontSizePoints: 21, lineHeight: 1.9)
-        XCTAssertTrue(html.contains("--chapterly-font-size: 21px"))
-        XCTAssertTrue(html.contains("--chapterly-line-height: 1.90"))
+        XCTAssertTrue(html.contains("--monori-font-size: 21px"))
+        XCTAssertTrue(html.contains("--monori-line-height: 1.90"))
         XCTAssertTrue(html.contains("<p>x</p>"))
     }
 
@@ -112,8 +112,8 @@ final class ReaderStylerTests: XCTestCase {
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
                                                 fontSizePoints: 19, lineHeight: 1.75)
         XCTAssertTrue(html.contains("body p *"))
-        XCTAssertTrue(html.contains("font-size: var(--chapterly-font-size) !important"))
-        XCTAssertTrue(html.contains("line-height: var(--chapterly-line-height) !important"))
+        XCTAssertTrue(html.contains("font-size: var(--monori-font-size) !important"))
+        XCTAssertTrue(html.contains("line-height: var(--monori-line-height) !important"))
         // Headings are not in the override list, so chapter sub-headings keep
         // their relative size (Google headings wrap text in <span>, which a bare
         // `body span` rule would otherwise flatten).
@@ -123,11 +123,11 @@ final class ReaderStylerTests: XCTestCase {
 
     func testWrappedDocumentClampsAndFormats() {
         let big = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 99, lineHeight: 9.0)
-        XCTAssertTrue(big.contains("--chapterly-font-size: 32px"))
-        XCTAssertTrue(big.contains("--chapterly-line-height: 2.40"))
+        XCTAssertTrue(big.contains("--monori-font-size: 32px"))
+        XCTAssertTrue(big.contains("--monori-line-height: 2.40"))
         let small = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 1, lineHeight: 0.1)
-        XCTAssertTrue(small.contains("--chapterly-font-size: 14px"))
-        XCTAssertTrue(small.contains("--chapterly-line-height: 1.20"))
+        XCTAssertTrue(small.contains("--monori-font-size: 14px"))
+        XCTAssertTrue(small.contains("--monori-line-height: 1.20"))
     }
 
     func testWrappedDocumentSupportsLightAndDarkScheme() {

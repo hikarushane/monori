@@ -1,8 +1,8 @@
 import Foundation
 
 public final class ScriptMessageRouter {
-    public static let importName = "chapterlyImport"
-    public static let collectionLinkName = "chapterlyCollectionLink"
+    public static let importName = "monoriImport"
+    public static let collectionLinkName = "monoriCollectionLink"
 
     public static var allHandlerNames: [String] { [importName, collectionLinkName] }
 

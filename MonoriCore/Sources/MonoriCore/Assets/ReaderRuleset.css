@@ -37,8 +37,8 @@ article,
 article p, article li, article blockquote,
 .patreon-post-content, .patreon-post-content p, .patreon-post-content li,
 .patreon-post-content blockquote, .patreon-post-content span {
-  font-size: var(--chapterly-font-size, 19px) !important;
-  line-height: var(--chapterly-line-height, 1.75) !important;
+  font-size: var(--monori-font-size, 19px) !important;
+  line-height: var(--monori-line-height, 1.75) !important;
 }
 
 [data-tag="post-title"],
