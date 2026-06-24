@@ -192,15 +192,16 @@ public enum GoogleDocsChapterSplitter {
     private static func chapterTitleParagraph(_ rawInner: String) -> String? {
         let lower = rawInner.lowercased()
         if lower.contains("<a ") { return nil }
-        let stripped = rawInner.replacingOccurrences(
-            of: "<br\\s*/?>\\s*(?:</[^>]+>\\s*)*$", with: "", options: [.regularExpression, .caseInsensitive])
-        let strippedLower = stripped.lowercased()
-        if strippedLower.contains("<br") { return nil }
-        let text = cleanTitle(stripped)
-        guard !text.isEmpty, text.count <= 40 else { return nil }
+        let fullText = cleanTitle(rawInner)
+        guard chapterMarkerCount(fullText) <= 1 else { return nil }
+        let beforeBr = rawInner.replacingOccurrences(
+            of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
+        let text = cleanTitle(beforeBr)
+        let hasCJK = text.range(of: #"[\u{4E00}-\u{9FFF}]"#, options: .regularExpression) != nil
+        let maxLen = hasCJK ? 60 : 40
+        guard !text.isEmpty, text.count <= maxLen else { return nil }
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
-        guard chapterMarkerCount(text) <= 1 else { return nil }
         return stripTrailingPunctuation(text)
     }
 
@@ -214,8 +215,10 @@ public enum GoogleDocsChapterSplitter {
               size >= 18.0 else { return nil }
 
         let lower = rawInner.lowercased()
-        if lower.contains("<a ") || lower.contains("<br") { return nil }
-        let text = cleanTitle(rawInner)
+        if lower.contains("<a ") { return nil }
+        let beforeBr = rawInner.replacingOccurrences(
+            of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
+        let text = cleanTitle(beforeBr)
         guard !text.isEmpty, text.count <= 40 else { return nil }
         let nsText = text as NSString
         if tabNameRegex.firstMatch(in: text, range: NSRange(location: 0, length: nsText.length)) != nil {
