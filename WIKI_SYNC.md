@@ -1,6 +1,6 @@
 # WIKI_SYNC
 
-> 來源 project: Chapterly
+> 來源 project: Monori
 > 產出日期: 2026-06-20（含 2026-06-19 未同步項目）
 > 同步目標: knowledge-wiki/wiki-pages/専案管理/
 
@@ -33,7 +33,7 @@ WKWebView 每次呼叫 `loadHTMLString()` 或 `load(URLRequest)` 後，內部會
 遇到 WKWebView 底色問題，先檢查 HTML/CSS 的 `background` 設定，不要只看 UIKit layer 的 backgroundColor。
 
 ## 出現過的專案
-- Chapterly（2026-06-19）
+- Monori（2026-06-19）
 ```
 
 ---
@@ -61,7 +61,7 @@ injection 之後頁面變色，兩者結果不一致，產生誤導性診斷。
 「CSS 診斷顯示正常但頁面看起來不對」= 幾乎可以直接懷疑診斷排序問題。
 
 ## 出現過的專案
-- Chapterly（2026-06-19，Bug 4 gray veil debug session）
+- Monori（2026-06-19，Bug 4 gray veil debug session）
 ```
 
 ---
@@ -93,7 +93,7 @@ element key 是 `safeArea`，不是 `safeAreaLayoutGuide`。
 不要等 xcodebuild 才發現。格式從系統樣板複製，不要憑記憶寫 document header。
 
 ## 出現過的專案
-- Chapterly/Monori（2026-06-20，手寫啟動畫面）
+- Monori（2026-06-20，手寫啟動畫面）
 ```
 
 ---
@@ -128,7 +128,7 @@ WKWebView 嵌入自訂 HTML 時，dark mode 下邊緣或頁面背景顯示系統
    但這無法取代 CSS 修法（loadHTMLString 後 scrollView.backgroundColor 會被 reset）。
 
 ## 目前使用專案
-- Chapterly（ReaderStyler.wrappedDocument()，2026-06-19）
+- Monori（ReaderStyler.wrappedDocument()，2026-06-19）
 ```
 
 ---

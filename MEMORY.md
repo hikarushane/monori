@@ -1,9 +1,9 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-22（regex 靜態化重構 + largeFontTitle 測試補充）
+> 最後更新：2026-06-24（Chapterly→Monori 全域改名完成並 merge 回 main）
 
 ## 專案概覽
-Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
+Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
 
 ## 架構決策
 | 決策 | 選擇 | 原因 | 狀態 | 日期 |
@@ -88,12 +88,12 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - `scripts/smoke-auto.sh` 會 `source "$PROJECT_DIR/.env"`；若 session 明確禁止讀 `.env`，agent 不能直接執行它，需使用者允許或改用不讀 `.env` 的注入方式。
 - `smoke-diagnostics.sh` 會重新 launch app 並 `log show --last 2m`；若要捕捉人工手勢 log，必須在 launch 後重現，或使用 live log capture。
 
-### 改名 Chapterly→Monori / 內部識別碼契約（2026-06-20）
-- **品牌名 = Monori**；`CFBundleDisplayName` 已改（2026-06-20），但模組/bundle id/專案名待全域改名。
+### 改名 Chapterly→Monori（2026-06-20 規劃 → 2026-06-24 完成並 merge 回 main）/ 內部識別碼契約
+- **品牌名 = Monori**；模組（`MonoriCore`）/bundle id（`dev.monori.Monori`）/專案名/`CFBundleDisplayName` 全部已改名完成（2026-06-24，commit `8914d4f`..`b2a2ca8`）。下方 Tier A/B 清單保留作為「當時改了什麼 / 哪些刻意不改」的契約參考。
 - **改名分兩層，禁止整包 `s/chapterly/monori/`**：
   - **Tier A 可見身分（要改）**：`project.yml` name/bundleIdPrefix(`dev.chapterly`→`dev.monori`)/package/target、`ChapterlyCore`→`MonoriCore`（目錄+Package.swift+所有 `import`）、`ChapterlyApp`→`MonoriApp`、scripts 內 `Chapterly.xcodeproj`/`-scheme Chapterly`/`dev.chapterly.Chapterly`/log predicate/`Chapterly-*` DerivedData glob、文件文字。
   - **Tier B 內部識別碼（不可改，跨檔契約，改了零使用者收益純風險）**：訊息 handler `chapterlyImport`/`chapterlyCollectionLink`（`ScriptMessageRouter.swift` ↔ `CollectionDetect.js`/`CollectionImport.js`/`DrawerDiagnostics.js`）、CSS 變數 `--chapterly-font-size`/`--chapterly-line-height`（`ReaderStyler.swift` ↔ `ReaderRuleset.css`）、`window.__chapterly*`/`chapterly-fade`/`chapterly-card-style`/`chapterly-reader-style`。
-- **`Chapterly.xcodeproj` 是 gitignored 產生物**：改名只動 `project.yml` 的 `name:` 再 `xcodegen generate`；腳本內硬寫的才手改。
+- **`Monori.xcodeproj` 是 gitignored 產生物**：改名只動 `project.yml` 的 `name:` 再 `xcodegen generate`；腳本內硬寫的才手改。
 - **bundle id 一變 → 本機資料重置**：無 App Group、無具名 UserDefaults suite、SwiftData 用預設容器 → 沒有遷移碼，但書庫 + `reader.fontSize`/`reader.lineSpacing` 會清空，需重 import + 重登 Patreon。
 - **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
 
@@ -101,10 +101,10 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **手寫 iOS launch storyboard 的 `targetRuntime` 寫成 macOS 值**（2026-06-20）：手刻 `LaunchScreen.storyboard` 用 `targetRuntime="AppleCocoa"` → ibtool `error -1`（IBDocument unarchive 失敗）。`AppleCocoa` 是 macOS runtime；iOS 必須 `iOS.CocoaTouch`，且 safe-area guide key 是 `safeArea` 不是 `safeAreaLayoutGuide`。驗證：`ibtool --errors --warnings --notices LaunchScreen.storyboard`；對照樣板 `iOS App Base.xctemplate/LaunchScreen.storyboard`。（cross-project 坑，見 WIKI_SYNC.md）
   📍 出現位置：`App/LaunchScreen.storyboard`
 
-- **Linker error after derived data corrupt**（2026-06-11）：刪舊 test bundle 後 `ld: symbol(s) not found for ImporterChapterPayload.init`，XCTest 快取舊 binary → `find ~/Library/Developer/Xcode/DerivedData -maxdepth 1 -name "Chapterly-*" -exec rm -rf {} +`
+- **Linker error after derived data corrupt**（2026-06-11）：刪舊 test bundle 後 `ld: symbol(s) not found for ImporterChapterPayload.init`，XCTest 快取舊 binary → `find ~/Library/Developer/Xcode/DerivedData -maxdepth 1 -name "Monori-*" -exec rm -rf {} +`
   📍 出現位置：clean rebuild 後 `xcodebuild test`
 
-- **`xcodebuild clean` 找不到 destination**（2026-06-11）：`xcodebuild clean -scheme Chapterly` 失敗，`-destination 'iPhone 17'` 只對 `test` command 有效 → 改用刪 DerivedData workaround
+- **`xcodebuild clean` 找不到 destination**（2026-06-11）：`xcodebuild clean -scheme Monori` 失敗，`-destination 'iPhone 17'` 只對 `test` command 有效 → 改用刪 DerivedData workaround
 
 - **looksLikeBodyText 誤判中文標題**（2026-06-11）：原本檢查 `？！…」』` → 正常章節標題如「那妳呢？」被誤判為 body text → 縮減至只檢查 `。`
 
@@ -135,7 +135,7 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 
 - **`git add -A` 掃進工件 + gitignore 不影響已追蹤檔**（2026-06-12）：T7 commit 把 `WIKI_SYNC.md`、`build/xcodebuild.log`、`docs/` 掃進版控。`.gitignore` 已加 `docs/`、`*.log`、`WIKI_SYNC.md`，但已追蹤檔案要另外 `git rm --cached` 才會解除。commit 時列明檔案、不要 `git add -A`。
 
-- **`smoke-diagnostics.sh` 重新 launch 會漏掉 launch 前手勢 log**（2026-06-13）：使用者先在 simulator 手動左滑，再跑 script；`grep back_swipe build/smoke/app.log` 無命中，因 script 重新 launch 並只收 `--last 2m` 的 `dev.chapterly/smoke-diagnostics` log，最後只有 launch-time smoke state。修法：需要手勢 log 時，在 script launch 後重現，或改用 live log capture；不要把「無 back_swipe log」誤判成 H1/H2/H3。
+- **`smoke-diagnostics.sh` 重新 launch 會漏掉 launch 前手勢 log**（2026-06-13）：使用者先在 simulator 手動左滑，再跑 script；`grep back_swipe build/smoke/app.log` 無命中，因 script 重新 launch 並只收 `--last 2m` 的 `dev.monori/smoke-diagnostics` log，最後只有 launch-time smoke state。修法：需要手勢 log 時，在 script launch 後重現，或改用 live log capture；不要把「無 back_swipe log」誤判成 H1/H2/H3。
 
 - **`smoke-auto.sh` 會讀 `.env`**（2026-06-13）：腳本開頭會 `source "$PROJECT_DIR/.env"` 取得 `SMOKE_TEST_URL`。若 agent session 有「嚴禁讀 `.env`」約束，就不能直接跑此腳本。修法：請使用者明確允許、由使用者自行跑，或新增/使用不讀 `.env` 的安全參數化入口。
 
@@ -157,11 +157,11 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - **Reader dismiss button screenshot check 不等於自動成功**（2026-06-13）：button code 已經 `./scripts/verify.sh` 編譯通過；但本次 Task 3 booted Simulator 不在 ReaderView，`describe` 沒有 `smoke.reader*` identifiers，嘗試從列表進 reader 進到 Patreon web content。不要把這次當作 R5 pass；下一輪需先確保 app 已安裝 `e2c0181` Debug build 並進 ReaderView，再用 `describe`/screenshot 驗證 button。
   📍 出現位置：reader dismiss plan Task 3；SIMULATOR_PLAYBOOK.md R5 follow-up
 
-- **`verify.sh` 內部 race → SQLITE_IOERR（2026-06-15，非程式問題，非沙箱問題）**：`verify.sh` Step 1 `xcodebuild build` 緊接 Step 2 `swift test`，兩步共用 `ChapterlyCore/.build`；xcodebuild 留下的 package build 狀態 / 背景鎖讓隨後的 `swift test` 在 `build.db` 印 `accessing build database: disk I/O error`（SQLITE_IOERR）→ `set -e` 讓 verify.sh 整體失敗。**單獨跑任一步乾淨**（`cd ChapterlyCore && swift test` exit 0；`xcodebuild build` BUILD SUCCEEDED）。使用者那 6 次 probe 重建把它從偶發變成穩定觸發。**根因是 verify.sh 的 step race，與沙箱無關**；無沙箱終端機也會觸發。修法：把 verify 拆兩步分別跑；別把此 IOERR 當程式錯誤、別 `rm .build`（重建仍會 IOERR）。`/bin/rm`/`\rm` 才能繞過使用者包過的 `rm`。
-  📍 出現位置：`ChapterlyCore/.build` 被兩個步驟競用；`.claude/settings.json` PreToolUse hook 在 commit 前跑 verify.sh（`if: "Bash(git commit *)"`）
+- **`verify.sh` 內部 race → SQLITE_IOERR（2026-06-15，非程式問題，非沙箱問題）**：`verify.sh` Step 1 `xcodebuild build` 緊接 Step 2 `swift test`，兩步共用 `MonoriCore/.build`；xcodebuild 留下的 package build 狀態 / 背景鎖讓隨後的 `swift test` 在 `build.db` 印 `accessing build database: disk I/O error`（SQLITE_IOERR）→ `set -e` 讓 verify.sh 整體失敗。**單獨跑任一步乾淨**（`cd MonoriCore && swift test` exit 0；`xcodebuild build` BUILD SUCCEEDED）。使用者那 6 次 probe 重建把它從偶發變成穩定觸發。**根因是 verify.sh 的 step race，與沙箱無關**；無沙箱終端機也會觸發。修法：把 verify 拆兩步分別跑；別把此 IOERR 當程式錯誤、別 `rm .build`（重建仍會 IOERR）。`/bin/rm`/`\rm` 才能繞過使用者包過的 `rm`。
+  📍 出現位置：`MonoriCore/.build` 被兩個步驟競用；`.claude/settings.json` PreToolUse hook 在 commit 前跑 verify.sh（`if: "Bash(git commit *)"`）
 
 - **xcodegen 2.45.4 不再 default 關鍵 build settings**（2026-06-15）：舊版 xcodegen 會 default `SWIFT_VERSION`、`PRODUCT_NAME`、Debug 的 `SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG`；2.45.4 全不 default。本專案 `project.yml` 原本沒明寫這些，靠舊版 default。結果 `xcodegen generate`（smoke-auto preflight 每次都跑）產生：(1) build 失敗 `SWIFT_VERSION '' is unsupported` + `Multiple commands produce '.app'`（空 PRODUCT_NAME）；(2) 即使 build 過，Debug 也沒定義 DEBUG → 所有 `#if DEBUG`（smoke autopilot、reader dismiss button、debug 診斷）被靜默編譯掉。修法：`project.yml` 的 `settings.base` 明寫 SWIFT_VERSION/PRODUCT_NAME，`settings.configs.Debug` 明寫 SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG + GCC_PREPROCESSOR_DEFINITIONS（commit `37c78ba`）。
-  📍 出現位置：任何 `xcodegen generate` 後的 build；`Chapterly.xcodeproj` 是 generated（未進 git），重生會覆蓋，不能靠 git restore，只能修 project.yml。
+  📍 出現位置：任何 `xcodegen generate` 後的 build；`Monori.xcodeproj` 是 generated（未進 git），重生會覆蓋，不能靠 git restore，只能修 project.yml。
 
 - **PreToolUse hook 的 `if:` 似乎不生效、對所有 Bash 都跑**（2026-06-15）：`.claude/settings.json` 第一個 hook 寫 `if: "Bash(git commit *)"` 想只在 commit 跑 verify，實際對每個 Bash 都先跑（verify 過才放行，靜默；過不了就擋並印 log）。配合上面的沙箱 IOERR → 擋住所有操作。解封法：暫時移除該 hook block（Edit settings.json），收尾再還原。
 
@@ -169,9 +169,9 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
   📍 出現位置：`App/Features/Reader/ReaderView.swift` `applyReaderTreatment()`
 
 - **Google Docs mobilebasic inline color 覆蓋**（2026-06-19）：Google Docs mobilebasic HTML 每個 `<p>/<span>` 都有 inline `color: #000000` + `background-color: #ffffff`；CSS 變數 / `color: CanvasText` 在 body 層設沒用，specificity 輸給 inline style。需 `* { color: CanvasText !important; background-color: transparent !important; } html, body { background: Canvas !important; }` 才能蓋掉。
-  📍 出現位置：`ChapterlyCore/Sources/ChapterlyCore/ReaderStyler.swift` `wrappedDocument()`
+  📍 出現位置：`MonoriCore/Sources/MonoriCore/ReaderStyler.swift` `wrappedDocument()`
 
-- **CWD drift 導致 pre-commit hook 失敗**（2026-06-22）：從 `ChapterlyCore/` 子目錄跑 `git commit`，pre-commit hook 執行 `./scripts/verify.sh` 找不到檔案（相對路徑基於 CWD）。修：commit 前先 `cd /Users/shane_yeh/Projects/Chapterly`。三次重現。
+- **CWD drift 導致 pre-commit hook 失敗**（2026-06-22）：從 `MonoriCore/` 子目錄跑 `git commit`，pre-commit hook 執行 `./scripts/verify.sh` 找不到檔案（相對路徑基於 CWD）。修：commit 前先 `cd /Users/shane_yeh/Projects/Chapterly`。三次重現。
   📍 出現位置：任何從子目錄執行 `git commit` 的場景
 
 - **`evaluateJavaScript` 診斷排序陷阱**（2026-06-19）：診斷 JS 若排在 `injectionScript()` 之前，拿到的 computed style 是注入前狀態 → 顯示「白底」誤導分析。診斷要排在注入後才能看到 injected CSS 的效果。
@@ -182,8 +182,8 @@ Chapterly 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載�
 - 用 `scrollApplied: Bool` guard 防止重複 scroll：Patreon 自帶 scroll 在 guard 後才執行，無效 → 改用 enforceScrollScript interval
 
 ## 環境 / 依賴
-- XcodeGen：`xcodegen generate` 後需 `xcodebuild -list -project Chapterly.xcodeproj` 驗證
-- 測試 fixture HTML 放 `ChapterlyCore/Tests/ChapterlyCoreTests/Fixtures/`
+- XcodeGen：`xcodegen generate` 後需 `xcodebuild -list -project Monori.xcodeproj` 驗證
+- 測試 fixture HTML 放 `MonoriCore/Tests/MonoriCoreTests/Fixtures/`
 - Smoke test artifacts 寫入 `build/smoke/`
 
 ## 未解決的問題
