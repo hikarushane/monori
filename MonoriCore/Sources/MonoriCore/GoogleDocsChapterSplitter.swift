@@ -122,6 +122,19 @@ public enum GoogleDocsChapterSplitter {
             }
         }
 
+        // 2b. Heading tags at levels step 1 didn't use, whose text is a chapter title.
+        for level in 1...6 {
+            let hPattern = "<h\(level)\\b[^>]*>([\\s\\S]*?)</h\(level)>"
+            guard let hRegex = try? NSRegularExpression(pattern: hPattern, options: .caseInsensitive) else { continue }
+            for m in hRegex.matches(in: body, range: NSRange(location: 0, length: ns.length)) {
+                let rawInner = ns.substring(with: m.range(at: 1))
+                guard let title = chapterTitleParagraph(rawInner) else { continue }
+                boundaries.append(Boundary(start: m.range.location,
+                                           afterEnd: m.range.location + m.range.length,
+                                           title: title))
+            }
+        }
+
         guard boundaries.count >= 2 else { return [] }
 
         // 3. Order by document position; drop overlapping/near-duplicate

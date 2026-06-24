@@ -276,6 +276,22 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
     }
 
+    func testChapterTitleInUnexpectedHeadingLevelDetected() {
+        let html = """
+        <html><body>
+        <p><span>第一章：開始</span></p>
+        <p><span>chapter one body text</span></p>
+        <h6><span>第二章：結束</span></h6>
+        <p><span>chapter two body text</span></p>
+        <p><span>第三章：重生</span></p>
+        <p><span>chapter three body text</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "HL", docTitle: "HL")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章：開始", "第二章：結束", "第三章：重生"])
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
+    }
+
     func testGoogleDocsTabNameNotDetectedAsChapter() {
         let html = """
         <html><body>
