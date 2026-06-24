@@ -1,6 +1,34 @@
 import SwiftUI
 import MonoriCore
 
+// MARK: - Source Icons
+
+/// Patreon brand mark: vertical bar + circle (simplified P shape).
+struct PatreonMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        var path = Path()
+        path.addRoundedRect(
+            in: CGRect(x: w * 0.12, y: h * 0.2, width: w * 0.24, height: h * 0.6),
+            cornerSize: CGSize(width: w * 0.06, height: w * 0.06))
+        path.addEllipse(in: CGRect(x: w * 0.44, y: h * 0.2, width: w * 0.42, height: w * 0.42))
+        return path
+    }
+}
+
+/// Google Drive mark: outlined triangle.
+struct DriveMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        var path = Path()
+        path.move(to: CGPoint(x: w * 0.5, y: h * 0.1))
+        path.addLine(to: CGPoint(x: w * 0.93, y: h * 0.8))
+        path.addLine(to: CGPoint(x: w * 0.07, y: h * 0.8))
+        path.closeSubpath()
+        return path
+    }
+}
+
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
     @State private var activeKind: SourceKind = .patreon
@@ -51,10 +79,14 @@ struct BrowseView: View {
                     activeKind = provider.kind
                     ensureLoaded(provider.kind)
                 } label: {
-                    Label(provider.displayName, systemImage: provider.iconSystemName)
-                        .font(.subheadline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                    HStack(spacing: 6) {
+                        sourceIcon(for: provider.kind)
+                            .frame(width: 16, height: 16)
+                        Text(provider.displayName)
+                            .font(.subheadline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
                 }
                 .buttonStyle(.bordered)
                 .tint(activeKind == provider.kind ? .accentColor : .secondary)
@@ -63,5 +95,15 @@ struct BrowseView: View {
         }
         .padding(.horizontal).padding(.vertical, 6)
         .background(.bar)
+    }
+
+    @ViewBuilder
+    private func sourceIcon(for kind: SourceKind) -> some View {
+        switch kind {
+        case .patreon:
+            PatreonMark().fill(.foreground)
+        case .googleDocs:
+            DriveMark().stroke(.foreground, lineWidth: 1.5)
+        }
     }
 }
