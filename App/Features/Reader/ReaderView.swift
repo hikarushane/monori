@@ -59,10 +59,10 @@ struct ReaderView: View {
                            }
                        })
             .accessibilityIdentifier("smoke.readerWebView")
-            .overlay(alignment: .top) { swipeTopIndicator }
-            .overlay(alignment: .bottom) { swipeBottomIndicator }
             .overlay(alignment: .top) { topChrome }
             .overlay(alignment: .bottom) { bottomChrome }
+            .overlay(alignment: .top) { swipeTopIndicator }
+            .overlay(alignment: .bottom) { swipeBottomIndicator }
             .onAppear { open(current) }
             .onDisappear { foreignTitleTask?.cancel() }
             .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
