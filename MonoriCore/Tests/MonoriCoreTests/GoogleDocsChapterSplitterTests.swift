@@ -276,6 +276,30 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
     }
 
+    func testPairedEnglishChineseTitlesProduceConsistentChapterNames() throws {
+        let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-paired-titles"),
+                                                 docID: "PT", docTitle: "Shaped by Her Hands")
+        XCTAssertEqual(r.chapters.map(\.title), [
+            "第一章：白衣女子",
+            "第二章：上了釉的距離（Glazed Over It）",
+            "第三章：介於陶土與玻璃之間",
+            "第四章：可以回去的地方",
+            "Chapter 5: First Lessons in Clay",
+            "第六章：未了的事",
+            "第七章：超出必要的存在",
+            "第八章：揮之不去的念頭"
+        ])
+        XCTAssertEqual(r.chapters.count, 8)
+        XCTAssertEqual(r.chapters.map(\.orderIndex), Array(0..<8))
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
+        XCTAssertTrue(r.chapters[3].contentHTML.contains("chapter four body"))
+        XCTAssertTrue(r.chapters[5].contentHTML.contains("chapter six body"))
+        XCTAssertFalse(r.chapters[0].title == "Tab 1", "Tab name must not appear as chapter")
+        for ch in r.chapters {
+            XCTAssertFalse(ch.contentHTML.isEmpty, "\(ch.title) should have body content")
+        }
+    }
+
     func testChapterTitleInUnexpectedHeadingLevelDetected() {
         let html = """
         <html><body>

@@ -137,12 +137,34 @@ public enum GoogleDocsChapterSplitter {
 
         guard boundaries.count >= 2 else { return [] }
 
-        // 3. Order by document position; drop overlapping/near-duplicate
-        //    boundaries (e.g. a heading the paragraph scan also caught).
+        // 3. Order by document position; merge overlapping and proximity-paired
+        //    boundaries (e.g. a 26pt English title followed immediately by an
+        //    11pt Chinese translation of the same chapter).
         boundaries.sort { $0.start < $1.start }
         var ordered: [Boundary] = []
         for b in boundaries {
-            if let last = ordered.last, b.start < last.afterEnd { continue }
+            if let lastIdx = ordered.indices.last {
+                let last = ordered[lastIdx]
+                if b.start < last.afterEnd { continue }
+                let gap = ns.substring(with: NSRange(location: last.afterEnd,
+                                                      length: b.start - last.afterEnd))
+                if cleanTitle(gap).isEmpty {
+                    let lastHasCJK = last.title.range(of: #"[\u{4E00}-\u{9FFF}]"#,
+                                                       options: .regularExpression) != nil
+                    let bHasCJK = b.title.range(of: #"[\u{4E00}-\u{9FFF}]"#,
+                                                 options: .regularExpression) != nil
+                    if bHasCJK && !lastHasCJK {
+                        ordered[lastIdx] = Boundary(start: last.start,
+                                                    afterEnd: b.afterEnd,
+                                                    title: b.title)
+                    } else {
+                        ordered[lastIdx] = Boundary(start: last.start,
+                                                    afterEnd: b.afterEnd,
+                                                    title: last.title)
+                    }
+                    continue
+                }
+            }
             ordered.append(b)
         }
         guard ordered.count >= 2 else { return [] }
