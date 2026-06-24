@@ -19,6 +19,13 @@ struct PatreonWebView: UIViewRepresentable {
     /// can pull down to reload. Only BrowseView enables this; ReaderView does
     /// not — pulling in the reader would discard partially-read content.
     var enablePullToRefresh: Bool = false
+    /// Called continuously while the user overscrolls past a page boundary.
+    /// `edge` is `.top` or `.bottom` (nil when the overscroll is released back
+    /// inside bounds). `progress` is in 0…1 where 1 = activation threshold.
+    var onOverscroll: ((Edge?, CGFloat) -> Void)? = nil
+    /// Called once when the user releases after crossing the activation
+    /// threshold (80 pt). The reader uses this to navigate to the adjacent chapter.
+    var onChapterBoundary: ((Edge) -> Void)? = nil
 
     private static let backSwipeName = "monori.backSwipe"
     private static let contentTapName = "monori.contentTap"
@@ -35,6 +42,8 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
+        context.coordinator.onOverscroll = onOverscroll
+        context.coordinator.onChapterBoundary = onChapterBoundary
         // The web view is shared and outlives this representable; re-attach the
         // gestures to the current coordinator so closures never go stale.
         for gesture in webView.gestureRecognizers ?? []
@@ -72,6 +81,7 @@ struct PatreonWebView: UIViewRepresentable {
             tap.delegate = context.coordinator
             webView.addGestureRecognizer(tap)
         }
+        context.coordinator.setupChapterSwipeDetection(webView)
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native makeUIView bounds=\(NSCoder.string(for: webView.bounds), privacy: .public)")
@@ -85,6 +95,8 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
+        context.coordinator.onOverscroll = onOverscroll
+        context.coordinator.onChapterBoundary = onChapterBoundary
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native updateUIView bounds=\(NSCoder.string(for: uiView.bounds), privacy: .public)")
@@ -99,9 +111,66 @@ struct PatreonWebView: UIViewRepresentable {
         var onContentTap: ((Bool) -> Void)?
         var backSwipeOverride: (() -> Void)?
         var allowBackSwipe: (() -> Bool)?
+        var onOverscroll: ((Edge?, CGFloat) -> Void)?
+        var onChapterBoundary: ((Edge) -> Void)?
         /// Retained so handleRefresh can call reload() and observe isLoading.
         var model: WebViewModel?
         private var refreshObservation: NSKeyValueObservation?
+
+        // MARK: - Chapter swipe detection
+        private var scrollObservation: NSKeyValueObservation?
+        private var panObservation: NSKeyValueObservation?
+        private var activeEdge: Edge?
+        private var activatedThreshold = false
+        private let activationThreshold: CGFloat = 80
+
+        func setupChapterSwipeDetection(_ webView: WKWebView) {
+            guard onOverscroll != nil else { return }
+            let scrollView = webView.scrollView
+
+            scrollObservation = scrollView.observe(\.contentOffset, options: [.new]) { [weak self] sv, _ in
+                guard let self else { return }
+                let y = sv.contentOffset.y
+                let maxY = sv.contentSize.height - sv.frame.height
+
+                if y < 0 {
+                    let progress = min(1, -y / self.activationThreshold)
+                    if progress >= 1.0, !self.activatedThreshold {
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                    }
+                    self.activatedThreshold = progress >= 1.0
+                    self.activeEdge = .top
+                    self.onOverscroll?(.top, progress)
+                } else if maxY > 0, y > maxY {
+                    let excess = y - maxY
+                    let progress = min(1, excess / self.activationThreshold)
+                    if progress >= 1.0, !self.activatedThreshold {
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                    }
+                    self.activatedThreshold = progress >= 1.0
+                    self.activeEdge = .bottom
+                    self.onOverscroll?(.bottom, progress)
+                } else if self.activeEdge != nil {
+                    self.activeEdge = nil
+                    self.activatedThreshold = false
+                    self.onOverscroll?(nil, 0)
+                }
+            }
+
+            panObservation = scrollView.panGestureRecognizer.observe(\.state, options: [.new]) { [weak self] pan, _ in
+                guard let self else { return }
+                let ended = pan.state == .ended || pan.state == .cancelled || pan.state == .failed
+                guard ended else { return }
+                if self.activatedThreshold, let edge = self.activeEdge {
+                    self.onChapterBoundary?(edge)
+                }
+                self.activeEdge = nil
+                self.activatedThreshold = false
+                self.onOverscroll?(nil, 0)
+            }
+        }
 
         private static let log = Logger(subsystem: "dev.monori",
                                         category: "smoke-diagnostics")

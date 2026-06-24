@@ -20,6 +20,10 @@ struct ReaderView: View {
     /// True while the web view is showing a stored-HTML chapter (Google Docs import).
     /// Prevents `syncCurrentChapter` from trying to match a URL that was never loaded.
     @State private var renderingStoredHTML = false
+    /// The edge being overscrolled (.top or .bottom), nil when not overscrolling.
+    @State private var swipeEdge: Edge?
+    /// Pull progress in 0…1 toward the chapter-navigation activation threshold.
+    @State private var swipeProgress: CGFloat = 0
 
     init(chapter: LocalChapterModel) {
         _current = State(initialValue: chapter)
@@ -36,8 +40,27 @@ struct ReaderView: View {
     var body: some View {
         PatreonWebView(model: env.reader,
                        onContentTap: handleContentTap(isCenter:),
-                       backSwipeOverride: handleBackSwipe)
+                       backSwipeOverride: handleBackSwipe,
+                       onOverscroll: { edge, progress in
+                           swipeEdge = edge
+                           swipeProgress = progress
+                       },
+                       onChapterBoundary: { edge in
+                           withAnimation(.easeInOut(duration: 0.3)) {
+                               swipeEdge = nil
+                               swipeProgress = 0
+                           }
+                           switch edge {
+                           case .top:
+                               if let prev = neighbors.previous { open(prev) }
+                           case .bottom:
+                               if let next = neighbors.next { open(next) }
+                           default: break
+                           }
+                       })
             .accessibilityIdentifier("smoke.readerWebView")
+            .overlay(alignment: .top) { swipeTopIndicator }
+            .overlay(alignment: .bottom) { swipeBottomIndicator }
             .overlay(alignment: .top) { topChrome }
             .overlay(alignment: .bottom) { bottomChrome }
             .onAppear { open(current) }
@@ -46,6 +69,30 @@ struct ReaderView: View {
             .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
             .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
             .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
+    }
+
+    // MARK: - Chapter swipe indicators
+
+    @ViewBuilder private var swipeTopIndicator: some View {
+        if swipeEdge == Edge.top, let prev = neighbors.previous {
+            ChapterSwipeIndicator(
+                title: ChapterTextFormatter.presentation(storedTitle: prev.title,
+                                                         urlString: prev.urlString).title,
+                edge: Edge.top,
+                progress: swipeProgress)
+                .padding(.top, 60)
+        }
+    }
+
+    @ViewBuilder private var swipeBottomIndicator: some View {
+        if swipeEdge == Edge.bottom, let next = neighbors.next {
+            ChapterSwipeIndicator(
+                title: ChapterTextFormatter.presentation(storedTitle: next.title,
+                                                         urlString: next.urlString).title,
+                edge: Edge.bottom,
+                progress: swipeProgress)
+                .padding(.bottom, 60)
+        }
     }
 
     // MARK: - Chrome
