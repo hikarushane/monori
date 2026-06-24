@@ -5,6 +5,7 @@ DerivedData/
 *.xcodeproj
 *.log
 build/smoke/
+.recall/
 
 # secrets
 .env
