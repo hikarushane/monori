@@ -1,61 +1,47 @@
 # HANDOFF
 
-> 上次 session: 2026-06-22（regex 靜態化重構 + largeFontTitle 測試補充）
+> 上次 session: 2026-06-24（Chapterly → Monori 全域改名 + merge 回 main）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Google Docs import 的 regex 效能重構完成，新測試通過。所有功能性 commit 在 `main`；重構+測試未 commit。
-- 測試/建置狀態：✅ 綠（`cd ChapterlyCore && swift test --filter GoogleDocsChapterSplitterTests` 18/18）
-- 分支 ＠ 最後 commit：`main @ dcc1f76`
-- 工作樹：dirty — `GoogleDocsChapterSplitter.swift`（regex 靜態化）+ `GoogleDocsChapterSplitterTests.swift`（新測試）
+全域改名 Chapterly → Monori 完成並 merge 回 `main`（fast-forward）。
+- 分支 ＠ 最後 commit：`main @ b2a2ca8`（`rename/monori` 已合併並刪除）
+- 測試/建置狀態：✅ 綠（`./scripts/verify.sh` exit 0，build 成功 + 135 tests，0 failures）
+- 工作樹：clean
 
-## ✅ 本次完成（2026-06-22）
-- **regex 靜態化重構**：`largeFontTitle` 的 font-size regex 和 `chapterMarkerCount` 的 marker regex 從每次呼叫 `try?` 編譯改為 `static let fontSizeRegex` / `static let chapterMarkerRegex` 快取（效能優化，功能不變）
-- **`testLargeFontNonTitleTextAcceptedAsChapter`**：驗證大字體非章回格式文字（「重要提醒」「寫在最後」）被 `largeFontTitle` 接受為章節邊界（設計意圖確認測試）
+## ✅ 本次完成（2026-06-24）
+全域改名 Chapterly → Monori（3 commits）：
+- `4aa373c` chore：gitignore `.recall/`
+- `8914d4f` refactor：原子改名 — Swift 模組 `MonoriCore`、app target `Monori`、bundle id `dev.monori.Monori`、`@main MonoriApp`、App `Logger(subsystem:)` → `dev.monori`、5 個 scripts
+- `b2a2ca8` docs：README / CLAUDE.md / AGENTS.md / COMPLIANCE.md / SIMULATOR_PLAYBOOK.md / config.json / .env.example / hook 文字 + SettingsView UI 字串
+
+最終全分支 review：READY TO MERGE（0 Critical / 0 Important）。計畫全文：`docs/superpowers/plans/2026-06-24-rename-chapterly-to-monori.md`。
 
 ## 🔄 進行中
-無。改動完成但未 commit。
+無。
 
 ## 🚧 試過但行不通（避免重踩）
-- **CWD drift 導致 hook 失敗**：從 `ChapterlyCore/` 子目錄跑 `git commit`，pre-commit hook 找不到 `./scripts/verify.sh` → commit 前先 `cd` 回 project root
-- **build database disk I/O error**：`.build/build.db` 損壞 → `swift package clean` 修復
+- **pre-commit hook 強制原子化**：每個 `git commit` 跑完整 `verify.sh`（要能 build）；半改名的樹 build fail。改名類大重構的 build-affecting 部分必須併成一個 commit。`--no-verify` 是 git flag，擋不掉 Claude Code hook。
+- **改名漏抓 Logger subsystem**：Swift `Logger(subsystem: "dev.chapterly")`（App 內 6 處）必須跟 scripts 的 log predicate 一起改成 `dev.monori`，否則 smoke log 收不到。
+- **不要整包 `s/Chapterly/Monori/`**：靠大小寫區分 —— Tier A 是大寫 `Chapterly*` + `dev.chapterly`；Tier B 是小寫 `chapterly*`（跨檔契約，見下）。
+- **CWD drift 導致 hook 失敗**：從子目錄跑 `git commit`，hook 找不到 `./scripts/verify.sh` → commit 前先 `cd` 回 project root。
+- **build database disk I/O error**：`.build/build.db` 損壞 → `swift package clean` 修復。
 
 ## ⚡ 接手要做的事
-1. commit 工作樹中的 2 個改動（`GoogleDocsChapterSplitter.swift` + tests）
-2. 用真實 Google Doc 重新測試 import（手動 Patreon 登入後跑 `./scripts/smoke-diagnostics.sh`）
-3. 全域改名 Chapterly → Monori（見 MEMORY.md 詳細清單）
+1. **使用者手動**（bundle id 已變 `dev.monori.Monori`）：重裝 app → 重登 Patreon → 重 import 一個 collection（SwiftData 容器重置 = 預期，非 bug）。
+2. 用真實 Google Doc 重新測試 import（手動 Patreon 登入後跑 `./scripts/smoke-diagnostics.sh`）—— 此項自前次 session 延續，尚未做。
 
-### 全域改名 Chapterly → Monori（延續）
+## 🔒 Tier B — 改名刻意保留（內部跨檔契約，勿動）
+- 訊息 handler：`chapterlyImport` / `chapterlyCollectionLink` / `chapterlyDrawerDiag` / `chapterly.backSwipe` / `chapterly.contentTap`
+- CSS 變數：`--chapterly-font-size` / `--chapterly-line-height`
+- JS 全域 + class：`window.__chapterly*`、`chapterly-fade` / `chapterly-card-style` / `chapterly-reader-style`
 
-**先決：開新分支**（建議 `rename/monori`）。改 bundle id 會讓 Patreon 登入失效 + 本機書庫資料重置，必須隔離成獨立 PR。
-
-**重點：不要整包 `s/Chapterly/Monori/`**，會打爛 JS↔Swift / CSS 跨檔契約。
-
-#### Tier A — 要改（使用者可見身分 + Swift 模組）
-1. `project.yml`：name/bundleIdPrefix/package/target
-2. 目錄 `git mv`：`ChapterlyCore/` → `MonoriCore/`（含子目錄）
-3. `Package.swift`：name/products/targets
-4. Swift source：`import ChapterlyCore` → `MonoriCore`；`ChapterlyApp` → `MonoriApp`
-5. scripts：`.xcodeproj`/`-scheme`/bundle id/log predicate/DerivedData glob
-6. 文件：README/CLAUDE.md/AGENTS.md 等
-
-#### Tier B — 不要改（內部識別碼，跨檔契約）
-- 訊息 handler：`chapterlyImport`/`chapterlyCollectionLink`
-- CSS 變數：`--chapterly-font-size`/`--chapterly-line-height`
-- JS 全域：`window.__chapterly*`、`chapterly-fade`/`chapterly-card-style`/`chapterly-reader-style`
-
-#### 驗證順序
-1. `xcodegen generate` → `xcodebuild -list -project Monori.xcodeproj`
-2. `./scripts/verify.sh`
-3. 使用者手動：重裝 app → 重登 Patreon → 重新 import collection
+## 📝 刻意留作歷史（仍含舊名 Chapterly）
+`MEMORY.md`、`WIKI_SYNC.md`、`docs/monori_rebrand_report.md`、ADR-0001、`docs/superpowers/2026-06-10-*`（plans/specs）—— 含「Chapterly→Monori」轉場標籤或為當日記錄，blanket sed 會打爛。
 
 ## ⚠️ 注意事項
-- 工作樹有 2 檔未 commit（regex 重構 + 測試，不影響功能）
-- bundle id 一變 → 本機資料重置（無遷移碼），需重 import + 重登 Patreon
-
-## 📁 本次修改的檔案
-- `ChapterlyCore/Sources/ChapterlyCore/GoogleDocsChapterSplitter.swift` — `fontSizeRegex` + `chapterMarkerRegex` 提取為 static let
-- `ChapterlyCore/Tests/ChapterlyCoreTests/GoogleDocsChapterSplitterTests.swift` — 新增 `testLargeFontNonTitleTextAcceptedAsChapter`
+- bundle id 變 → 本機資料重置（無遷移碼、無 App Group、SwiftData 用預設容器），需重 import + 重登 Patreon。
+- `Monori.xcodeproj` 是 gitignored 產生物：改 `project.yml` 後跑 `xcodegen generate` 重生。
 
 ## 🔗 相關資源
 - Standard verification：`./scripts/verify.sh`
