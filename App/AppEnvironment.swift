@@ -65,6 +65,10 @@ final class AppEnvironment {
         wire(browse)
         wire(reader)
         // googleBrowse and refresher wire themselves on first access.
+
+        // Pre-warm the default Patreon URL so it's already loading by the time
+        // BrowseView appears, reducing perceived cold start latency.
+        browse.load(SourceRegistry.patreon.startURL)
     }
 
     func startSmokeToolsIfNeeded() {

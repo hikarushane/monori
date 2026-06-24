@@ -31,11 +31,14 @@ final class WebViewModel: NSObject {
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
 
+    private static let sharedProcessPool = WKProcessPool()
+
     override init() {
         let router = ScriptMessageRouter()
         self.router = router
 
         let config = WKWebViewConfiguration()
+        config.processPool = Self.sharedProcessPool
         config.websiteDataStore = .default()
         config.defaultWebpagePreferences.preferredContentMode = .mobile
 
