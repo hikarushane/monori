@@ -16,14 +16,14 @@ struct WebCollectionBanner: View {
 
     var body: some View {
         banner
-            .alert(env.importedCountThisSession == 0 ? "No chapters found" : "Chapters imported",
+            .alert(env.importedCountThisSession == 0 ? "未找到章節" : "已匯入章節",
                    isPresented: $showImportConfirmation) {
-                Button("OK") {}
+                Button("確定") {}
             } message: {
                 if env.importedCountThisSession == 0 {
-                    Text("No chapter links were found on this page. Make sure the collection page finished loading, then try again. Patreon's markup may also have changed.")
+                    Text("此頁面未找到章節連結。請確認收藏頁面已完全載入後再試一次。Patreon 的頁面結構也可能已變更。")
                 } else {
-                    Text("Imported \(env.importedCountThisSession) chapters. Already-imported chapters are merged, not duplicated.")
+                    Text("已匯入 \(env.importedCountThisSession) 個章節。已匯入的章節會合併，不會重複。")
                 }
             }
     }
@@ -32,7 +32,7 @@ struct WebCollectionBanner: View {
     private var banner: some View {
         if model.isOnGoogleDocPage {
             HStack {
-                Label("Google Doc", systemImage: "doc.richtext")
+                Label("Google 文件", systemImage: "doc.richtext")
                     .font(.subheadline)
                 Spacer()
                 Button {
@@ -45,9 +45,9 @@ struct WebCollectionBanner: View {
                     }
                 } label: {
                     if importing {
-                        HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("Importing…") }
+                        HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("匯入中⋯") }
                     } else {
-                        Text("Import")
+                        Text("匯入")
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -60,7 +60,7 @@ struct WebCollectionBanner: View {
             .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnCollectionPage {
             HStack {
-                Label("Collection page", systemImage: "books.vertical")
+                Label("收藏頁面", systemImage: "books.vertical")
                     .font(.subheadline)
                 Spacer()
                 Button {
@@ -86,10 +86,10 @@ struct WebCollectionBanner: View {
                     if importing {
                         HStack(spacing: 6) {
                             ProgressView().controlSize(.mini)
-                            Text("Importing…")
+                            Text("匯入中⋯")
                         }
                     } else {
-                        Text("Import all chapters")
+                        Text("匯入所有章節")
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -103,11 +103,11 @@ struct WebCollectionBanner: View {
             .accessibilityIdentifier("smoke.collectionBanner")
         } else if let link = model.detectedCollection {
             HStack {
-                Text("Series: \(link.collectionName)")
+                Text("系列：\(link.collectionName)")
                     .font(.subheadline)
                     .lineLimit(1)
                 Spacer()
-                Button("Open collection") {
+                Button("開啟收藏") {
                     if let url = URLNormalizer.normalize(link.collectionURL) {
                         model.load(url)
                     }

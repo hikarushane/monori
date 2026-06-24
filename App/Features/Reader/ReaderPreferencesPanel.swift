@@ -10,24 +10,24 @@ struct ReaderPreferencesPanel: View {
         Grid(horizontalSpacing: 12, verticalSpacing: 12) {
             GridRow {
                 controlButton(disabled: prefs.fontSize <= ReaderPreferences.fontSizeRange.lowerBound,
-                              accessibilityLabel: "Decrease font size",
+                              accessibilityLabel: "縮小字體",
                               action: { prefs.fontSize -= 1 }) {
                     Text("A").font(.system(size: 15))
                 }
                 controlButton(disabled: prefs.fontSize >= ReaderPreferences.fontSizeRange.upperBound,
-                              accessibilityLabel: "Increase font size",
+                              accessibilityLabel: "放大字體",
                               action: { prefs.fontSize += 1 }) {
                     Text("A").font(.system(size: 26))
                 }
             }
             GridRow {
                 controlButton(disabled: prefs.lineSpacing <= ReaderPreferences.lineSpacingRange.lowerBound + 0.001,
-                              accessibilityLabel: "Decrease line spacing",
+                              accessibilityLabel: "縮小行距",
                               action: { prefs.lineSpacing -= ReaderPreferences.lineSpacingStep }) {
                     Image(systemName: "arrow.down.and.line.horizontal.and.arrow.up")
                 }
                 controlButton(disabled: prefs.lineSpacing >= ReaderPreferences.lineSpacingRange.upperBound - 0.001,
-                              accessibilityLabel: "Increase line spacing",
+                              accessibilityLabel: "放大行距",
                               action: { prefs.lineSpacing += ReaderPreferences.lineSpacingStep }) {
                     Image(systemName: "arrow.up.and.line.horizontal.and.arrow.down")
                 }

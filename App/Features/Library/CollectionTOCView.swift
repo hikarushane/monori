@@ -19,23 +19,23 @@ struct CollectionTOCView: View {
 
     private var refreshAlertTitle: String {
         switch refreshOutcome {
-        case .newChapters: return "New chapters imported"
-        case .upToDate: return "Up to date"
-        case .needsLogin: return "Login required"
-        case .failed, nil: return "Could not check"
+        case .newChapters: return "已匯入新章節"
+        case .upToDate: return "已是最新"
+        case .needsLogin: return "需要登入"
+        case .failed, nil: return "無法檢查"
         }
     }
 
     private var refreshAlertMessage: String {
         switch refreshOutcome {
         case .newChapters(let count):
-            return "Imported \(count) new chapter\(count == 1 ? "" : "s")."
+            return "已匯入 \(count) 個新章節。"
         case .upToDate:
-            return "Your library already matches this collection."
+            return "書庫已與此收藏同步。"
         case .needsLogin:
-            return "Patreon asked for login. Open the Browse tab, log in, then try again."
+            return "Patreon 要求登入。請開啟「瀏覽」分頁登入後重試。"
         case .failed, nil:
-            return "Could not load the collection page. Check your connection and try again."
+            return "無法載入收藏頁面。請確認網路連線後重試。"
         }
     }
 
@@ -48,8 +48,8 @@ struct CollectionTOCView: View {
                         readerTarget = ReaderTarget(id: chapter.id)
                     }
                     .swipeActions {
-                        Button("Delete", role: .destructive) { env.store.delete(chapter) }
-                        Button("Rename") {
+                        Button("刪除", role: .destructive) { env.store.delete(chapter) }
+                        Button("重新命名") {
                             renameTarget = chapter
                             renameText = chapter.title
                         }
@@ -75,7 +75,7 @@ struct CollectionTOCView: View {
                             collection.sortDirection =
                                 collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
                         } label: {
-                            Label("Reverse order", systemImage: "arrow.up.arrow.down")
+                            Label("反轉順序", systemImage: "arrow.up.arrow.down")
                         }
                         if collection.sourceKind == .patreon {
                             Button {
@@ -86,14 +86,14 @@ struct CollectionTOCView: View {
                                     showRefreshResult = true
                                 }
                             } label: {
-                                Label("Check for new chapters", systemImage: "arrow.triangle.2.circlepath")
+                                Label("檢查新章節", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .accessibilityIdentifier("smoke.refreshChaptersButton")
                         }
                     } label: {
                         Image(systemName: "ellipsis")
                     }
-                    .accessibilityLabel("Chapter options")
+                    .accessibilityLabel("章節選項")
                 }
             }
         }
@@ -102,18 +102,18 @@ struct CollectionTOCView: View {
                 ReaderView(chapter: chapter)
             }
         }
-        .alert("Rename chapter", isPresented: Binding(
+        .alert("重新命名章節", isPresented: Binding(
             get: { renameTarget != nil },
             set: { if !$0 { renameTarget = nil } })) {
-            TextField("Title", text: $renameText)
-            Button("Save") {
+            TextField("標題", text: $renameText)
+            Button("儲存") {
                 if let t = renameTarget { env.store.rename(t, to: renameText) }
                 renameTarget = nil
             }
-            Button("Cancel", role: .cancel) { renameTarget = nil }
+            Button("取消", role: .cancel) { renameTarget = nil }
         }
         .alert(refreshAlertTitle, isPresented: $showRefreshResult) {
-            Button("OK") {}
+            Button("確定") {}
         } message: {
             Text(refreshAlertMessage)
         }
@@ -121,7 +121,7 @@ struct CollectionTOCView: View {
             if refreshing {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Checking for new chapters… long collections can take a few minutes.")
+                    Text("正在檢查新章節⋯大型收藏可能需要幾分鐘。")
                         .font(.footnote)
                 }
                 .padding(.horizontal, 14)
@@ -157,7 +157,7 @@ struct CollectionTOCView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.borderless)
-                .accessibilityLabel(chapter.isBookmarked ? "Remove bookmark" : "Bookmark this chapter")
+                .accessibilityLabel(chapter.isBookmarked ? "移除書籤" : "加入書籤")
                 .accessibilityIdentifier("smoke.chapterBookmarkButton")
             }
             if let preview = previewText {

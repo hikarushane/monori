@@ -348,7 +348,7 @@ struct ReaderView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Close reader")
+            .accessibilityLabel("關閉閱讀器")
             .accessibilityIdentifier("smoke.readerDismissButton")
             #endif
             if foreignPageTitle == nil {
@@ -361,7 +361,7 @@ struct ReaderView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(current.isBookmarked ? "Remove bookmark" : "Bookmark this chapter")
+                .accessibilityLabel(current.isBookmarked ? "移除書籤" : "加入書籤")
                 .accessibilityIdentifier("smoke.readerBookmarkButton")
             } else {
                 Color.clear.frame(width: 44, height: 44)
@@ -375,7 +375,7 @@ struct ReaderView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Reading options")
+            .accessibilityLabel("閱讀選項")
             .accessibilityIdentifier("smoke.readerPrefsButton")
         }
         // Title is centered to the bar's full width (== screen center / Dynamic

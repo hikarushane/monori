@@ -28,7 +28,7 @@ struct LibraryView: View {
                                                 .font(.subheadline)
                                                 .foregroundStyle(.secondary)
                                         }
-                                        Text("\(collection.chapters.count) chapters")
+                                        Text("\(collection.chapters.count) 章")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                     }
@@ -48,15 +48,15 @@ struct LibraryView: View {
                     }
                 }
             }
-            .navigationTitle("Library")
+            .navigationTitle("書庫")
         }
     }
 
     private var emptyState: some View {
         ContentUnavailableView {
-            Label("No collections yet", systemImage: "books.vertical")
+            Label("尚無收藏", systemImage: "books.vertical")
         } description: {
-            Text("Browse to a Patreon post, open its series page, and tap \u{201c}Import all chapters\u{201d}.")
+            Text("在「瀏覽」分頁開啟 Patreon 文章的系列頁面，然後點選「匯入所有章節」。")
         }
     }
 }

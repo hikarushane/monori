@@ -16,15 +16,15 @@ struct AppRootView: View {
                 selectedTab = newTab
             })) {
             BrowseView()
-                .tabItem { Label("Browse", systemImage: "globe") }
+                .tabItem { Label("瀏覽", systemImage: "globe") }
                 .accessibilityIdentifier("smoke.browseTab")
                 .tag(AppTab.browse)
             LibraryView()
-                .tabItem { Label("Library", systemImage: "books.vertical") }
+                .tabItem { Label("書庫", systemImage: "books.vertical") }
                 .accessibilityIdentifier("smoke.libraryTab")
                 .tag(AppTab.library)
             SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tabItem { Label("設定", systemImage: "gearshape") }
                 .accessibilityIdentifier("smoke.settingsTab")
                 .tag(AppTab.settings)
         }

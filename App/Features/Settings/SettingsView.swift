@@ -10,36 +10,36 @@ struct SettingsView: View {
         @Bindable var prefs = env.prefs
         NavigationStack {
             Form {
-                Section("Reading") {
-                    Stepper("Font size: \(prefs.fontSize)", value: $prefs.fontSize, in: 14...32)
+                Section("閱讀") {
+                    Stepper("字體大小：\(prefs.fontSize)", value: $prefs.fontSize, in: 14...32)
                 }
 
                 Section {
-                    Button("Clear Library Data", role: .destructive) { confirmClearLibrary = true }
+                    Button("清除書庫資料", role: .destructive) { confirmClearLibrary = true }
                         .accessibilityIdentifier("smoke.clearDataButton")
-                    Button("Logout from Patreon", role: .destructive) { confirmLogout = true }
+                    Button("登出 Patreon", role: .destructive) { confirmLogout = true }
                         .accessibilityIdentifier("smoke.logoutButton")
                 } header: {
-                    Text("Data")
+                    Text("資料")
                 } footer: {
-                    Text("Clear Library Data deletes collections, chapters, and bookmarks stored on this device. Logout from Patreon ends the website session in the built-in browser. The two are independent.")
+                    Text("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「登出 Patreon」會結束內建瀏覽器中的 Patreon 連線。兩者互相獨立。")
                 }
 
-                Section("About") {
-                    LabeledContent("Version", value: MonoriCore.version)
-                    Text("Monori is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and bookmarks on this device — never post content. Patreon controls all access to posts.")
+                Section("關於") {
+                    LabeledContent("版本", value: MonoriCore.version)
+                    Text("Monori 是一個純本機的閱讀介面，使用你自己的 Patreon 連線。僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由 Patreon 控制。")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("Settings")
-            .confirmationDialog("Delete all collections, chapters, and bookmarks?",
+            .navigationTitle("設定")
+            .confirmationDialog("刪除所有收藏、章節與書籤？",
                                 isPresented: $confirmClearLibrary, titleVisibility: .visible) {
-                Button("Clear Library Data", role: .destructive) { env.clearLibraryData() }
+                Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
             }
-            .confirmationDialog("End your Patreon session in the built-in browser?",
+            .confirmationDialog("結束內建瀏覽器中的 Patreon 連線？",
                                 isPresented: $confirmLogout, titleVisibility: .visible) {
-                Button("Logout from Patreon", role: .destructive) {
+                Button("登出 Patreon", role: .destructive) {
                     Task { await env.logoutFromPatreon() }
                 }
             }
