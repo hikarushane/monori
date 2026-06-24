@@ -30,6 +30,7 @@ final class WebViewModel: NSObject {
 
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
+    private var spaLoadingTask: Task<Void, Never>?
 
     private static let sharedProcessPool = WKProcessPool()
 
@@ -89,6 +90,23 @@ final class WebViewModel: NSObject {
                     self.currentURL = newURL
                     self.detectedCollection = nil
                     self.runCollectionDetect()
+                    // SPA navigations (e.g. Patreon pushState) don't trigger
+                    // estimatedProgress. Simulate a brief progress flash so the
+                    // loading bar gives visual feedback on in-page link clicks.
+                    if self.loadingProgress >= 1 {
+                        self.spaLoadingTask?.cancel()
+                        self.loadingProgress = 0.2
+                        self.spaLoadingTask = Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(150))
+                            guard !Task.isCancelled else { return }
+                            self.loadingProgress = 0.7
+                            try? await Task.sleep(for: .milliseconds(300))
+                            guard !Task.isCancelled else { return }
+                            if self.loadingProgress <= 0.7 {
+                                self.loadingProgress = 1
+                            }
+                        }
+                    }
                 }
             }
         }
