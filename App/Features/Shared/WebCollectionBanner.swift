@@ -1,8 +1,8 @@
 import SwiftUI
-import ChapterlyCore
+import MonoriCore
 import os
 
-private let bannerLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+private let bannerLog = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
 
 /// Banner shown above a Patreon web view. On a collection page it offers
 /// chapter import; on a post that links to a collection it shows the series

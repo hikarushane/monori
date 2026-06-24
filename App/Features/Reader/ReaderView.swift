@@ -1,6 +1,6 @@
 import SwiftUI
 import WebKit
-import ChapterlyCore
+import MonoriCore
 
 struct ReaderView: View {
     @Environment(AppEnvironment.self) private var env

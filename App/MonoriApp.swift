@@ -1,9 +1,9 @@
 import SwiftUI
 import SwiftData
-import ChapterlyCore
+import MonoriCore
 
 @main
-struct ChapterlyApp: App {
+struct MonoriApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()

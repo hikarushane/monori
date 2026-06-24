@@ -1,5 +1,5 @@
 import XCTest
-import ChapterlyCore
+import MonoriCore
 
 final class ChapterTextFormatterTests: XCTestCase {
     func testShortTitleDisplaysAsTitleOnly() {

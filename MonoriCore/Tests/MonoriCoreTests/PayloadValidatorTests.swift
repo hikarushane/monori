@@ -1,5 +1,5 @@
 import XCTest
-import ChapterlyCore
+import MonoriCore
 
 final class PayloadValidatorTests: XCTestCase {
     private func validImporterBody() -> [String: Any] {

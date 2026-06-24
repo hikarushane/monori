@@ -1,7 +1,7 @@
 #if DEBUG
 import Foundation
 import WebKit
-import ChapterlyCore
+import MonoriCore
 import os
 
 struct AutopilotReaderTarget: Identifiable {
@@ -16,7 +16,7 @@ struct AutopilotReaderTarget: Identifiable {
 /// `[SMOKE] step=...` line per step. Never touches cookies, tokens, or page content.
 @MainActor
 final class SmokeAutopilot {
-    private static let log = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    private static let log = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
 
     private unowned let env: AppEnvironment
     private let stepTimeout: Duration = .seconds(30)

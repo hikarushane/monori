@@ -11,7 +11,7 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 UI_DIR="$PROJECT_DIR/build/smoke/ui"
-BUNDLE_ID="dev.chapterly.Chapterly"
+BUNDLE_ID="dev.monori.Monori"
 
 # pipx installs idb into ~/.local/bin; agent shells are often non-login
 # shells that miss it.

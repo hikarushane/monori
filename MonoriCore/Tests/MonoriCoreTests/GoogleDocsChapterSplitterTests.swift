@@ -1,5 +1,5 @@
 import XCTest
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 final class GoogleDocsChapterSplitterTests: XCTestCase {
     private func fixture(_ name: String) throws -> String {

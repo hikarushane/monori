@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 import SwiftData
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 @MainActor
 final class LibraryStoreTests: XCTestCase {

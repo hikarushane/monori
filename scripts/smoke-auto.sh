@@ -10,13 +10,13 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 SMOKE_DIR="$PROJECT_DIR/build/smoke"
-SCHEME="Chapterly"
-PROJECT="Chapterly.xcodeproj"
-BUNDLE_ID="dev.chapterly.Chapterly"
+SCHEME="Monori"
+PROJECT="Monori.xcodeproj"
+BUNDLE_ID="dev.monori.Monori"
 PHASE1_TIMEOUT=180
 PHASE2_TIMEOUT=90
 EXPECTED_STEPS=8
-LOG_PREDICATE='subsystem == "dev.chapterly" AND category == "smoke-diagnostics"'
+LOG_PREDICATE='subsystem == "dev.monori" AND category == "smoke-diagnostics"'
 
 mkdir -p "$SMOKE_DIR"
 
@@ -64,7 +64,7 @@ fi
 
 APP_PATH="$(xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showBuildSettings \
   -configuration Debug -destination "$DESTINATION" 2>/dev/null \
-  | grep "BUILT_PRODUCTS_DIR" | head -1 | awk '{print $3}')/Chapterly.app"
+  | grep "BUILT_PRODUCTS_DIR" | head -1 | awk '{print $3}')/Monori.app"
 if [ ! -d "$APP_PATH" ]; then
   echo "ERROR: built app not found at $APP_PATH"
   exit 1

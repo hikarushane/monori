@@ -1,5 +1,5 @@
 import SwiftUI
-import ChapterlyCore
+import MonoriCore
 
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env

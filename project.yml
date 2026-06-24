@@ -1,6 +1,6 @@
-name: Chapterly
+name: Monori
 options:
-  bundleIdPrefix: dev.chapterly
+  bundleIdPrefix: dev.monori
   deploymentTarget:
     iOS: "17.0"
 # Set explicitly: xcodegen 2.45.x no longer defaults these, and without them
@@ -20,10 +20,10 @@ settings:
       SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
       GCC_PREPROCESSOR_DEFINITIONS: "DEBUG=1 $(inherited)"
 packages:
-  ChapterlyCore:
-    path: ChapterlyCore
+  MonoriCore:
+    path: MonoriCore
 targets:
-  Chapterly:
+  Monori:
     type: application
     platform: iOS
     sources: [App]
@@ -33,4 +33,4 @@ targets:
         CFBundleDisplayName: Monori
         UILaunchStoryboardName: LaunchScreen
     dependencies:
-      - package: ChapterlyCore
+      - package: MonoriCore

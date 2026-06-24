@@ -1,5 +1,5 @@
 import XCTest
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 final class BackSwipePolicyTests: XCTestCase {
     private func url(_ s: String) -> URL { URL(string: s)! }

@@ -1,6 +1,6 @@
 import SwiftUI
 import SwiftData
-import ChapterlyCore
+import MonoriCore
 
 struct LibraryView: View {
     @Environment(AppEnvironment.self) private var env

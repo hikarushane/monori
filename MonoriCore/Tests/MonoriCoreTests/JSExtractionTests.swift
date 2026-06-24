@@ -1,6 +1,6 @@
 import XCTest
 import WebKit
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 @MainActor
 final class JSExtractionTests: XCTestCase {

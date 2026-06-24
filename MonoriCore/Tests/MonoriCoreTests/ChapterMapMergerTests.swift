@@ -1,5 +1,5 @@
 import XCTest
-import ChapterlyCore
+import MonoriCore
 
 final class ChapterMapMergerTests: XCTestCase {
     private func payload(_ title: String, _ url: String, order: Int,

@@ -1,7 +1,7 @@
 import Foundation
 import WebKit
 import os
-import ChapterlyCore
+import MonoriCore
 
 @MainActor
 @Observable
@@ -213,7 +213,7 @@ private final class MessageShim: NSObject, WKScriptMessageHandler {
 /// DEBUG-only: logs DrawerDiagnostics.js events to os.Logger so smoke runs
 /// capture which page event precedes the Google Drive drawer retract.
 private final class DrawerDiagShim: NSObject, WKScriptMessageHandler {
-    private static let log = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    private static let log = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let d = message.body as? [String: Any] else { return }
         let kind = d["kind"] as? String ?? "?"

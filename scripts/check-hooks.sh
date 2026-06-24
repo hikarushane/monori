@@ -4,7 +4,7 @@
 # The verify.sh PreToolUse hook's `if` gate ("Bash(git commit *)") MUST live
 # INSIDE the hook command object (next to `command`/`timeout`), NOT as a sibling
 # of `matcher`. When `if` sits at the matcher level Claude Code does not
-# recognize it, so verify.sh (full iOS build + ChapterlyCore tests) fires on
+# recognize it, so verify.sh (full iOS build + MonoriCore tests) fires on
 # EVERY Bash command instead of only on `git commit` — an effective lockup.
 #
 # This check fails loudly if that nesting ever regresses. It is run as Step 0 of

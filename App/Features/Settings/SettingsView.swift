@@ -1,5 +1,5 @@
 import SwiftUI
-import ChapterlyCore
+import MonoriCore
 
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
@@ -26,7 +26,7 @@ struct SettingsView: View {
                 }
 
                 Section("About") {
-                    LabeledContent("Version", value: ChapterlyCore.version)
+                    LabeledContent("Version", value: MonoriCore.version)
                     Text("Chapterly is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and bookmarks on this device — never post content. Patreon controls all access to posts.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)

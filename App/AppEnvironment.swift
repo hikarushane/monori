@@ -1,10 +1,10 @@
 import Foundation
 import SwiftUI
 import WebKit
-import ChapterlyCore
+import MonoriCore
 import os
 
-private let smokeLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+private let smokeLog = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
 
 enum CollectionRefreshOutcome: Equatable {
     case newChapters(Int)

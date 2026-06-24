@@ -2,19 +2,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "ChapterlyCore",
+    name: "MonoriCore",
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
-        .library(name: "ChapterlyCore", targets: ["ChapterlyCore"])
+        .library(name: "MonoriCore", targets: ["MonoriCore"])
     ],
     targets: [
         .target(
-            name: "ChapterlyCore",
+            name: "MonoriCore",
             resources: [.process("Assets")]
         ),
         .testTarget(
-            name: "ChapterlyCoreTests",
-            dependencies: ["ChapterlyCore"],
+            name: "MonoriCoreTests",
+            dependencies: ["MonoriCore"],
             resources: [.process("Fixtures")]
         )
     ]

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pure helpers for the debug-only smoke autopilot. Kept in ChapterlyCore so the
+/// Pure helpers for the debug-only smoke autopilot. Kept in MonoriCore so the
 /// log-line format and tolerance logic are unit-testable without a simulator.
 public enum SmokeCheck {
     public static func approximatelyEqual(_ a: Double, _ b: Double, tolerance: Double) -> Bool {

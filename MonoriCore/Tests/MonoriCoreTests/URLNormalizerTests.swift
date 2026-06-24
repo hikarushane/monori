@@ -1,5 +1,5 @@
 import XCTest
-import ChapterlyCore
+import MonoriCore
 
 final class URLNormalizerTests: XCTestCase {
     func testNormalizesHostSchemeAndTrailingSlash() {

@@ -1,5 +1,5 @@
 import SwiftUI
-import ChapterlyCore
+import MonoriCore
 
 struct ReaderTarget: Identifiable {
     let id: String

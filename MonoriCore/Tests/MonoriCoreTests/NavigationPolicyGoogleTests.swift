@@ -1,5 +1,5 @@
 import XCTest
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 final class NavigationPolicyGoogleTests: XCTestCase {
     private func decide(_ s: String) -> NavigationDecision {

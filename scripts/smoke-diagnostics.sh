@@ -5,9 +5,9 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 SMOKE_DIR="$PROJECT_DIR/build/smoke"
-SCHEME="Chapterly"
-PROJECT="Chapterly.xcodeproj"
-BUNDLE_ID="dev.chapterly.Chapterly"
+SCHEME="Monori"
+PROJECT="Monori.xcodeproj"
+BUNDLE_ID="dev.monori.Monori"
 
 mkdir -p "$SMOKE_DIR"
 
@@ -304,12 +304,12 @@ case "$MODE" in
 
     echo ""
     log "--- Install ---"
-    APP_PATH=$(find "$PROJECT_DIR/build" -name "Chapterly.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null | head -1)
+    APP_PATH=$(find "$PROJECT_DIR/build" -name "Monori.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null | head -1)
     if [ -z "$APP_PATH" ]; then
       APP_PATH=$(xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showBuildSettings -configuration Debug \
         -destination "$DESTINATION" 2>/dev/null \
         | grep "BUILT_PRODUCTS_DIR" | head -1 | awk '{print $3}')
-      APP_PATH="$APP_PATH/Chapterly.app"
+      APP_PATH="$APP_PATH/Monori.app"
     fi
 
     if [ ! -d "$APP_PATH" ]; then
@@ -355,7 +355,7 @@ log "Video: $SMOKE_DIR/current-run.mov"
 echo ""
 log "--- Collect app log ---"
 xcrun simctl spawn "$BOOTED_UDID" log show \
-  --predicate 'subsystem == "dev.chapterly" AND category == "smoke-diagnostics"' \
+  --predicate 'subsystem == "dev.monori" AND category == "smoke-diagnostics"' \
   --style compact \
   --last 2m \
   2>/dev/null > "$SMOKE_DIR/app.log" || true

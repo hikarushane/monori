@@ -1,6 +1,6 @@
 import XCTest
 import SwiftData
-@testable import ChapterlyCore
+@testable import MonoriCore
 
 final class ModelMigrationTests: XCTestCase {
     @MainActor

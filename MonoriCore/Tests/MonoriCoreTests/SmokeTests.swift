@@ -1,8 +1,8 @@
 import XCTest
-import ChapterlyCore
+import MonoriCore
 
 final class SmokeTests: XCTestCase {
     func testVersion() {
-        XCTAssertEqual(ChapterlyCore.version, "0.1.0")
+        XCTAssertEqual(MonoriCore.version, "0.1.0")
     }
 }

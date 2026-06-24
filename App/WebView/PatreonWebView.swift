@@ -19,7 +19,7 @@ struct PatreonWebView: UIViewRepresentable {
     private static let backSwipeName = "chapterly.backSwipe"
     private static let contentTapName = "chapterly.contentTap"
     #if DEBUG
-    private static let diagLog = Logger(subsystem: "dev.chapterly", category: "smoke-diagnostics")
+    private static let diagLog = Logger(subsystem: "dev.monori", category: "smoke-diagnostics")
     #endif
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -84,7 +84,7 @@ struct PatreonWebView: UIViewRepresentable {
         var backSwipeOverride: (() -> Void)?
         var allowBackSwipe: (() -> Bool)?
 
-        private static let log = Logger(subsystem: "dev.chapterly",
+        private static let log = Logger(subsystem: "dev.monori",
                                         category: "smoke-diagnostics")
 
         @objc func handleBackSwipe(_ gesture: UIScreenEdgePanGestureRecognizer) {
