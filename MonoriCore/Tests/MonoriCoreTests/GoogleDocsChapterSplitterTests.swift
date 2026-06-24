@@ -275,4 +275,19 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
         XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
     }
+
+    func testGoogleDocsTabNameNotDetectedAsChapter() {
+        let html = """
+        <html><body>
+        <p><span style="font-size:26pt">Tab 1</span></p>
+        <p><span style="font-size:26pt">重要提醒</span></p>
+        <p><span>reminder body content here</span></p>
+        <p><span style="font-size:26pt">寫在最後</span></p>
+        <p><span>afterword body content here</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "TAB", docTitle: "TAB")
+        XCTAssertEqual(r.chapters.map(\.title), ["重要提醒", "寫在最後"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("reminder body"))
+    }
 }

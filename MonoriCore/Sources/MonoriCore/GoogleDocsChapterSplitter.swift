@@ -79,6 +79,10 @@ public enum GoogleDocsChapterSplitter {
         pattern: #"font-size:\s*(\d+(?:\.\d+)?)\s*pt"#,
         options: .caseInsensitive)
 
+    private static let tabNameRegex = try! NSRegularExpression(
+        pattern: #"^Tab\s+\d+$"#,
+        options: .caseInsensitive)
+
     private static let chapterMarkerRegex = try! NSRegularExpression(
         pattern: #"第[0-9０-９一二三四五六七八九十百千兩两〇零]+[章回節节話话篇卷部幕]|特別篇[0-9０-９一二三四五六七八九十〇零]*|番外篇?[0-9０-９一二三四五六七八九十〇零]+|chapter\s+[0-9]+"#,
         options: .caseInsensitive)
@@ -178,6 +182,10 @@ public enum GoogleDocsChapterSplitter {
         if lower.contains("<a ") || lower.contains("<br") { return nil }
         let text = cleanTitle(rawInner)
         guard !text.isEmpty, text.count <= 40 else { return nil }
+        let nsText = text as NSString
+        if tabNameRegex.firstMatch(in: text, range: NSRange(location: 0, length: nsText.length)) != nil {
+            return nil
+        }
         return stripTrailingPunctuation(text)
     }
 
