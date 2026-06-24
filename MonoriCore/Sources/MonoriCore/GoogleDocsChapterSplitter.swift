@@ -154,7 +154,7 @@ public enum GoogleDocsChapterSplitter {
         let lower = rawInner.lowercased()
         if lower.contains("<a ") { return nil }
         let stripped = rawInner.replacingOccurrences(
-            of: "<br\\s*/?>\\s*$", with: "", options: [.regularExpression, .caseInsensitive])
+            of: "<br\\s*/?>\\s*(?:</[^>]+>\\s*)*$", with: "", options: [.regularExpression, .caseInsensitive])
         let strippedLower = stripped.lowercased()
         if strippedLower.contains("<br") { return nil }
         let text = cleanTitle(stripped)
