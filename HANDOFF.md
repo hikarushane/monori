@@ -23,7 +23,7 @@
 ## 🚧 試過但行不通（避免重踩）
 - **pre-commit hook 強制原子化**：每個 `git commit` 跑完整 `verify.sh`（要能 build）；半改名的樹 build fail。改名類大重構的 build-affecting 部分必須併成一個 commit。`--no-verify` 是 git flag，擋不掉 Claude Code hook。
 - **改名漏抓 Logger subsystem**：Swift `Logger(subsystem: "dev.chapterly")`（App 內 6 處）必須跟 scripts 的 log predicate 一起改成 `dev.monori`，否則 smoke log 收不到。
-- **不要整包 `s/Chapterly/Monori/`**：靠大小寫區分 —— Tier A 是大寫 `Chapterly*` + `dev.chapterly`；Tier B 是小寫 `chapterly*`（跨檔契約，見下）。
+- **Tier A+B 全改完**：Tier A 大寫 `Chapterly*` + `dev.chapterly`（8914d4f）；Tier B 小寫 `chapterly*` 內部識別碼（本次）。原本靠大小寫區分保留 Tier B，後決定一併改完。
 - **CWD drift 導致 hook 失敗**：從子目錄跑 `git commit`，hook 找不到 `./scripts/verify.sh` → commit 前先 `cd` 回 project root。
 - **build database disk I/O error**：`.build/build.db` 損壞 → `swift package clean` 修復。
 
@@ -31,10 +31,10 @@
 1. **使用者手動**（bundle id 已變 `dev.monori.Monori`）：重裝 app → 重登 Patreon → 重 import 一個 collection（SwiftData 容器重置 = 預期，非 bug）。
 2. 用真實 Google Doc 重新測試 import（手動 Patreon 登入後跑 `./scripts/smoke-diagnostics.sh`）—— 此項自前次 session 延續，尚未做。
 
-## 🔒 Tier B — 改名刻意保留（內部跨檔契約，勿動）
-- 訊息 handler：`chapterlyImport` / `chapterlyCollectionLink` / `chapterlyDrawerDiag` / `chapterly.backSwipe` / `chapterly.contentTap`
-- CSS 變數：`--chapterly-font-size` / `--chapterly-line-height`
-- JS 全域 + class：`window.__chapterly*`、`chapterly-fade` / `chapterly-card-style` / `chapterly-reader-style`
+## 🔒 Tier B — 已完成改名（內部跨檔契約）
+- 訊息 handler：`monoriImport` / `monoriCollectionLink` / `monoriDrawerDiag` / `monori.backSwipe` / `monori.contentTap`
+- CSS 變數：`--monori-font-size` / `--monori-line-height`
+- JS 全域 + class：`window.__monori*`、`monori-fade` / `monori-card-style` / `monori-reader-style`
 
 ## 📝 刻意留作歷史（仍含舊名 Chapterly）
 `MEMORY.md`、`WIKI_SYNC.md`、`docs/monori_rebrand_report.md`、ADR-0001、`docs/superpowers/2026-06-10-*`（plans/specs）—— 含「Chapterly→Monori」轉場標籤或為當日記錄，blanket sed 會打爛。

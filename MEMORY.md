@@ -63,9 +63,9 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **`URLNormalizer.normalize`** 只支援 Patreon URL → Google Docs URL 回 nil → `fallbackTitle` 為空 → 顯示 "Patreon post"。此問題已由 `stripTrailingPunctuation` 間接修復（不觸發 contamination 路徑）
 
 ### 進度儲存（已廢止 2026-06-12 — 進度功能整個移除，以下僅歷史參考）
-- `ProgressTracker.js` 只在 `__chapterlyUserInteracted === true` 後存 progress
+- `ProgressTracker.js` 只在 `__monoriUserInteracted === true` 後存 progress
 - `touchstart` / `wheel` 事件設 flag
-- `enforceScrollScript` 每次執行先 reset `__chapterlyUserInteracted = false`（此 script 仍在用，只是固定 progress: nil = 頂部）
+- `enforceScrollScript` 每次執行先 reset `__monoriUserInteracted = false`（此 script 仍在用，只是固定 progress: nil = 頂部）
 
 ### 書籤（更新自 2026-06-12）
 - 儲存欄位：`isBookmarked: Bool` on `LocalChapterModel`；切換：`store.toggleBookmark(_:)`
@@ -89,10 +89,10 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - `smoke-diagnostics.sh` 會重新 launch app 並 `log show --last 2m`；若要捕捉人工手勢 log，必須在 launch 後重現，或使用 live log capture。
 
 ### 改名 Chapterly→Monori（2026-06-20 規劃 → 2026-06-24 完成並 merge 回 main）/ 內部識別碼契約
-- **品牌名 = Monori**；模組（`MonoriCore`）/bundle id（`dev.monori.Monori`）/專案名/`CFBundleDisplayName` 全部已改名完成（2026-06-24，commit `8914d4f`..`b2a2ca8`）。下方 Tier A/B 清單保留作為「當時改了什麼 / 哪些刻意不改」的契約參考。
-- **改名分兩層，禁止整包 `s/chapterly/monori/`**：
-  - **Tier A 可見身分（要改）**：`project.yml` name/bundleIdPrefix(`dev.chapterly`→`dev.monori`)/package/target、`ChapterlyCore`→`MonoriCore`（目錄+Package.swift+所有 `import`）、`ChapterlyApp`→`MonoriApp`、scripts 內 `Chapterly.xcodeproj`/`-scheme Chapterly`/`dev.chapterly.Chapterly`/log predicate/`Chapterly-*` DerivedData glob、文件文字。
-  - **Tier B 內部識別碼（不可改，跨檔契約，改了零使用者收益純風險）**：訊息 handler `chapterlyImport`/`chapterlyCollectionLink`（`ScriptMessageRouter.swift` ↔ `CollectionDetect.js`/`CollectionImport.js`/`DrawerDiagnostics.js`）、CSS 變數 `--chapterly-font-size`/`--chapterly-line-height`（`ReaderStyler.swift` ↔ `ReaderRuleset.css`）、`window.__chapterly*`/`chapterly-fade`/`chapterly-card-style`/`chapterly-reader-style`。
+- **品牌名 = Monori**；模組（`MonoriCore`）/bundle id（`dev.monori.Monori`）/專案名/`CFBundleDisplayName` 全部已改名完成（2026-06-24，commit `8914d4f`..`b2a2ca8`）。下方 Tier A/B 清單保留作為「當時改了什麼 / 完整改名」的契約參考。
+- **改名全部完成（Tier A + Tier B）**：
+  - **Tier A 可見身分（已改）**：`project.yml` name/bundleIdPrefix(`dev.chapterly`→`dev.monori`)/package/target、`ChapterlyCore`→`MonoriCore`（目錄+Package.swift+所有 `import`）、`ChapterlyApp`→`MonoriApp`、scripts 內 `Chapterly.xcodeproj`/`-scheme Chapterly`/`dev.chapterly.Chapterly`/log predicate/`Chapterly-*` DerivedData glob、文件文字。
+  - **Tier B 內部識別碼（已改）**：訊息 handler `monoriImport`/`monoriCollectionLink`/`monoriDrawerDiag`/`monori.backSwipe`/`monori.contentTap`（`ScriptMessageRouter.swift` ↔ `CollectionDetect.js`/`CollectionImport.js`/`DrawerDiagnostics.js`）、CSS 變數 `--monori-font-size`/`--monori-line-height`（`ReaderStyler.swift` ↔ `ReaderRuleset.css`）、`window.__monori*`/`monori-fade`/`monori-card-style`/`monori-reader-style`（0ba1978）。
 - **`Monori.xcodeproj` 是 gitignored 產生物**：改名只動 `project.yml` 的 `name:` 再 `xcodegen generate`；腳本內硬寫的才手改。
 - **bundle id 一變 → 本機資料重置**：無 App Group、無具名 UserDefaults suite、SwiftData 用預設容器 → 沒有遷移碼，但書庫 + `reader.fontSize`/`reader.lineSpacing` 會清空，需重 import + 重登 Patreon。
 - **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
@@ -114,7 +114,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 
 - **`Color.clear` 撐高底部列**（2026-06-11）：Prev/Next 按鈕的佔位用 `Color.clear.frame(width: 72)` 沒有加 `height:`，VStack 給它垂直空間 → 底部列在第一/最後章節膨脹至半屏。修：加 `height: 0`。
 
-- **SmokeAutopilot progress_save 失敗**（2026-06-11）：`ProgressTracker.js` 要求 `__chapterlyUserInteracted === true` 才存進度；純 JS scroll 沒觸發 gesture → `stored_progress=nil`。修：scroll 前先 `window.dispatchEvent(new Event('wheel'))`。
+- **SmokeAutopilot progress_save 失敗**（2026-06-11）：`ProgressTracker.js` 要求 `__monoriUserInteracted === true` 才存進度；純 JS scroll 沒觸發 gesture → `stored_progress=nil`。修：scroll 前先 `window.dispatchEvent(new Event('wheel'))`。
 
 - **Cloudflare 人類驗證擋 smoke**（2026-06-11）：smoke-auto `import` 步驟 `no_post_links_found`、頁面 title「請稍候...」、只有 2 個 `<a>` → 截圖證實是 Cloudflare「驗證您是人類」checkbox。非程式問題；只能使用者手動勾。判讀方式：`build/smoke/app.log` 的 Page Links Dump + `simctl io booted screenshot`。
 
