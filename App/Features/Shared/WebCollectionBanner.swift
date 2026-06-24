@@ -89,7 +89,7 @@ struct WebCollectionBanner: View {
                             Text("匯入中⋯")
                         }
                     } else {
-                        Text("匯入所有章節")
+                        Text("匯入")
                     }
                 }
                 .buttonStyle(.borderedProminent)
