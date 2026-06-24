@@ -1,4 +1,4 @@
-Chapterly 關鍵規則（每回合 / 壓縮前重申，防 mid-session drift；完整版見 CLAUDE.md）：
+Monori 關鍵規則（每回合 / 壓縮前重申，防 mid-session drift；完整版見 CLAUDE.md）：
 1. Patreon 登入 / CAPTCHA / Cloudflare / 2FA / email 驗證永遠是手動使用者步驟。絕不自動化、讀取或列印密碼、cookie、token、auth header、session。
 2. 一般 code 改動不重啟 / erase / reset Simulator、不刪 app — 需保留 Patreon 登入狀態。只有明確測試全新安裝才 erase。
 3. 失敗先收 log / screenshot / UI 階層再改 code，不要猜。先定位失敗階段（XcodeGen→build→unit→UI→simulator→runtime→login→smoke）。

@@ -27,7 +27,7 @@ struct SettingsView: View {
 
                 Section("About") {
                     LabeledContent("Version", value: MonoriCore.version)
-                    Text("Chapterly is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and bookmarks on this device — never post content. Patreon controls all access to posts.")
+                    Text("Monori is a local-only reading shell for your own Patreon session. It stores chapter titles, links, and bookmarks on this device — never post content. Patreon controls all access to posts.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

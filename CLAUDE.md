@@ -240,7 +240,7 @@ xcodegen generate
 After regenerating:
 
 ```bash
-xcodebuild -list -project Chapterly.xcodeproj
+xcodebuild -list -project Monori.xcodeproj
 ```
 
 Do not manually edit generated Xcode project files unless there is no other reasonable option.
@@ -538,7 +538,7 @@ Result:
 - verify.sh: passed
 - smoke-diagnostics.sh: failed at XcodeGen
 - Cause: project.yml referenced a missing test folder
-- Fix: created the missing folder and regenerated Chapterly.xcodeproj
+- Fix: created the missing folder and regenerated Monori.xcodeproj
 - Next step: open Xcode and press Cmd + R, or run ./scripts/smoke-diagnostics.sh after manual Patreon login
 ```
 

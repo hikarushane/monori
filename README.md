@@ -1,11 +1,11 @@
-# Chapterly
+# Monori
 
 A calm, local-only reading shell for your own Patreon session. Log into
 patreon.com inside the app, import a series' chapter list from its collection
 page, and read with clean typography, previous/next chapter navigation, and
 bookmarks you can set per chapter.
 
-Chapterly is **not** a Patreon client or API consumer. It never bypasses
+Monori is **not** a Patreon client or API consumer. It never bypasses
 access control, never stores post content, and has no backend. See
 [COMPLIANCE.md](COMPLIANCE.md).
 
@@ -19,18 +19,18 @@ access control, never stores post content, and has no backend. See
 
 ```bash
 git clone <this repo>
-cd Chapterly
+cd Monori
 xcodegen generate
-open Chapterly.xcodeproj
+open Monori.xcodeproj
 ```
 
-Select the Chapterly scheme, set your own signing team (Signing & Capabilities),
+Select the Monori scheme, set your own signing team (Signing & Capabilities),
 and run on a device or simulator.
 
 ## Tests
 
 ```bash
-swift test --package-path ChapterlyCore
+swift test --package-path MonoriCore
 ```
 
 ## Sideloading for non-developers

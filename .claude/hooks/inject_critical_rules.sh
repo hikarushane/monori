@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Re-inject Chapterly's most-violated CLAUDE.md rules so they survive:
+# Re-inject Monori's most-violated CLAUDE.md rules so they survive:
 #   - mid-session attention drift  (registered on UserPromptSubmit: every turn)
 #   - context compaction           (registered on PreCompact: before summarize)
 # Claude Code loads CLAUDE.md natively ONCE at session start; this hook counters

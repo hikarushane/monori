@@ -1,13 +1,13 @@
-# Chapterly Compliance Notes
+# Monori Compliance Notes
 
-## What Chapterly is
+## What Monori is
 
 A local-only iOS reading shell. The user logs into patreon.com inside the app's
 WKWebView with their own account. Patreon serves every page and enforces all
-access control. Chapterly only restyles what Patreon already shows the user and
+access control. Monori only restyles what Patreon already shows the user and
 remembers chapter links and reading position locally.
 
-## What Chapterly never does
+## What Monori never does
 
 - Never reads, copies, or exports session cookies or website data
   (the `WKWebsiteDataStore` is only ever wiped on logout, never enumerated)
@@ -36,13 +36,13 @@ Nothing else.
 ## When access is revoked
 
 Nothing is cached, so a revoked membership simply shows Patreon's own locked
-page inside the webview. Chapterly has no content to keep showing.
+page inside the webview. Monori has no content to keep showing.
 
 ## Remaining risks
 
 - Client-side restyling of a logged-in page is comparable to Safari Reader
   Mode or a content blocker, but Patreon's Terms of Use do not explicitly
-  bless it. Chapterly is distributed as sideloaded, open-source, personal-use
+  bless it. Monori is distributed as sideloaded, open-source, personal-use
   software partly for this reason.
 - Patreon markup changes can break the reader CSS and the collection importer.
   Degradation is graceful (plain Patreon page; manual chapter entry).

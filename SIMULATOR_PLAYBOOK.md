@@ -66,8 +66,8 @@ perform the UI steps manually.
    state resets:
 
    ```bash
-   xcrun simctl terminate booted dev.chapterly.Chapterly || true
-   xcrun simctl launch booted dev.chapterly.Chapterly --smoke-diagnostics
+   xcrun simctl terminate booted dev.monori.Monori || true
+   xcrun simctl launch booted dev.monori.Monori --smoke-diagnostics
    ```
 
    Collect logs later with `./scripts/smoke-diagnostics.sh` (writes
