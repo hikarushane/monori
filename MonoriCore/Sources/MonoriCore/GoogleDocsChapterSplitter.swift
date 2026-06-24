@@ -152,8 +152,12 @@ public enum GoogleDocsChapterSplitter {
     /// one chapter marker.
     private static func chapterTitleParagraph(_ rawInner: String) -> String? {
         let lower = rawInner.lowercased()
-        if lower.contains("<a ") || lower.contains("<br") { return nil }
-        let text = cleanTitle(rawInner)
+        if lower.contains("<a ") { return nil }
+        let stripped = rawInner.replacingOccurrences(
+            of: "<br\\s*/?>\\s*$", with: "", options: [.regularExpression, .caseInsensitive])
+        let strippedLower = stripped.lowercased()
+        if strippedLower.contains("<br") { return nil }
+        let text = cleanTitle(stripped)
         guard !text.isEmpty, text.count <= 40 else { return nil }
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }

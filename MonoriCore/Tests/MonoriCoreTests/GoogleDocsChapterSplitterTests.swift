@@ -260,4 +260,19 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(r.chapters[1].contentHTML.contains("letter body"))
         XCTAssertTrue(r.chapters[2].contentHTML.contains("special episode body"))
     }
+
+    func testTrailingBrInChapterTitleDoesNotReject() {
+        let html = """
+        <html><body>
+        <p><span style="font-weight:700">第一章：白衣女子<br></span></p>
+        <p><span>chapter one body content here</span></p>
+        <p><span style="font-weight:700">第二章：上了釉的距離<br></span></p>
+        <p><span>chapter two body content here</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "BR", docTitle: "BR")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章：白衣女子", "第二章：上了釉的距離"])
+        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
+        XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
+    }
 }
