@@ -3,6 +3,9 @@ import Foundation
 public enum SourceKind: String, Codable, CaseIterable, Sendable {
     case patreon
     case googleDocs
+    case ao3
+    case vocus
+    case asianFanfics
 }
 
 public struct SourceProvider: Identifiable, Sendable {
@@ -29,9 +32,18 @@ public enum SourceRegistry {
         kind: .googleDocs, displayName: "Google Drive", iconSystemName: "doc.richtext",
         startURL: URL(string: "https://drive.google.com")!)
 
+    public static let ao3 = SourceProvider(
+        kind: .ao3, displayName: "AO3", iconSystemName: "book",
+        startURL: URL(string: "https://archiveofourown.org")!)
+
     public static let all: [SourceProvider] = [patreon, googleDrive]
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
-        all.first { $0.kind == kind } ?? patreon
+        switch kind {
+        case .patreon: return patreon
+        case .googleDocs: return googleDrive
+        case .ao3: return ao3
+        case .vocus, .asianFanfics: return patreon  // placeholder until Task 6 wires them
+        }
     }
 }

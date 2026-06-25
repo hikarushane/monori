@@ -41,6 +41,25 @@ struct DriveMark: Shape {
     }
 }
 
+/// AO3 mark: an open book — two angled pages meeting at a center spine.
+struct AO3Mark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        var p = Path()
+        p.move(to: CGPoint(x: w * 0.50, y: h * 0.82))
+        p.addLine(to: CGPoint(x: w * 0.08, y: h * 0.72))
+        p.addLine(to: CGPoint(x: w * 0.08, y: h * 0.18))
+        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.28))
+        p.closeSubpath()
+        p.move(to: CGPoint(x: w * 0.50, y: h * 0.82))
+        p.addLine(to: CGPoint(x: w * 0.92, y: h * 0.72))
+        p.addLine(to: CGPoint(x: w * 0.92, y: h * 0.18))
+        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.28))
+        p.closeSubpath()
+        return p
+    }
+}
+
 /// The shared source icon. One source of truth for the Browse source picker and
 /// the Library collection list, so the two never drift. Renders with the current
 /// foreground style, so callers tint it via `.foregroundStyle(...)`.
@@ -52,6 +71,10 @@ struct SourceGlyph: View {
             PatreonMark().fill(.foreground)
         case .googleDocs:
             DriveMark().stroke(.foreground, lineWidth: 1.5)
+        case .ao3:
+            AO3Mark().stroke(.foreground, lineWidth: 1.5)
+        case .vocus, .asianFanfics:
+            Circle().stroke(.foreground, lineWidth: 1.5)
         }
     }
 }
