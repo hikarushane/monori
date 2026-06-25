@@ -161,8 +161,11 @@ final class WebViewModel: NSObject {
     }
 
     func runCollectionDetect() {
-        guard isOnPostPage else { return }
-        webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
+        if isOnPostPage {
+            webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
+        } else if isOnVocusRoomPage {
+            webView.evaluateJavaScript(JSAssets.vocusRoomDetect, completionHandler: nil)
+        }
     }
 
     /// Fetches the current Google Doc's `/mobilebasic` HTML using the page's
