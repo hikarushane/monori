@@ -80,4 +80,58 @@ public enum URLNormalizer {
     public static func isGoogleDocURL(_ string: String) -> Bool {
         googleDocID(string) != nil
     }
+
+    // MARK: - AO3
+
+    private static func ao3Host(_ string: String) -> String? {
+        guard let url = URL(string: string),
+              let host = url.host?.lowercased(),
+              host == "archiveofourown.org" || host.hasSuffix(".archiveofourown.org")
+        else { return nil }
+        return host
+    }
+
+    public static func ao3WorkID(_ string: String) -> String? {
+        guard ao3Host(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let idx = parts.firstIndex(of: "works"),
+              parts.indices.contains(idx + 1) else { return nil }
+        let id = parts[idx + 1]
+        return !id.isEmpty && id.allSatisfy(\.isNumber) ? id : nil
+    }
+
+    public static func ao3ChapterID(_ string: String) -> String? {
+        guard ao3Host(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let idx = parts.firstIndex(of: "chapters"),
+              parts.indices.contains(idx + 1) else { return nil }
+        let id = parts[idx + 1]
+        return !id.isEmpty && id.allSatisfy(\.isNumber) ? id : nil
+    }
+
+    public static func isAO3WorkURL(_ string: String) -> Bool {
+        ao3WorkID(string) != nil
+    }
+
+    public static func isAO3SeriesURL(_ string: String) -> Bool {
+        guard ao3Host(string) != nil,
+              let url = URL(string: string) else { return false }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let idx = parts.firstIndex(of: "series"),
+              parts.indices.contains(idx + 1) else { return false }
+        return parts[idx + 1].allSatisfy(\.isNumber)
+    }
+
+    public static func canonicalAO3WorkURL(_ string: String) -> String? {
+        guard let id = ao3WorkID(string) else { return nil }
+        return "https://archiveofourown.org/works/\(id)"
+    }
+
+    public static func canonicalAO3ChapterURL(_ string: String) -> String? {
+        guard let workID = ao3WorkID(string),
+              let chapterID = ao3ChapterID(string) else { return nil }
+        return "https://archiveofourown.org/works/\(workID)/chapters/\(chapterID)"
+    }
 }
