@@ -44,7 +44,7 @@
     return null;
   }
 
-  var roomTitle = roomTitleFromTabs() || roomTitleFromPageTitle() || roomSlugFromURL() || 'Vocus Room';
+  var roomTitle = roomTitleFromPageTitle() || salonNameFromHeader() || roomSlugFromURL() || roomTitleFromTabs() || 'Vocus Room';
   var creatorName = salonNameFromHeader();
 
   handler.postMessage({

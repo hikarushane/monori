@@ -55,14 +55,27 @@ var collected = [];
 var authorName = limitField(creatorNameFromPage());
 
 function roomTitleFromPage() {
+  var title = document.title || '';
+  var sep = title.indexOf('｜');
+  if (sep > 0) {
+    var t = title.substring(0, sep).trim();
+    if (t) return t;
+  }
+  var h1 = document.querySelector('h1');
+  if (h1) {
+    var text = compactText(h1.textContent);
+    if (text && text.length < 100) return text;
+  }
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length >= 4 && parts[2] === 'room') {
+    var slug = decodeURIComponent(parts[3]);
+    if (slug) return slug;
+  }
   var tabs = document.querySelectorAll('a[role="tab"][aria-selected="true"], [class*="active"] a[href*="/room/"]');
   for (var i = 0; i < tabs.length; i++) {
     var text = compactText(tabs[i].textContent);
     if (text && text.length < 100) return text;
   }
-  var title = document.title || '';
-  var sep = title.indexOf('｜');
-  if (sep > 0) return title.substring(0, sep).trim();
   return 'Vocus Room';
 }
 
