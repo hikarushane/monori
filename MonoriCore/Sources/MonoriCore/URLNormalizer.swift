@@ -134,4 +134,59 @@ public enum URLNormalizer {
               let chapterID = ao3ChapterID(string) else { return nil }
         return "https://archiveofourown.org/works/\(workID)/chapters/\(chapterID)"
     }
+
+    // MARK: - Vocus
+
+    private static func vocusHost(_ string: String) -> String? {
+        guard let url = URL(string: string),
+              let host = url.host?.lowercased(),
+              host == "vocus.cc" || host.hasSuffix(".vocus.cc")
+        else { return nil }
+        return host
+    }
+
+    private static let hexID = try! Regex("[0-9a-f]{24}")
+
+    public static func vocusSalonID(_ string: String) -> String? {
+        guard vocusHost(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.first == "salon", parts.count >= 2 else { return nil }
+        let id = parts[1]
+        return id.count == 24 && id.wholeMatch(of: hexID) != nil ? id : nil
+    }
+
+    public static func isVocusRoomURL(_ string: String) -> Bool {
+        vocusRoomSlug(string) != nil
+    }
+
+    public static func vocusRoomSlug(_ string: String) -> String? {
+        guard let salonID = vocusSalonID(string),
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        // ["salon", salonID, "room", slug, ...]
+        guard parts.count >= 4,
+              parts[0] == "salon", parts[1] == salonID,
+              parts[2] == "room", !parts[3].isEmpty else { return nil }
+        return parts[3]
+    }
+
+    public static func isVocusArticleURL(_ string: String) -> Bool {
+        vocusArticleID(string) != nil
+    }
+
+    public static func vocusArticleID(_ string: String) -> String? {
+        guard vocusHost(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count >= 2, parts[0] == "article" else { return nil }
+        let id = parts[1]
+        return id.count == 24 && id.wholeMatch(of: hexID) != nil ? id : nil
+    }
+
+    public static func canonicalVocusRoomURL(_ string: String) -> String? {
+        guard let salonID = vocusSalonID(string),
+              let slug = vocusRoomSlug(string) else { return nil }
+        return "https://vocus.cc/salon/\(salonID)/room/\(slug)"
+    }
 }

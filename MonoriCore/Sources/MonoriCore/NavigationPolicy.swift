@@ -22,6 +22,9 @@ public enum NavigationPolicy {
         if host == "archiveofourown.org" || host.hasSuffix(".archiveofourown.org") {
             return .allowInWebView
         }
+        if host == "vocus.cc" || host.hasSuffix(".vocus.cc") {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 
