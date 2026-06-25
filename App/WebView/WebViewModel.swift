@@ -27,6 +27,10 @@ final class WebViewModel: NSObject {
         guard let url = currentURL else { return false }
         return URLNormalizer.isGoogleDocURL(url.absoluteString)
     }
+    var isOnAO3WorkPage: Bool {
+        guard let url = currentURL else { return false }
+        return URLNormalizer.isAO3WorkURL(url.absoluteString)
+    }
 
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
@@ -54,6 +58,9 @@ final class WebViewModel: NSObject {
             injectionTime: .atDocumentStart, forMainFrameOnly: true))
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.cardTreatment,
+            injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        config.userContentController.addUserScript(WKUserScript(
+            source: JSAssets.ao3WorkDetect,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         // Hide Patreon's own top gradient loading bar (web content, not the app's
         // native ProgressView). Injected at document start so the suppressor is
@@ -165,6 +172,27 @@ final class WebViewModel: NSObject {
         """
         let result = try? await webView.callAsyncJavaScript(js, contentWorld: .page)
         return result as? String
+    }
+
+    func fetchAO3NavigatePage() async -> String? {
+        guard let url = currentURL?.absoluteString,
+              let workID = URLNormalizer.ao3WorkID(url) else { return nil }
+        return await fetchAO3Path("/works/\(workID)/navigate")
+    }
+
+    func fetchAO3ChapterPage(path: String) async -> String? {
+        guard path.range(of: #"^/works/\d+/chapters/\d+$"#, options: .regularExpression) != nil
+        else { return nil }
+        return await fetchAO3Path(path)
+    }
+
+    private func fetchAO3Path(_ path: String) async -> String? {
+        let js = """
+        const r = await fetch('\(path)', { credentials: 'include' });
+        if (!r.ok) return null;
+        return await r.text();
+        """
+        return try? await webView.callAsyncJavaScript(js, contentWorld: .page) as? String
     }
 
     /// Expands the lazily-loaded collection list (scrolling until no new post

@@ -36,7 +36,7 @@ public enum SourceRegistry {
         kind: .ao3, displayName: "AO3", iconSystemName: "book",
         startURL: URL(string: "https://archiveofourown.org")!)
 
-    public static let all: [SourceProvider] = [patreon, googleDrive]
+    public static let all: [SourceProvider] = [patreon, googleDrive, ao3]
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
         switch kind {

@@ -28,6 +28,11 @@ final class AppEnvironment {
         if _googleBrowse == nil { let m = WebViewModel(); wire(m); _googleBrowse = m }
         return _googleBrowse!
     }
+    @ObservationIgnored private var _ao3Browse: WebViewModel?
+    var ao3Browse: WebViewModel {
+        if _ao3Browse == nil { let m = WebViewModel(); wire(m); _ao3Browse = m }
+        return _ao3Browse!
+    }
     @ObservationIgnored private var _refresher: WebViewModel?
     /// Offscreen collection re-crawler, built on first refresh.
     var refresher: WebViewModel {
@@ -37,6 +42,8 @@ final class AppEnvironment {
     let prefs = ReaderPreferences()
 
     var importedCountThisSession = 0
+    var ao3ImportCurrent = 0
+    var ao3ImportTotal = 0
     private var didStartSmokeTools = false
     private var smokeDiagnosticsTask: Task<Void, Never>?
 
@@ -164,7 +171,7 @@ final class AppEnvironment {
         model.router.onCollectionLink = { [weak model] payload in
             // Detect runs against whatever DOM the SPA still shows; by the time the
             // message arrives the user may have left the post (e.g. back to home).
-            guard let model, model.isOnPostPage else { return }
+            guard let model, model.isOnPostPage || model.isOnAO3WorkPage else { return }
             model.detectedCollection = payload
         }
     }
@@ -182,6 +189,80 @@ final class AppEnvironment {
         try? store.applyDocImport(imported)
         importedCountThisSession = imported.chapters.count
         return imported.chapters.count
+    }
+
+    /// Imports the AO3 work currently shown in `model` into the library.
+    /// Multi-chapter works are fetched one by one with a 1 s delay.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importAO3Work(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL?.absoluteString,
+              let _ = URLNormalizer.ao3WorkID(url) else { return 0 }
+
+        let detectedTitle = model.detectedCollection?.collectionName
+        let scrapedTitle = try? await model.webView.callAsyncJavaScript(
+            "document.querySelector('h2.title.heading')?.textContent?.trim() ?? null",
+            contentWorld: .page) as? String
+        let workTitle = detectedTitle ?? scrapedTitle ?? "AO3 Work"
+
+        let authorName = try? await model.webView.callAsyncJavaScript(
+            "document.querySelector('a[rel=\"author\"]')?.textContent?.trim() ?? null",
+            contentWorld: .page) as? String
+
+        guard let navigateHTML = await model.fetchAO3NavigatePage() else { return 0 }
+        let entries = AO3ChapterSplitter.parseNavigatePage(html: navigateHTML)
+
+        if entries.isEmpty {
+            let contentJS = "document.querySelector('.userstuff')?.innerHTML ?? null"
+            guard let content = try? await model.webView.callAsyncJavaScript(
+                contentJS, contentWorld: .page) as? String, !content.isEmpty else { return 0 }
+            let canonicalURL = URLNormalizer.canonicalAO3WorkURL(url) ?? url
+            let imported = ImportedCollection(
+                sourceURLString: canonicalURL, title: workTitle, creatorName: authorName,
+                sourceKind: .ao3,
+                chapters: [ImportedChapter(title: workTitle, urlString: canonicalURL,
+                                           orderIndex: 0, contentHTML: content)])
+            try? store.applyDocImport(imported)
+            importedCountThisSession = 1
+            return 1
+        }
+
+        ao3ImportTotal = entries.count
+        ao3ImportCurrent = 0
+        var chapters: [ImportedChapter] = []
+
+        for (index, entry) in entries.enumerated() {
+            ao3ImportCurrent = index + 1
+            guard let chapterHTML = await model.fetchAO3ChapterPage(path: entry.chapterPath)
+            else { continue }
+            guard let content = AO3ChapterSplitter.extractChapterContent(html: chapterHTML)
+            else { continue }
+
+            let chapterURL = URLNormalizer.canonicalAO3ChapterURL(
+                "https://archiveofourown.org\(entry.chapterPath)")
+                ?? "https://archiveofourown.org\(entry.chapterPath)"
+
+            chapters.append(ImportedChapter(
+                title: entry.title, urlString: chapterURL,
+                orderIndex: index, contentHTML: content))
+
+            if index < entries.count - 1 {
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+
+        ao3ImportTotal = 0
+        ao3ImportCurrent = 0
+
+        guard !chapters.isEmpty else { return 0 }
+
+        let canonicalURL = URLNormalizer.canonicalAO3WorkURL(url) ?? url
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL, title: workTitle, creatorName: authorName,
+            sourceKind: .ao3, chapters: chapters)
+        try? store.applyDocImport(imported)
+        importedCountThisSession = chapters.count
+        return chapters.count
     }
 
     /// Loads the collection's source page in the offscreen refresher web view and

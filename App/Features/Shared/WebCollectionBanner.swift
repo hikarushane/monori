@@ -30,7 +30,46 @@ struct WebCollectionBanner: View {
 
     @ViewBuilder
     private var banner: some View {
-        if model.isOnGoogleDocPage {
+        if model.isOnAO3WorkPage {
+            HStack {
+                HStack(spacing: 6) {
+                    SourceGlyph(kind: .ao3).frame(width: 16, height: 16)
+                    Text(model.detectedCollection?.collectionName ?? "AO3 作品")
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Button {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importAO3Work(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+                } label: {
+                    if importing {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.mini)
+                            if env.ao3ImportTotal > 0 {
+                                Text("匯入中 \(env.ao3ImportCurrent)/\(env.ao3ImportTotal)⋯")
+                            } else {
+                                Text("匯入中⋯")
+                            }
+                        }
+                    } else {
+                        Text("匯入")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(importing)
+                .accessibilityIdentifier("smoke.importChaptersButton")
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(.bar)
+            .accessibilityIdentifier("smoke.collectionBanner")
+        } else if model.isOnGoogleDocPage {
             HStack {
                 Label("Google 文件", systemImage: "doc.richtext")
                     .font(.subheadline)

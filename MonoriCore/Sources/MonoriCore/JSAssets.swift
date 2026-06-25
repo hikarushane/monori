@@ -15,4 +15,5 @@ public enum JSAssets {
     public static var cardTreatment: String { script(named: "CardTreatment") }
     public static var drawerDiagnostics: String { script(named: "DrawerDiagnostics") }
     public static var suppressLoadingBar: String { script(named: "SuppressLoadingBar") }
+    public static var ao3WorkDetect: String { script(named: "AO3WorkDetect") }
 }

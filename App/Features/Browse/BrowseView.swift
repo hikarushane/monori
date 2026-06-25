@@ -10,7 +10,11 @@ struct BrowseView: View {
     /// so navigating or back-swiping inside one source can never cross into the
     /// other. `.patreon` -> `env.browse`; `.googleDocs` -> `env.googleBrowse`.
     private var activeModel: WebViewModel {
-        activeKind == .googleDocs ? env.googleBrowse : env.browse
+        switch activeKind {
+        case .googleDocs: return env.googleBrowse
+        case .ao3: return env.ao3Browse
+        default: return env.browse
+        }
     }
 
     var body: some View {
@@ -42,7 +46,12 @@ struct BrowseView: View {
     /// Loads a source's start page the first time it is shown. A source the user
     /// already visited keeps its place (no reload) when switched back to.
     private func ensureLoaded(_ kind: SourceKind) {
-        let model = kind == .googleDocs ? env.googleBrowse : env.browse
+        let model: WebViewModel
+        switch kind {
+        case .googleDocs: model = env.googleBrowse
+        case .ao3: model = env.ao3Browse
+        default: model = env.browse
+        }
         if model.currentURL == nil {
             model.load(SourceRegistry.provider(for: kind).startURL)
         }
