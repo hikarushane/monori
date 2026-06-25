@@ -31,6 +31,10 @@ final class WebViewModel: NSObject {
         guard let url = currentURL else { return false }
         return URLNormalizer.isAO3WorkURL(url.absoluteString)
     }
+    var isOnVocusRoomPage: Bool {
+        guard let url = currentURL else { return false }
+        return URLNormalizer.isVocusRoomURL(url.absoluteString)
+    }
 
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
@@ -61,6 +65,9 @@ final class WebViewModel: NSObject {
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.ao3WorkDetect,
+            injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        config.userContentController.addUserScript(WKUserScript(
+            source: JSAssets.vocusRoomDetect,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         // Hide Patreon's own top gradient loading bar (web content, not the app's
         // native ProgressView). Injected at document start so the suppressor is

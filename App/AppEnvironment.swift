@@ -33,6 +33,11 @@ final class AppEnvironment {
         if _ao3Browse == nil { let m = WebViewModel(); wire(m); _ao3Browse = m }
         return _ao3Browse!
     }
+    @ObservationIgnored private var _vocusBrowse: WebViewModel?
+    var vocusBrowse: WebViewModel {
+        if _vocusBrowse == nil { let m = WebViewModel(); wire(m); _vocusBrowse = m }
+        return _vocusBrowse!
+    }
     @ObservationIgnored private var _refresher: WebViewModel?
     /// Offscreen collection re-crawler, built on first refresh.
     var refresher: WebViewModel {
@@ -171,7 +176,7 @@ final class AppEnvironment {
         model.router.onCollectionLink = { [weak model] payload in
             // Detect runs against whatever DOM the SPA still shows; by the time the
             // message arrives the user may have left the post (e.g. back to home).
-            guard let model, model.isOnPostPage || model.isOnAO3WorkPage else { return }
+            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage else { return }
             model.detectedCollection = payload
         }
     }
@@ -263,6 +268,41 @@ final class AppEnvironment {
         let imported = ImportedCollection(
             sourceURLString: canonicalURL, title: workTitle, creatorName: authorName,
             sourceKind: .ao3, chapters: chapters)
+        try? store.applyDocImport(imported)
+        importedCountThisSession = chapters.count
+        return chapters.count
+    }
+
+    /// Imports the Vocus room currently shown in `model` into the library.
+    /// Calls VocusRoomImport.js via callAsyncJavaScript and persists results
+    /// through applyDocImport with sourceKind .vocus and nil contentHTML.
+    /// Returns the number of articles imported (0 on failure / empty).
+    @discardableResult
+    func importVocusRoom(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL?.absoluteString,
+              URLNormalizer.isVocusRoomURL(url) else { return 0 }
+
+        let roomTitle = model.detectedCollection?.collectionName ?? "Vocus Room"
+        let creatorName = model.detectedCollection?.creatorName
+
+        let result = try? await model.webView.callAsyncJavaScript(
+            JSAssets.vocusRoomImport, contentWorld: .page)
+        guard let articles = result as? [[String: Any]], !articles.isEmpty else { return 0 }
+
+        let canonicalURL = URLNormalizer.canonicalVocusRoomURL(url) ?? url
+        let chapters = articles.enumerated().map { index, dict -> ImportedChapter in
+            ImportedChapter(
+                title: (dict["title"] as? String) ?? "Article",
+                urlString: (dict["url"] as? String) ?? "",
+                orderIndex: (dict["domOrder"] as? Int) ?? index)
+        }
+
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL,
+            title: roomTitle,
+            creatorName: creatorName,
+            sourceKind: .vocus,
+            chapters: chapters)
         try? store.applyDocImport(imported)
         importedCountThisSession = chapters.count
         return chapters.count
