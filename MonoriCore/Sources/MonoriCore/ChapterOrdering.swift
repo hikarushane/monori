@@ -25,6 +25,10 @@ public enum ChapterOrdering {
         if let id = URLNormalizer.patreonPostID(urlString).flatMap(Int.init) {
             return (0, id)
         }
+        if let hex = URLNormalizer.vocusArticleID(urlString),
+           let ts = Int(hex.prefix(8), radix: 16) {
+            return (0, ts)
+        }
         return (1, orderIndex)
     }
 }
