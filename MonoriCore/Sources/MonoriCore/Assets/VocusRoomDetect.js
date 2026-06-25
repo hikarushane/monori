@@ -1,5 +1,5 @@
 (function () {
-  if (location.hostname !== 'vocus.cc') return;
+  if (location.hostname !== 'vocus.cc' && !location.hostname.endsWith('.vocus.cc')) return;
   if (!/\/salon\/[0-9a-f]{24}\/room\//.test(location.pathname)) return;
 
   var articleLinks = document.querySelectorAll('a[href^="/article/"]');
