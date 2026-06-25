@@ -151,9 +151,8 @@ public enum URLNormalizer {
         guard vocusHost(string) != nil,
               let url = URL(string: string) else { return nil }
         let parts = url.path.split(separator: "/").map(String.init)
-        guard parts.first == "salon", parts.count >= 2 else { return nil }
-        let id = parts[1]
-        return id.count == 24 && id.wholeMatch(of: hexID) != nil ? id : nil
+        guard parts.first == "salon", parts.count >= 2, !parts[1].isEmpty else { return nil }
+        return parts[1]
     }
 
     public static func isVocusRoomURL(_ string: String) -> Bool {

@@ -5,20 +5,24 @@ final class URLNormalizerVocusTests: XCTestCase {
 
     // MARK: isVocusRoomURL
 
-    func testRoomURLRecognized() {
+    func testRoomURLWithSlugSalonID() {
+        XCTAssertTrue(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"))
+    }
+
+    func testRoomURLWithHexSalonID() {
         XCTAssertTrue(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"))
     }
 
     func testRoomURLWithCategoryRecognized() {
-        XCTAssertTrue(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass/%E6%96%87%E7%AB%A0"))
+        XCTAssertTrue(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853/%E6%96%87%E7%AB%A0"))
     }
 
     func testSalonHomeNotRoom() {
-        XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a"))
+        XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/Aliens"))
     }
 
     func testSalonAboutNotRoom() {
-        XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/about"))
+        XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/Aliens/about"))
     }
 
     func testArticleURLNotRoom() {
@@ -29,38 +33,40 @@ final class URLNormalizerVocusTests: XCTestCase {
         XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://www.patreon.com/collection/12345"))
     }
 
-    func testRoomURLWithShortSalonIDRejected() {
-        XCTAssertFalse(URLNormalizer.isVocusRoomURL("https://vocus.cc/salon/abc/room/bass"))
-    }
-
     // MARK: vocusRoomSlug
 
     func testExtractsRoomSlug() {
-        XCTAssertEqual(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"), "bass")
+        XCTAssertEqual(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"),
+                       "69c87373694f1e8d97d07853")
     }
 
     func testRoomSlugWithCategory() {
-        XCTAssertEqual(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass/cat"), "bass")
+        XCTAssertEqual(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853/cat"),
+                       "69c87373694f1e8d97d07853")
     }
 
     func testRoomSlugNilForNonRoom() {
-        XCTAssertNil(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/65a4a22bfd89780001e7867a"))
+        XCTAssertNil(URLNormalizer.vocusRoomSlug("https://vocus.cc/salon/Aliens"))
     }
 
     // MARK: vocusSalonID
 
-    func testExtractsSalonIDFromRoom() {
-        XCTAssertEqual(URLNormalizer.vocusSalonID("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"),
-                       "65a4a22bfd89780001e7867a")
+    func testExtractsSlugSalonID() {
+        XCTAssertEqual(URLNormalizer.vocusSalonID("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"),
+                       "Aliens")
     }
 
-    func testExtractsSalonIDFromSalonHome() {
+    func testExtractsHexSalonID() {
         XCTAssertEqual(URLNormalizer.vocusSalonID("https://vocus.cc/salon/65a4a22bfd89780001e7867a"),
                        "65a4a22bfd89780001e7867a")
     }
 
     func testSalonIDNilForArticle() {
         XCTAssertNil(URLNormalizer.vocusSalonID("https://vocus.cc/article/67ca7699fd897800017f312c"))
+    }
+
+    func testSalonIDNilForNonVocus() {
+        XCTAssertNil(URLNormalizer.vocusSalonID("https://www.patreon.com/salon/Aliens"))
     }
 
     // MARK: isVocusArticleURL
@@ -74,7 +80,7 @@ final class URLNormalizerVocusTests: XCTestCase {
     }
 
     func testRoomURLNotArticle() {
-        XCTAssertFalse(URLNormalizer.isVocusArticleURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"))
+        XCTAssertFalse(URLNormalizer.isVocusArticleURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"))
     }
 
     // MARK: vocusArticleID
@@ -85,21 +91,21 @@ final class URLNormalizerVocusTests: XCTestCase {
     }
 
     func testArticleIDNilForNonArticle() {
-        XCTAssertNil(URLNormalizer.vocusArticleID("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"))
+        XCTAssertNil(URLNormalizer.vocusArticleID("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"))
     }
 
     // MARK: canonicalVocusRoomURL
 
     func testCanonicalRoomURL() {
         XCTAssertEqual(
-            URLNormalizer.canonicalVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass/%E6%96%87%E7%AB%A0"),
-            "https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass")
+            URLNormalizer.canonicalVocusRoomURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853/%E6%96%87%E7%AB%A0"),
+            "https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853")
     }
 
     func testCanonicalRoomURLAlreadyCanonical() {
         XCTAssertEqual(
-            URLNormalizer.canonicalVocusRoomURL("https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass"),
-            "https://vocus.cc/salon/65a4a22bfd89780001e7867a/room/bass")
+            URLNormalizer.canonicalVocusRoomURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"),
+            "https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853")
     }
 
     func testCanonicalRoomURLNilForNonRoom() {
