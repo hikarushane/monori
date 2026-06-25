@@ -272,6 +272,7 @@ final class AppEnvironment {
     /// re-runs the chapter import. `applyImport` merges by normalized URL, so
     /// already-imported chapters are untouched and only genuinely new posts land.
     func refreshCollection(_ collection: LocalCollectionModel) async -> CollectionRefreshOutcome {
+        guard collection.sourceKind == .patreon else { return .upToDate }
         guard let url = URL(string: collection.sourceURLString) else { return .failed }
         // An offscreen WKWebView needs a real frame for layout-driven lazy lists.
         if refresher.webView.frame.isEmpty {
