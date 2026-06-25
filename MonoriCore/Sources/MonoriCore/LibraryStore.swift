@@ -140,17 +140,30 @@ public final class LibraryStore {
     }
 
     public func chapter(withPageURL pageURL: String) -> LocalChapterModel? {
-        guard let normalized = URLNormalizer.normalize(pageURL)?.absoluteString else { return nil }
-        var descriptor = FetchDescriptor<LocalChapterModel>(
-            predicate: #Predicate { $0.urlString == normalized })
-        descriptor.fetchLimit = 1
-        if let exact = try? context.fetch(descriptor).first {
-            return exact
+        // 1. Patreon: normalize URL then match
+        if let normalized = URLNormalizer.normalize(pageURL)?.absoluteString {
+            var descriptor = FetchDescriptor<LocalChapterModel>(
+                predicate: #Predicate { $0.urlString == normalized })
+            descriptor.fetchLimit = 1
+            if let exact = try? context.fetch(descriptor).first {
+                return exact
+            }
+            if let postID = URLNormalizer.patreonPostID(pageURL),
+               let chapters = try? context.fetch(FetchDescriptor<LocalChapterModel>())
+            {
+                return chapters.first { URLNormalizer.patreonPostID($0.urlString) == postID }
+            }
         }
-        guard let postID = URLNormalizer.patreonPostID(pageURL),
-              let chapters = try? context.fetch(FetchDescriptor<LocalChapterModel>())
-        else { return nil }
-        return chapters.first { URLNormalizer.patreonPostID($0.urlString) == postID }
+
+        // 2. Vocus: canonicalize article URL then match
+        if let canonical = URLNormalizer.canonicalVocusArticleURL(pageURL) {
+            var descriptor = FetchDescriptor<LocalChapterModel>(
+                predicate: #Predicate { $0.urlString == canonical })
+            descriptor.fetchLimit = 1
+            return try? context.fetch(descriptor).first
+        }
+
+        return nil
     }
 
     // MARK: edits

@@ -194,4 +194,38 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertLessThan(chapter.title.utf8.count, PayloadValidator.maxFieldLength + 1)
         XCTAssertLessThan(chapter.urlString.utf8.count, PayloadValidator.maxURLLength + 1)
     }
+
+    func testChapterWithVocusArticleURL() throws {
+        let store = try LibraryStore.inMemory()
+        let imported = ImportedCollection(
+            sourceURLString: "https://vocus.cc/salon/TestSalon/room/aabbccdd11223344aabbccdd",
+            title: "Test Room",
+            creatorName: "Author",
+            sourceKind: .vocus,
+            chapters: [
+                ImportedChapter(title: "First Article",
+                                urlString: "https://vocus.cc/article/67ca7699fd897800017f312c",
+                                orderIndex: 0),
+                ImportedChapter(title: "Second Article",
+                                urlString: "https://vocus.cc/article/67ca7699fd897800017f312d",
+                                orderIndex: 1)
+            ])
+        try store.applyDocImport(imported)
+
+        // Exact URL match
+        let found = store.chapter(withPageURL: "https://vocus.cc/article/67ca7699fd897800017f312c")
+        XCTAssertEqual(found?.title, "First Article")
+
+        // With query params (web view may add tracking)
+        let withQuery = store.chapter(withPageURL: "https://vocus.cc/article/67ca7699fd897800017f312c?from=salon")
+        XCTAssertEqual(withQuery?.title, "First Article")
+
+        // Non-existent article
+        let missing = store.chapter(withPageURL: "https://vocus.cc/article/000000000000000000000000")
+        XCTAssertNil(missing)
+
+        // Patreon URL still returns nil (no Vocus match)
+        let patreon = store.chapter(withPageURL: "https://www.patreon.com/posts/12345")
+        XCTAssertNil(patreon)
+    }
 }

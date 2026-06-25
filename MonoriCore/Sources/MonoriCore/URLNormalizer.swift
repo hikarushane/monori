@@ -188,4 +188,9 @@ public enum URLNormalizer {
               let slug = vocusRoomSlug(string) else { return nil }
         return "https://vocus.cc/salon/\(salonID)/room/\(slug)"
     }
+
+    public static func canonicalVocusArticleURL(_ string: String) -> String? {
+        guard let id = vocusArticleID(string) else { return nil }
+        return "https://vocus.cc/article/\(id)"
+    }
 }

@@ -111,4 +111,26 @@ final class URLNormalizerVocusTests: XCTestCase {
     func testCanonicalRoomURLNilForNonRoom() {
         XCTAssertNil(URLNormalizer.canonicalVocusRoomURL("https://vocus.cc/article/67ca7699fd897800017f312c"))
     }
+
+    // MARK: canonicalVocusArticleURL
+
+    func testCanonicalArticleURL() {
+        XCTAssertEqual(
+            URLNormalizer.canonicalVocusArticleURL("https://vocus.cc/article/67ca7699fd897800017f312c"),
+            "https://vocus.cc/article/67ca7699fd897800017f312c")
+    }
+
+    func testCanonicalArticleURLStripsQuery() {
+        XCTAssertEqual(
+            URLNormalizer.canonicalVocusArticleURL("https://vocus.cc/article/67ca7699fd897800017f312c?from=salon"),
+            "https://vocus.cc/article/67ca7699fd897800017f312c")
+    }
+
+    func testCanonicalArticleURLNilForRoom() {
+        XCTAssertNil(URLNormalizer.canonicalVocusArticleURL("https://vocus.cc/salon/Aliens/room/69c87373694f1e8d97d07853"))
+    }
+
+    func testCanonicalArticleURLNilForPatreon() {
+        XCTAssertNil(URLNormalizer.canonicalVocusArticleURL("https://www.patreon.com/posts/12345"))
+    }
 }
