@@ -81,7 +81,7 @@ public final class LibraryStore {
             let c = LocalCollectionModel(title: imported.title,
                                          sourceURLString: imported.sourceURLString,
                                          creatorName: imported.creatorName,
-                                         sourceKind: .googleDocs)
+                                         sourceKind: imported.sourceKind)
             context.insert(c)
             collection = c
         }

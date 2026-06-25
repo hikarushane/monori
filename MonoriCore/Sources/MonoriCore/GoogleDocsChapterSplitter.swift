@@ -18,12 +18,15 @@ public struct ImportedCollection: Equatable, Sendable {
     public let sourceURLString: String
     public let title: String
     public let creatorName: String?
+    public let sourceKind: SourceKind
     public let chapters: [ImportedChapter]
 
-    public init(sourceURLString: String, title: String, creatorName: String?, chapters: [ImportedChapter]) {
+    public init(sourceURLString: String, title: String, creatorName: String?,
+                sourceKind: SourceKind = .googleDocs, chapters: [ImportedChapter]) {
         self.sourceURLString = sourceURLString
         self.title = title
         self.creatorName = creatorName
+        self.sourceKind = sourceKind
         self.chapters = chapters
     }
 }

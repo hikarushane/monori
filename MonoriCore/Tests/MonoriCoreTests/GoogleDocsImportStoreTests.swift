@@ -40,4 +40,24 @@ final class GoogleDocsImportStoreTests: XCTestCase {
         try store.applyDocImport(imported(["第一章", "第二章"]))
         XCTAssertEqual(try store.collections()[0].chapters.count, 2)
     }
+
+    func testAO3ImportCreatesAO3Collection() throws {
+        let store = try LibraryStore.inMemory()
+        let imported = ImportedCollection(
+            sourceURLString: "https://archiveofourown.org/works/12345",
+            title: "Test Work",
+            creatorName: "Author",
+            sourceKind: .ao3,
+            chapters: [
+                ImportedChapter(title: "Chapter 1", urlString: "https://archiveofourown.org/works/12345/chapters/100001",
+                                orderIndex: 0, contentHTML: "<p>Content</p>")
+            ]
+        )
+        try store.applyDocImport(imported)
+        let cols = try store.collections()
+        XCTAssertEqual(cols.count, 1)
+        XCTAssertEqual(cols[0].sourceKind, .ao3)
+        XCTAssertEqual(cols[0].chapters.count, 1)
+        XCTAssertTrue(cols[0].chapters[0].contentHTML != nil)
+    }
 }
