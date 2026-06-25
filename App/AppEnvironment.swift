@@ -199,6 +199,9 @@ final class AppEnvironment {
         guard let url = model.currentURL?.absoluteString,
               let _ = URLNormalizer.ao3WorkID(url) else { return 0 }
 
+        ao3ImportTotal = 0
+        ao3ImportCurrent = 0
+
         let detectedTitle = model.detectedCollection?.collectionName
         let scrapedTitle = try? await model.webView.callAsyncJavaScript(
             "document.querySelector('h2.title.heading')?.textContent?.trim() ?? null",
