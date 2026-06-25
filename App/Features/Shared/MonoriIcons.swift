@@ -60,6 +60,22 @@ struct AO3Mark: Shape {
     }
 }
 
+/// Vocus (方格子) mark: a 2×2 grid of rounded squares.
+struct VocusMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        let gap = w * 0.08
+        let cell = (w - gap) / 2
+        let r = CGSize(width: cell * 0.22, height: cell * 0.22)
+        var p = Path()
+        p.addRoundedRect(in: CGRect(x: 0, y: 0, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: cell + gap, y: 0, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: 0, y: cell + gap, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: cell + gap, y: cell + gap, width: cell, height: cell), cornerSize: r)
+        return p
+    }
+}
+
 /// The shared source icon. One source of truth for the Browse source picker and
 /// the Library collection list, so the two never drift. Renders with the current
 /// foreground style, so callers tint it via `.foregroundStyle(...)`.
@@ -73,7 +89,9 @@ struct SourceGlyph: View {
             DriveMark().stroke(.foreground, lineWidth: 1.5)
         case .ao3:
             AO3Mark().stroke(.foreground, lineWidth: 1.5)
-        case .vocus, .asianFanfics:
+        case .vocus:
+            VocusMark().fill(.foreground)
+        case .asianFanfics:
             Circle().stroke(.foreground, lineWidth: 1.5)
         }
     }

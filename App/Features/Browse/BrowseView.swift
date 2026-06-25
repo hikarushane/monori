@@ -13,6 +13,7 @@ struct BrowseView: View {
         switch activeKind {
         case .googleDocs: return env.googleBrowse
         case .ao3: return env.ao3Browse
+        case .vocus: return env.vocusBrowse
         default: return env.browse
         }
     }
@@ -50,6 +51,7 @@ struct BrowseView: View {
         switch kind {
         case .googleDocs: model = env.googleBrowse
         case .ao3: model = env.ao3Browse
+        case .vocus: model = env.vocusBrowse
         default: model = env.browse
         }
         if model.currentURL == nil {
