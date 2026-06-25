@@ -4,9 +4,9 @@ public struct ImportedChapter: Equatable, Sendable {
     public let title: String
     public let urlString: String
     public let orderIndex: Int
-    public let contentHTML: String
+    public let contentHTML: String?
 
-    public init(title: String, urlString: String, orderIndex: Int, contentHTML: String) {
+    public init(title: String, urlString: String, orderIndex: Int, contentHTML: String? = nil) {
         self.title = title
         self.urlString = urlString
         self.orderIndex = orderIndex

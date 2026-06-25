@@ -2,9 +2,16 @@ import XCTest
 @testable import MonoriCore
 
 final class SourceKindTests: XCTestCase {
-    func testRegistryHasPatreonAndGoogleDrive() {
+    func testRegistryHasAllSources() {
         let kinds = SourceRegistry.all.map(\.kind)
-        XCTAssertEqual(kinds, [.patreon, .googleDocs])
+        XCTAssertEqual(kinds, [.patreon, .googleDocs, .ao3, .vocus])
+    }
+
+    func testVocusProviderLookup() {
+        let provider = SourceRegistry.provider(for: .vocus)
+        XCTAssertEqual(provider.kind, .vocus)
+        XCTAssertEqual(provider.displayName, "Vocus")
+        XCTAssertEqual(provider.startURL.host, "vocus.cc")
     }
 
     func testProvidersHaveStartURLsAndIcons() {

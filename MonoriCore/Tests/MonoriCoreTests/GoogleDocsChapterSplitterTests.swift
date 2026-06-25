@@ -11,8 +11,8 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         let result = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-33chapter"),
                                                      docID: "ABC", docTitle: "Undone by Time")
         XCTAssertEqual(result.chapters.map(\.title), ["第一章：A", "第二章：B", "第三章：C"])
-        XCTAssertTrue(result.chapters[0].contentHTML.contains("body a1"))
-        XCTAssertFalse(result.chapters[0].contentHTML.contains("第二章"))
+        XCTAssertTrue(result.chapters[0].contentHTML?.contains("body a1") ?? false)
+        XCTAssertFalse(result.chapters[0].contentHTML?.contains("第二章") ?? true)
         XCTAssertEqual(result.sourceURLString, "https://docs.google.com/document/d/ABC")
     }
 
@@ -34,7 +34,7 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
                                                 docID: "D3", docTitle: "煙火")
         XCTAssertEqual(r.chapters.count, 1)
         XCTAssertEqual(r.chapters[0].title, "煙火")
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("line 1"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("line 1") ?? false)
     }
 
     func testStripsScriptStyleAndInlineHandlers() {
@@ -45,7 +45,7 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         </body></html>
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "S", docTitle: "S")
-        let joined = r.chapters.map(\.contentHTML).joined()
+        let joined = r.chapters.compactMap(\.contentHTML).joined()
         XCTAssertFalse(joined.localizedCaseInsensitiveContains("<script"))
         XCTAssertFalse(joined.localizedCaseInsensitiveContains("<style"))
         XCTAssertFalse(joined.localizedCaseInsensitiveContains("onclick"))
@@ -77,9 +77,9 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         let r = GoogleDocsChapterSplitter.split(html: try fixture("gdoc-mixed-headings"),
                                                 docID: "MIX", docTitle: "Mixed")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第二章", "第三章 🔥", "第四章"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha one body"))
-        XCTAssertFalse(r.chapters[0].contentHTML.contains("第二章"))
-        XCTAssertFalse(r.chapters[0].contentHTML.contains("beta two body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("alpha one body") ?? false)
+        XCTAssertFalse(r.chapters[0].contentHTML?.contains("第二章") ?? true)
+        XCTAssertFalse(r.chapters[0].contentHTML?.contains("beta two body") ?? true)
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3])
     }
 
@@ -93,8 +93,8 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "MK", docTitle: "MK")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章 開始", "第二章 歡迎回家", "第三章 盛大開幕"])
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("beta body"))
-        XCTAssertFalse(r.chapters[1].contentHTML.contains("第三章"))
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("beta body") ?? false)
+        XCTAssertFalse(r.chapters[1].contentHTML?.contains("第三章") ?? true)
     }
 
     func testTOCGridAndDuplicateTitlesProduceOrderedNonEmptyChapters() {
@@ -116,8 +116,8 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.title),
                        ["第一章 甲", "第二章 乙", "第三章 丙", "第四章 丁", "第五章 戊"])
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha body"))
-        XCTAssertFalse(r.chapters[0].contentHTML.contains("第二章"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("alpha body") ?? false)
+        XCTAssertFalse(r.chapters[0].contentHTML?.contains("第二章") ?? true)
     }
 
     func testDuplicateTitleKeepsRichestOccurrence() {
@@ -130,7 +130,7 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "DUP", docTitle: "DUP")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章 甲", "第二章 乙"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("longer first chapter"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("longer first chapter") ?? false)
     }
 
     func testTOCParagraphWithLineBreaksIsNotSplitIntoChapters() {
@@ -167,10 +167,10 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
                        ["第一章 一些新的東西開始", "第二章 不是小女孩", "第三章 唯一的希望",
                         "第四章 盛大開幕", "第五章 歡迎回家"])
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("alpha body one"))
-        XCTAssertTrue(r.chapters[4].contentHTML.contains("epsilon body five"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("alpha body one") ?? false)
+        XCTAssertTrue(r.chapters[4].contentHTML?.contains("epsilon body five") ?? false)
         for chapter in r.chapters {
-            XCTAssertFalse(chapter.contentHTML.contains("第三十五"),
+            XCTAssertFalse(chapter.contentHTML?.contains("第三十五") ?? false,
                            "no chapter should leak another chapter's title")
         }
     }
@@ -213,17 +213,17 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
             "特別篇二 趕上"
         ])
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2, 3, 4, 5, 6])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("ch49 body"))
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("author letter body"))
-        XCTAssertTrue(r.chapters[2].contentHTML.contains("special ep1 intro"))
-        XCTAssertTrue(r.chapters[3].contentHTML.contains("act1 body"))
-        XCTAssertTrue(r.chapters[6].contentHTML.contains("special ep2 body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("ch49 body") ?? false)
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("author letter body") ?? false)
+        XCTAssertTrue(r.chapters[2].contentHTML?.contains("special ep1 intro") ?? false)
+        XCTAssertTrue(r.chapters[3].contentHTML?.contains("act1 body") ?? false)
+        XCTAssertTrue(r.chapters[6].contentHTML?.contains("special ep2 body") ?? false)
         // 幕 titles have trailing 。 stripped
         XCTAssertFalse(r.chapters[3].title.hasSuffix("。"))
         XCTAssertFalse(r.chapters[4].title.hasSuffix("。"))
         // No TOC table entries leaked as chapters
         for ch in r.chapters {
-            XCTAssertFalse(ch.contentHTML.isEmpty, "\(ch.title) should have body content")
+            XCTAssertFalse((ch.contentHTML?.isEmpty ?? true), "\(ch.title) should have body content")
         }
     }
 
@@ -238,8 +238,8 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "NTL", docTitle: "NTL")
         XCTAssertEqual(r.chapters.map(\.title), ["重要提醒", "寫在最後"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("reminder body"))
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("afterword body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("reminder body") ?? false)
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("afterword body") ?? false)
     }
 
     func testLargeFontParagraphsDetectedAsChapters() {
@@ -256,9 +256,9 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "LF", docTitle: "LF")
         XCTAssertEqual(r.chapters.map(\.title),
                        ["第一章 開始", "作者的信", "特別篇一 模仿遊戲"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("letter body"))
-        XCTAssertTrue(r.chapters[2].contentHTML.contains("special episode body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("chapter one body") ?? false)
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("letter body") ?? false)
+        XCTAssertTrue(r.chapters[2].contentHTML?.contains("special episode body") ?? false)
     }
 
     func testTrailingBrInChapterTitleDoesNotReject() {
@@ -272,8 +272,8 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "BR", docTitle: "BR")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章：白衣女子", "第二章：上了釉的距離"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("chapter one body") ?? false)
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("chapter two body") ?? false)
     }
 
     func testPairedEnglishChineseTitlesProduceConsistentChapterNames() throws {
@@ -291,12 +291,12 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         ])
         XCTAssertEqual(r.chapters.count, 8)
         XCTAssertEqual(r.chapters.map(\.orderIndex), Array(0..<8))
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("chapter one body"))
-        XCTAssertTrue(r.chapters[3].contentHTML.contains("chapter four body"))
-        XCTAssertTrue(r.chapters[5].contentHTML.contains("chapter six body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("chapter one body") ?? false)
+        XCTAssertTrue(r.chapters[3].contentHTML?.contains("chapter four body") ?? false)
+        XCTAssertTrue(r.chapters[5].contentHTML?.contains("chapter six body") ?? false)
         XCTAssertFalse(r.chapters[0].title == "Tab 1", "Tab name must not appear as chapter")
         for ch in r.chapters {
-            XCTAssertFalse(ch.contentHTML.isEmpty, "\(ch.title) should have body content")
+            XCTAssertFalse((ch.contentHTML?.isEmpty ?? true), "\(ch.title) should have body content")
         }
     }
 
@@ -313,7 +313,7 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "HL", docTitle: "HL")
         XCTAssertEqual(r.chapters.map(\.title), ["第一章：開始", "第二章：結束", "第三章：重生"])
-        XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("chapter two body") ?? false)
     }
 
     func testLongEnglishChapterTitleNotDropped() {
@@ -364,6 +364,6 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         """
         let r = GoogleDocsChapterSplitter.split(html: html, docID: "TAB", docTitle: "TAB")
         XCTAssertEqual(r.chapters.map(\.title), ["重要提醒", "寫在最後"])
-        XCTAssertTrue(r.chapters[0].contentHTML.contains("reminder body"))
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("reminder body") ?? false)
     }
 }

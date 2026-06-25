@@ -28,11 +28,12 @@ public enum PayloadValidator {
     }
 
     public static func validateCollectionLink(_ body: Any) -> Result<CollectionLinkPayload, PayloadError> {
-        return checked(body, required: ["collectionName", "collectionURL"], optional: []).flatMap { dict in
+        return checked(body, required: ["collectionName", "collectionURL"], optional: ["creatorName"]).flatMap { dict in
             do {
                 return .success(CollectionLinkPayload(
                     collectionName: try string(dict, "collectionName", max: maxFieldLength),
-                    collectionURL: try string(dict, "collectionURL", max: maxURLLength)))
+                    collectionURL: try string(dict, "collectionURL", max: maxURLLength),
+                    creatorName: try optionalString(dict, "creatorName", max: maxFieldLength)))
             } catch let e as PayloadError { return .failure(e) } catch { return .failure(.notADictionary) }
         }
     }

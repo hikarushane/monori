@@ -36,14 +36,19 @@ public enum SourceRegistry {
         kind: .ao3, displayName: "AO3", iconSystemName: "book",
         startURL: URL(string: "https://archiveofourown.org")!)
 
-    public static let all: [SourceProvider] = [patreon, googleDrive, ao3]
+    public static let vocus = SourceProvider(
+        kind: .vocus, displayName: "Vocus", iconSystemName: "square.grid.2x2",
+        startURL: URL(string: "https://vocus.cc")!)
+
+    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus]
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
         switch kind {
         case .patreon: return patreon
         case .googleDocs: return googleDrive
         case .ao3: return ao3
-        case .vocus, .asianFanfics: return patreon  // placeholder until Task 6 wires them
+        case .vocus: return vocus
+        case .asianFanfics: return patreon
         }
     }
 }

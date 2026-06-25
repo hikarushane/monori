@@ -28,10 +28,12 @@ public struct ImporterChapterPayload: Equatable {
 public struct CollectionLinkPayload: Equatable {
     public let collectionName: String
     public let collectionURL: String
+    public let creatorName: String?
 
-    public init(collectionName: String, collectionURL: String) {
+    public init(collectionName: String, collectionURL: String, creatorName: String? = nil) {
         self.collectionName = collectionName
         self.collectionURL = collectionURL
+        self.creatorName = creatorName
     }
 }
 
