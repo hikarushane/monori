@@ -197,9 +197,9 @@ public enum GoogleDocsChapterSplitter {
         let beforeBr = rawInner.replacingOccurrences(
             of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
         let text = cleanTitle(beforeBr)
-        let hasCJK = text.range(of: #"[\u{4E00}-\u{9FFF}]"#, options: .regularExpression) != nil
-        let maxLen = hasCJK ? 60 : 40
-        guard !text.isEmpty, text.count <= maxLen else { return nil }
+        // ^-anchored pattern + markerCount≤1 + no-<a> are the real guards;
+        // 120 is a safety net, not a filter.
+        guard !text.isEmpty, text.count <= 120 else { return nil }
         guard text.range(of: chapterTitlePattern,
                          options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
         return stripTrailingPunctuation(text)
@@ -219,11 +219,13 @@ public enum GoogleDocsChapterSplitter {
         let beforeBr = rawInner.replacingOccurrences(
             of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
         let text = cleanTitle(beforeBr)
-        guard !text.isEmpty, text.count <= 60 else { return nil }
+        guard !text.isEmpty else { return nil }
         let nsText = text as NSString
         if tabNameRegex.firstMatch(in: text, range: NSRange(location: 0, length: nsText.length)) != nil {
             return nil
         }
+        // REMOVED: Old length check was: guard !text.isEmpty, text.count <= 60 else { return nil }
+        // Font-size >= 18pt is sufficient structural signal; no length check needed.
         return stripTrailingPunctuation(text)
     }
 

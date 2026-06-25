@@ -316,6 +316,42 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(r.chapters[1].contentHTML.contains("chapter two body"))
     }
 
+    func testLongEnglishChapterTitleNotDropped() {
+        let html = """
+        <html><body>
+        <p><span>第一章：白衣女子</span></p>
+        <p><span>chapter one body</span></p>
+        <p class="title"><span style="font-size:26pt">Chapter 64: Back to the Place Where It All Began</span></p>
+        <p><span>Chapter 64：Back to the Place Where It All Began<br>＊兩星期後＊</span></p>
+        <p><span>chapter sixty-four body</span></p>
+        <p><span>第六十五章：屬於我們</span></p>
+        <p><span>chapter sixty-five body</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "C64", docTitle: "T")
+        let titles = r.chapters.map(\.title)
+        XCTAssertTrue(titles.contains("第一章：白衣女子"), "ch1 missing")
+        XCTAssertTrue(titles.contains { $0.contains("Chapter 64") || $0.contains("64") },
+                      "Chapter 64 missing! Got: \(titles)")
+        XCTAssertTrue(titles.contains("第六十五章：屬於我們"), "ch65 missing")
+    }
+
+    func testLargeFontLongTitleNotDropped() {
+        // Test that large-font (18pt+) titles > 60 chars are accepted.
+        // Before the fix, the old code rejected any > 60 chars with: guard !text.isEmpty, text.count <= 60
+        let html = """
+        <html><body>
+        <p><span style="font-size:26pt">A Very Long Title That Is Definitely Much Longer Than Sixty Characters And Should Be Accepted</span></p>
+        <p><span>first body</span></p>
+        <p><span style="font-size:26pt">Another Extraordinarily Long Title Text That Also Exceeds Sixty Characters By Quite A Lot Here</span></p>
+        <p><span>second body</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "LF", docTitle: "T")
+        XCTAssertEqual(r.chapters.count, 2)
+        XCTAssertTrue(r.chapters.map(\.title).count == 2)
+    }
+
     func testGoogleDocsTabNameNotDetectedAsChapter() {
         let html = """
         <html><body>
