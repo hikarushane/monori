@@ -225,7 +225,12 @@ struct ReaderView: View {
             let staleTitles: Set<String> = [current.title, currentTitle]
             let slugTitle = ChapterTextFormatter.presentation(storedTitle: "",
                                                               urlString: url.absoluteString).title
-            foreignPageTitle = slugTitle.isEmpty ? "Patreon post" : slugTitle
+            let fallback: String = {
+                let s = url.absoluteString
+                if URLNormalizer.isVocusHost(s) { return "Vocus" }
+                return "Patreon post"
+            }()
+            foreignPageTitle = slugTitle.isEmpty ? fallback : slugTitle
             applyReaderTreatment()
             pollForeignTitle(rejecting: staleTitles)
         }

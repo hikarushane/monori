@@ -145,6 +145,10 @@ public enum URLNormalizer {
         return host
     }
 
+    public static func isVocusHost(_ string: String) -> Bool {
+        vocusHost(string) != nil
+    }
+
     private static let hexID = try! Regex("[0-9a-f]{24}")
 
     public static func vocusSalonID(_ string: String) -> String? {

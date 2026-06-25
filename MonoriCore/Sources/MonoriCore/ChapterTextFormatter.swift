@@ -29,7 +29,11 @@ public enum ChapterTextFormatter {
             title = firstLine
             previewSource = lines.dropFirst().joined(separator: "\n")
         } else {
-            title = !fallback.isEmpty ? fallback : "Patreon post"
+            let sourceLabel: String = {
+                if URLNormalizer.isVocusHost(urlString) { return "Vocus" }
+                return "Patreon post"
+            }()
+            title = !fallback.isEmpty ? fallback : sourceLabel
             previewSource = cleaned
         }
 

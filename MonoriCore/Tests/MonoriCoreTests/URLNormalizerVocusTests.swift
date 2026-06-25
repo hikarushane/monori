@@ -133,4 +133,18 @@ final class URLNormalizerVocusTests: XCTestCase {
     func testCanonicalArticleURLNilForPatreon() {
         XCTAssertNil(URLNormalizer.canonicalVocusArticleURL("https://www.patreon.com/posts/12345"))
     }
+
+    // MARK: isVocusHost
+
+    func testVocusHostRecognized() {
+        XCTAssertTrue(URLNormalizer.isVocusHost("https://vocus.cc/article/67ca7699fd897800017f312c"))
+    }
+
+    func testVocusSubdomainRecognized() {
+        XCTAssertTrue(URLNormalizer.isVocusHost("https://cdn.vocus.cc/images/foo.jpg"))
+    }
+
+    func testPatreonNotVocusHost() {
+        XCTAssertFalse(URLNormalizer.isVocusHost("https://www.patreon.com/posts/12345"))
+    }
 }
