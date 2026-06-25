@@ -19,6 +19,9 @@ public enum NavigationPolicy {
         if isGoogleDomain(host) {
             return .allowInWebView
         }
+        if host == "archiveofourown.org" || host.hasSuffix(".archiveofourown.org") {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 
