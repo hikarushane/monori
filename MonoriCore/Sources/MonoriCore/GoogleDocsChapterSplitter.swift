@@ -219,7 +219,7 @@ public enum GoogleDocsChapterSplitter {
         let beforeBr = rawInner.replacingOccurrences(
             of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
         let text = cleanTitle(beforeBr)
-        guard !text.isEmpty, text.count <= 40 else { return nil }
+        guard !text.isEmpty, text.count <= 60 else { return nil }
         let nsText = text as NSString
         if tabNameRegex.firstMatch(in: text, range: NSRange(location: 0, length: nsText.length)) != nil {
             return nil
