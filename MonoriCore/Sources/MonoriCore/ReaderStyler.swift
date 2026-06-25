@@ -29,6 +29,32 @@ public enum ReaderStyler {
         """
     }
 
+    public static func vocusRuleset() -> String {
+        guard let url = Bundle.module.url(forResource: "VocusReaderRuleset", withExtension: "css"),
+              let css = try? String(contentsOf: url, encoding: .utf8) else {
+            assertionFailure("Missing VocusReaderRuleset.css")
+            return ""
+        }
+        return css
+    }
+
+    public static func vocusInjectionScript() -> String {
+        let css = vocusRuleset()
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "${", with: "\\${")
+        return """
+        (function () {
+          var old = document.getElementById("\(styleElementID)");
+          if (old) { old.remove(); }
+          var style = document.createElement("style");
+          style.id = "\(styleElementID)";
+          style.textContent = `\(css)`;
+          document.documentElement.appendChild(style);
+        })();
+        """
+    }
+
     public static func removalScript() -> String {
         """
         (function () {

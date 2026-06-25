@@ -261,22 +261,20 @@ struct ReaderView: View {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
         if foreignPageTitle == nil {
-            // Skip the Patreon reader ruleset for stored-HTML chapters: ReaderRuleset.css
-            // has a dark-mode body background (#1c1b19 !important) designed for Patreon's
-            // page chrome, which overrides wrappedDocument's white background and creates
-            // a gray veil on Google Docs chapters in dark mode.
             if !renderingStoredHTML {
-                webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+                let sourceKind = current.collection?.sourceKind ?? .patreon
+                switch sourceKind {
+                case .vocus:
+                    webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript(), completionHandler: nil)
+                default:
+                    webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+                }
             }
             applyTypography()
             repairCurrentTitleIfNeeded(webView)
         } else {
-            // The ruleset is post-page specific: on creator/collection pages it
-            // hides the chrome and squeezes the feed, so strip it there.
             webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
         }
-        // Every page opens at the top; the enforcer also defeats Patreon's own
-        // auto-scroll on freshly loaded pages.
         webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: nil),
                                    completionHandler: nil)
     }
