@@ -87,6 +87,9 @@ public enum ReaderStyler {
             line-height: var(--monori-line-height) !important;
           }
           img { max-width: 100%; height: auto; }
+          blockquote { border-left: 3px solid rgba(128,128,128,0.3);
+                       margin: 1em 0; padding: 0.5em 1em; }
+          hr { border: none; border-top: 1px solid rgba(128,128,128,0.3); margin: 2em 0; }
         </style></head><body>\(inner)</body></html>
         """
     }
