@@ -104,6 +104,41 @@ struct WebCollectionBanner: View {
             .padding(.horizontal).padding(.vertical, 8)
             .background(.bar)
             .accessibilityIdentifier("smoke.collectionBanner")
+        } else if model.isOnAFFForewordPage {
+            HStack {
+                HStack(spacing: 6) {
+                    SourceGlyph(kind: .asianFanfics).frame(width: 16, height: 16)
+                    Text(model.detectedCollection?.collectionName ?? "AFF 故事")
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Button {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importAFFStory(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+                } label: {
+                    if importing {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.mini)
+                            Text("匯入中⋯")
+                        }
+                    } else {
+                        Text("匯入")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(importing)
+                .accessibilityIdentifier("smoke.importChaptersButton")
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(.bar)
+            .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnGoogleDocPage {
             HStack {
                 Label("Google 文件", systemImage: "doc.richtext")
