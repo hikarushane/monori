@@ -38,6 +38,11 @@ final class AppEnvironment {
         if _vocusBrowse == nil { let m = WebViewModel(); wire(m); _vocusBrowse = m }
         return _vocusBrowse!
     }
+    @ObservationIgnored private var _affBrowse: WebViewModel?
+    var affBrowse: WebViewModel {
+        if _affBrowse == nil { let m = WebViewModel(); wire(m); _affBrowse = m }
+        return _affBrowse!
+    }
     @ObservationIgnored private var _refresher: WebViewModel?
     /// Offscreen collection re-crawler, built on first refresh.
     var refresher: WebViewModel {
@@ -176,7 +181,7 @@ final class AppEnvironment {
         model.router.onCollectionLink = { [weak model] payload in
             // Detect runs against whatever DOM the SPA still shows; by the time the
             // message arrives the user may have left the post (e.g. back to home).
-            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage else { return }
+            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage else { return }
             model.detectedCollection = payload
         }
     }
@@ -306,6 +311,39 @@ final class AppEnvironment {
         try? store.applyDocImport(imported)
         importedCountThisSession = chapters.count
         return chapters.count
+    }
+
+    /// Imports the AsianFanfics story currently shown in `model` into the library.
+    /// Calls AFFStoryImport.js via callAsyncJavaScript and persists results
+    /// through applyDocImport with sourceKind .asianFanfics.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importAFFStory(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL?.absoluteString,
+              URLNormalizer.isAFFForewordURL(url) else { return 0 }
+
+        let storyTitle = model.detectedCollection?.collectionName ?? "AFF Story"
+        let creatorName = model.detectedCollection?.creatorName
+
+        let result = try? await model.webView.callAsyncJavaScript(
+            JSAssets.affStoryImport, contentWorld: .page)
+        guard let chapters = result as? [[String: Any]], !chapters.isEmpty else { return 0 }
+
+        let canonicalURL = URLNormalizer.canonicalAFFStoryURL(url) ?? url
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL,
+            title: storyTitle,
+            creatorName: creatorName,
+            sourceKind: .asianFanfics,
+            chapters: chapters.enumerated().map { index, dict -> ImportedChapter in
+                ImportedChapter(
+                    title: (dict["title"] as? String) ?? "Chapter",
+                    urlString: (dict["url"] as? String) ?? "",
+                    orderIndex: (dict["domOrder"] as? Int) ?? index)
+            })
+        try? store.applyDocImport(imported)
+        importedCountThisSession = imported.chapters.count
+        return imported.chapters.count
     }
 
     /// Loads the collection's source page in the offscreen refresher web view and
