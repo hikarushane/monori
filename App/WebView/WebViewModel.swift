@@ -35,6 +35,10 @@ final class WebViewModel: NSObject {
         guard let url = currentURL else { return false }
         return URLNormalizer.isVocusRoomURL(url.absoluteString)
     }
+    var isOnAFFForewordPage: Bool {
+        guard let url = currentURL else { return false }
+        return URLNormalizer.isAFFForewordURL(url.absoluteString)
+    }
 
     private var urlObservation: NSKeyValueObservation?
     private var progressObservation: NSKeyValueObservation?
@@ -68,6 +72,9 @@ final class WebViewModel: NSObject {
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         config.userContentController.addUserScript(WKUserScript(
             source: JSAssets.vocusRoomDetect,
+            injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        config.userContentController.addUserScript(WKUserScript(
+            source: JSAssets.affStoryDetect,
             injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         // Hide Patreon's own top gradient loading bar (web content, not the app's
         // native ProgressView). Injected at document start so the suppressor is
@@ -165,6 +172,8 @@ final class WebViewModel: NSObject {
             webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
         } else if isOnVocusRoomPage {
             webView.evaluateJavaScript(JSAssets.vocusRoomDetect, completionHandler: nil)
+        } else if isOnAFFForewordPage {
+            webView.evaluateJavaScript(JSAssets.affStoryDetect, completionHandler: nil)
         }
     }
 
