@@ -44,8 +44,16 @@
     return null;
   }
 
+  function creatorNameFromURL() {
+    var parts = location.pathname.split('/').filter(Boolean);
+    if (parts.length >= 2 && parts[0] === 'salon') {
+      return decodeURIComponent(parts[1]);
+    }
+    return null;
+  }
+
   var roomTitle = roomTitleFromPageTitle() || salonNameFromHeader() || roomSlugFromURL() || roomTitleFromTabs() || 'Vocus Room';
-  var creatorName = salonNameFromHeader();
+  var creatorName = creatorNameFromURL() || salonNameFromHeader();
 
   handler.postMessage({
     collectionName: roomTitle,

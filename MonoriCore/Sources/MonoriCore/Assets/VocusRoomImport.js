@@ -38,6 +38,10 @@ function excerptNear(anchor) {
 }
 
 function creatorNameFromPage() {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length >= 2 && parts[0] === 'salon') {
+    return decodeURIComponent(parts[1]);
+  }
   var h1 = document.querySelector('h1');
   if (h1) {
     var text = compactText(h1.textContent);
