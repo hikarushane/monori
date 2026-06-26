@@ -4,6 +4,7 @@ import MonoriCore
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
     @State private var activeKind: SourceKind = .patreon
+    @State private var isPickerExpanded = false
 
     /// The web view shown for the selected source. Each source owns a distinct
     /// WebViewModel -- and thus a distinct WKWebView and back/forward history --
@@ -60,27 +61,60 @@ struct BrowseView: View {
     }
 
     private var sourcePicker: some View {
-        HStack(spacing: 8) {
-            ForEach(SourceRegistry.all) { provider in
-                Button {
-                    activeKind = provider.kind
-                    ensureLoaded(provider.kind)
-                } label: {
-                    HStack(spacing: 6) {
-                        SourceGlyph(kind: provider.kind)
-                            .frame(width: 16, height: 16)
-                        Text(provider.displayName)
-                            .font(.subheadline)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+        VStack(spacing: 0) {
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    isPickerExpanded.toggle()
                 }
-                .buttonStyle(.bordered)
-                .tint(activeKind == provider.kind ? .accentColor : .secondary)
-                .accessibilityIdentifier("smoke.sourceEntry.\(provider.kind.rawValue)")
+            } label: {
+                HStack {
+                    SourceGlyph(kind: activeKind)
+                        .frame(width: 20, height: 20)
+                    Text(SourceRegistry.provider(for: activeKind).displayName)
+                        .font(.subheadline.weight(.medium))
+                    Spacer()
+                    DropdownChevron()
+                        .stroke(.secondary, style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                        .frame(width: 12, height: 12)
+                        .rotationEffect(.degrees(isPickerExpanded ? 180 : 0))
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("smoke.sourcePicker")
+
+            if isPickerExpanded {
+                ForEach(SourceRegistry.all.filter { $0.kind != activeKind }) { provider in
+                    Divider().padding(.horizontal, 16)
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                            activeKind = provider.kind
+                            ensureLoaded(provider.kind)
+                            isPickerExpanded = false
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            SourceGlyph(kind: provider.kind)
+                                .frame(width: 18, height: 18)
+                            Text(provider.displayName)
+                                .font(.subheadline)
+                            Spacer()
+                        }
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .accessibilityIdentifier("smoke.sourceEntry.\(provider.kind.rawValue)")
+                }
             }
         }
-        .padding(.horizontal).padding(.vertical, 6)
+        .clipped()
         .background(.bar)
     }
 }

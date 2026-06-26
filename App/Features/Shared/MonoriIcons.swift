@@ -97,6 +97,21 @@ struct SourceGlyph: View {
     }
 }
 
+// MARK: UI chrome marks
+
+/// Dropdown indicator: a small outlined downward-pointing triangle.
+struct DropdownChevron: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        var p = Path()
+        p.move(to: CGPoint(x: w * 0.1, y: h * 0.2))
+        p.addLine(to: CGPoint(x: w * 0.5, y: h * 0.8))
+        p.addLine(to: CGPoint(x: w * 0.9, y: h * 0.2))
+        p.closeSubpath()
+        return p
+    }
+}
+
 // MARK: Bottom-navigator marks
 
 /// Browse: a globe — outer circle, a meridian ellipse, and an equator hairline.
