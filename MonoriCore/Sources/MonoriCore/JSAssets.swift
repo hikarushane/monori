@@ -18,4 +18,6 @@ public enum JSAssets {
     public static var ao3WorkDetect: String { script(named: "AO3WorkDetect") }
     public static var vocusRoomDetect: String { script(named: "VocusRoomDetect") }
     public static var vocusRoomImport: String { script(named: "VocusRoomImport") }
+    public static var affStoryDetect: String { script(named: "AFFStoryDetect") }
+    public static var affStoryImport: String { script(named: "AFFStoryImport") }
 }
