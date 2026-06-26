@@ -271,6 +271,8 @@ struct ReaderView: View {
                 switch sourceKind {
                 case .vocus:
                     webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript(), completionHandler: nil)
+                case .asianFanfics:
+                    webView.evaluateJavaScript(ReaderStyler.affInjectionScript(), completionHandler: nil)
                 default:
                     webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
                 }
