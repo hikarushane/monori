@@ -25,6 +25,9 @@ public enum NavigationPolicy {
         if host == "vocus.cc" || host.hasSuffix(".vocus.cc") {
             return .allowInWebView
         }
+        if host == "asianfanfics.com" || host.hasSuffix(".asianfanfics.com") {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 
