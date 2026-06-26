@@ -40,7 +40,13 @@ public enum SourceRegistry {
         kind: .vocus, displayName: "Vocus", iconSystemName: "square.grid.2x2",
         startURL: URL(string: "https://vocus.cc")!)
 
-    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus]
+    public static let asianFanfics = SourceProvider(
+        kind: .asianFanfics,
+        displayName: "AsianFanfics",
+        iconSystemName: "book.pages",
+        startURL: URL(string: "https://www.asianfanfics.com")!)
+
+    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus, asianFanfics]
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
         switch kind {
@@ -48,7 +54,7 @@ public enum SourceRegistry {
         case .googleDocs: return googleDrive
         case .ao3: return ao3
         case .vocus: return vocus
-        case .asianFanfics: return patreon
+        case .asianFanfics: return asianFanfics
         }
     }
 }

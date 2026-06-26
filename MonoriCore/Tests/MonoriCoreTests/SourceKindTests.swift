@@ -4,7 +4,7 @@ import XCTest
 final class SourceKindTests: XCTestCase {
     func testRegistryHasAllSources() {
         let kinds = SourceRegistry.all.map(\.kind)
-        XCTAssertEqual(kinds, [.patreon, .googleDocs, .ao3, .vocus])
+        XCTAssertEqual(kinds, [.patreon, .googleDocs, .ao3, .vocus, .asianFanfics])
     }
 
     func testVocusProviderLookup() {
@@ -56,5 +56,12 @@ final class SourceKindTests: XCTestCase {
         XCTAssertEqual(provider.kind, .ao3)
         XCTAssertEqual(provider.displayName, "AO3")
         XCTAssertEqual(provider.startURL.host, "archiveofourown.org")
+    }
+
+    func testAFFProviderLookup() {
+        let provider = SourceRegistry.provider(for: .asianFanfics)
+        XCTAssertEqual(provider.kind, .asianFanfics)
+        XCTAssertEqual(provider.displayName, "AsianFanfics")
+        XCTAssertEqual(provider.startURL.host, "www.asianfanfics.com")
     }
 }
