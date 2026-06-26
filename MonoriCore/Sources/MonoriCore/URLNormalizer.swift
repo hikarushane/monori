@@ -197,4 +197,47 @@ public enum URLNormalizer {
         guard let id = vocusArticleID(string) else { return nil }
         return "https://vocus.cc/article/\(id)"
     }
+
+    // MARK: - AsianFanfics
+
+    private static func affHost(_ string: String) -> String? {
+        guard let url = URL(string: string),
+              let host = url.host?.lowercased(),
+              host == "asianfanfics.com" || host == "www.asianfanfics.com"
+        else { return nil }
+        return host
+    }
+
+    public static func affStoryID(_ string: String) -> String? {
+        guard affHost(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count >= 3,
+              parts[0] == "story", parts[1] == "view",
+              !parts[2].isEmpty, parts[2].allSatisfy(\.isNumber)
+        else { return nil }
+        return parts[2]
+    }
+
+    public static func isAFFStoryURL(_ string: String) -> Bool {
+        affStoryID(string) != nil
+    }
+
+    public static func isAFFForewordURL(_ string: String) -> Bool {
+        guard affHost(string) != nil,
+              let url = URL(string: string) else { return false }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count >= 3,
+              parts[0] == "story", parts[1] == "view",
+              parts[2].allSatisfy(\.isNumber)
+        else { return false }
+        if parts.count == 3 { return true }
+        if parts.count == 4 && !parts[3].allSatisfy(\.isNumber) { return true }
+        return false
+    }
+
+    public static func canonicalAFFStoryURL(_ string: String) -> String? {
+        guard let id = affStoryID(string) else { return nil }
+        return "https://www.asianfanfics.com/story/view/\(id)"
+    }
 }
