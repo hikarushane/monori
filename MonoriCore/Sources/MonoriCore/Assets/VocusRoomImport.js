@@ -38,6 +38,18 @@ function excerptNear(anchor) {
 }
 
 function creatorNameFromPage() {
+  try {
+    var sd = window.__NEXT_DATA__.props.pageProps.salonData;
+    if (sd) {
+      if (sd.owner && sd.owner.fullname) return sd.owner.fullname.trim();
+      if (sd.name) {
+        var n = sd.name.trim();
+        var suffix = '的沙龍';
+        if (n.endsWith(suffix)) return n.slice(0, -suffix.length).trim();
+        return n;
+      }
+    }
+  } catch (e) {}
   var parts = location.pathname.split('/').filter(Boolean);
   if (parts.length >= 2 && parts[0] === 'salon') {
     return decodeURIComponent(parts[1]);

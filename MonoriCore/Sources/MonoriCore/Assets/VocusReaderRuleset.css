@@ -49,14 +49,12 @@ body {
   background-color: #faf8f5 !important;
 }
 
-body > div,
-body > div > div,
-body > div > div > div,
-body > div > div > div > div,
-body > div > div > div > div > div,
-body > div > div > div > div > div > div,
-body > div > div > div > div > div > div > div,
-body > div > div > div > div > div > div > div > div {
+body > *,
+body > * > *,
+body > * > * > *,
+body > * > * > * > *,
+body > * > * > * > * > *,
+body > * > * > * > * > * > * {
   background-color: inherit !important;
 }
 

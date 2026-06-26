@@ -44,6 +44,22 @@
     return null;
   }
 
+  function creatorNameFromNextData() {
+    try {
+      var sd = window.__NEXT_DATA__.props.pageProps.salonData;
+      if (sd) {
+        if (sd.owner && sd.owner.fullname) return sd.owner.fullname.trim();
+        if (sd.name) {
+          var n = sd.name.trim();
+          var suffix = '的沙龍';
+          if (n.endsWith(suffix)) return n.slice(0, -suffix.length).trim();
+          return n;
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
   function creatorNameFromURL() {
     var parts = location.pathname.split('/').filter(Boolean);
     if (parts.length >= 2 && parts[0] === 'salon') {
@@ -53,7 +69,7 @@
   }
 
   var roomTitle = roomTitleFromPageTitle() || salonNameFromHeader() || roomSlugFromURL() || roomTitleFromTabs() || 'Vocus Room';
-  var creatorName = creatorNameFromURL() || salonNameFromHeader();
+  var creatorName = creatorNameFromNextData() || creatorNameFromURL();
 
   handler.postMessage({
     collectionName: roomTitle,
