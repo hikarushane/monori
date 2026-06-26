@@ -76,6 +76,30 @@ struct VocusMark: Shape {
     }
 }
 
+/// AsianFanfics mark: a stylised "A" — two angled strokes meeting at the top
+/// with a horizontal crossbar. Filled, geometric.
+struct AFFMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width, h = rect.height
+        var p = Path()
+        // Left leg
+        p.move(to: CGPoint(x: w * 0.10, y: h * 0.88))
+        p.addLine(to: CGPoint(x: w * 0.42, y: h * 0.12))
+        p.addLine(to: CGPoint(x: w * 0.58, y: h * 0.12))
+        p.addLine(to: CGPoint(x: w * 0.30, y: h * 0.88))
+        p.closeSubpath()
+        // Right leg
+        p.move(to: CGPoint(x: w * 0.70, y: h * 0.88))
+        p.addLine(to: CGPoint(x: w * 0.42, y: h * 0.12))
+        p.addLine(to: CGPoint(x: w * 0.58, y: h * 0.12))
+        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.88))
+        p.closeSubpath()
+        // Crossbar
+        p.addRect(CGRect(x: w * 0.22, y: h * 0.52, width: w * 0.56, height: h * 0.10))
+        return p
+    }
+}
+
 /// The shared source icon. One source of truth for the Browse source picker and
 /// the Library collection list, so the two never drift. Renders with the current
 /// foreground style, so callers tint it via `.foregroundStyle(...)`.
@@ -92,7 +116,7 @@ struct SourceGlyph: View {
         case .vocus:
             VocusMark().fill(.foreground)
         case .asianFanfics:
-            Circle().stroke(.foreground, lineWidth: 1.5)
+            AFFMark().fill(.foreground)
         }
     }
 }
