@@ -2,44 +2,109 @@
   color-scheme: light dark;
 }
 
+/* ── Hide everything except content + comments ── */
+
+/* Site-wide chrome */
+body > header,
 nav,
-header,
-footer,
 iframe,
-.secondary,
-.comments,
-h1.comments__title,
+#ad-top,
+#bottom-ad,
+.ad-main,
+[class*="ad_responsive"],
+#ad_calendar_rated {
+  display: none !important;
+}
+
+/* Sidebar */
+aside.secondary {
+  display: none !important;
+}
+
+/* Metadata block between title and content */
+footer.main-meta {
+  display: none !important;
+}
+
+/* Chapter title — app provides its own in the top bar */
+header.title-flush {
+  display: none !important;
+}
+
+/* In-page chapter nav (Foreword / chapter list dropdown) */
+main.primary > div:has(select[name="chapter-nav"]),
+main.primary > div:has(a[href*="story/view"]):not(#bodyText) {
+  display: none !important;
+}
+
+/* Post-content widgets */
+#chapter-upvote,
+#chapter-upvote-thanks,
 select,
 .promote-section,
 [class*="promote"],
 [class*="bid"],
 .story-nav,
 .story-actions,
-[class*="upvote"],
+[class*="upvote"]:not(#comments *),
 [class*="subscribe"],
 [class*="share-url"],
 [class*="report-content"] {
   display: none !important;
 }
 
+/* "Next Chapter →" and "Back to Top ↑" links after content */
+main.primary > div:has(> a[href*="story/view"]):not(#bodyText),
+main.primary > div.my-4 {
+  display: none !important;
+}
+
+/* ── Layout: full-width content ── */
+
+/* Override the 4/5 + 1/5 column split */
+.aff-stack--x {
+  display: block !important;
+}
+
+.aff-col {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#main-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* ── Content styling ── */
+
 #user-submitted-body,
 #post-react {
   max-width: 42em !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  padding: 1em 16px !important;
 }
 
 #user-submitted-body p,
+#user-submitted-body div,
 #user-submitted-body li,
 #user-submitted-body blockquote,
-#user-submitted-body span,
-#post-react p,
-#post-react li,
-#post-react blockquote,
-#post-react span {
+#user-submitted-body span {
   font-size: var(--monori-font-size, 19px) !important;
   line-height: var(--monori-line-height, 1.75) !important;
 }
+
+/* ── Comments styling ── */
+
+section#comments {
+  max-width: 42em !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 16px !important;
+}
+
+/* ── Background ── */
 
 body {
   background-color: #faf8f5 !important;
@@ -50,13 +115,10 @@ body {
     background-color: #1c1b19 !important;
   }
   #user-submitted-body p,
+  #user-submitted-body div,
   #user-submitted-body span,
   #user-submitted-body li,
-  #user-submitted-body blockquote,
-  #post-react p,
-  #post-react span,
-  #post-react li,
-  #post-react blockquote {
+  #user-submitted-body blockquote {
     color: #e8e6e3 !important;
   }
 }
