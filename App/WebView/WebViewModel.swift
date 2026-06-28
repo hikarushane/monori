@@ -120,6 +120,11 @@ final class WebViewModel: NSObject {
                     self.currentURL = newURL
                     self.detectedCollection = nil
                     self.runCollectionDetect()
+                    // Hide ads on AFF pages in browse mode
+                    if let url = newURL?.absoluteString,
+                       URLNormalizer.isAFFStoryURL(url) {
+                        self.webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript(), completionHandler: nil)
+                    }
                     // SPA navigations (e.g. Patreon pushState) don't trigger
                     // estimatedProgress. Simulate a brief progress flash so the
                     // loading bar gives visual feedback on in-page link clicks.
@@ -375,6 +380,11 @@ extension WebViewModel: WKNavigationDelegate {
         finishedNavigationCount += 1
         detectedCollection = nil
         runCollectionDetect()
+        // Hide ads on AFF pages in browse mode
+        if let url = webView.url?.absoluteString,
+           URLNormalizer.isAFFStoryURL(url) {
+            webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript(), completionHandler: nil)
+        }
     }
 }
 

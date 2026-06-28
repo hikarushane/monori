@@ -81,6 +81,30 @@ public enum ReaderStyler {
         """
     }
 
+    private static func affBrowseRuleset() -> String {
+        guard let url = Bundle.module.url(forResource: "AFFBrowseRuleset", withExtension: "css"),
+              let css = try? String(contentsOf: url, encoding: .utf8) else { return "" }
+        return css
+    }
+
+    public static func affBrowseInjectionScript() -> String {
+        let css = affBrowseRuleset()
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "${", with: "\\${")
+        return """
+        (function () {
+          var id = "monori-browse-style";
+          var old = document.getElementById(id);
+          if (old) { return; }
+          var style = document.createElement("style");
+          style.id = id;
+          style.textContent = `\(css)`;
+          document.documentElement.appendChild(style);
+        })();
+        """
+    }
+
     public static func removalScript() -> String {
         """
         (function () {
