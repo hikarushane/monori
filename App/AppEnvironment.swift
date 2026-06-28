@@ -338,7 +338,7 @@ final class AppEnvironment {
             chapters: chapters.enumerated().map { index, dict -> ImportedChapter in
                 ImportedChapter(
                     title: (dict["title"] as? String) ?? "Chapter",
-                    urlString: (dict["url"] as? String) ?? "",
+                    urlString: URLNormalizer.canonicalAFFChapterURL((dict["url"] as? String) ?? "") ?? (dict["url"] as? String) ?? "",
                     orderIndex: (dict["domOrder"] as? Int) ?? index)
             })
         try? store.applyDocImport(imported)
@@ -389,12 +389,12 @@ final class AppEnvironment {
         return false
     }
 
-    func logoutFromPatreon() async {
+    func clearBrowserData() async {
         let dataStore = WKWebsiteDataStore.default()
         let types = WKWebsiteDataStore.allWebsiteDataTypes()
         let records = await dataStore.dataRecords(ofTypes: types)
         await dataStore.removeData(ofTypes: types, for: records)
-        browse.load(URL(string: "https://www.patreon.com/login")!)
+        browse.load(URL(string: "about:blank")!)
     }
 
     func clearLibraryData() {
