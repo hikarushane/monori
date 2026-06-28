@@ -170,6 +170,18 @@ public enum ReaderStyler {
         """
     }
 
+    /// Captures the current scroll progress as a value in [0, 1], or null if the
+    /// page is too short to scroll.
+    public static let captureScrollProgressScript = """
+    (function () {
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - window.innerHeight;
+      if (max <= 0) { return null; }
+      var progress = window.scrollY / max;
+      return Math.min(1, Math.max(0, progress));
+    })();
+    """
+
     /// Pins the scroll position to `progress` (or top when nil) for a few seconds,
     /// re-applying every 400ms to defeat Patreon's own auto-scroll. Stops as soon
     /// as the user touches or wheel-scrolls the page.

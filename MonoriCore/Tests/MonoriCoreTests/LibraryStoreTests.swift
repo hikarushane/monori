@@ -266,4 +266,20 @@ final class LibraryStoreTests: XCTestCase {
         let missing = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131/99")
         XCTAssertNil(missing)
     }
+
+    func testSaveAndRestoreReadingProgress() throws {
+        let storeURL = try temporaryStoreURL()
+        let diskStore = try onDiskStore(at: storeURL)
+
+        try diskStore.applyImport([payload("Ch 1", "https://patreon.com/posts/1-100", order: 0)])
+        let chapter = diskStore.orderedChapters(of: try diskStore.collections()[0])[0]
+
+        XCTAssertNil(chapter.readingProgress)
+
+        diskStore.saveReadingProgress(0.42, for: chapter)
+        XCTAssertEqual(chapter.readingProgress ?? 0, 0.42, accuracy: 0.001)
+
+        diskStore.saveReadingProgress(nil, for: chapter)
+        XCTAssertNil(chapter.readingProgress)
+    }
 }

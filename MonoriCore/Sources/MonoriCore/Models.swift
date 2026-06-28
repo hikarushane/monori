@@ -53,6 +53,7 @@ public final class LocalChapterModel {
     public var excerpt: String?
     public var isBookmarked: Bool = false
     public var contentHTML: String?
+    public var readingProgress: Double?
     public var collection: LocalCollectionModel?
 
     public init(id: String = UUID().uuidString,

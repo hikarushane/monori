@@ -189,6 +189,11 @@ public final class LibraryStore {
         try? context.save()
     }
 
+    public func saveReadingProgress(_ progress: Double?, for chapter: LocalChapterModel) {
+        chapter.readingProgress = progress
+        try? context.save()
+    }
+
     public func rename(_ chapter: LocalChapterModel, to title: String) {
         chapter.title = String(title.prefix(PayloadValidator.maxFieldLength))
         try? context.save()

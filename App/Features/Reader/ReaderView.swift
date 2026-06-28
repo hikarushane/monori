@@ -64,7 +64,10 @@ struct ReaderView: View {
             .overlay(alignment: .top) { swipeTopIndicator }
             .overlay(alignment: .bottom) { swipeBottomIndicator }
             .onAppear { open(current) }
-            .onDisappear { foreignTitleTask?.cancel() }
+            .onDisappear {
+                saveScrollPosition()
+                foreignTitleTask?.cancel()
+            }
             .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
             .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
             .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
@@ -177,7 +180,19 @@ struct ReaderView: View {
                                                  urlString: current.urlString).title
     }
 
+    private func saveScrollPosition() {
+        guard foreignPageTitle == nil else { return }
+        let chapter = current
+        env.reader.webView.evaluateJavaScript(ReaderStyler.captureScrollProgressScript) { result, _ in
+            Task { @MainActor in
+                let progress = result as? Double
+                env.store.saveReadingProgress(progress, for: chapter)
+            }
+        }
+    }
+
     private func open(_ chapter: LocalChapterModel) {
+        saveScrollPosition()
         foreignTitleTask?.cancel()
         foreignPageTitle = nil
         foreignPageKey = nil
@@ -282,7 +297,8 @@ struct ReaderView: View {
         } else {
             webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
         }
-        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: nil),
+        let savedProgress = foreignPageTitle == nil ? current.readingProgress : nil
+        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: savedProgress),
                                    completionHandler: nil)
     }
 
