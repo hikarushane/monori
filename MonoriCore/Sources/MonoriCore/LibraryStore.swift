@@ -163,6 +163,22 @@ public final class LibraryStore {
             return try? context.fetch(descriptor).first
         }
 
+        // 3. AFF: canonicalize chapter URL then match
+        if let canonical = URLNormalizer.canonicalAFFChapterURL(pageURL) {
+            var descriptor = FetchDescriptor<LocalChapterModel>(
+                predicate: #Predicate { $0.urlString == canonical })
+            descriptor.fetchLimit = 1
+            if let exact = try? context.fetch(descriptor).first {
+                return exact
+            }
+            // Stored URL may include slug suffix; normalize both sides
+            if let chapters = try? context.fetch(FetchDescriptor<LocalChapterModel>()) {
+                return chapters.first {
+                    URLNormalizer.canonicalAFFChapterURL($0.urlString) == canonical
+                }
+            }
+        }
+
         return nil
     }
 

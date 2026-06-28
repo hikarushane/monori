@@ -228,4 +228,42 @@ final class LibraryStoreTests: XCTestCase {
         let patreon = store.chapter(withPageURL: "https://www.patreon.com/posts/12345")
         XCTAssertNil(patreon)
     }
+
+    func testChapterWithAFFChapterURL() throws {
+        let store = try LibraryStore.inMemory()
+        let imported = ImportedCollection(
+            sourceURLString: "https://www.asianfanfics.com/story/view/1695131",
+            title: "Test Story",
+            creatorName: "Author",
+            sourceKind: .asianFanfics,
+            chapters: [
+                ImportedChapter(title: "Chapter 1",
+                                urlString: "https://www.asianfanfics.com/story/view/1695131/1",
+                                orderIndex: 0),
+                ImportedChapter(title: "Chapter 2",
+                                urlString: "https://www.asianfanfics.com/story/view/1695131/2",
+                                orderIndex: 1)
+            ])
+        try store.applyDocImport(imported)
+
+        // Exact canonical URL match
+        let exact = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131/1")
+        XCTAssertEqual(exact?.title, "Chapter 1")
+
+        // Slug-suffixed URL (browser strips slug) should still resolve
+        let withSlug = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131/1/n-a")
+        XCTAssertEqual(withSlug?.title, "Chapter 1")
+
+        // Second chapter
+        let second = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131/2/chapter-title")
+        XCTAssertEqual(second?.title, "Chapter 2")
+
+        // Foreword URL returns nil
+        let foreword = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131")
+        XCTAssertNil(foreword)
+
+        // Non-existent chapter returns nil
+        let missing = store.chapter(withPageURL: "https://www.asianfanfics.com/story/view/1695131/99")
+        XCTAssertNil(missing)
+    }
 }

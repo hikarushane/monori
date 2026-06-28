@@ -240,4 +240,19 @@ public enum URLNormalizer {
         guard let id = affStoryID(string) else { return nil }
         return "https://www.asianfanfics.com/story/view/\(id)"
     }
+
+    /// Canonical form of an AFF **chapter** URL: `https://www.asianfanfics.com/story/view/{storyId}/{chapterId}`.
+    /// Returns nil for foreword URLs, non-AFF URLs, or invalid paths.
+    public static func canonicalAFFChapterURL(_ string: String) -> String? {
+        guard affHost(string) != nil,
+              let url = URL(string: string) else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        // Need at least: story / view / {storyId} / {chapterId}
+        guard parts.count >= 4,
+              parts[0] == "story", parts[1] == "view",
+              parts[2].allSatisfy(\.isNumber),
+              parts[3].allSatisfy(\.isNumber)
+        else { return nil }
+        return "https://www.asianfanfics.com/story/view/\(parts[2])/\(parts[3])"
+    }
 }

@@ -99,4 +99,37 @@ final class URLNormalizerAFFTests: XCTestCase {
             URLNormalizer.canonicalAFFStoryURL("https://www.asianfanfics.com/story/view/1738243"),
             "https://www.asianfanfics.com/story/view/1738243")
     }
+
+    // MARK: canonicalAFFChapterURL
+
+    func testCanonicalAFFChapterURL_stripsSlug() {
+        let input = "https://www.asianfanfics.com/story/view/1695131/1/n-a"
+        XCTAssertEqual(
+            URLNormalizer.canonicalAFFChapterURL(input),
+            "https://www.asianfanfics.com/story/view/1695131/1"
+        )
+    }
+
+    func testCanonicalAFFChapterURL_alreadyCanonical() {
+        let input = "https://www.asianfanfics.com/story/view/1695131/1"
+        XCTAssertEqual(
+            URLNormalizer.canonicalAFFChapterURL(input),
+            "https://www.asianfanfics.com/story/view/1695131/1"
+        )
+    }
+
+    func testCanonicalAFFChapterURL_forewordReturnsNil() {
+        let input = "https://www.asianfanfics.com/story/view/1695131"
+        XCTAssertNil(URLNormalizer.canonicalAFFChapterURL(input))
+    }
+
+    func testCanonicalAFFChapterURL_forewordWithSlugReturnsNil() {
+        let input = "https://www.asianfanfics.com/story/view/1695131/some-title"
+        XCTAssertNil(URLNormalizer.canonicalAFFChapterURL(input))
+    }
+
+    func testCanonicalAFFChapterURL_nonAFFReturnsNil() {
+        let input = "https://www.patreon.com/posts/12345"
+        XCTAssertNil(URLNormalizer.canonicalAFFChapterURL(input))
+    }
 }
