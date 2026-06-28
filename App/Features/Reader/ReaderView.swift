@@ -185,14 +185,16 @@ struct ReaderView: View {
         let chapter = current
         env.reader.webView.evaluateJavaScript(ReaderStyler.captureScrollProgressScript) { result, _ in
             Task { @MainActor in
-                let progress = result as? Double
+                let progress = (result as? NSNumber)?.doubleValue
                 env.store.saveReadingProgress(progress, for: chapter)
             }
         }
     }
 
     private func open(_ chapter: LocalChapterModel) {
-        saveScrollPosition()
+        if env.reader.currentURL != nil {
+            saveScrollPosition()
+        }
         foreignTitleTask?.cancel()
         foreignPageTitle = nil
         foreignPageKey = nil
