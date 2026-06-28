@@ -60,18 +60,25 @@ struct AO3Mark: Shape {
     }
 }
 
-/// Vocus (方格子) mark: a 2×2 grid of rounded squares.
+/// Vocus (方格子) mark: a 2×2 grid of outlined squares with generous gaps —
+/// lighter than the filled version for better small-size legibility.
 struct VocusMark: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width, h = rect.height
-        let gap = w * 0.08
-        let cell = (w - gap) / 2
-        let r = CGSize(width: cell * 0.22, height: cell * 0.22)
+        let inset: CGFloat = 0.10
+        let gap = w * 0.14
+        let usable = w * (1 - 2 * inset) - gap
+        let cell = usable / 2
+        let x0 = w * inset
+        let x1 = x0 + cell + gap
+        let y0 = h * inset
+        let y1 = y0 + cell + gap
+        let r = CGSize(width: cell * 0.18, height: cell * 0.18)
         var p = Path()
-        p.addRoundedRect(in: CGRect(x: 0, y: 0, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: cell + gap, y: 0, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: 0, y: cell + gap, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: cell + gap, y: cell + gap, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: x0, y: y0, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: x1, y: y0, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: x0, y: y1, width: cell, height: cell), cornerSize: r)
+        p.addRoundedRect(in: CGRect(x: x1, y: y1, width: cell, height: cell), cornerSize: r)
         return p
     }
 }
@@ -130,7 +137,7 @@ struct SourceGlyph: View {
         case .ao3:
             AO3Mark().stroke(.foreground, lineWidth: 1.5)
         case .vocus:
-            VocusMark().fill(.foreground)
+            VocusMark().stroke(.foreground, style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
         case .asianFanfics:
             AFFMark().fill(.foreground)
         }
