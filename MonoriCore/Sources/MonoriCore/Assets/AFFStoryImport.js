@@ -7,7 +7,7 @@ var authorLink = document.querySelector('.row-meta a[href^="/profile/u/"]');
 if (authorLink) creatorName = authorLink.textContent.trim().substring(0, 256);
 
 function collectFromSelect() {
-  var sel = document.querySelector('select');
+  var sel = document.querySelector('select[name="chapter-nav"]');
   if (!sel) return [];
   var collected = [];
   for (var i = 0; i < sel.options.length; i++) {
@@ -27,28 +27,24 @@ function collectFromSelect() {
 }
 
 var tocWidget = document.querySelector('.widget--chapters');
-// Collapsed TOC: widget exists but server sent fewer links. The expand
-// toggle link is the signal. Fall back to <select> which always has all
-// chapters regardless of the collapse preference.
-if (!tocWidget || tocWidget.querySelector('a[href*="toggle_full_chapter_nav"]')) {
-  return collectFromSelect();
-}
-
-var links = tocWidget.querySelectorAll('a[href^="/story/view/"]');
 var collected = [];
 
-for (var i = 0; i < links.length; i++) {
-  var a = links[i];
-  var href = a.getAttribute('href') || '';
-  if (!href) continue;
-  collected.push({
-    title: a.textContent.trim().substring(0, 256),
-    url: 'https://www.asianfanfics.com' + href.split('?')[0],
-    creatorName: creatorName,
-    collectionName: storyTitle,
-    collectionURL: location.href,
-    domOrder: i
-  });
+if (tocWidget) {
+  var links = tocWidget.querySelectorAll('a[href^="/story/view/"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href) continue;
+    collected.push({
+      title: a.textContent.trim().substring(0, 256),
+      url: 'https://www.asianfanfics.com' + href.split('?')[0],
+      creatorName: creatorName,
+      collectionName: storyTitle,
+      collectionURL: location.href,
+      domOrder: i
+    });
+  }
 }
 
-return collected;
+if (collected.length > 0) return collected;
+return collectFromSelect();

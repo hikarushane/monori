@@ -21,7 +21,7 @@ struct WebCollectionBanner: View {
                 Button("確定") {}
             } message: {
                 if env.importedCountThisSession == 0 {
-                    Text("此頁面未找到章節連結。請確認收藏頁面已完全載入後再試一次。Patreon 的頁面結構也可能已變更。")
+                    Text("此頁面未找到章節連結。請確認收藏頁面已完全載入後再試一次。")
                 } else {
                     Text("已匯入 \(env.importedCountThisSession) 個章節。已匯入的章節會合併，不會重複。")
                 }
