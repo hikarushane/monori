@@ -10,6 +10,18 @@ struct SettingsView: View {
         @Bindable var prefs = env.prefs
         NavigationStack {
             Form {
+                Section("外觀") {
+                    Picker("主題", selection: Binding(
+                        get: { env.appPrefs.appearance },
+                        set: { env.appPrefs.appearance = $0 }
+                    )) {
+                        ForEach(AppearanceMode.allCases, id: \.self) { mode in
+                            Text(mode.label).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 Section("閱讀") {
                     Stepper("字體大小：\(prefs.fontSize)", value: $prefs.fontSize, in: 14...32)
                 }

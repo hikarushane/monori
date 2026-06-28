@@ -50,6 +50,7 @@ final class AppEnvironment {
         return _refresher!
     }
     let prefs = ReaderPreferences()
+    let appPrefs = AppPreferences()
 
     var importedCountThisSession = 0
     var ao3ImportCurrent = 0

@@ -28,6 +28,7 @@ struct AppRootView: View {
                 .accessibilityIdentifier("smoke.settingsTab")
                 .tag(AppTab.settings)
         }
+        .preferredColorScheme(env.appPrefs.appearance.colorScheme)
         .environment(env)
         .modelContainer(env.store.container)
         .task { env.startSmokeToolsIfNeeded() }
