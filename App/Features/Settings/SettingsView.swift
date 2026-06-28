@@ -17,17 +17,17 @@ struct SettingsView: View {
                 Section {
                     Button("清除書庫資料", role: .destructive) { confirmClearLibrary = true }
                         .accessibilityIdentifier("smoke.clearDataButton")
-                    Button("登出 Patreon", role: .destructive) { confirmLogout = true }
+                    Button("清除瀏覽器資料", role: .destructive) { confirmLogout = true }
                         .accessibilityIdentifier("smoke.logoutButton")
                 } header: {
                     Text("資料")
                 } footer: {
-                    Text("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「登出 Patreon」會結束內建瀏覽器中的 Patreon 連線。兩者互相獨立。")
+                    Text("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。")
                 }
 
                 Section("關於") {
                     LabeledContent("版本", value: MonoriCore.version)
-                    Text("Monori 是一個純本機的閱讀介面，使用你自己的 Patreon 連線。僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由 Patreon 控制。")
+                    Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由各平台控制。")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -37,10 +37,10 @@ struct SettingsView: View {
                                 isPresented: $confirmClearLibrary, titleVisibility: .visible) {
                 Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
             }
-            .confirmationDialog("結束內建瀏覽器中的 Patreon 連線？",
+            .confirmationDialog("清除內建瀏覽器的所有 cookie 與登入狀態？",
                                 isPresented: $confirmLogout, titleVisibility: .visible) {
-                Button("登出 Patreon", role: .destructive) {
-                    Task { await env.logoutFromPatreon() }
+                Button("清除瀏覽器資料", role: .destructive) {
+                    Task { await env.clearBrowserData() }
                 }
             }
         }
