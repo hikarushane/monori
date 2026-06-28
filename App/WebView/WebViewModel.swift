@@ -46,6 +46,28 @@ final class WebViewModel: NSObject {
 
     private static let sharedProcessPool = WKProcessPool()
 
+    private static let affAdBlockRules = #"""
+    [
+      {"trigger":{"url-filter":"googlesyndication\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"doubleclick\\.net","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"googletagmanager\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"google-analytics\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"shareasale\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"cloudflareinsights\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
+      {"trigger":{"url-filter":".*","if-domain":["*asianfanfics.com"]},"action":{"type":"css-display-none","selector":"#ad-top, #bottom-ad, .ad-main, [class*='ad_responsive'], #ad_calendar_rated, .excerpt-promoted"}}
+    ]
+    """#
+
+    private static func installAFFAdBlockRules(on webView: WKWebView) {
+        Task { @MainActor in
+            guard let list = try? await WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: "monori-aff-ads",
+                encodedContentRuleList: affAdBlockRules
+            ) else { return }
+            webView.configuration.userContentController.add(list)
+        }
+    }
+
     override init() {
         let router = ScriptMessageRouter()
         self.router = router
@@ -106,6 +128,7 @@ final class WebViewModel: NSObject {
 
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        Self.installAFFAdBlockRules(on: webView)
         // Off on purpose: the built-in gesture skips Patreon's same-document
         // (SPA) history entries, and PatreonWebView installs its own left-edge
         // swipe that calls goBack() — keeping both would double-navigate on

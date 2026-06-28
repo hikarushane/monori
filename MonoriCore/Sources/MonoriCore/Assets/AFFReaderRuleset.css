@@ -2,17 +2,17 @@
   color-scheme: light dark;
 }
 
-/* ── Hide everything except content + comments ── */
+/* ── Whitelist approach: hide everything, then show content + comments ── */
 
-/* Site-wide chrome */
+/* Body-level: hide all headers, ad wrappers, iframes */
 body > header,
-nav,
-iframe,
-#ad-top,
-#bottom-ad,
-.ad-main,
-[class*="ad_responsive"],
-#ad_calendar_rated {
+body > div:not(#main-container),
+body > iframe {
+  display: none !important;
+}
+
+/* Inside main.primary: hide all direct children except #bodyText and #comments */
+main.primary > *:not(#bodyText):not(#comments) {
   display: none !important;
 }
 
@@ -21,47 +21,19 @@ aside.secondary {
   display: none !important;
 }
 
-/* Metadata block between title and content */
-footer.main-meta {
-  display: none !important;
-}
-
-/* Chapter title — app provides its own in the top bar */
-header.title-flush {
-  display: none !important;
-}
-
-/* In-page chapter nav (Foreword / chapter list dropdown) */
-main.primary > div:has(select[name="chapter-nav"]),
-main.primary > div:has(a[href*="story/view"]):not(#bodyText) {
-  display: none !important;
-}
-
-/* Post-content widgets */
-#chapter-upvote,
-#chapter-upvote-thanks,
-select,
+/* Catch-all for ad elements anywhere */
+.ad-main,
+[id*="ad-"],
+[class*="ad_responsive"],
+#ad_calendar_rated,
 .promote-section,
 [class*="promote"],
-[class*="bid"],
-.story-nav,
-.story-actions,
-[class*="upvote"]:not(#comments *),
-[class*="subscribe"],
-[class*="share-url"],
-[class*="report-content"] {
-  display: none !important;
-}
-
-/* "Next Chapter →" and "Back to Top ↑" links after content */
-main.primary > div:has(> a[href*="story/view"]):not(#bodyText),
-main.primary > div.my-4 {
+[class*="bid"] {
   display: none !important;
 }
 
 /* ── Layout: full-width content ── */
 
-/* Override the 4/5 + 1/5 column split */
 .aff-stack--x {
   display: block !important;
 }
@@ -72,6 +44,7 @@ main.primary > div.my-4 {
 }
 
 #main-container {
+  margin-top: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
