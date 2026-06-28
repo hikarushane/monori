@@ -76,26 +76,42 @@ struct VocusMark: Shape {
     }
 }
 
-/// AsianFanfics mark: a stylised "A" — two angled strokes meeting at the top
-/// with a horizontal crossbar. Filled, geometric.
+/// AsianFanfics mark: three silhouette heads in a staggered row with a small
+/// tilted open book to the lower-right — "community of readers". Filled.
 struct AFFMark: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width, h = rect.height
         var p = Path()
-        // Left leg
-        p.move(to: CGPoint(x: w * 0.10, y: h * 0.88))
-        p.addLine(to: CGPoint(x: w * 0.42, y: h * 0.12))
-        p.addLine(to: CGPoint(x: w * 0.58, y: h * 0.12))
-        p.addLine(to: CGPoint(x: w * 0.30, y: h * 0.88))
+
+        // Head 1 (left, slightly lower)
+        p.addEllipse(in: CGRect(x: w * 0.06, y: h * 0.22, width: w * 0.20, height: w * 0.20))
+        // Shoulders 1
+        p.addEllipse(in: CGRect(x: w * 0.01, y: h * 0.45, width: w * 0.30, height: w * 0.18))
+
+        // Head 2 (center, highest)
+        p.addEllipse(in: CGRect(x: w * 0.26, y: h * 0.10, width: w * 0.22, height: w * 0.22))
+        // Shoulders 2
+        p.addEllipse(in: CGRect(x: w * 0.20, y: h * 0.35, width: w * 0.34, height: w * 0.20))
+
+        // Head 3 (right, slightly lower)
+        p.addEllipse(in: CGRect(x: w * 0.47, y: h * 0.22, width: w * 0.20, height: w * 0.20))
+        // Shoulders 3
+        p.addEllipse(in: CGRect(x: w * 0.42, y: h * 0.45, width: w * 0.30, height: w * 0.18))
+
+        // Small open book (lower-right)
+        // Left page
+        p.move(to: CGPoint(x: w * 0.72, y: h * 0.88))
+        p.addLine(to: CGPoint(x: w * 0.60, y: h * 0.72))
+        p.addLine(to: CGPoint(x: w * 0.60, y: h * 0.56))
+        p.addLine(to: CGPoint(x: w * 0.72, y: h * 0.68))
         p.closeSubpath()
-        // Right leg
-        p.move(to: CGPoint(x: w * 0.70, y: h * 0.88))
-        p.addLine(to: CGPoint(x: w * 0.42, y: h * 0.12))
-        p.addLine(to: CGPoint(x: w * 0.58, y: h * 0.12))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.88))
+        // Right page
+        p.move(to: CGPoint(x: w * 0.72, y: h * 0.88))
+        p.addLine(to: CGPoint(x: w * 0.84, y: h * 0.72))
+        p.addLine(to: CGPoint(x: w * 0.84, y: h * 0.56))
+        p.addLine(to: CGPoint(x: w * 0.72, y: h * 0.68))
         p.closeSubpath()
-        // Crossbar
-        p.addRect(CGRect(x: w * 0.22, y: h * 0.52, width: w * 0.56, height: h * 0.10))
+
         return p
     }
 }
