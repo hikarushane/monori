@@ -44,8 +44,6 @@ final class WebViewModel: NSObject {
     private var progressObservation: NSKeyValueObservation?
     private var spaLoadingTask: Task<Void, Never>?
 
-    private static let sharedProcessPool = WKProcessPool()
-
     private static let affAdBlockRules = #"""
     [
       {"trigger":{"url-filter":"googlesyndication\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
@@ -73,7 +71,6 @@ final class WebViewModel: NSObject {
         self.router = router
 
         let config = WKWebViewConfiguration()
-        config.processPool = Self.sharedProcessPool
         config.websiteDataStore = .default()
         config.defaultWebpagePreferences.preferredContentMode = .mobile
 
