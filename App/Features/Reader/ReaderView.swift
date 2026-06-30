@@ -183,11 +183,10 @@ struct ReaderView: View {
     private func saveScrollPosition() {
         guard foreignPageTitle == nil else { return }
         let chapter = current
-        env.reader.webView.evaluateJavaScript(ReaderStyler.captureScrollProgressScript) { result, _ in
-            Task { @MainActor in
-                let progress = (result as? NSNumber)?.doubleValue
-                env.store.saveReadingProgress(progress, for: chapter)
-            }
+        Task { @MainActor in
+            let result = try? await env.reader.webView.evaluateJavaScript(ReaderStyler.captureScrollProgressScript)
+            let progress = (result as? NSNumber)?.doubleValue
+            env.store.saveReadingProgress(progress, for: chapter)
         }
     }
 
@@ -265,13 +264,12 @@ struct ReaderView: View {
                 // The one-shot collection detect can race the SPA render; refresh it
                 // alongside the title so the series banner reflects the settled page.
                 env.reader.runCollectionDetect()
-                env.reader.webView.evaluateJavaScript(Self.readerTitleScript) { result, _ in
-                    Task { @MainActor in
-                        guard foreignPageTitle != nil,
-                              let title = result as? String, !title.isEmpty,
-                              !staleTitles.contains(title) else { return }
-                        foreignPageTitle = title
-                    }
+                Task { @MainActor in
+                    let result = try? await env.reader.webView.evaluateJavaScript(Self.readerTitleScript)
+                    guard foreignPageTitle != nil,
+                          let title = result as? String, !title.isEmpty,
+                          !staleTitles.contains(title) else { return }
+                    foreignPageTitle = title
                 }
             }
         }
@@ -282,26 +280,31 @@ struct ReaderView: View {
     private func applyReaderTreatment() {
         guard env.reader.currentURL != nil else { return }
         let webView = env.reader.webView
-        if foreignPageTitle == nil {
-            if !renderingStoredHTML {
-                let sourceKind = current.collection?.sourceKind ?? .patreon
-                switch sourceKind {
-                case .vocus:
-                    webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript(), completionHandler: nil)
-                case .asianFanfics:
-                    webView.evaluateJavaScript(ReaderStyler.affInjectionScript(), completionHandler: nil)
-                default:
-                    webView.evaluateJavaScript(ReaderStyler.injectionScript(), completionHandler: nil)
+        Task { @MainActor in
+            if foreignPageTitle == nil {
+                if !renderingStoredHTML {
+                    let sourceKind = current.collection?.sourceKind ?? .patreon
+                    switch sourceKind {
+                    case .vocus:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript())
+                    case .asianFanfics:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.affInjectionScript())
+                    default:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
+                    }
                 }
+                _ = try? await webView.evaluateJavaScript(
+                    ReaderStyler.fontSizeScript(points: prefs.fontSize))
+                _ = try? await webView.evaluateJavaScript(
+                    ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+                repairCurrentTitleIfNeeded(webView)
+            } else {
+                _ = try? await webView.evaluateJavaScript(ReaderStyler.removalScript())
             }
-            applyTypography()
-            repairCurrentTitleIfNeeded(webView)
-        } else {
-            webView.evaluateJavaScript(ReaderStyler.removalScript(), completionHandler: nil)
+            let savedProgress = foreignPageTitle == nil ? current.readingProgress : nil
+            _ = try? await webView.evaluateJavaScript(
+                ReaderStyler.enforceScrollScript(progress: savedProgress))
         }
-        let savedProgress = foreignPageTitle == nil ? current.readingProgress : nil
-        webView.evaluateJavaScript(ReaderStyler.enforceScrollScript(progress: savedProgress),
-                                   completionHandler: nil)
     }
 
     /// Applies the current font-size/line-spacing prefs to the web view. Called
@@ -311,21 +314,22 @@ struct ReaderView: View {
     /// load/navigation so a newly opened chapter reflects the saved prefs.
     private func applyTypography() {
         let webView = env.reader.webView
-        webView.evaluateJavaScript(ReaderStyler.fontSizeScript(points: prefs.fontSize),
-                                   completionHandler: nil)
-        webView.evaluateJavaScript(ReaderStyler.lineHeightScript(value: prefs.lineSpacing),
-                                   completionHandler: nil)
+        Task { @MainActor in
+            _ = try? await webView.evaluateJavaScript(
+                ReaderStyler.fontSizeScript(points: prefs.fontSize))
+            _ = try? await webView.evaluateJavaScript(
+                ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+        }
     }
 
     private func repairCurrentTitleIfNeeded(_ webView: WKWebView) {
         guard ChapterTextFormatter.isProbablyContaminatedTitle(current.title) else { return }
-        webView.evaluateJavaScript(Self.readerTitleScript) { result, _ in
+        Task { @MainActor in
+            let result = try? await webView.evaluateJavaScript(Self.readerTitleScript)
             guard let title = result as? String, !title.isEmpty,
                   !ChapterTextFormatter.isProbablyContaminatedTitle(title)
             else { return }
-            Task { @MainActor in
-                env.store.rename(current, to: title)
-            }
+            env.store.rename(current, to: title)
         }
     }
 
