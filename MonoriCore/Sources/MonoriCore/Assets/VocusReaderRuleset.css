@@ -16,13 +16,23 @@ footer,
 iframe,
 [data-type="AdaptiveColorCard"],
 .table-of-contents,
-.next-article-col {
+.next-article-col,
+ins.adsbygoogle,
+[data-google-query-id],
+[id^="google_ads_"],
+[id^="div-gpt-ad"] {
   display: none !important;
 }
 
 /* Fixed-position overlays: top header, bottom sharing bar, QR popup */
 body > div > div:first-child {
   position: static !important;
+}
+
+/* Collapse reserved ad/embed container heights */
+.editor-content-block *,
+.lexical-web-theme * {
+  min-height: 0 !important;
 }
 
 /* --- reading column --- */

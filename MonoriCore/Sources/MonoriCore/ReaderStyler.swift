@@ -51,6 +51,60 @@ public enum ReaderStyler {
           style.id = "\(styleElementID)";
           style.textContent = `\(css)`;
           document.documentElement.appendChild(style);
+          function cleanVocusChrome() {
+            var content = document.querySelector('.editor-content-block') ||
+                          document.querySelector('.lexical-web-theme') ||
+                          document.querySelector('article');
+            if (content) {
+              var cur = content;
+              while (cur.parentElement && cur.parentElement !== document.documentElement) {
+                var par = cur.parentElement;
+                for (var i = 0; i < par.children.length; i++) {
+                  var sib = par.children[i];
+                  if (sib !== cur && sib.tagName !== 'STYLE' && sib.tagName !== 'SCRIPT' && sib.tagName !== 'LINK') {
+                    sib.style.setProperty('display', 'none', 'important');
+                  }
+                }
+                cur = par;
+              }
+            }
+            var all = document.querySelectorAll('body *');
+            for (var j = 0; j < all.length; j++) {
+              try {
+                var s = window.getComputedStyle(all[j]);
+                if (s.position === 'fixed' || s.position === 'sticky') {
+                  all[j].style.setProperty('display', 'none', 'important');
+                }
+              } catch(e) {}
+            }
+            var contentSel = '.editor-content-block, .lexical-web-theme';
+            var adBlocks = document.querySelectorAll('div, section, aside');
+            for (var k = 0; k < adBlocks.length; k++) {
+              var t = (adBlocks[k].textContent || '').trim();
+              if (t.length < 200 && t.indexOf('\\u5EE3\\u544A') >= 0) {
+                var cb3 = adBlocks[k].closest(contentSel);
+                if (cb3) {
+                  var w = adBlocks[k];
+                  while (w.parentElement !== cb3) w = w.parentElement;
+                  w.style.setProperty('display', 'none', 'important');
+                } else {
+                  adBlocks[k].style.setProperty('display', 'none', 'important');
+                }
+              }
+            }
+            var hiddenFrames = document.querySelectorAll('iframe');
+            for (var m = 0; m < hiddenFrames.length; m++) {
+              var icb = hiddenFrames[m].closest(contentSel);
+              if (icb) {
+                var ip = hiddenFrames[m];
+                while (ip.parentElement !== icb) ip = ip.parentElement;
+                ip.style.setProperty('display', 'none', 'important');
+              }
+            }
+          }
+          cleanVocusChrome();
+          setTimeout(cleanVocusChrome, 1000);
+          setTimeout(cleanVocusChrome, 3000);
         })();
         """
     }
