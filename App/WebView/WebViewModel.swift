@@ -143,7 +143,9 @@ final class WebViewModel: NSObject {
                     // Hide ads on AFF pages in browse mode
                     if let url = newURL?.absoluteString,
                        URLNormalizer.isAFFStoryURL(url) {
-                        self.webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript(), completionHandler: nil)
+                        Task { @MainActor in
+                            try? await self.webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript())
+                        }
                     }
                     // SPA navigations (e.g. Patreon pushState) don't trigger
                     // estimatedProgress. Simulate a brief progress flash so the
@@ -181,8 +183,9 @@ final class WebViewModel: NSObject {
     /// restores the feed position the user left.
     func handleBrowseTabReselect() {
         if let url = currentURL, URLNormalizer.isPatreonHome(url) {
-            webView.evaluateJavaScript("window.scrollTo({ top: 0, behavior: 'smooth' });",
-                                       completionHandler: nil)
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript("window.scrollTo({ top: 0, behavior: 'smooth' });")
+            }
         } else if let home = webView.backForwardList.backList.last(where: {
             URLNormalizer.isPatreonHome($0.url)
         }) {
@@ -194,11 +197,17 @@ final class WebViewModel: NSObject {
 
     func runCollectionDetect() {
         if isOnPostPage {
-            webView.evaluateJavaScript(JSAssets.collectionDetect, completionHandler: nil)
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript(JSAssets.collectionDetect)
+            }
         } else if isOnVocusRoomPage {
-            webView.evaluateJavaScript(JSAssets.vocusRoomDetect, completionHandler: nil)
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript(JSAssets.vocusRoomDetect)
+            }
         } else if isOnAFFForewordPage {
-            webView.evaluateJavaScript(JSAssets.affStoryDetect, completionHandler: nil)
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript(JSAssets.affStoryDetect)
+            }
         }
     }
 
@@ -293,7 +302,8 @@ final class WebViewModel: NSObject {
             return lines.join('\\n');
         })();
         """
-        webView.evaluateJavaScript(js) { result, _ in
+        Task { @MainActor in
+            let result = try? await webView.evaluateJavaScript(js)
             completion((result as? String) ?? "<no output>")
         }
     }
@@ -403,7 +413,9 @@ extension WebViewModel: WKNavigationDelegate {
         // Hide ads on AFF pages in browse mode
         if let url = webView.url?.absoluteString,
            URLNormalizer.isAFFStoryURL(url) {
-            webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript(), completionHandler: nil)
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript(ReaderStyler.affBrowseInjectionScript())
+            }
         }
     }
 }
