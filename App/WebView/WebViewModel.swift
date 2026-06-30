@@ -436,6 +436,10 @@ extension WebViewModel: WKUIDelegate {
         #endif
         switch decision {
         case .allowInWebView:
+            if URLNormalizer.isVocusRoomURL(url.absoluteString) {
+                webView.load(URLRequest(url: url))
+                return nil
+            }
             let popup = WKWebView(frame: .zero, configuration: configuration)
             popup.uiDelegate = self
             popupWebView = popup
