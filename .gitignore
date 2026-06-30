@@ -4,7 +4,8 @@ DerivedData/
 .build/
 *.xcodeproj
 *.log
-build/smoke/
+build/
+MonoriCore/build/
 .recall/
 
 # secrets
