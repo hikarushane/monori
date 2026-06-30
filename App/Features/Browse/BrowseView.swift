@@ -44,6 +44,12 @@ struct BrowseView: View {
             }
         }
         .onAppear { ensureLoaded(activeKind) }
+        .sheet(isPresented: Binding(
+            get: { activeModel.popupWebView != nil },
+            set: { if !$0 { activeModel.popupWebView = nil } }
+        )) {
+            PopupWebSheet(webView: activeModel.popupWebView!)
+        }
     }
 
     /// Loads a source's start page the first time it is shown. A source the user

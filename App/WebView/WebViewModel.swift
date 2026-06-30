@@ -12,6 +12,7 @@ final class WebViewModel: NSObject {
     var finishedNavigationCount = 0
     /// Mirrors WKWebView.estimatedProgress (0...1; 1 when idle) for SwiftUI.
     var loadingProgress: Double = 1
+    var popupWebView: WKWebView?
     var detectedCollection: CollectionLinkPayload?
     var isOnCollectionPage: Bool {
         guard let url = currentURL else { return false }
@@ -428,21 +429,29 @@ extension WebViewModel: WKUIDelegate {
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
-        if let url = navigationAction.request.url {
-            let decision = NavigationPolicy.decide(url: url, isMainFrame: true)
-            #if DEBUG
-            print("[NAV] window.open / _blank → \(decision) | \(url.absoluteString.prefix(120))")
-            #endif
-            switch decision {
-            case .allowInWebView:
-                webView.load(navigationAction.request)
-            case .openInSafari:
-                print("[NAV] ⚠️ OPENING IN SAFARI (popup): \(url.absoluteString)")
-                UIApplication.shared.open(url)
-            case .block:
-                break
-            }
+        guard let url = navigationAction.request.url else { return nil }
+        let decision = NavigationPolicy.decide(url: url, isMainFrame: true)
+        #if DEBUG
+        print("[NAV] window.open / _blank → \(decision) | \(url.absoluteString.prefix(120))")
+        #endif
+        switch decision {
+        case .allowInWebView:
+            let popup = WKWebView(frame: .zero, configuration: configuration)
+            popup.uiDelegate = self
+            popupWebView = popup
+            return popup
+        case .openInSafari:
+            print("[NAV] ⚠️ OPENING IN SAFARI (popup): \(url.absoluteString)")
+            UIApplication.shared.open(url)
+            return nil
+        case .block:
+            return nil
         }
-        return nil
+    }
+
+    func webViewDidClose(_ webView: WKWebView) {
+        if webView === popupWebView {
+            popupWebView = nil
+        }
     }
 }
