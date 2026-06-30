@@ -297,6 +297,7 @@ struct ReaderView: View {
                     ReaderStyler.fontSizeScript(points: prefs.fontSize))
                 _ = try? await webView.evaluateJavaScript(
                     ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+                // Spawns own Task — does not block enforceScroll (title repair is independent of scroll)
                 repairCurrentTitleIfNeeded(webView)
             } else {
                 _ = try? await webView.evaluateJavaScript(ReaderStyler.removalScript())
@@ -307,11 +308,10 @@ struct ReaderView: View {
         }
     }
 
-    /// Applies the current font-size/line-spacing prefs to the web view. Called
-    /// via the `.onChange(of: prefs.fontSize/lineSpacing)` modifiers below on
-    /// every prefs-panel tap (or Settings stepper change) so the text resizes
-    /// immediately, and from `applyReaderTreatment()` on every fresh page
-    /// load/navigation so a newly opened chapter reflects the saved prefs.
+    /// Applies the current font-size/line-spacing prefs to the web view.
+    /// Called via the `.onChange(of: prefs.fontSize/lineSpacing)` modifiers
+    /// on every prefs-panel tap (or Settings stepper change) so the text
+    /// resizes immediately.
     private func applyTypography() {
         let webView = env.reader.webView
         Task { @MainActor in

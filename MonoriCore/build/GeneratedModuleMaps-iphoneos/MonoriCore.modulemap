@@ -1,0 +1,4 @@
+module MonoriCore {
+header "MonoriCore-Swift.h"
+export *
+}

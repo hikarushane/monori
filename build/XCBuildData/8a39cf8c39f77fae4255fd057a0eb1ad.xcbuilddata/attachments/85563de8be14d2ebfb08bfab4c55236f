@@ -1,0 +1,179 @@
+{
+  "" : {
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/Monori-primary.dia",
+    "emit-module-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/Monori-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/Monori-primary-emit-module.dia",
+    "pch" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/Monori-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/Monori-primary.swiftdeps"
+  },
+  "/Users/shane_yeh/Projects/monori/App/AppEnvironment.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppEnvironment~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/AppRootView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/AppRootView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Browse/BrowseView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/BrowseView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Library/CollectionTOCView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/CollectionTOCView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Library/LibraryView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/LibraryView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Reader/ChapterSwipeIndicator.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ChapterSwipeIndicator~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Reader/ReaderPreferences.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferences~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Reader/ReaderPreferencesPanel.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderPreferencesPanel~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Reader/ReaderView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/ReaderView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Settings/SettingsView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Shared/MonoriIcons.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriIcons~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/Features/Shared/WebCollectionBanner.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebCollectionBanner~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/MonoriApp.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/MonoriApp~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/SmokeAutopilot.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/SmokeAutopilot~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/WebView/PatreonWebView.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/PatreonWebView~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/App/WebView/WebViewModel.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/WebViewModel~partial.swiftmodule"
+  },
+  "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/build/Monori.build/Debug-iphoneos/Monori.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

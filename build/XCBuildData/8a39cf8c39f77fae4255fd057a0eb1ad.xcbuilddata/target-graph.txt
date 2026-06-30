@@ -1,0 +1,9 @@
+Target dependency graph (4 targets)
+Target 'Monori' in project 'Monori'
+➜ Explicit dependency on target 'MonoriCore' in project 'MonoriCore'
+Target 'MonoriCore' in project 'MonoriCore'
+➜ Explicit dependency on target 'MonoriCore' in project 'MonoriCore'
+➜ Explicit dependency on target 'MonoriCore_MonoriCore' in project 'MonoriCore'
+Target 'MonoriCore' in project 'MonoriCore'
+➜ Explicit dependency on target 'MonoriCore_MonoriCore' in project 'MonoriCore'
+Target 'MonoriCore_MonoriCore' in project 'MonoriCore' (no dependencies)

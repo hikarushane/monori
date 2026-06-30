@@ -1,0 +1,73 @@
+/* Respect device color scheme. Without this, the injected CSS leaves the
+   vocus page in light mode even when the device is in dark mode. */
+:root {
+  color-scheme: light dark;
+}
+
+/* MonoriCore/Sources/MonoriCore/Assets/VocusReaderRuleset.css
+   Vocus reader ruleset. Hides chrome and ads while preserving the article
+   body and vocus native typography. Only font-size and line-height are
+   overridden via CSS variables set by the app. */
+
+/* --- hide chrome --- */
+nav,
+header,
+footer,
+iframe,
+[data-type="AdaptiveColorCard"],
+.table-of-contents,
+.next-article-col {
+  display: none !important;
+}
+
+/* Fixed-position overlays: top header, bottom sharing bar, QR popup */
+body > div > div:first-child {
+  position: static !important;
+}
+
+/* --- reading column --- */
+.editor-content-block,
+.lexical-web-theme {
+  max-width: 42em !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Typography: use app prefs without fighting vocus native fonts */
+.editor-content-block,
+.editor-content-block p,
+.editor-content-block li,
+.editor-content-block blockquote,
+.editor-content-block span,
+.lexical__paragraph {
+  font-size: var(--monori-font-size, 19px) !important;
+  line-height: var(--monori-line-height, 1.75) !important;
+}
+
+/* --- dark mode --- */
+body {
+  background-color: #faf8f5 !important;
+}
+
+body > *,
+body > * > *,
+body > * > * > *,
+body > * > * > * > *,
+body > * > * > * > * > *,
+body > * > * > * > * > * > * {
+  background-color: inherit !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1c1b19 !important;
+  }
+  .editor-content-block,
+  .editor-content-block p,
+  .editor-content-block span,
+  .editor-content-block li,
+  .editor-content-block blockquote,
+  .lexical__paragraph {
+    color: #e8e6e3 !important;
+  }
+}

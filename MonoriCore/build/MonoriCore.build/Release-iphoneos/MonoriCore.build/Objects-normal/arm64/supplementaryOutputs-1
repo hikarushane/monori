@@ -1,0 +1,12 @@
+{
+  "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "abi-baseline-json" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore.abi.json",
+    "const-values" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore-primary.swiftconstvalues",
+    "dependencies" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore-primary.d",
+    "diagnostics" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore-primary.dia",
+    "objc-header" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore-Swift.h",
+    "swiftdoc" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore.swiftdoc",
+    "swiftmodule" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore.swiftmodule",
+    "swiftsourceinfo" : "/Users/shane_yeh/Projects/monori/MonoriCore/build/MonoriCore.build/Release-iphoneos/MonoriCore.build/Objects-normal/arm64/MonoriCore.swiftsourceinfo"
+  }
+}
