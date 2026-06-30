@@ -18,9 +18,13 @@ enum CollectionRefreshOutcome: Equatable {
 final class AppEnvironment {
     let store: LibraryStore
     let browse = WebViewModel()
-    let reader = WebViewModel()
     // @Observable does not support lazy var — use @ObservationIgnored backing optionals
-    // so these two web processes are not spun up until first access.
+    // so these web processes are not spun up until first access.
+    @ObservationIgnored private var _reader: WebViewModel?
+    var reader: WebViewModel {
+        if _reader == nil { let m = WebViewModel(); wire(m); _reader = m }
+        return _reader!
+    }
     @ObservationIgnored private var _googleBrowse: WebViewModel?
     /// Built on first use (Browse → Google Drive) so launch spins up fewer
     /// WKWebViews. Isolated from the Patreon `browse` session.
@@ -81,8 +85,7 @@ final class AppEnvironment {
             store = (try? LibraryStore.inMemory()) ?? { fatalError("SwiftData unavailable") }()
         }
         wire(browse)
-        wire(reader)
-        // googleBrowse and refresher wire themselves on first access.
+        // reader, googleBrowse, and others wire themselves on first access.
 
         // Pre-warm the default Patreon URL so it's already loading by the time
         // BrowseView appears, reducing perceived cold start latency.
