@@ -28,6 +28,9 @@ public enum NavigationPolicy {
         if host == "asianfanfics.com" || host.hasSuffix(".asianfanfics.com") {
             return .allowInWebView
         }
+        if host == "appleid.apple.com" {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 

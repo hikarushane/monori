@@ -22,4 +22,11 @@ final class NavigationPolicyVocusTests: XCTestCase {
         let url = URL(string: "https://vocus.cc/salon/abc123")!
         XCTAssertEqual(NavigationPolicy.decide(url: url, isMainFrame: false), .allowInWebView)
     }
+
+    func testAllowsAppleIDOAuth() {
+        XCTAssertEqual(
+            decide("https://appleid.apple.com/auth/authorize?client_id=cc.vocus.web&response_mode=web_message"),
+            .allowInWebView
+        )
+    }
 }
