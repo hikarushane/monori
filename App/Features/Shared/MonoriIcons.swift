@@ -83,40 +83,37 @@ struct VocusMark: Shape {
     }
 }
 
-/// AsianFanfics mark: three silhouette heads in a staggered row with a small
-/// tilted open book to the lower-right — "community of readers". Filled.
+/// AsianFanfics mark: a centered silhouette (head + shoulders) above an open
+/// book — "a reader". Filled.
 struct AFFMark: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width, h = rect.height
         var p = Path()
 
-        // Head 1 (left, slightly lower)
-        p.addEllipse(in: CGRect(x: w * 0.06, y: h * 0.22, width: w * 0.20, height: w * 0.20))
-        // Shoulders 1
-        p.addEllipse(in: CGRect(x: w * 0.01, y: h * 0.45, width: w * 0.30, height: w * 0.18))
+        // Head
+        p.addEllipse(in: CGRect(
+            x: w * 0.34, y: h * 0.04,
+            width: w * 0.32, height: w * 0.32
+        ))
 
-        // Head 2 (center, highest)
-        p.addEllipse(in: CGRect(x: w * 0.26, y: h * 0.10, width: w * 0.22, height: w * 0.22))
-        // Shoulders 2
-        p.addEllipse(in: CGRect(x: w * 0.20, y: h * 0.35, width: w * 0.34, height: w * 0.20))
+        // Shoulders
+        p.addEllipse(in: CGRect(
+            x: w * 0.18, y: h * 0.36,
+            width: w * 0.64, height: h * 0.16
+        ))
 
-        // Head 3 (right, slightly lower)
-        p.addEllipse(in: CGRect(x: w * 0.47, y: h * 0.22, width: w * 0.20, height: w * 0.20))
-        // Shoulders 3
-        p.addEllipse(in: CGRect(x: w * 0.42, y: h * 0.45, width: w * 0.30, height: w * 0.18))
-
-        // Small open book (lower-right)
-        // Left page
-        p.move(to: CGPoint(x: w * 0.72, y: h * 0.88))
-        p.addLine(to: CGPoint(x: w * 0.60, y: h * 0.72))
-        p.addLine(to: CGPoint(x: w * 0.60, y: h * 0.56))
-        p.addLine(to: CGPoint(x: w * 0.72, y: h * 0.68))
+        // Open book — left page
+        p.move(to: CGPoint(x: w * 0.10, y: h * 0.58))
+        p.addLine(to: CGPoint(x: w * 0.47, y: h * 0.62))
+        p.addLine(to: CGPoint(x: w * 0.47, y: h * 0.72))
+        p.addLine(to: CGPoint(x: w * 0.10, y: h * 0.86))
         p.closeSubpath()
-        // Right page
-        p.move(to: CGPoint(x: w * 0.72, y: h * 0.88))
-        p.addLine(to: CGPoint(x: w * 0.84, y: h * 0.72))
-        p.addLine(to: CGPoint(x: w * 0.84, y: h * 0.56))
-        p.addLine(to: CGPoint(x: w * 0.72, y: h * 0.68))
+
+        // Open book — right page
+        p.move(to: CGPoint(x: w * 0.53, y: h * 0.62))
+        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.58))
+        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.86))
+        p.addLine(to: CGPoint(x: w * 0.53, y: h * 0.72))
         p.closeSubpath()
 
         return p
