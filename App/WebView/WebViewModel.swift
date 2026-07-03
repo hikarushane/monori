@@ -422,9 +422,12 @@ extension WebViewModel: WKNavigationDelegate {
 }
 
 extension WebViewModel: WKUIDelegate {
-    /// Patreon renders some links with target="_blank"; without this delegate
-    /// WKWebView silently ignores those taps ("nothing happens"). Route them
-    /// through the same policy and load them in place instead.
+    /// Sites open links via window.open / target="_blank"; without this
+    /// delegate WKWebView silently ignores those taps ("nothing happens").
+    /// Only OAuth sign-in popups get a real popup WKWebView (their
+    /// postMessage flow needs window.opener). Content links load in the
+    /// main web view, which carries the collection-detection scripts and
+    /// message handlers the import banner depends on. See ADR-0007.
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
@@ -436,8 +439,8 @@ extension WebViewModel: WKUIDelegate {
         #endif
         switch decision {
         case .allowInWebView:
-            if URLNormalizer.isVocusRoomURL(url.absoluteString) {
-                webView.load(URLRequest(url: url))
+            guard NavigationPolicy.requiresPopupWindow(url) else {
+                webView.load(navigationAction.request)
                 return nil
             }
             let popup = WKWebView(frame: .zero, configuration: configuration)
