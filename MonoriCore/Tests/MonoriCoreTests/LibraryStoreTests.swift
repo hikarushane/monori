@@ -12,11 +12,12 @@ final class LibraryStoreTests: XCTestCase {
     }
 
     private func payload(_ title: String, _ url: String, order: Int,
-                         excerpt: String? = nil) -> ImporterChapterPayload {
+                         excerpt: String? = nil,
+                         collection: String = "【更新中】焚心 The Burning Heart") -> ImporterChapterPayload {
         ImporterChapterPayload(title: title, url: url, visibleDateText: nil,
                                excerpt: excerpt,
                                creatorName: "ocean",
-                               collectionName: "【更新中】焚心 The Burning Heart",
+                               collectionName: collection,
                                collectionURL: "https://www.patreon.com/collection/9999",
                                domOrder: order)
     }
@@ -59,6 +60,15 @@ final class LibraryStoreTests: XCTestCase {
         ])
         let chapters = store.orderedChapters(of: try store.collections()[0])
         XCTAssertEqual(chapters.map(\.title), ["4 愛", "5 脣瓣"])
+    }
+
+    func testReimportRefreshesStaleCollectionTitle() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0,
+                                       collection: "Customize this collection")])
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let collections = try store.collections()
+        XCTAssertEqual(collections.count, 1)
+        XCTAssertEqual(collections[0].title, "【更新中】焚心 The Burning Heart")
     }
 
     func testImportPersistsExcerptAndReimportFillsMissing() throws {

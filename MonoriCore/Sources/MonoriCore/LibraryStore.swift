@@ -40,6 +40,11 @@ public final class LibraryStore {
         if collection.creatorName?.isEmpty ?? true {
             collection.creatorName = first.creatorName
         }
+        // Re-import syncs the title from the page so a name scraped wrong
+        // once (e.g. owner-view "Customize this collection") heals itself.
+        if !first.collectionName.isEmpty {
+            collection.title = first.collectionName
+        }
 
         let existing = collection.chapters
             .sorted { $0.orderIndex < $1.orderIndex }
