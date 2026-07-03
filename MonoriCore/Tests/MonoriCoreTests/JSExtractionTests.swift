@@ -131,6 +131,17 @@ final class JSExtractionTests: XCTestCase {
         XCTAssertEqual(payloads.map(\.creatorName), ["ocean", "ocean"])
     }
 
+    func testCollectionImportOwnerViewPrefersDocumentTitleOverOwnerUIHeading() async throws {
+        let bodies = try await runScript(JSAssets.collectionImport,
+                                         fixture: "collection_page_owner_view",
+                                         handlerName: "monoriImport")
+        let payloads = try bodies.map { try PayloadValidator.validateImporterChapter($0).get() }
+        XCTAssertEqual(payloads.count, 2)
+        XCTAssertTrue(payloads.allSatisfy { $0.collectionName == "聽君一席話，如聽一席話" },
+                      "owner-view h1 'Customize this collection' must not become the collection name, got: \(payloads.map(\.collectionName))")
+        XCTAssertEqual(payloads.map(\.creatorName), ["hikaruHa", "hikaruHa"])
+    }
+
     func testCollectionImportLoadsLazyContentBeforeScraping() async throws {
         let bodies = try await runScript(JSAssets.collectionImport,
                                          fixture: "collection_page_lazy",

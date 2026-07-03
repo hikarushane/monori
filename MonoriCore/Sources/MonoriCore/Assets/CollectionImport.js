@@ -14,8 +14,18 @@ function limitField(value) {
   return compactText(value).slice(0, 256);
 }
 
+// The owner's view of their own collection renders management UI (e.g.
+// "Customize this collection") as the first h1, so document.title —
+// "NAME | Collection from CREATOR | N posts | Patreon" — is the only
+// reliable source of the collection name there.
+function collectionNameFromDocumentTitle() {
+  var match = (document.title || "").match(/^(.*?)\s*\|\s*Collection from\s/i);
+  return match ? limitField(match[1]) : "";
+}
+
 var h1 = document.querySelector("h1");
-var collectionName = limitField((h1 && h1.textContent) || document.title || "");
+var collectionName = collectionNameFromDocumentTitle()
+  || limitField((h1 && h1.textContent) || document.title || "");
 var collectionURL = location.href;
 var creatorName = creatorNameFromPage();
 
