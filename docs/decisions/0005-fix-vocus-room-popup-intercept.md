@@ -1,7 +1,9 @@
 # ADR-0005: Intercept Vocus Room URLs Instead of Creating Popup WebView
 
 ## Status
-Accepted
+Superseded by ADR-0007
+
+> **Correction (2026-07-03):** the root-cause attribution below ("Vocus changed their SPA") is wrong. Room links had loaded in the main WebView since a12eba5 (2026-06-12); what changed was our own popup handling in 784bd9d (2026-06-30), which routed every allowed `window.open` URL into a bare popup sheet. The per-URL interception this ADR chose was replaced by an OAuth-only popup policy in ADR-0007 after Google Docs hit the same regression.
 
 ## Date
 2026-06-30
