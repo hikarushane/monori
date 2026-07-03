@@ -4,6 +4,7 @@ import os
 
 struct PatreonWebView: UIViewRepresentable {
     let model: WebViewModel
+    @Environment(\.colorScheme) private var colorScheme
     /// Called when the user taps the page. The Bool is true when the tap landed
     /// in the central region (middle 50% horizontally, middle 40% vertically),
     /// which the reader uses to toggle its chrome without firing on link taps
@@ -82,6 +83,7 @@ struct PatreonWebView: UIViewRepresentable {
             webView.addGestureRecognizer(tap)
         }
         context.coordinator.setupChapterSwipeDetection(webView)
+        webView.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native makeUIView bounds=\(NSCoder.string(for: webView.bounds), privacy: .public)")
@@ -97,6 +99,7 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.allowBackSwipe = allowBackSwipe
         context.coordinator.onOverscroll = onOverscroll
         context.coordinator.onChapterBoundary = onChapterBoundary
+        uiView.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native updateUIView bounds=\(NSCoder.string(for: uiView.bounds), privacy: .public)")
