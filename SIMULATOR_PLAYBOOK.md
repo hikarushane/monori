@@ -194,6 +194,27 @@ maintenance mode), record the date and exact error here, drive with
 driver A (computer-use MCP) or manual fallback, and leave driver B
 alone until a dedicated follow-up plan addresses it.
 
+- **"Mach port invalid, device disconnected" on every tap while
+  `doctor` passes (2026-07-03):** a stale `idb_companion` daemon from
+  before a Simulator relaunch. Fix: `pkill -f idb_companion`, wait 2s,
+  retry — the companion respawns and taps work again. `idb kill` alone
+  was NOT enough.
+
+### Capturing `print()` output (app stdout)
+
+`log stream`/`log show` never see Swift `print()` (only `Logger`).
+To read `[NAV]` and other print-based debug lines, relaunch the app
+with a console pty attached and log to a file:
+
+```bash
+xcrun simctl terminate booted dev.monori.Monori || true
+(xcrun simctl launch --console-pty booted dev.monori.Monori > /tmp/monori-console.log 2>&1 &)
+```
+
+Login state survives; in-app navigation resets. Grep the file after
+driving (`grep -a "\[NAV\]" /tmp/monori-console.log`). Verified
+2026-07-03 while diagnosing window.open popup routing.
+
 ## Human-verification handoff
 
 Triggers — any of these visible in a screenshot:
