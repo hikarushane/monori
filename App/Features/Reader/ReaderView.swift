@@ -284,6 +284,8 @@ struct ReaderView: View {
             if foreignPageTitle == nil {
                 if !renderingStoredHTML {
                     let sourceKind = current.collection?.sourceKind ?? .patreon
+                    DiagnosticLog.shared.log(category: "reader",
+                        "applying reader CSS, source=\(sourceKind)")
                     switch sourceKind {
                     case .vocus:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript())
@@ -300,6 +302,8 @@ struct ReaderView: View {
                 // Spawns own Task — does not block enforceScroll (title repair is independent of scroll)
                 repairCurrentTitleIfNeeded(webView)
             } else {
+                DiagnosticLog.shared.log(category: "reader",
+                    "foreign page — reader CSS removed")
                 _ = try? await webView.evaluateJavaScript(ReaderStyler.removalScript())
             }
             let savedProgress = foreignPageTitle == nil ? current.readingProgress : nil
@@ -381,6 +385,8 @@ struct ReaderView: View {
             if foreignPageTitle == nil {
                 Button {
                     env.store.toggleBookmark(current)
+                    DiagnosticLog.shared.log(category: "bookmark",
+                        "reader bookmark \(current.isBookmarked ? "set" : "cleared")")
                 } label: {
                     Image(systemName: current.isBookmarked ? "bookmark.fill" : "bookmark")
                         .foregroundStyle(current.isBookmarked ? Color.accentColor : Color.secondary)

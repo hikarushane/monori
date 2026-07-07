@@ -175,6 +175,8 @@ final class AppEnvironment {
                 self.pendingImport = []
                 try? self.store.applyImport(batch)
                 self.importedCountThisSession = batch.count
+                DiagnosticLog.shared.log(category: "import",
+                    "web import batch applied: \(batch.count) chapters")
                 if Self.isSmokeMode {
                     let collectionCount = (try? self.store.collectionCount()) ?? -1
                     smokeLog.notice("[SMOKE] import_payload_batch_count=\(batch.count)")
@@ -187,6 +189,8 @@ final class AppEnvironment {
             // message arrives the user may have left the post (e.g. back to home).
             guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage else { return }
             model.detectedCollection = payload
+            DiagnosticLog.shared.log(category: "import",
+                "collection detected: \(payload.collectionName)")
         }
     }
 
@@ -195,13 +199,27 @@ final class AppEnvironment {
     @discardableResult
     func importGoogleDoc(from model: WebViewModel) async -> Int {
         guard let url = model.currentURL?.absoluteString,
-              let docID = URLNormalizer.googleDocID(url) else { return 0 }
-        guard let html = await model.fetchGoogleDocHTML() else { return 0 }
+              let docID = URLNormalizer.googleDocID(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "google-docs: current URL is not a doc")
+            return 0
+        }
+        guard let html = await model.fetchGoogleDocHTML() else {
+            DiagnosticLog.shared.error(category: "import",
+                "google-docs: HTML fetch failed")
+            return 0
+        }
         let docTitle = model.webView.title ?? "Google Doc"
         let imported = GoogleDocsChapterSplitter.split(html: html, docID: docID, docTitle: docTitle)
-        guard !imported.chapters.isEmpty else { return 0 }
+        guard !imported.chapters.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "google-docs: split produced 0 chapters")
+            return 0
+        }
         try? store.applyDocImport(imported)
         importedCountThisSession = imported.chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "google-docs: imported \(imported.chapters.count) chapters")
         return imported.chapters.count
     }
 
@@ -211,7 +229,11 @@ final class AppEnvironment {
     @discardableResult
     func importAO3Work(from model: WebViewModel) async -> Int {
         guard let url = model.currentURL?.absoluteString,
-              let _ = URLNormalizer.ao3WorkID(url) else { return 0 }
+              let _ = URLNormalizer.ao3WorkID(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "ao3: current URL is not a work")
+            return 0
+        }
 
         ao3ImportTotal = 0
         ao3ImportCurrent = 0
@@ -226,13 +248,21 @@ final class AppEnvironment {
             "document.querySelector('a[rel=\"author\"]')?.textContent?.trim() ?? null",
             contentWorld: .page) as? String
 
-        guard let navigateHTML = await model.fetchAO3NavigatePage() else { return 0 }
+        guard let navigateHTML = await model.fetchAO3NavigatePage() else {
+            DiagnosticLog.shared.error(category: "import",
+                "ao3: navigate page fetch failed")
+            return 0
+        }
         let entries = AO3ChapterSplitter.parseNavigatePage(html: navigateHTML)
 
         if entries.isEmpty {
             let contentJS = "document.querySelector('.userstuff')?.innerHTML ?? null"
             guard let content = try? await model.webView.callAsyncJavaScript(
-                contentJS, contentWorld: .page) as? String, !content.isEmpty else { return 0 }
+                contentJS, contentWorld: .page) as? String, !content.isEmpty else {
+                DiagnosticLog.shared.error(category: "import",
+                    "ao3: single-chapter content extraction failed")
+                return 0
+            }
             let canonicalURL = URLNormalizer.canonicalAO3WorkURL(url) ?? url
             let imported = ImportedCollection(
                 sourceURLString: canonicalURL, title: workTitle, creatorName: authorName,
@@ -241,6 +271,8 @@ final class AppEnvironment {
                                            orderIndex: 0, contentHTML: content)])
             try? store.applyDocImport(imported)
             importedCountThisSession = 1
+            DiagnosticLog.shared.log(category: "import",
+                "ao3: imported 1 chapter (single)")
             return 1
         }
 
@@ -271,7 +303,11 @@ final class AppEnvironment {
         ao3ImportTotal = 0
         ao3ImportCurrent = 0
 
-        guard !chapters.isEmpty else { return 0 }
+        guard !chapters.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "ao3: 0 of \(entries.count) chapters extracted")
+            return 0
+        }
 
         let canonicalURL = URLNormalizer.canonicalAO3WorkURL(url) ?? url
         let imported = ImportedCollection(
@@ -279,6 +315,8 @@ final class AppEnvironment {
             sourceKind: .ao3, chapters: chapters)
         try? store.applyDocImport(imported)
         importedCountThisSession = chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "ao3: imported \(chapters.count)/\(entries.count) chapters")
         return chapters.count
     }
 
@@ -289,14 +327,22 @@ final class AppEnvironment {
     @discardableResult
     func importVocusRoom(from model: WebViewModel) async -> Int {
         guard let url = model.currentURL?.absoluteString,
-              URLNormalizer.isVocusRoomURL(url) else { return 0 }
+              URLNormalizer.isVocusRoomURL(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "vocus: current URL is not a room")
+            return 0
+        }
 
         let roomTitle = model.detectedCollection?.collectionName ?? "Vocus Room"
         let creatorName = model.detectedCollection?.creatorName
 
         let result = try? await model.webView.callAsyncJavaScript(
             JSAssets.vocusRoomImport, contentWorld: .page)
-        guard let articles = result as? [[String: Any]], !articles.isEmpty else { return 0 }
+        guard let articles = result as? [[String: Any]], !articles.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "vocus: import script returned no articles")
+            return 0
+        }
 
         let canonicalURL = URLNormalizer.canonicalVocusRoomURL(url) ?? url
         let chapters = articles.enumerated().map { index, dict -> ImportedChapter in
@@ -314,6 +360,8 @@ final class AppEnvironment {
             chapters: chapters)
         try? store.applyDocImport(imported)
         importedCountThisSession = chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "vocus: imported \(chapters.count) articles")
         return chapters.count
     }
 
@@ -324,14 +372,22 @@ final class AppEnvironment {
     @discardableResult
     func importAFFStory(from model: WebViewModel) async -> Int {
         guard let url = model.currentURL?.absoluteString,
-              URLNormalizer.isAFFForewordURL(url) else { return 0 }
+              URLNormalizer.isAFFForewordURL(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "aff: current URL is not a foreword")
+            return 0
+        }
 
         let storyTitle = model.detectedCollection?.collectionName ?? "AFF Story"
         let creatorName = model.detectedCollection?.creatorName
 
         let result = try? await model.webView.callAsyncJavaScript(
             JSAssets.affStoryImport, contentWorld: .page)
-        guard let chapters = result as? [[String: Any]], !chapters.isEmpty else { return 0 }
+        guard let chapters = result as? [[String: Any]], !chapters.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "aff: import script returned no chapters")
+            return 0
+        }
 
         let canonicalURL = URLNormalizer.canonicalAFFStoryURL(url) ?? url
         let imported = ImportedCollection(
@@ -347,6 +403,8 @@ final class AppEnvironment {
             })
         try? store.applyDocImport(imported)
         importedCountThisSession = imported.chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "aff: imported \(imported.chapters.count) chapters")
         return imported.chapters.count
     }
 
@@ -355,7 +413,10 @@ final class AppEnvironment {
     /// already-imported chapters are untouched and only genuinely new posts land.
     func refreshCollection(_ collection: LocalCollectionModel) async -> CollectionRefreshOutcome {
         guard collection.sourceKind == .patreon else { return .upToDate }
-        guard let url = URL(string: collection.sourceURLString) else { return .failed }
+        guard let url = URL(string: collection.sourceURLString) else {
+            DiagnosticLog.shared.error(category: "refresh", "invalid source URL")
+            return .failed
+        }
         // An offscreen WKWebView needs a real frame for layout-driven lazy lists.
         if refresher.webView.frame.isEmpty {
             refresher.webView.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
@@ -366,8 +427,14 @@ final class AppEnvironment {
         let loaded = await waitUntil(timeout: .seconds(30)) { [refresher] in
             refresher.finishedNavigationCount > baseline && !refresher.webView.isLoading
         }
-        guard loaded else { return .failed }
-        if refresher.currentURL?.path.contains("/login") == true { return .needsLogin }
+        guard loaded else {
+            DiagnosticLog.shared.error(category: "refresh", "page load timed out")
+            return .failed
+        }
+        if refresher.currentURL?.path.contains("/login") == true {
+            DiagnosticLog.shared.log(category: "refresh", "needs login")
+            return .needsLogin
+        }
         await refresher.runCollectionImport()
         // applyImport flushes 300 ms after the last chapter message lands;
         // wait it out before counting.
@@ -380,6 +447,8 @@ final class AppEnvironment {
         // root, then auto re-enter the collection ~5 s later" the user reported.
         // Runs only after the import flush has landed, so it can't drop chapters.
         refresher.webView.loadHTMLString("", baseURL: nil)
+        DiagnosticLog.shared.log(category: "refresh",
+            delta > 0 ? "found \(delta) new chapters" : "up to date")
         return delta > 0 ? .newChapters(delta) : .upToDate
     }
 
@@ -399,9 +468,11 @@ final class AppEnvironment {
         let records = await dataStore.dataRecords(ofTypes: types)
         await dataStore.removeData(ofTypes: types, for: records)
         browse.load(URL(string: "about:blank")!)
+        DiagnosticLog.shared.log(category: "data", "browser data cleared (logged out)")
     }
 
     func clearLibraryData() {
         try? store.clearLibrary()
+        DiagnosticLog.shared.log(category: "data", "library data cleared")
     }
 }

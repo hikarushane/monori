@@ -150,6 +150,8 @@ struct CollectionTOCView: View {
                 Spacer()
                 Button {
                     env.store.toggleBookmark(chapter)
+                    DiagnosticLog.shared.log(category: "bookmark",
+                        "TOC bookmark \(chapter.isBookmarked ? "set" : "cleared")")
                 } label: {
                     Image(systemName: chapter.isBookmarked ? "bookmark.fill" : "bookmark")
                         .foregroundStyle(chapter.isBookmarked ? Color.accentColor : Color.secondary)
