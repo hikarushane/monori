@@ -12,6 +12,7 @@ struct SettingsView: View {
     }
     @State private var logExport: LogExport?
     @State private var showNoLogsAlert = false
+    @State private var showExportFailedAlert = false
 
     var body: some View {
         @Bindable var prefs = env.prefs
@@ -46,13 +47,17 @@ struct SettingsView: View {
 
                 Section {
                     Button("匯出診斷記錄") {
-                        if let text = DiagnosticLog.shared.exportText() {
-                            let url = FileManager.default.temporaryDirectory
-                                .appendingPathComponent("monori-diagnostic-log.txt")
-                            try? text.write(to: url, atomically: true, encoding: .utf8)
-                            logExport = LogExport(url: url)
-                        } else {
+                        guard let text = DiagnosticLog.shared.exportText() else {
                             showNoLogsAlert = true
+                            return
+                        }
+                        let url = FileManager.default.temporaryDirectory
+                            .appendingPathComponent("monori-diagnostic-log.txt")
+                        do {
+                            try text.write(to: url, atomically: true, encoding: .utf8)
+                            logExport = LogExport(url: url)
+                        } catch {
+                            showExportFailedAlert = true
                         }
                     }
                     .accessibilityIdentifier("smoke.exportLogsButton")
@@ -84,6 +89,9 @@ struct SettingsView: View {
                 ActivityView(items: [export.url])
             }
             .alert("尚無診斷記錄", isPresented: $showNoLogsAlert) {
+                Button("好", role: .cancel) {}
+            }
+            .alert("匯出失敗", isPresented: $showExportFailedAlert) {
                 Button("好", role: .cancel) {}
             }
         }
