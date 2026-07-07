@@ -52,6 +52,40 @@ public final class DiagnosticLog: @unchecked Sendable {
         queue.sync {}
     }
 
+    /// Header + rotated file + current file, oldest first.
+    /// `nil` when neither log file exists.
+    public func exportText() -> String? {
+        queue.sync {
+            let rotated = try? String(contentsOf: rotatedFileURL, encoding: .utf8)
+            let current = try? String(contentsOf: currentFileURL, encoding: .utf8)
+            if rotated == nil && current == nil { return nil }
+            return Self.exportHeader() + (rotated ?? "") + (current ?? "")
+        }
+    }
+
+    private static func exportHeader() -> String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let build = info?["CFBundleVersion"] as? String ?? "unknown"
+        var sysinfo = utsname()
+        uname(&sysinfo)
+        let model = withUnsafePointer(to: &sysinfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) { String(cString: $0) }
+        }
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return """
+        Monori diagnostic log
+        App: \(version) (\(build))
+        iOS: \(ProcessInfo.processInfo.operatingSystemVersionString), \(model)
+        Locale: \(Locale.current.identifier)
+        Exported: \(f.string(from: Date()))
+        ---
+
+        """
+    }
+
     private func append(category: String, message: String, isError: Bool) {
         if forwardToOSLog {
             let logger = Logger(subsystem: "dev.monori", category: category)

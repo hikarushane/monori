@@ -88,4 +88,37 @@ final class DiagnosticLogTests: XCTestCase {
         XCTAssertEqual(lines.count, 50)
         XCTAssertTrue(lines.allSatisfy { $0.contains(" [t] line-") })
     }
+
+    func testExportTextNilWhenNoFiles() {
+        XCTAssertNil(log.exportText())
+    }
+
+    func testExportTextConcatenatesOldestFirstWithHeader() throws {
+        let pad = String(repeating: "a", count: 40)
+        log.log(category: "t", "first-\(pad)")
+        log.log(category: "t", "second-\(pad)")
+        log.log(category: "t", "third-\(pad)")   // rotates (maxFileBytes=200)
+        log.log(category: "t", "fourth-\(pad)")  // fresh current
+        log.flush()
+
+        let text = try XCTUnwrap(log.exportText())
+        XCTAssertTrue(text.hasPrefix("Monori diagnostic log"))
+        XCTAssertTrue(text.contains("\n---\n"))
+        let first = try XCTUnwrap(text.range(of: "first-"))
+        let fourth = try XCTUnwrap(text.range(of: "fourth-"))
+        XCTAssertTrue(first.lowerBound < fourth.lowerBound,
+                      "rotated (older) content must precede current content")
+    }
+
+    func testExportHeaderHasNoUDIDOrAccountFields() throws {
+        log.log(category: "t", "x")
+        log.flush()
+        let header = try XCTUnwrap(log.exportText())
+            .components(separatedBy: "\n---\n")[0]
+        let allowed = ["Monori diagnostic log", "App:", "iOS:", "Locale:", "Exported:"]
+        for line in header.split(separator: "\n") {
+            XCTAssertTrue(allowed.contains { line.hasPrefix($0) },
+                          "unexpected header line: \(line)")
+        }
+    }
 }
