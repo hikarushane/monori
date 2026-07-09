@@ -30,6 +30,8 @@ final class AutoCheckSchedulerTests: XCTestCase {
         XCTAssertTrue(AutoCheckScheduler.due(from: [c], now: now).isEmpty)
         c.lastCheckedAt = now.addingTimeInterval(-7 * 60 * 60)   // 7 h ago
         XCTAssertEqual(AutoCheckScheduler.due(from: [c], now: now).count, 1)
+        c.lastCheckedAt = now.addingTimeInterval(-AutoCheckScheduler.cooldown)  // exactly 6 h ago
+        XCTAssertEqual(AutoCheckScheduler.due(from: [c], now: now).count, 1)
     }
 
     func testForceIgnoresCooldownButNotStatusOrCapability() throws {
@@ -38,6 +40,9 @@ final class AutoCheckSchedulerTests: XCTestCase {
         XCTAssertEqual(AutoCheckScheduler.due(from: [c], force: true).count, 1)
         c.readingStatus = .finished
         XCTAssertTrue(AutoCheckScheduler.due(from: [c], force: true).isEmpty)
+        let gdocs = try makeCollection(url: "https://docs.google.com/document/d/x", kind: .googleDocs)
+        gdocs.lastCheckedAt = Date()
+        XCTAssertTrue(AutoCheckScheduler.due(from: [gdocs], force: true).isEmpty)
     }
 
     func testNonReadingAndUnsupportedKindsAreExcluded() throws {

@@ -4,7 +4,7 @@ public enum AutoCheckScheduler {
     public static let cooldown: TimeInterval = 6 * 60 * 60
 
     /// Collections due for a new-chapter check: actively followed,
-    /// refresh-capable, and past the cooldown (or never checked).
+    /// refresh-capable, and at or past the cooldown (or never checked).
     /// `force` (pull-to-refresh) ignores the cooldown only.
     public static func due(from collections: [LocalCollectionModel],
                            now: Date = .now,
