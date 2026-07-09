@@ -303,4 +303,46 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(c.unreadCount, 0)
         XCTAssertFalse(c.chapters[0].isNew)
     }
+
+    func testRefreshMergeMarksOnlyAddedChaptersNew() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+        ])
+        let c = try store.collections()[0]
+        let chapters = store.orderedChapters(of: c)
+        XCTAssertFalse(chapters[0].isNew)
+        XCTAssertTrue(chapters[1].isNew)
+        XCTAssertEqual(c.unreadCount, 1)
+        XCTAssertNotNil(c.lastNewChapterAt)
+    }
+
+    func testReimportWithNoNewChaptersLeavesTimestampNil() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 0)
+        XCTAssertNil(c.lastNewChapterAt)
+    }
+
+    func testDocImportMergeMarksAddedChapterNew() throws {
+        let first = ImportedCollection(
+            sourceURLString: "https://vocus.cc/salon/abc/room/def",
+            title: "Room", creatorName: "someone", sourceKind: .vocus,
+            chapters: [ImportedChapter(title: "A1", urlString: "https://vocus.cc/article/1", orderIndex: 0)])
+        try store.applyDocImport(first)
+        let second = ImportedCollection(
+            sourceURLString: "https://vocus.cc/salon/abc/room/def",
+            title: "Room", creatorName: "someone", sourceKind: .vocus,
+            chapters: [
+                ImportedChapter(title: "A1", urlString: "https://vocus.cc/article/1", orderIndex: 0),
+                ImportedChapter(title: "A2", urlString: "https://vocus.cc/article/2", orderIndex: 1)
+            ])
+        try store.applyDocImport(second)
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 1)
+        XCTAssertNotNil(c.lastNewChapterAt)
+        XCTAssertTrue(c.chapters.first { $0.urlString.hasSuffix("/2") }!.isNew)
+    }
 }

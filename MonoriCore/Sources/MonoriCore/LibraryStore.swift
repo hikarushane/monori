@@ -46,6 +46,12 @@ public final class LibraryStore {
             collection.title = first.collectionName
         }
 
+        // A merge into a collection that already has chapters is a refresh;
+        // chapters inserted below are "new" in the update-center sense.
+        // The initial import of a (possibly complete) serial is not.
+        let isRefreshMerge = !collection.chapters.isEmpty
+        var insertedNewChapter = false
+
         let existing = collection.chapters
             .sorted { $0.orderIndex < $1.orderIndex }
             .map { ChapterRecord(title: $0.title, urlString: $0.urlString,
@@ -71,9 +77,14 @@ public final class LibraryStore {
                                                 orderIndex: record.orderIndex,
                                                 visibleDateText: record.visibleDateText,
                                                 excerpt: record.excerpt)
+                chapter.isNew = isRefreshMerge
+                insertedNewChapter = true
                 chapter.collection = collection
                 context.insert(chapter)
             }
+        }
+        if isRefreshMerge && insertedNewChapter {
+            collection.lastNewChapterAt = Date()
         }
         try context.save()
     }
@@ -91,6 +102,12 @@ public final class LibraryStore {
             collection = c
         }
 
+        // A merge into a collection that already has chapters is a refresh;
+        // chapters inserted below are "new" in the update-center sense.
+        // The initial import of a (possibly complete) serial is not.
+        let isRefreshMerge = !collection.chapters.isEmpty
+        var insertedNewChapter = false
+
         var existingByURL: [String: LocalChapterModel] = [:]
         for chapter in collection.chapters where existingByURL[chapter.urlString] == nil {
             existingByURL[chapter.urlString] = chapter
@@ -103,10 +120,15 @@ public final class LibraryStore {
             } else {
                 let chapter = LocalChapterModel(title: ic.title, urlString: ic.urlString,
                                                 orderIndex: ic.orderIndex)
+                chapter.isNew = isRefreshMerge
+                insertedNewChapter = true
                 chapter.contentHTML = ic.contentHTML
                 chapter.collection = collection
                 context.insert(chapter)
             }
+        }
+        if isRefreshMerge && insertedNewChapter {
+            collection.lastNewChapterAt = Date()
         }
         try context.save()
     }
