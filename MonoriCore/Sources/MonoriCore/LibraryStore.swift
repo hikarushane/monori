@@ -241,6 +241,26 @@ public final class LibraryStore {
         try context.save()
     }
 
+    /// Called when the user opens a chapter (TOC tap or reader prev/next).
+    public func markChapterOpened(_ chapter: LocalChapterModel, at date: Date = .now) {
+        chapter.isNew = false
+        chapter.collection?.lastReadAt = date
+        try? context.save()
+    }
+
+    public func setReadingStatus(_ status: CollectionReadingStatus,
+                                 for collection: LocalCollectionModel) {
+        collection.readingStatus = status
+        try? context.save()
+    }
+
+    /// Stamps a completed (auto or manual) new-chapter check, successful or not,
+    /// so the cooldown holds regardless of outcome.
+    public func recordCheck(_ collection: LocalCollectionModel, at date: Date = .now) {
+        collection.lastCheckedAt = date
+        try? context.save()
+    }
+
     // MARK: private
 
     private func findCollection(sourceURLString: String) throws -> LocalCollectionModel? {

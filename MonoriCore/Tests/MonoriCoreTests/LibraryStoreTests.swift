@@ -345,4 +345,35 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertNotNil(c.lastNewChapterAt)
         XCTAssertTrue(c.chapters.first { $0.urlString.hasSuffix("/2") }!.isNew)
     }
+
+    func testMarkChapterOpenedClearsIsNewAndSetsLastReadAt() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+        ])
+        let c = try store.collections()[0]
+        let newChapter = store.orderedChapters(of: c)[1]
+        XCTAssertTrue(newChapter.isNew)
+        store.markChapterOpened(newChapter)
+        XCTAssertFalse(newChapter.isNew)
+        XCTAssertNotNil(c.lastReadAt)
+        XCTAssertEqual(c.unreadCount, 0)
+    }
+
+    func testSetReadingStatusPersists() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let c = try store.collections()[0]
+        store.setReadingStatus(.finished, for: c)
+        XCTAssertEqual(try store.collections()[0].readingStatus, .finished)
+    }
+
+    func testRecordCheckSetsLastCheckedAtOnly() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let c = try store.collections()[0]
+        store.recordCheck(c)
+        XCTAssertNotNil(c.lastCheckedAt)
+        XCTAssertNil(c.lastNewChapterAt)
+        XCTAssertNil(c.lastReadAt)
+    }
 }
