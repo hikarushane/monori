@@ -58,3 +58,16 @@ public enum SourceRegistry {
         }
     }
 }
+
+public extension SourceKind {
+    /// Sources whose collections can be re-crawled by the offscreen refresher.
+    /// Vocus / AsianFanfics flip to true once their offscreen path is verified;
+    /// AO3 needs its own content-preserving merge (separate plan); Google Docs
+    /// stays manual by design.
+    var supportsAutoCheck: Bool {
+        switch self {
+        case .patreon: return true
+        case .googleDocs, .ao3, .vocus, .asianFanfics: return false
+        }
+    }
+}
