@@ -10,6 +10,10 @@ enum CollectionRefreshOutcome: Equatable {
     case newChapters(Int)
     case upToDate
     case needsLogin
+    /// CAPTCHA / Cloudflare interstitial — needs the user, stop this source for the round.
+    case blocked
+    /// Source has no offscreen refresh path (Google Docs, AO3 for now).
+    case unsupported
     case failed
 }
 
@@ -412,7 +416,7 @@ final class AppEnvironment {
     /// re-runs the chapter import. `applyImport` merges by normalized URL, so
     /// already-imported chapters are untouched and only genuinely new posts land.
     func refreshCollection(_ collection: LocalCollectionModel) async -> CollectionRefreshOutcome {
-        guard collection.sourceKind == .patreon else { return .upToDate }
+        guard collection.sourceKind.supportsAutoCheck else { return .unsupported }
         guard let url = URL(string: collection.sourceURLString) else {
             DiagnosticLog.shared.error(category: "refresh", "invalid source URL")
             return .failed
@@ -435,10 +439,19 @@ final class AppEnvironment {
             DiagnosticLog.shared.log(category: "refresh", "needs login")
             return .needsLogin
         }
-        await refresher.runCollectionImport()
-        // applyImport flushes 300 ms after the last chapter message lands;
-        // wait it out before counting.
-        try? await Task.sleep(for: .milliseconds(600))
+        if await refresherShowsHumanChallenge() {
+            DiagnosticLog.shared.log(category: "refresh", "human verification page, stopping")
+            return .blocked
+        }
+        switch collection.sourceKind {
+        case .patreon:
+            await refresher.runCollectionImport()
+            // applyImport flushes 300 ms after the last chapter message lands;
+            // wait it out before counting.
+            try? await Task.sleep(for: .milliseconds(600))
+        case .googleDocs, .ao3, .vocus, .asianFanfics:
+            return .unsupported
+        }
         let delta = collection.chapters.count - countBefore
         // Free the (~200 MB measured) collection DOM the offscreen refresher
         // rendered while crawling the whole collection. Leaving it resident keeps
@@ -450,6 +463,17 @@ final class AppEnvironment {
         DiagnosticLog.shared.log(category: "refresh",
             delta > 0 ? "found \(delta) new chapters" : "up to date")
         return delta > 0 ? .newChapters(delta) : .upToDate
+    }
+
+    /// Detects a Cloudflare / CAPTCHA interstitial in the offscreen refresher.
+    /// Detection only — human verification is always a manual user step.
+    private func refresherShowsHumanChallenge() async -> Bool {
+        if refresher.currentURL?.host?.contains("challenges.cloudflare.com") == true {
+            return true
+        }
+        let title = (try? await refresher.webView.callAsyncJavaScript(
+            "return document.title;", contentWorld: .page)) as? String ?? ""
+        return title.localizedCaseInsensitiveContains("just a moment")
     }
 
     private func waitUntil(timeout: Duration,

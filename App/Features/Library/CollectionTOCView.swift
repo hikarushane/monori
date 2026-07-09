@@ -22,18 +22,25 @@ struct CollectionTOCView: View {
         case .newChapters: return "已匯入新章節"
         case .upToDate: return "已是最新"
         case .needsLogin: return "需要登入"
+        case .blocked: return "需要人工驗證"
+        case .unsupported: return "不支援"
         case .failed, nil: return "無法檢查"
         }
     }
 
     private var refreshAlertMessage: String {
+        let sourceName = SourceRegistry.provider(for: collection.sourceKind).displayName
         switch refreshOutcome {
         case .newChapters(let count):
             return "已匯入 \(count) 個新章節。"
         case .upToDate:
             return "書庫已與此收藏同步。"
         case .needsLogin:
-            return "Patreon 要求登入。請開啟「瀏覽」分頁登入後重試。"
+            return "\(sourceName) 要求登入。請開啟「瀏覽」分頁登入後重試。"
+        case .blocked:
+            return "\(sourceName) 顯示人工驗證頁面。請開啟「瀏覽」分頁完成驗證後重試。"
+        case .unsupported:
+            return "此來源不支援自動檢查新章節。"
         case .failed, nil:
             return "無法載入收藏頁面。請確認網路連線後重試。"
         }
@@ -77,11 +84,12 @@ struct CollectionTOCView: View {
                         } label: {
                             Label("反轉順序", systemImage: "arrow.up.arrow.down")
                         }
-                        if collection.sourceKind == .patreon {
+                        if collection.sourceKind.supportsAutoCheck {
                             Button {
                                 refreshing = true
                                 Task {
                                     refreshOutcome = await env.refreshCollection(collection)
+                                    env.store.recordCheck(collection)
                                     refreshing = false
                                     showRefreshResult = true
                                 }
@@ -89,6 +97,9 @@ struct CollectionTOCView: View {
                                 Label("檢查新章節", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .accessibilityIdentifier("smoke.refreshChaptersButton")
+                        } else {
+                            Label("此來源不支援檢查新章節", systemImage: "arrow.triangle.2.circlepath")
+                                .foregroundStyle(.secondary)
                         }
                     } label: {
                         Image(systemName: "ellipsis")
