@@ -198,6 +198,7 @@ struct ReaderView: View {
         foreignPageTitle = nil
         foreignPageKey = nil
         current = chapter
+        env.store.markChapterOpened(chapter)
         if let html = chapter.contentHTML {
             renderingStoredHTML = true
             let base = URL(string: chapter.urlString.components(separatedBy: "#").first ?? chapter.urlString)

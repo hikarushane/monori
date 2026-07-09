@@ -46,12 +46,55 @@ struct CollectionTOCView: View {
         }
     }
 
+    // Extracted so the get/set closures don't bloat the toolbar ViewBuilder
+    // expression past the type-checker's time budget.
+    private var readingStatusBinding: Binding<CollectionReadingStatus> {
+        Binding(get: { collection.readingStatus },
+                set: { env.store.setReadingStatus($0, for: collection) })
+    }
+
+    // The ••• menu content lives here so the toolbar expression stays small
+    // enough for the Swift type-checker (inlining it times out compilation).
+    @ViewBuilder
+    private var chapterOptionsMenu: some View {
+        Picker("閱讀狀態", selection: readingStatusBinding) {
+            ForEach(CollectionReadingStatus.allCases, id: \.self) { status in
+                Text(status.label).tag(status)
+            }
+        }
+        .accessibilityIdentifier("smoke.collectionStatusMenu")
+        Button {
+            collection.sortDirection =
+                collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
+        } label: {
+            Label("反轉順序", systemImage: "arrow.up.arrow.down")
+        }
+        if collection.sourceKind.supportsAutoCheck {
+            Button {
+                refreshing = true
+                Task {
+                    refreshOutcome = await env.refreshCollection(collection)
+                    env.store.recordCheck(collection)
+                    refreshing = false
+                    showRefreshResult = true
+                }
+            } label: {
+                Label("檢查新章節", systemImage: "arrow.triangle.2.circlepath")
+            }
+            .accessibilityIdentifier("smoke.refreshChaptersButton")
+        } else {
+            Label("此來源不支援檢查新章節", systemImage: "arrow.triangle.2.circlepath")
+                .foregroundStyle(.secondary)
+        }
+    }
+
     var body: some View {
         List {
             ForEach(chapters) { chapter in
                 chapterRow(chapter)
                     .contentShape(Rectangle())
                     .onTapGesture {
+                        env.store.markChapterOpened(chapter)
                         readerTarget = ReaderTarget(id: chapter.id)
                     }
                     .swipeActions {
@@ -78,29 +121,7 @@ struct CollectionTOCView: View {
                         .accessibilityIdentifier("smoke.refreshChaptersButton")
                 } else {
                     Menu {
-                        Button {
-                            collection.sortDirection =
-                                collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
-                        } label: {
-                            Label("反轉順序", systemImage: "arrow.up.arrow.down")
-                        }
-                        if collection.sourceKind.supportsAutoCheck {
-                            Button {
-                                refreshing = true
-                                Task {
-                                    refreshOutcome = await env.refreshCollection(collection)
-                                    env.store.recordCheck(collection)
-                                    refreshing = false
-                                    showRefreshResult = true
-                                }
-                            } label: {
-                                Label("檢查新章節", systemImage: "arrow.triangle.2.circlepath")
-                            }
-                            .accessibilityIdentifier("smoke.refreshChaptersButton")
-                        } else {
-                            Label("此來源不支援檢查新章節", systemImage: "arrow.triangle.2.circlepath")
-                                .foregroundStyle(.secondary)
-                        }
+                        chapterOptionsMenu
                     } label: {
                         Image(systemName: "ellipsis")
                     }
@@ -152,8 +173,16 @@ struct CollectionTOCView: View {
         return VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(text.title)
-                        .font(.body.weight(.medium))
+                    HStack(spacing: 6) {
+                        if chapter.isNew {
+                            Circle()
+                                .fill(Color.accentColor)
+                                .frame(width: 8, height: 8)
+                                .accessibilityLabel("新章節")
+                        }
+                        Text(text.title)
+                            .font(.body.weight(.medium))
+                    }
                     if let date = chapter.visibleDateText {
                         Text(date).font(.caption).foregroundStyle(.secondary)
                     }
