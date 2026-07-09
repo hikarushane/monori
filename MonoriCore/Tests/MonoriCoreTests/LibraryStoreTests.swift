@@ -292,4 +292,15 @@ final class LibraryStoreTests: XCTestCase {
         diskStore.saveReadingProgress(nil, for: chapter)
         XCTAssertNil(chapter.readingProgress)
     }
+
+    func testNewCollectionDefaultsForUpdateCenterFields() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.readingStatus, .reading)
+        XCTAssertNil(c.lastCheckedAt)
+        XCTAssertNil(c.lastNewChapterAt)
+        XCTAssertNil(c.lastReadAt)
+        XCTAssertEqual(c.unreadCount, 0)
+        XCTAssertFalse(c.chapters[0].isNew)
+    }
 }

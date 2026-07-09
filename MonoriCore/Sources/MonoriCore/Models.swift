@@ -6,6 +6,12 @@ public enum CollectionSortDirection: String, Codable {
     case newestToOldest
 }
 
+public enum CollectionReadingStatus: String, Codable, CaseIterable, Sendable {
+    case reading
+    case finished
+    case dropped
+}
+
 @Model
 public final class LocalCollectionModel {
     @Attribute(.unique) public var id: String
@@ -14,6 +20,10 @@ public final class LocalCollectionModel {
     public var creatorName: String?
     public var sortDirectionRaw: String
     public var sourceKindRaw: String = SourceKind.patreon.rawValue
+    public var readingStatusRaw: String = CollectionReadingStatus.reading.rawValue
+    public var lastCheckedAt: Date?
+    public var lastNewChapterAt: Date?
+    public var lastReadAt: Date?
     @Relationship(deleteRule: .cascade, inverse: \LocalChapterModel.collection)
     public var chapters: [LocalChapterModel]
 
@@ -26,6 +36,14 @@ public final class LocalCollectionModel {
         get { SourceKind(rawValue: sourceKindRaw) ?? .patreon }
         set { sourceKindRaw = newValue.rawValue }
     }
+
+    public var readingStatus: CollectionReadingStatus {
+        get { CollectionReadingStatus(rawValue: readingStatusRaw) ?? .reading }
+        set { readingStatusRaw = newValue.rawValue }
+    }
+
+    /// Chapters discovered by a refresh and not yet opened.
+    public var unreadCount: Int { chapters.filter(\.isNew).count }
 
     public init(id: String = UUID().uuidString,
                 title: String,
@@ -52,6 +70,7 @@ public final class LocalChapterModel {
     public var visibleDateText: String?
     public var excerpt: String?
     public var isBookmarked: Bool = false
+    public var isNew: Bool = false
     public var contentHTML: String?
     public var readingProgress: Double?
     public var collection: LocalCollectionModel?
