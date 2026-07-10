@@ -41,7 +41,14 @@ final class AutoCheckCoordinator {
               env.appPrefs.autoCheckEnabled,
               !AppEnvironment.isSmokeMode,
               !AppEnvironment.isAutopilot else { return }
-        let due = AutoCheckScheduler.due(from: (try? env.store.collections()) ?? [], force: force)
+        let all: [LocalCollectionModel]
+        do {
+            all = try env.store.collections()
+        } catch {
+            DiagnosticLog.shared.error(category: "refresh", "auto-check: store read failed")
+            return
+        }
+        let due = AutoCheckScheduler.due(from: all, force: force)
         guard !due.isEmpty else { return }
         isRunning = true
         checkedCount = 0
