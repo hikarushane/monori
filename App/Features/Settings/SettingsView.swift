@@ -35,6 +35,18 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Toggle("自動檢查新章節", isOn: Binding(
+                        get: { env.appPrefs.autoCheckEnabled },
+                        set: { env.appPrefs.autoCheckEnabled = $0 }
+                    ))
+                    .accessibilityIdentifier("smoke.autoCheckToggle")
+                } header: {
+                    Text("書庫")
+                } footer: {
+                    Text("開啟書庫時自動為「追更中」的收藏檢查新章節。僅在 app 使用中執行，不會在背景連線。")
+                }
+
+                Section {
                     Button("清除書庫資料", role: .destructive) { confirmClearLibrary = true }
                         .accessibilityIdentifier("smoke.clearDataButton")
                     Button("清除瀏覽器資料", role: .destructive) { confirmLogout = true }

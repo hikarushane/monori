@@ -35,8 +35,19 @@ final class AppPreferences {
         }
     }
 
+    private var autoCheckStorage: Bool
+
+    var autoCheckEnabled: Bool {
+        get { autoCheckStorage }
+        set {
+            autoCheckStorage = newValue
+            UserDefaults.standard.set(newValue, forKey: "app.autoCheckEnabled")
+        }
+    }
+
     init() {
         appearanceStorage = UserDefaults.standard.string(forKey: "app.appearance")
             ?? AppearanceMode.system.rawValue
+        autoCheckStorage = UserDefaults.standard.object(forKey: "app.autoCheckEnabled") as? Bool ?? true
     }
 }

@@ -57,6 +57,12 @@ final class AppEnvironment {
         if _refresher == nil { let m = WebViewModel(); wire(m); _refresher = m }
         return _refresher!
     }
+    @ObservationIgnored private var _autoCheck: AutoCheckCoordinator?
+    /// Foreground new-chapter checker, built on first Library visit.
+    var autoCheck: AutoCheckCoordinator {
+        if _autoCheck == nil { _autoCheck = AutoCheckCoordinator(env: self) }
+        return _autoCheck!
+    }
     let prefs = ReaderPreferences()
     let appPrefs = AppPreferences()
 
