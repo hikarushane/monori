@@ -455,7 +455,17 @@ final class AppEnvironment {
             // applyImport flushes 300 ms after the last chapter message lands;
             // wait it out before counting.
             try? await Task.sleep(for: .milliseconds(600))
-        case .googleDocs, .ao3, .vocus, .asianFanfics:
+        case .vocus:
+            // Staged behind SourceKind.supportsAutoCheck (still false for .vocus
+            // pending on-device verification). Unreachable until that flag flips —
+            // the guard at the top returns .unsupported first — but ready so
+            // enabling vocus auto-check is a one-line capability change.
+            let ok = await runVocusRefresherImport(for: collection)
+            guard ok else {
+                refresher.webView.loadHTMLString("", baseURL: nil)
+                return .failed
+            }
+        case .googleDocs, .ao3, .asianFanfics:
             return .unsupported
         }
         let delta = collection.chapters.count - countBefore
@@ -469,6 +479,34 @@ final class AppEnvironment {
         DiagnosticLog.shared.log(category: "refresh",
             delta > 0 ? "found \(delta) new chapters" : "up to date")
         return delta > 0 ? .newChapters(delta) : .upToDate
+    }
+
+    /// Re-runs the Vocus room import against the offscreen refresher.
+    /// Titles/creator come from the stored collection (the offscreen refresher
+    /// has no `detectedCollection`). Returns false when the script yields no
+    /// articles (layout change, error page). Staged: reachable once
+    /// `SourceKind.vocus.supportsAutoCheck` flips true after on-device checks.
+    private func runVocusRefresherImport(for collection: LocalCollectionModel) async -> Bool {
+        let result = try? await refresher.webView.callAsyncJavaScript(
+            JSAssets.vocusRoomImport, contentWorld: .page)
+        guard let articles = result as? [[String: Any]], !articles.isEmpty else {
+            DiagnosticLog.shared.error(category: "refresh", "vocus: import script returned no articles")
+            return false
+        }
+        let chapters = articles.enumerated().map { index, dict -> ImportedChapter in
+            ImportedChapter(
+                title: (dict["title"] as? String) ?? "Article",
+                urlString: (dict["url"] as? String) ?? "",
+                orderIndex: (dict["domOrder"] as? Int) ?? index)
+        }
+        let imported = ImportedCollection(
+            sourceURLString: collection.sourceURLString,
+            title: collection.title,
+            creatorName: collection.creatorName,
+            sourceKind: .vocus,
+            chapters: chapters)
+        try? store.applyDocImport(imported)
+        return true
     }
 
     /// Detects a Cloudflare / CAPTCHA interstitial in the offscreen refresher.
