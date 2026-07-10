@@ -52,7 +52,10 @@ final class AutoCheckCoordinator {
     }
 
     private func run(_ due: [LocalCollectionModel]) async {
-        defer { isRunning = false }
+        // Clear runTask on every exit path so a later runForced() whose start()
+        // is guard-blocked awaits nil (immediate return) rather than a stale,
+        // already-finished task that would look like a fresh completed round.
+        defer { isRunning = false; runTask = nil }
         for collection in due {
             if Task.isCancelled { break }
             checkedCount += 1
