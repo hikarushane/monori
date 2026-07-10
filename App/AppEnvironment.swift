@@ -465,7 +465,16 @@ final class AppEnvironment {
                 refresher.webView.loadHTMLString("", baseURL: nil)
                 return .failed
             }
-        case .googleDocs, .ao3, .asianFanfics:
+        case .asianFanfics:
+            // Staged behind SourceKind.supportsAutoCheck (still false for
+            // .asianFanfics pending on-device verification). Unreachable until
+            // that flag flips; ready so enabling is a one-line capability change.
+            let ok = await runAFFRefresherImport(for: collection)
+            guard ok else {
+                refresher.webView.loadHTMLString("", baseURL: nil)
+                return .failed
+            }
+        case .googleDocs, .ao3:
             return .unsupported
         }
         let delta = collection.chapters.count - countBefore
@@ -505,6 +514,33 @@ final class AppEnvironment {
             creatorName: collection.creatorName,
             sourceKind: .vocus,
             chapters: chapters)
+        try? store.applyDocImport(imported)
+        return true
+    }
+
+    /// Re-runs the AsianFanfics story import against the offscreen refresher.
+    /// Titles/creator come from the stored collection. Returns false when the
+    /// script yields no chapters. Staged: reachable once
+    /// `SourceKind.asianFanfics.supportsAutoCheck` flips true after on-device checks.
+    private func runAFFRefresherImport(for collection: LocalCollectionModel) async -> Bool {
+        let result = try? await refresher.webView.callAsyncJavaScript(
+            JSAssets.affStoryImport, contentWorld: .page)
+        guard let items = result as? [[String: Any]], !items.isEmpty else {
+            DiagnosticLog.shared.error(category: "refresh", "aff: import script returned no chapters")
+            return false
+        }
+        let imported = ImportedCollection(
+            sourceURLString: collection.sourceURLString,
+            title: collection.title,
+            creatorName: collection.creatorName,
+            sourceKind: .asianFanfics,
+            chapters: items.enumerated().map { index, dict -> ImportedChapter in
+                ImportedChapter(
+                    title: (dict["title"] as? String) ?? "Chapter",
+                    urlString: URLNormalizer.canonicalAFFChapterURL((dict["url"] as? String) ?? "")
+                        ?? (dict["url"] as? String) ?? "",
+                    orderIndex: (dict["domOrder"] as? Int) ?? index)
+            })
         try? store.applyDocImport(imported)
         return true
     }
