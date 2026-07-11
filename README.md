@@ -47,8 +47,15 @@ in with their own Patreon account.
 2. Open a post in a series → tap **Open collection** when the series banner
    appears → on the collection page tap **Import all chapters** (the script
    scrolls automatically; re-imports merge without duplicates).
-3. **Library** tab → pick the collection → tap a chapter to read. Tap **•••**
-   in the toolbar → **Check for new chapters** to import newly released chapters.
+3. **Library** tab → pick the collection → tap a chapter to read. Collections
+   you mark as **追更中 (reading)** are checked for new chapters automatically in
+   the foreground (toggle in Settings); new chapters get an unread badge and a
+   dot in the table of contents. Sort (title / recently updated / recently read),
+   search by title or author, and filter by reading status from the toolbar
+   menu; pull to refresh checks all reading collections now. Per collection, tap
+   **•••** → set its reading status, or **Check for new chapters** to import
+   manually. (Automatic checking supports Patreon today; other sources still use
+   the manual **Check for new chapters** action.)
 4. Reader: chrome hidden by default — tap the page center to show/hide bars.
    Bookmark top-left; font size + line spacing in the preferences panel
    (⊤T button, top-right). Left-edge swipe to leave. Previous/next chapter

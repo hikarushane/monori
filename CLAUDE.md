@@ -409,6 +409,11 @@ smoke.readerDismissButton
 smoke.refreshChaptersButton
 smoke.refreshStatusBanner
 smoke.clearDataButton
+smoke.collectionStatusMenu
+smoke.librarySortMenu
+smoke.libraryUnreadBadge
+smoke.autoCheckSpinner
+smoke.autoCheckToggle
 ```
 
 If an important UI element does not have an accessibility identifier, add one.
