@@ -49,8 +49,11 @@ swift test 2>&1 | tee -a "$LOG_FILE"
 SWIFT_EXIT=${PIPESTATUS[0]}
 set -e
 if [ "$SWIFT_EXIT" -ne 0 ]; then
-  if grep -qE "with [1-9][0-9]* failure" "$LOG_FILE"; then
-    echo "ERROR: MonoriCore tests have failures." >&2
+  # A crashed test run (fatalError / signal) never prints the "with N failures"
+  # summary line, so also match assertion-failure lines and crash markers —
+  # otherwise a real failure gets misclassified as the transient build.db race.
+  if grep -qE "with [1-9][0-9]* failures?|error: -\[|Fatal error:|exited with unexpected signal" "$LOG_FILE"; then
+    echo "ERROR: MonoriCore tests have real failures (see $LOG_FILE)." >&2
     exit 1
   fi
   echo "(swift test exit $SWIFT_EXIT — transient build.db race; tests passed, continuing)" | tee -a "$LOG_FILE"
