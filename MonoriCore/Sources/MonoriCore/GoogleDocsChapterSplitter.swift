@@ -200,11 +200,17 @@ public enum GoogleDocsChapterSplitter {
         let beforeBr = rawInner.replacingOccurrences(
             of: "<br[\\s\\S]*", with: "", options: [.regularExpression, .caseInsensitive])
         let text = cleanTitle(beforeBr)
-        // ^-anchored pattern + markerCount≤1 + no-<a> are the real guards;
-        // 120 is a safety net, not a filter.
         guard !text.isEmpty, text.count <= 120 else { return nil }
-        guard text.range(of: chapterTitlePattern,
-                         options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
+        guard let markerRange = text.range(of: chapterTitlePattern,
+                                           options: [.regularExpression, .caseInsensitive]) else { return nil }
+        // Beyond the conservative length a marker prefix alone is ambiguous:
+        // "Chapter 64: Back to..." is a title, "ch49 body content..." is prose.
+        // Only a separator right after the marker disambiguates in favor of a title.
+        let hasCJK = text.range(of: #"[\u{4E00}-\u{9FFF}]"#, options: .regularExpression) != nil
+        if text.count > (hasCJK ? 60 : 40) {
+            guard let next = text[markerRange.upperBound...].first,
+                  ":：.．—–-".contains(next) else { return nil }
+        }
         return stripTrailingPunctuation(text)
     }
 

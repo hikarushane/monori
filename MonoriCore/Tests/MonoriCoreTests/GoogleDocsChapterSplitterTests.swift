@@ -336,6 +336,23 @@ final class GoogleDocsChapterSplitterTests: XCTestCase {
         XCTAssertTrue(titles.contains("第六十五章：屬於我們"), "ch65 missing")
     }
 
+    func testProseStartingWithMarkerNotDetectedAsChapter() {
+        // "ch49 body content..." starts with a marker ("ch49") but is body
+        // prose — without a separator after the marker it must not become a
+        // boundary, or the following chapter title gets merged away.
+        let html = """
+        <html><body>
+        <p><span style="font-size:26pt">第四十九章 不同形式的空間</span></p>
+        <p><span>ch49 body content with enough text to be non-empty</span></p>
+        <p><span style="font-size:26pt">作者的信</span></p>
+        <p><span>author letter body</span></p>
+        </body></html>
+        """
+        let r = GoogleDocsChapterSplitter.split(html: html, docID: "PM", docTitle: "T")
+        XCTAssertEqual(r.chapters.map(\.title), ["第四十九章 不同形式的空間", "作者的信"])
+        XCTAssertTrue(r.chapters[0].contentHTML?.contains("ch49 body") ?? false)
+    }
+
     func testLargeFontLongTitleNotDropped() {
         // Test that large-font (18pt+) titles > 60 chars are accepted.
         // Before the fix, the old code rejected any > 60 chars with: guard !text.isEmpty, text.count <= 60
