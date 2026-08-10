@@ -1,0 +1,178 @@
+<title>Monori - Privacy Policy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @font-face {
+    font-family: 'SystemSerif';
+    src: local('Georgia'), local('Times New Roman');
+  }
+
+  :root {
+    --bg: #FAFAF8;
+    --text: #2C2C2E;
+    --text-secondary: #6B6B6F;
+    --accent: #4A7C7C;
+    --border: #E0DFDB;
+    --surface: #F0EFEB;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1A1A1E;
+      --text: #E4E4E2;
+      --text-secondary: #9A9A9E;
+      --accent: #7CB5B5;
+      --border: #2E2E32;
+      --surface: #232327;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1A1A1E;
+    --text: #E4E4E2;
+    --text-secondary: #9A9A9E;
+    --accent: #7CB5B5;
+    --border: #2E2E32;
+    --surface: #232327;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #FAFAF8;
+    --text: #2C2C2E;
+    --text-secondary: #6B6B6F;
+    --accent: #4A7C7C;
+    --border: #E0DFDB;
+    --surface: #F0EFEB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  main {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'SystemSerif', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.25rem;
+    text-wrap: balance;
+  }
+
+  .updated {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+
+  .contact-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .contact-box a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .contact-box a:hover {
+    text-decoration: underline;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+</style>
+
+<main>
+  <h1>Monori 隱私權政策</h1>
+  <p class="updated">最後更新：2026 年 8 月 10 日</p>
+
+  <p>Monori 是一個跨平台同人文閱讀 app，支援 Patreon、AO3、Google Docs、Vocus 和 AsianFanfics。我們重視你的隱私，這份政策說明 Monori 如何處理你的資料。</p>
+
+  <h2>我們不收集任何資料</h2>
+  <p>Monori 沒有後端伺服器、沒有雲端服務、沒有分析追蹤。app 不會向任何第三方傳送你的個人資訊。</p>
+
+  <h2>本機儲存的內容</h2>
+  <p>Monori 在你的裝置上儲存以下資料，這些資料不會離開你的手機：</p>
+  <ul>
+    <li>匯入的合集與章節標題、連結</li>
+    <li>閱讀進度與書籤</li>
+    <li>閱讀狀態標記（追更中、已完結等）</li>
+    <li>字型大小與行距偏好</li>
+    <li>Google Docs 和 AO3 的文章內容（供離線閱讀，僅存於本機）</li>
+  </ul>
+  <p>Patreon、Vocus 和 AsianFanfics 的文章不儲存內容，每次開啟時從原始來源即時載入。</p>
+
+  <h2>平台登入</h2>
+  <p>Monori 使用內建的網頁瀏覽器（WKWebView）載入各平台網頁。登入流程完全由各平台處理。Monori 不會存取、讀取或儲存你的密碼、Cookie、Token 或任何驗證資訊。</p>
+
+  <h2>網路存取</h2>
+  <p>Monori 只在以下情況連接網路：</p>
+  <ul>
+    <li>在「瀏覽」分頁載入平台網頁（Patreon、AO3、Google Docs、Vocus、AsianFanfics）</li>
+    <li>開啟閱讀器時載入文章頁面</li>
+    <li>匯入 AO3 作品或 Google Docs 文件內容</li>
+    <li>檢查追更中合集是否有新章節</li>
+  </ul>
+  <p>所有網路請求都直接連到各平台的原始網域。Monori 不經過任何中間伺服器。</p>
+
+  <h2>廣告過濾</h2>
+  <p>Monori 在 AsianFanfics 和 Vocus 閱讀時會過濾廣告內容。過濾在你的裝置上執行，不經過任何外部服務。</p>
+
+  <h2>兒童隱私</h2>
+  <p>Monori 不針對 13 歲以下兒童設計，也不刻意收集任何人的個人資訊。</p>
+
+  <h2>政策變更</h2>
+  <p>如果本政策有重大變更，我們會在 app 更新說明中告知。</p>
+
+  <div class="contact-box">
+    <strong>聯絡我們</strong><br>
+    如果你對隱私權政策有任何問題，請寄信至<br>
+    <a href="mailto:shane.shanyeh@gmail.com">shane.shanyeh@gmail.com</a>
+  </div>
+
+  <footer>
+    &copy; 2026 Monori. All rights reserved.
+  </footer>
+</main>

@@ -1,0 +1,172 @@
+<title>Monori - Support</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --text: #2C2C2E;
+    --text-secondary: #6B6B6F;
+    --accent: #4A7C7C;
+    --border: #E0DFDB;
+    --surface: #F0EFEB;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1A1A1E;
+      --text: #E4E4E2;
+      --text-secondary: #9A9A9E;
+      --accent: #7CB5B5;
+      --border: #2E2E32;
+      --surface: #232327;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1A1A1E;
+    --text: #E4E4E2;
+    --text-secondary: #9A9A9E;
+    --accent: #7CB5B5;
+    --border: #2E2E32;
+    --surface: #232327;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #FAFAF8;
+    --text: #2C2C2E;
+    --text-secondary: #6B6B6F;
+    --accent: #4A7C7C;
+    --border: #E0DFDB;
+    --surface: #F0EFEB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  main {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.25rem;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p { margin-bottom: 1rem; }
+
+  ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  li { margin-bottom: 0.35rem; }
+
+  .contact-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .contact-box a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .contact-box a:hover {
+    text-decoration: underline;
+  }
+
+  .faq-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .faq-item strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+</style>
+
+<main>
+  <h1>Monori 支援</h1>
+  <p class="subtitle">跨平台同人文閱讀器</p>
+
+  <h2>常見問題</h2>
+
+  <div class="faq-item">
+    <strong>Monori 是什麼？</strong>
+    <p>Monori 是一個跨平台的同人文閱讀 app，支援 Patreon、AO3、Google Docs、Vocus 和 AsianFanfics。它把五個平台的作品收進同一個書架，給你乾淨排版的閱讀體驗。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>支援哪些平台？</strong>
+    <p>Patreon（連載匯入、自動追更）、AO3（作品匯入、離線閱讀）、Google Docs（分章匯入、離線閱讀）、Vocus（專題匯入、廣告隱藏）、AsianFanfics（故事匯入、廣告過濾）。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>為什麼需要在 app 裡登入平台？</strong>
+    <p>Monori 使用內建瀏覽器載入各平台網頁。你需要登入才能看到有權限閱讀的內容，和在 Safari 登入一樣。Monori 不存取你的密碼或登入資訊。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>匯入的章節存在哪裡？</strong>
+    <p>章節標題和連結存在你的手機裡，不會上傳到任何伺服器。AO3 和 Google Docs 的文章內容也儲存在本機供離線閱讀。Patreon、Vocus 和 AsianFanfics 不儲存文章內容。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>可以離線閱讀嗎？</strong>
+    <p>AO3 和 Google Docs 匯入的內容支援離線閱讀。Patreon、Vocus 和 AsianFanfics 的內容每次開啟時從原始來源載入。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>如何清除所有資料？</strong>
+    <p>在「設定」分頁使用「清除書庫資料」可刪除所有匯入的合集和章節。平台登入狀態獨立於書庫資料，不會被一起清除。</p>
+  </div>
+
+  <h2>需要其他協助？</h2>
+
+  <div class="contact-box">
+    請寄信至 <a href="mailto:shane.shanyeh@gmail.com">shane.shanyeh@gmail.com</a>，我們會盡快回覆。
+  </div>
+
+  <footer>
+    &copy; 2026 Monori. All rights reserved.
+  </footer>
+</main>

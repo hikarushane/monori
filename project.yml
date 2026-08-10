@@ -12,6 +12,11 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     PRODUCT_NAME: "$(TARGET_NAME)"
+    # Pin the signing team (hikarushane.dev@gmail.com). Without this, xcodegen
+    # regeneration wipes the team picked in Xcode's Signing UI, and Xcode may
+    # re-sign with a different Apple ID — the device then rejects the install
+    # with MismatchedApplicationIdentifierEntitlement (team prefix changed).
+    DEVELOPMENT_TEAM: X8MSQ726HU
     ALWAYS_SEARCH_USER_PATHS: NO
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
@@ -32,5 +37,13 @@ targets:
       properties:
         CFBundleDisplayName: Monori
         UILaunchStoryboardName: LaunchScreen
+        ITSAppUsesNonExemptEncryption: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
     dependencies:
       - package: MonoriCore
