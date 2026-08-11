@@ -1,19 +1,14 @@
 # Monori
 
-A calm, local-only reading shell for your own Patreon session. Log into
-patreon.com inside the app, import a series' chapter list from its collection
-page, and read with clean typography, previous/next chapter navigation, and
-bookmarks you can set per chapter.
+一個安靜、local-only 的閱讀殼層，讀你自己在 Patreon、Google Docs、AO3、方格子、AsianFanfics 上有權限看的內容。用自己的帳號登入來源網站，把系列的章節匯入 App，用乾淨的排版閱讀，支援上一章／下一章導覽，每章可以個別加書籤。
 
-Monori is **not** a Patreon client or API consumer. It never bypasses
-access control, never stores post content, and has no backend. See
-[COMPLIANCE.md](COMPLIANCE.md).
+Monori 不是任何平台的 client 或 API consumer。不繞過存取控制，不把內容存到自己的伺服器，因為根本沒有這個伺服器。細節見 [COMPLIANCE.md](COMPLIANCE.md)。
 
-## Requirements
+## 需求
 
-- Xcode 15.4+ (iOS 17 SDK)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
-- An iPhone (sideload) or the iOS simulator
+- Xcode 15.4+（iOS 17 SDK）
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen)：`brew install xcodegen`
+- 一支 iPhone（側載）或 iOS 模擬器
 
 ## Build
 
@@ -24,51 +19,35 @@ xcodegen generate
 open Monori.xcodeproj
 ```
 
-Select the Monori scheme, set your own signing team (Signing & Capabilities),
-and run on a device or simulator.
+選 Monori scheme，在 Signing & Capabilities 設定自己的 signing team，在裝置或模擬器上執行。
 
-## Tests
+## 測試
 
 ```bash
 swift test --package-path MonoriCore
 ```
 
-## Sideloading for non-developers
+## 給非開發者的側載方式
 
-Any of: AltStore / SideStore with the built `.ipa`, or a free Apple developer
-certificate in Xcode (7-day resign cycle), or an Apple Developer Program
-membership (1-year certificates). Each user signs the app themselves and logs
-in with their own Patreon account.
+以下任一種：用 build 出來的 `.ipa` 搭配 AltStore／SideStore、用 Xcode 的免費 Apple 開發者憑證（7 天要重簽一次）、或用 Apple Developer Program 會員資格（憑證效期一年）。每個使用者自己簽署 App，用自己的帳號登入各平台。
 
-## Using the app
+## 使用方式
 
-1. **Browse** tab → log into patreon.com (email login; third-party SSO that
-   leaves patreon.com opens in Safari by design — prefer email login).
-2. Open a post in a series → tap **Open collection** when the series banner
-   appears → on the collection page tap **Import all chapters** (the script
-   scrolls automatically; re-imports merge without duplicates).
-3. **Library** tab → pick the collection → tap a chapter to read. Collections
-   you mark as **追更中 (reading)** are checked for new chapters automatically in
-   the foreground (toggle in Settings); new chapters get an unread badge and a
-   dot in the table of contents. Sort (title / recently updated / recently read),
-   search by title or author, and filter by reading status from the toolbar
-   menu; pull to refresh checks all reading collections now. Per collection, tap
-   **•••** → set its reading status, or **Check for new chapters** to import
-   manually. (Automatic checking supports Patreon today; other sources still use
-   the manual **Check for new chapters** action.)
-4. Reader: chrome hidden by default — tap the page center to show/hide bars.
-   Bookmark top-left; font size + line spacing in the preferences panel
-   (⊤T button, top-right). Left-edge swipe to leave. Previous/next chapter
-   in the bottom bar.
+1. **Browse** 分頁上方是來源選單，點開可以切換 Patreon、Google Docs、AO3、方格子、AsianFanfics。每個來源各自獨立的 WebView 與登入狀態，互不影響，切換來源不會弄丟其他來源的瀏覽紀錄。在對應平台頁面用自己的帳號登入（Patreon 建議用 email 登入：第三方 SSO 只要跳出 patreon.com 就會在 Safari 開啟，這是刻意設計）。
+2. 匯入依來源而定，頁面上方會出現對應的匯入 banner：
+   - **Patreon**：打開系列裡的一篇貼文，出現「系列：⋯」banner 時點**開啟收藏**，到收藏頁面後點**匯入**（章節目錄會自動捲動載入，重複匯入不會產生重複章節）。
+   - **AO3**：打開作品頁面，banner 直接顯示**匯入**，點下去匯入整部作品的章節。
+   - **方格子**：打開房間頁面，banner 顯示**匯入**，點下去匯入房間裡的文章。
+   - **AsianFanfics**：打開故事頁面，banner 顯示**匯入**，點下去匯入故事章節。
+   - **Google Docs**：打開文件，banner 顯示「Google 文件」與**匯入**，點下去把內容收進 library；同一份文件裡有多章時，會依標題樣式自動切開。
+3. **Library** 分頁選 collection，點章節開始讀。標成**追更中**的 collection 會在前景自動檢查新章節（Settings 可切換；目前僅 Patreon 支援自動檢查，其他來源用手動**檢查新章節**），新章節會有未讀標記，目錄裡也有紅點。工具列選單可以排序（標題／最近更新／最近閱讀）、搜尋標題或作者、依閱讀狀態篩選；下拉可以重新整理所有追更中的 collection。單一 collection 點 **•••** 可以設定閱讀狀態，或手動**檢查新章節**。
+4. Reader：預設隱藏工具列，點畫面中間顯示／隱藏。書籤在左上角；字級與行距在偏好設定面板（右上角 ⊤T 按鈕）。左邊緣滑動離開。上一章／下一章在底部工具列。
 
-## Known limitations
+## 已知限制
 
-- Patreon markup changes can break reader styling and import — both degrade
-  gracefully; chapter lists can always be re-imported from the Browse tab.
-- No offline reading, by design.
+- 各平台改版面可能讓 Reader 樣式或匯入功能失效，兩者都會優雅降級（Reader 退回原始頁面；章節目錄可以從 Browse 分頁重新匯入）。
+- 沒有離線閱讀，這是刻意的設計。
 
-## What not to implement
+## 不要實作的東西
 
-Cookie access, network interception, Patreon API calls, content storage or
-export, cross-user sharing — see COMPLIANCE.md. Pull requests adding any of
-these will be declined.
+擷取 cookie、攔截網路封包、呼叫平台的官方或內部 API、把內容存到 Monori 自己的伺服器或做匯出、跨使用者分享，細節見 [COMPLIANCE.md](COMPLIANCE.md)。加這些功能的 PR 會被拒絕。
