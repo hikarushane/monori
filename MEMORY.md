@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-06-24（Chapterly→Monori 全域改名完成並 merge 回 main）
+> 最後更新：2026-08-12（WebView UA 標示為 Safari，修好 Patreon Google／Facebook 登入）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -29,6 +29,8 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
 | Google Docs 章節偵測：font-size 主、text pattern 副 | 雙層策略：`largeFontTitle` (≥18pt) 主、`chapterTitlePattern` 副 | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
 | Google Docs 標題去尾標點 | `stripTrailingPunctuation` 去除 。！？.!? | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
+| WebView 身分 | `applicationNameForUserAgent = BrowserIdentity.userAgentSuffix`（`Version/18.7 Safari/604.1`），對外呈現為 Safari | → docs/decisions/0008-identify-as-safari-in-user-agent.md | active | 2026-08-12 |
+| Facebook OAuth 主機 | `decide` 用 `.facebook.com` suffix match、`requiresPopupWindow` 用 `m.` / `www.` 精確比對 | OAuth 流程會在 `m.` / `www.` / `staticxx.` 之間跳，收窄成單一主機會讓登入半途壞掉；popup 判定維持 ADR-0007 的精確比對防 lookalike | active | 2026-08-12 |
 
 ## 規範
 ### Patreon DOM
@@ -98,6 +100,16 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
 
 ## 踩過的坑
+- **WKWebView 預設 UA 讓 Google 擋掉 Patreon 的 Google 登入**（2026-08-12）：內測人員回報「以 Google 繼續登入」變灰、按不動。WKWebView 的預設 UA 停在 `Mobile/15E148`，沒有 `Version/` 也沒有 `Safari/` token；Google 判定為 embedded webview，對 `https://accounts.google.com/gsi/client` 回 403 → Patreon 那顆按鈕沒有 SDK 可用就變成停用狀態。同一支 URL 換 UA 測：預設 UA 403、加上兩個 token 200（266 KB）。解法見 ADR-0008。
+  📍 出現位置：`App/WebView/WebViewModel.swift` init 的 `applicationNameForUserAgent`
+  ⚠️ **會再壞**：Google 這個檢查是防釣魚保護，針對的正是會對頁面注入 JS 的 app —— Monori 確實會注入（reader CSS、collection 偵測）。Google 隨時可以加 UA 以外的判斷，症狀會一模一樣。再次發生時視為預期，**不要靠加碼偽裝去對抗**，改走引導使用者的路。
+  🔍 診斷手法：在 `WKWebViewConfiguration` 塞 `#if DEBUG` user script，包住 `window.open`、掛 capture 階段的 `error` listener（`e.target.tagName` 會抓到載入失敗的 `<script>`／`<link>`）、覆寫 `console.warn/error`，再用 `xcrun simctl launch --console-pty` 收 log。對照組很關鍵：Apple 登入正常開 popup、Google 連 `window.open` 都沒呼叫，才排除掉 popup 機制的嫌疑。
+
+- **Patreon 換 UA 後餵不同的登入頁**（2026-08-12）：標示為 Safari 之後，Patreon 改送完整版登入頁（SSO 三顆在上、email 欄在下、多了「需要登入方面的協助？」），跟預設 UA 拿到的降級版排版不同。任何依賴登入頁 DOM 結構的東西要重新對一次。
+
+- **Facebook 登入被丟去 Safari**（2026-08-12）：`m.facebook.com` 不在 `NavigationPolicy.decide` 白名單 → `window.open` 判成 `openInSafari`，popup 離開 app 就再也 postMessage 不回 `window.opener`。ADR-0007 的 Consequences 早就預告過「下一個 OAuth provider 會這樣壞」。副作用：改成 suffix match 之後，Patreon 貼文裡的 facebook 連結也會留在 app 內而不是開 Safari，這是刻意取捨。
+  📍 出現位置：`MonoriCore/Sources/MonoriCore/NavigationPolicy.swift`
+
 - **手寫 iOS launch storyboard 的 `targetRuntime` 寫成 macOS 值**（2026-06-20）：手刻 `LaunchScreen.storyboard` 用 `targetRuntime="AppleCocoa"` → ibtool `error -1`（IBDocument unarchive 失敗）。`AppleCocoa` 是 macOS runtime；iOS 必須 `iOS.CocoaTouch`，且 safe-area guide key 是 `safeArea` 不是 `safeAreaLayoutGuide`。驗證：`ibtool --errors --warnings --notices LaunchScreen.storyboard`；對照樣板 `iOS App Base.xctemplate/LaunchScreen.storyboard`。（cross-project 坑，見 WIKI_SYNC.md）
   📍 出現位置：`App/LaunchScreen.storyboard`
 
@@ -187,6 +199,8 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - Smoke test artifacts 寫入 `build/smoke/`
 
 ## 未解決的問題
+- [ ] **Google 登入的存活監控（2026-08-12 起）**：UA 標示為 Safari 是暫時有效的手段，不是永久解。內測若再回報「以 Google 繼續登入」變灰按不動，先跑 `curl -A "<app 的 UA>" -o /dev/null -w "%{http_code}" https://accounts.google.com/gsi/client` 確認是不是又被 403，再依 ADR-0008 的結論走引導路線。
+- [ ] **TestFlight build number 要手動 bump**：`project.yml` 的 `CFBundleVersion`（xcodegen 會覆寫 `App/Info.plist`，只改 plist 沒用）。目前值 3。
 - [ ] **Task 3（2026-06-19-plan）**：`PatreonWebView.makeUIView()` 的 content-tap `UITapGestureRecognizer` 應只在 `onContentTap != nil` 時安裝；Browse/Login tab 不傳 closure，目前也安裝了（無害但多餘）。位置：`App/WebView/PatreonWebView.swift`。
 - [ ] **Cloudflare CAPTCHA**：Simulator 的 Patreon session 被 Cloudflare 出題，使用者需手動勾「驗證您是人類」後重跑 `./scripts/smoke-auto.sh`（程式碼修復已完成、verify.sh 84/84）
 - ~~[ ] README.md:48「Import visible chapters」待使用者確認後改為「Import all chapters」~~（已解決 2026-06-13，commit c10dd62）

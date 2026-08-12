@@ -33,7 +33,7 @@ swift test --package-path MonoriCore
 
 ## 使用方式
 
-1. **Browse** 分頁上方是來源選單，點開可以切換 Patreon、Google Docs、AO3、方格子、AsianFanfics。每個來源各自獨立的 WebView 與登入狀態，互不影響，切換來源不會弄丟其他來源的瀏覽紀錄。在對應平台頁面用自己的帳號登入（Patreon 建議用 email 登入：第三方 SSO 只要跳出 patreon.com 就會在 Safari 開啟，這是刻意設計）。
+1. **Browse** 分頁上方是來源選單，點開可以切換 Patreon、Google Docs、AO3、方格子、AsianFanfics。每個來源各自獨立的 WebView 與登入狀態，互不影響，切換來源不會弄丟其他來源的瀏覽紀錄。在對應平台頁面用自己的帳號登入（Patreon 的 Google、Apple、Facebook 登入都在 app 內的彈出視窗完成）。
 2. 匯入依來源而定，頁面上方會出現對應的匯入 banner：
    - **Patreon**：打開系列裡的一篇貼文，出現「系列：⋯」banner 時點**開啟收藏**，到收藏頁面後點**匯入**（章節目錄會自動捲動載入，重複匯入不會產生重複章節）。
    - **AO3**：打開作品頁面，banner 直接顯示**匯入**，點下去匯入整部作品的章節。
@@ -47,6 +47,7 @@ swift test --package-path MonoriCore
 
 - 各平台改版面可能讓 Reader 樣式或匯入功能失效，兩者都會優雅降級（Reader 退回原始頁面；章節目錄可以從 Browse 分頁重新匯入）。
 - 沒有離線閱讀，這是刻意的設計。
+- **Patreon 的 Google 登入隨時可能再次失效。** 這顆按鈕依賴 Google 的 Identity Services SDK，而 Google 會對它判定為 app 內建瀏覽器的環境回 403。Monori 把 WebView 的 User-Agent 標示為 Safari 讓 SDK 正常載入（見 [ADR-0008](docs/decisions/0008-identify-as-safari-in-user-agent.md)），但 Google 可以隨時加上 User-Agent 以外的判斷。失效時的症狀是「以 Google 繼續登入」變成灰色、按不動。遇到這個狀況：先在 Safari 用 Google 登入 Patreon、到帳號設定加一組密碼，再回 Monori 用 email 加密碼登入；或改用 Apple、Facebook 登入。
 
 ## 不要實作的東西
 
