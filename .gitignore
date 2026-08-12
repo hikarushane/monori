@@ -29,3 +29,7 @@ Docs/demo/
 # Regenerate with `graphify update .` / `/understand` (autoUpdate runs on commit).
 graphify-out/
 .understand-anything/
+
+# App Store Connect CLI workspace: signed .xcarchive / .ipa / ExportOptions and
+# downloaded reports. Build outputs and signing material never belong in git.
+.asc/

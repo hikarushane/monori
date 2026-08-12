@@ -17,13 +17,14 @@
 - ADR-0008 記錄決策、證據與接受的風險；README 已知限制補上失效症狀與繞道
 - MEMORY.md 補三筆坑與兩筆架構決策
 - build number 提升到 3（釘在 `project.yml`）
+- TestFlight build 3 已上傳並通過處理（processingState `VALID`，build id `32ac3ca7-8fb5-486f-8bea-3ae53aadce3b`）。`Monori 內測` 是 internal 群組且 `hasAccessToAllBuilds: True`，新 build 自動可用，不需 Beta App Review
 
 ## 🔄 進行中
-- **TestFlight build 3 上傳**
-  - 做到：程式碼已 commit，build number 已 bump 到 3
-  - 未完成：archive → export → upload
-  - 阻塞：帳號只有 DEVELOPMENT 憑證，沒有 Apple Distribution 憑證（`asc certificates list` 只回一筆 DEVELOPMENT；keychain 也查不到 Apple Distribution）。build 1、2 應該是從 Xcode 用 cloud-managed signing 上傳的
-  - 完成判準：`asc builds list --app 6799533673` 看得到 version 3 且 processingState 為 VALID，並已指派給測試群組
+- **等內測回報複測結果**
+  - 做到：build 3 已在 TestFlight，回報問題的測試者（`paulalin880416@gmail.com`）在 `Monori 內測` 群組內
+  - 未完成：沒有發推播通知（`--notify` 刻意沒帶）。要通知就跑
+    `asc testflight notifications create --app 6799533673 --build 32ac3ca7-8fb5-486f-8bea-3ae53aadce3b`（先用 `--help` 確認旗標）
+  - 完成判準：測試者能用 Google 帳號登入 Patreon 並看到書庫
 
 ## 🚧 試過但行不通（避免重踩）
 - **不要靠加碼偽裝去對抗 Google 的再次封鎖**：UA 標示為 Safari 只是暫時有效。Google 的 embedded webview 檢查是防釣魚保護，針對的正是會對頁面注入 JS 的 app，Monori 確實會注入。再壞時改走引導使用者的路（見 ADR-0008）
@@ -31,9 +32,12 @@
 - **`swift test` 報 `build.db: disk I/O error`**：跑 `swift package clean` 修復（xcodebuild 的 SWBBuildService 佔用）
 
 ## ⚡ 接手要做的事
-1. **解掉 TestFlight 上傳的簽章阻塞**：最省事的路是使用者在 Xcode 開 `Monori.xcodeproj` → Product → Archive → Distribute App → TestFlight，讓 Xcode 自動建立 distribution 憑證。若要留在 CLI，需要先有 Apple Distribution 憑證，指令是 `asc xcode archive --project Monori.xcodeproj --scheme Monori --configuration Release --archive-path .asc/artifacts/Monori.xcarchive` 再 `asc xcode export` → `asc publish testflight --app 6799533673 --ipa <path> --group <group-id>`
-2. **決定發給哪個群組**：`Monori 內測`（internal，`285e0421-0ff0-4036-b4a5-8f23ee73703e`，立即發布）或 `monori 外測`（external，`9992ed2f-e7dc-4b58-8fc0-e798137fecf0`，需 Beta App Review）
-3. **請回報的內測人員複測**：登入頁應該長成 SSO 三顆在上、email 欄在下、底下有「需要登入方面的協助？」；Google 按鈕點下去會開出 app 內的 Google 授權頁
+1. **請回報的內測人員複測**：登入頁應該長成 SSO 三顆在上、email 欄在下、底下有「需要登入方面的協助？」；Google 按鈕點下去會開出 app 內的 Google 授權頁
+2. **若複測仍失敗**：先跑「相關資源」裡的 curl 確認是不是又被 403。是 → 依 ADR-0008 走引導路線，不要加碼偽裝；否 → 收 `--console-pty` log 看 `[NAV] window.open` 有沒有出現
+3. **下次要再出 build**：先把 `project.yml` 的 `CFBundleVersion` 加一，再跑
+   `asc xcode archive --project Monori.xcodeproj --scheme Monori --configuration Release --archive-path .asc/artifacts/Monori.xcarchive --overwrite --xcodebuild-flag -allowProvisioningUpdates`
+   → `asc xcode export --archive-path .asc/artifacts/Monori.xcarchive --ipa-path .asc/artifacts/Monori.ipa --overwrite --xcodebuild-flag -allowProvisioningUpdates`
+   → `asc publish testflight --app 6799533673 --ipa .asc/artifacts/Monori.ipa --group 285e0421-0ff0-4036-b4a5-8f23ee73703e --wait`
 
 ## ⚠️ 注意事項
 - 真實 Patreon 登入沒有跑過。本次只驗到「SDK 載入成功、授權頁開得出來」，整條登入走完會不會拿到 session 尚未證實 —— 那是手動使用者步驟

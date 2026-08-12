@@ -1,7 +1,7 @@
 # WIKI_SYNC
 
-> 來源 project: Monori
-> 產出日期: 2026-06-20（含 2026-06-19 未同步項目）
+> 來源 project: monori
+> 產出日期: 2026-08-12
 > 同步目標: knowledge-wiki/wiki-pages/専案管理/
 
 使用方式：在 knowledge-wiki session 中執行「専案管理 update」，將以下內容分別寫入對應路徑。
@@ -10,152 +10,118 @@
 
 ## errors/（踩過的坑）
 
-**error_wkwebview-scrollview-bgcolor-reset.md 建議內容：**
+**error_wkwebview-default-ua-blocks-google-oauth.md 建議內容：**
+
 ```
 ## 症狀
-設定 `WKWebView.scrollView.backgroundColor = .systemBackground` 後，dark mode 下頁面邊緣仍顯示錯誤底色（gray veil）。
+App 內嵌 WKWebView 開第三方網站的登入頁，「Continue with Google」按鈕呈現停用（灰色），
+點下去完全沒反應：沒有 popup、沒有 JS error、連 window.open 都沒被呼叫。
+同一頁的 Apple / Facebook 登入正常。
 
 ## 根因
-WKWebView 每次呼叫 `loadHTMLString()` 或 `load(URLRequest)` 後，內部會 reset
-`scrollView.backgroundColor`，覆蓋掉開發者的設定。UIKit layer 雖然在設定後的 screenshot
-看起來正確，但新頁面 load 後又還原。
+WKWebView 的預設 User-Agent 停在 `Mobile/15E148`，不帶 `Version/` 也不帶 `Safari/` token：
+
+    Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+
+Google 以此判定為 embedded webview，對 Google Identity Services 的 SDK
+`https://accounts.google.com/gsi/client` 直接回 403。網站的 Google 登入按鈕拿不到 SDK，
+就渲染成停用狀態。這是 Google 針對「會對頁面注入 JS 的 app」的防釣魚保護，不是 bug。
 
 ## 修法
-底色問題必須在 HTML/CSS 層解決，不能靠 UIKit：
-- 在 `<html>` 使用 `<meta name="color-scheme" content="light dark">` 讓 WebKit 知道頁面支援雙色模式
-- 在 CSS 設 `html, body { background: Canvas; }` 使用系統顏色
-- 對有 hardcoded inline style 的 HTML（如 Google Docs export）需加 `* { background-color: transparent !important; }`
+先確認是不是這個原因（只換 UA，其他不動）：
 
-`webView.isOpaque = true` + `webView.backgroundColor = .systemBackground` 可作為 fallback
-（防止極短暫 flash），但無法取代 CSS 修法。
+    curl -s -o /dev/null -w "%{http_code}\n" -A "<app 的 UA>" https://accounts.google.com/gsi/client
+    curl -s -o /dev/null -w "%{http_code}\n" -A "<Safari 的 UA>" https://accounts.google.com/gsi/client
 
-## 預防措施
-遇到 WKWebView 底色問題，先檢查 HTML/CSS 的 `background` 設定，不要只看 UIKit layer 的 backgroundColor。
+403 對 200 就確定了。兩條路：
 
-## 出現過的專案
-- Monori（2026-06-19）
-```
+1. 合規路線：告訴使用者這個環境不支援 Google 登入，引導去真正的瀏覽器設定密碼或改用其他 SSO。
+2. 讓 WebView 以 Safari 身分呈現：
+   `config.applicationNameForUserAgent = "Version/18.7 Safari/604.1"`
+   用 `applicationNameForUserAgent` 而非 `customUserAgent`，base UA 才會繼續跟著 WebKit 更新。
+   `Version/` 要跟 WebKit 自己回報的 OS token 對齊（目前 `iPhone OS 18_7`），不是裝置的 iOS 版本。
 
----
-
-**error_evaluatejavascript-diagnostic-ordering.md 建議內容：**
-```
-## 症狀
-在 WKWebView 頁面處理函式中插入診斷 JS（用 evaluateJavaScript 讀 computed style），得到的
-結果顯示「白底/正常」，但頁面實際渲染與使用者肉眼看到的不符。
-
-## 根因
-WKWebView.evaluateJavaScript() 是非同步排隊。若診斷 JS 排在 injectionScript() 之前，
-它拿到的 computed style 是 CSS injection 執行前的狀態；injection 還沒跑，頁面還是原始樣式。
-injection 之後頁面變色，兩者結果不一致，產生誤導性診斷。
-
-## 修法
-診斷 JS 必須排在所有 injection 之後：
-  webView.evaluateJavaScript(injectionScript(), completionHandler: nil)
-  webView.evaluateJavaScript(diagnosticScript, completionHandler: nil)  // 放後面
-
-或在 injectionScript 的 completionHandler 中觸發診斷。
+選 2 要清楚知道代價：這是繞過 Google 的防釣魚檢查，Google 隨時可以加上 UA 以外的判斷再擋一次，
+症狀會一模一樣。再次發生時不要靠加碼偽裝去對抗。
 
 ## 預防措施
-插入 WKWebView 診斷時，始終確認它在 injection 之後排隊。
-「CSS 診斷顯示正常但頁面看起來不對」= 幾乎可以直接懷疑診斷排序問題。
+- 寫一個測試釘住 UA 後綴同時含 `Version/` 與 `Safari/`，掉一個就紅燈。
+- 診斷手法可複用：在 `WKWebViewConfiguration` 掛 `#if DEBUG` user script，
+  包住 `window.open`、掛 capture 階段的 `error` listener（`e.target.tagName` 抓得到載入失敗的
+  `<script>` / `<link>`）、覆寫 `console.warn/error`，再用
+  `xcrun simctl launch --console-pty` 收 log。
+- 一定要準備對照組。本案是「Apple 登入正常開 popup、Google 連 window.open 都沒呼叫」，
+  才排除掉 popup 機制的嫌疑，直接指向 SDK 沒載入。
 
 ## 出現過的專案
-- Monori（2026-06-19，Bug 4 gray veil debug session）
-```
-
----
-
-**error_ios-launch-storyboard-targetruntime.md 建議內容：**
-```
-## 症狀
-手寫（非 Interface Builder 產出）的 iOS `LaunchScreen.storyboard` 編譯失敗：
-`The document "LaunchScreen.storyboard" could not be opened.
-(com.apple.InterfaceBuilder error -1.)`
-ibtool stack trace 停在 `IBDocument unarchivePlatformIndependentDataWithUnarchiver`。
-
-## 根因
-`<document targetRuntime="...">` 寫成 macOS 的值（`AppleCocoa` 或亂猜的
-`AppleCocoa.CocoaTouch`）。ibtool 印 `Unknown target runtime "AppleCocoa"` 後即 abort。
-iOS storyboard 的正確值是 `iOS.CocoaTouch`。次要陷阱：safe-area layout guide 的
-element key 是 `safeArea`，不是 `safeAreaLayoutGuide`。
-
-## 修法
-- `targetRuntime="iOS.CocoaTouch"`
-- safe area 用 `<viewLayoutGuide key="safeArea" id="..."/>`
-- 對照系統樣板（最可靠的格式來源）：
-  /Applications/Xcode.app/Contents/Developer/Library/Xcode/Templates/
-    Project Templates/MultiPlatform/Application/iOS App Base.xctemplate/LaunchScreen.storyboard
-
-## 預防措施
-手寫任何 .storyboard/.xib 後，先用
-`ibtool --errors --warnings --notices File.storyboard` 驗證（0 error 才算過），
-不要等 xcodebuild 才發現。格式從系統樣板複製，不要憑記憶寫 document header。
-
-## 出現過的專案
-- Monori（2026-06-20，手寫啟動畫面）
+- monori（2026-08-12）
 ```
 
 ---
 
 ## patterns/（可複用模式）
 
-**pattern_wkwebview-dark-mode-css.md 建議內容：**
+**pattern_webview-oauth-popup-host-allowlist.md 建議內容：**
+
 ```
 ## 問題描述
-WKWebView 嵌入自訂 HTML 時，dark mode 下邊緣或頁面背景顯示系統預設灰色（gray veil），
-或 hardcoded 顏色在深色模式下不可讀。
+App 內嵌 WebView 承載第三方網站時，網站的 OAuth 登入用 `window.open` 開 popup，
+並靠 `response_mode=web_message` postMessage 回 `window.opener`。
+若把這類 URL 導去系統瀏覽器，或在原地載入而毀掉 opener，登入永遠無法完成。
+而內容連結若一律給 popup，又會失去主 WebView 上的偵測 script 與功能列。
 
 ## 解法
-在 HTML wrapper 中：
+分類的問題不是「這是哪個網站」，而是「這個 URL 需不需要真正的 popup window 語意」——
+只有 OAuth 登入端點需要。
 
-1. meta tag（在 <head> 最早處，WebKit 比 CSS 更早讀它）：
-   <meta name="color-scheme" content="light dark">
+在 `WKUIDelegate.createWebViewWith` 裡：
+- 通過導覽白名單的 URL，預設用 `webView.load(request)` 留在主 WebView
+- 只有命中 OAuth 主機清單時才建立 popup WKWebView
 
-2. CSS :root 宣告：
-   :root { color-scheme: light dark; }
+兩份清單的比對嚴格度刻意不同：
+- 導覽白名單用 suffix match（`.facebook.com`），因為 OAuth 流程會在
+  `m.` / `www.` / `staticxx.` 之間跳，收窄成單一主機會讓登入半途壞掉
+- popup 判定用精確主機比對，擋掉 `appleid.apple.com.evil.example` 這種 lookalike
 
-3. 用 CSS 系統顏色取代 hardcoded 值：
-   html, body { background: Canvas; color: CanvasText; }
-
-4. 若載入的 HTML 有 hardcoded inline style（如 Google Docs export），加：
-   * { color: CanvasText !important; background-color: transparent !important; }
-   html, body { background: Canvas !important; }
-
-5. UIKit 層可加 fallback（防首幀 flash）：
-   webView.isOpaque = true
-   webView.backgroundColor = .systemBackground
-   但這無法取代 CSS 修法（loadHTMLString 後 scrollView.backgroundColor 會被 reset）。
+每加一個 OAuth provider，兩份清單都要加，漏掉後者的失敗模式是「登入表單開不出來」。
+測試要同時涵蓋正常主機、lookalike 主機、以及不該拿到 popup 的內容 URL。
 
 ## 目前使用專案
-- Monori（ReaderStyler.wrappedDocument()，2026-06-19）
+- monori（NavigationPolicy.decide / requiresPopupWindow，ADR-0007 + ADR-0008）
 ```
 
 ---
 
-**pattern_bundleid-rename-resets-local-data.md 建議內容：**
+## adr/（架構決策）
+
+**adr_identify-embedded-webview-as-safari.md 建議內容：**
+
 ```
-## 問題描述
-iOS app 改 bundle identifier（rebrand / 改名）後，使用者「資料不見了」：
-書庫、設定、登入狀態全部重置。誤以為是 migration bug。
+## 背景
+內嵌 WKWebView 的 app，若網站的登入流程依賴 Google Identity Services，
+Google 會因為預設 UA 缺少 `Version/` 與 `Safari/` token 而回 403，登入按鈕變成死的。
+限制條件：app 的所有功能都讀網站的 session cookie，
+所以不能改用 `ASWebAuthenticationSession`（它對 custom callback scheme 驗證，
+拿不到 cookie 放進 WKWebView）。
 
-## 解法
-這不是 bug，是 sandbox 行為——改 bundle id = 系統視為新 app = 全新 container。
-規劃改名時要先盤點本機持久層，並把資料重置當作預期結果寫進交接：
+## 決策
+用 `applicationNameForUserAgent` 補上 `Version/x Safari/604.1`，讓 WebView 以 Safari 身分呈現。
 
-1. 盤點儲存載體：
-   - `UserDefaults.standard` → 綁 bundle id，會清空
-   - 具名 suite / App Group（`group.xxx`）→ 若 group id 不變則保留；改了就清空
-   - SwiftData/CoreData 預設 `ModelContainer` → 在 app container 內，清空
-   - Keychain → 用 access group；無 group 時綁 bundle id
-2. 若資料必須保留 → 需寫一次性遷移（舊→新 App Group），或乾脆不改 bundle id
-3. dev / 早期 app → 通常接受重置，交接寫明「使用者需重登 + 重建資料」
-4. WKWebView 登入態（cookie/`WKWebsiteDataStore`）綁 app container → 改 id 後需重登
+## 替代方案考慮
+| 方案 | Pros | Cons | 拒絕原因 |
+|------|------|------|---------|
+| 維持預設 UA，改成引導使用者 | 不碰 Google 的防釣魚檢查 | 每個 Google 帳號使用者都要先繞到別的瀏覽器設密碼 | 專案擁有者權衡後選擇改 UA |
+| 改用 ASWebAuthenticationSession | Apple 官方認可的 OAuth 途徑 | 拿不到網站 session cookie | 下游功能全部依賴 cookie，技術上不可行 |
+| customUserAgent 寫死整串 UA | 完全控制 | base UA 不再跟著 WebKit 更新，OS token 會過期 | 維護成本高於收益 |
 
-## 排查指令
-git grep -nE 'UserDefaults|suiteName|ModelContainer|appGroup|group\.|Keychain'
-無 App Group / 無具名 suite = 改 id 後本機資料必然全失。
+## 後果
+Google / Apple / Facebook 登入都能在 app 內完成。
+接受的風險：這是繞過 Google 針對「會對頁面注入 JS 的 app」的防釣魚保護，
+Google 可隨時加上 UA 以外的判斷再擋，且不會事先通知。
+再次失效時視為預期，改走引導路線，不要加碼偽裝。
+另外，網站可能因此改送不同版本的頁面（本案 Patreon 換成完整版登入頁），
+任何依賴該頁 DOM 結構的程式碼都要重新驗證。
 
-## 目前使用專案
-- Chapterly→Monori（2026-06-20，rebrand 規劃；`dev.chapterly`→`dev.monori`）
+## 目前狀態
+active
 ```
