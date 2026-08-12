@@ -74,6 +74,10 @@ final class WebViewModel: NSObject {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
         config.defaultWebpagePreferences.preferredContentMode = .mobile
+        // Identify as Safari. WKWebView's stock UA omits the Version/ and Safari/
+        // tokens, which makes Google 403 the sign-in SDK Patreon's "Continue with
+        // Google" button needs — the button then renders disabled. See BrowserIdentity.
+        config.applicationNameForUserAgent = BrowserIdentity.userAgentSuffix
 
         for name in ScriptMessageRouter.allHandlerNames {
             config.userContentController.add(MessageShim(router: router), name: name)
