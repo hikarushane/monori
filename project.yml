@@ -36,6 +36,12 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Monori
+        # Pinned here because xcodegen regenerates App/Info.plist and would
+        # otherwise reset these to its defaults (1.0 / 1). Bump CFBundleVersion
+        # for every TestFlight upload — App Store Connect rejects a build number
+        # it has already seen.
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "3"
         UILaunchStoryboardName: LaunchScreen
         ITSAppUsesNonExemptEncryption: false
         UISupportedInterfaceOrientations:
