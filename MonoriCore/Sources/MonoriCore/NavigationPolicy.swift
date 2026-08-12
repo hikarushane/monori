@@ -31,20 +31,28 @@ public enum NavigationPolicy {
         if host == "appleid.apple.com" {
             return .allowInWebView
         }
+        // Patreon's "Continue with Facebook" popup, plus the staticxx.facebook.com
+        // redirect_uri it finishes on.
+        if host == "facebook.com" || host.hasSuffix(".facebook.com") {
+            return .allowInWebView
+        }
         return .openInSafari
     }
 
     /// True when a window.open / target=_blank URL needs a real popup
     /// WKWebView instead of loading in the main web view. OAuth sign-in
-    /// popups (Apple / Google) use response_mode=web_message and postMessage
-    /// back to window.opener; loading them in place destroys the opener and
-    /// the auth page refuses to render outside a popup. Everything else loads
-    /// in the main web view so collection detection scripts and the import
-    /// banner keep working. Exact-host match only — lookalike or suffixed
+    /// popups (Apple / Google / Facebook) use response_mode=web_message and
+    /// postMessage back to window.opener; loading them in place destroys the
+    /// opener and the auth page refuses to render outside a popup. Everything
+    /// else loads in the main web view so collection detection scripts and the
+    /// import banner keep working. Exact-host match only — lookalike or suffixed
     /// hosts must not get popup treatment. See ADR-0007.
     public static func requiresPopupWindow(_ url: URL) -> Bool {
         guard let host = url.host?.lowercased() else { return false }
-        return host == "appleid.apple.com" || host == "accounts.google.com"
+        return host == "appleid.apple.com"
+            || host == "accounts.google.com"
+            || host == "m.facebook.com"
+            || host == "www.facebook.com"
     }
 
     /// Matches any Google-owned domain including country-code TLDs
