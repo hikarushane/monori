@@ -17,6 +17,7 @@ AuthKey_*
 
 # vendor docs
 docs/superpowers/
+docs/lipsum/
 Docs/demo/
 
 # Claude Code local state (team settings tracked at .claude/ root)
