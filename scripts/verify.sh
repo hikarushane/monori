@@ -7,6 +7,7 @@ cd "$PROJECT_DIR"
 BUILD_DIR="$PROJECT_DIR/build"
 RESULT_BUNDLE="$BUILD_DIR/TestResults.xcresult"
 LOG_FILE="$BUILD_DIR/xcodebuild.log"
+SWIFT_TEST_LOG="$BUILD_DIR/swift-test.log"
 
 SCHEME="Monori"
 PROJECT="Monori.xcodeproj"
@@ -45,15 +46,26 @@ cd "$PROJECT_DIR/MonoriCore"
 # swift test can exit non-zero from a transient I/O collision even when all tests pass.
 # Capture the exit code without triggering set -e, then only hard-fail on real failures.
 set +e
-swift test 2>&1 | tee -a "$LOG_FILE"
+swift test 2>&1 | tee "$SWIFT_TEST_LOG" | tee -a "$LOG_FILE"
 SWIFT_EXIT=${PIPESTATUS[0]}
 set -e
 if [ "$SWIFT_EXIT" -ne 0 ]; then
   # A crashed test run (fatalError / signal) never prints the "with N failures"
   # summary line, so also match assertion-failure lines and crash markers —
   # otherwise a real failure gets misclassified as the transient build.db race.
-  if grep -qE "with [1-9][0-9]* failures?|error: -\[|Fatal error:|exited with unexpected signal" "$LOG_FILE"; then
+  if grep -qE "with [1-9][0-9]* failures?|error: -\[|Fatal error:|exited with unexpected signal" "$SWIFT_TEST_LOG"; then
     echo "ERROR: MonoriCore tests have real failures (see $LOG_FILE)." >&2
+    exit 1
+  fi
+  # Regression guard (2026-07-12 incident): a test-target COMPILE error (e.g.
+  # "error: cannot find 'AutoCheckScheduler' in scope") exits non-zero without a
+  # "with N failures" line, so the race tolerance below used to swallow it and
+  # verify.sh reported a false green. Hard-fail on any error: line that is not
+  # the known transient build.db I/O collision.
+  NON_RACE_ERRORS=$(grep -E "error:" "$SWIFT_TEST_LOG" | grep -vE "build\.db|database is locked|disk I/O error" || true)
+  if [ -n "$NON_RACE_ERRORS" ]; then
+    echo "ERROR: swift test exited $SWIFT_EXIT with build/compile errors (not the transient build.db race):" >&2
+    echo "$NON_RACE_ERRORS" | head -5 >&2
     exit 1
   fi
   echo "(swift test exit $SWIFT_EXIT — transient build.db race; tests passed, continuing)" | tee -a "$LOG_FILE"
