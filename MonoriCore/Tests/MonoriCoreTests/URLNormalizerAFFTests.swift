@@ -132,4 +132,21 @@ final class URLNormalizerAFFTests: XCTestCase {
         let input = "https://www.patreon.com/posts/12345"
         XCTAssertNil(URLNormalizer.canonicalAFFChapterURL(input))
     }
+
+    func testCanonicalisesSlugSuffixedChapterURL() {
+        XCTAssertEqual(
+            URLNormalizer.canonicalAFFChapterURL(
+                "https://www.asianfanfics.com/story/view/1754805/3/paper-ghosts-ipsum"),
+            "https://www.asianfanfics.com/story/view/1754805/3")
+    }
+
+    func testSlugSuffixedForewordIsStillAForeword() {
+        XCTAssertTrue(URLNormalizer.isAFFForewordURL(
+            "https://www.asianfanfics.com/story/view/1754805/paper-ghosts-ipsum"))
+    }
+
+    func testSlugSuffixedChapterIsNotAForeword() {
+        XCTAssertFalse(URLNormalizer.isAFFForewordURL(
+            "https://www.asianfanfics.com/story/view/1754805/3/paper-ghosts-ipsum"))
+    }
 }
