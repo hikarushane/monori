@@ -37,6 +37,7 @@ final class AFFExtractionTests: XCTestCase {
 
     func testSkipsForewordAndContinueRow() async throws {
         let titles = try await importChapters().compactMap { $0["title"] as? String }
+        XCTAssertEqual(titles.count, 5)
         XCTAssertFalse(titles.contains { $0.localizedCaseInsensitiveContains("Foreword") })
         XCTAssertFalse(titles.contains { $0.contains("▶") })
         XCTAssertFalse(titles.contains { $0.contains("Continue") })
@@ -67,6 +68,7 @@ final class AFFExtractionTests: XCTestCase {
 
     func testCarriesStoryMetadataFromHeader() async throws {
         let chapters = try await importChapters()
+        XCTAssertEqual(chapters.count, 5)
         XCTAssertTrue(chapters.allSatisfy { $0["collectionName"] as? String == "Paper Ghosts (Ipsum)" })
         XCTAssertTrue(chapters.allSatisfy { $0["creatorName"] as? String == "shane245" })
         XCTAssertTrue(chapters.allSatisfy {
@@ -75,7 +77,9 @@ final class AFFExtractionTests: XCTestCase {
     }
 
     func testNeverLeaksBodyText() async throws {
-        let joined = try await importChapters()
+        let chapters = try await importChapters()
+        XCTAssertEqual(chapters.count, 5)
+        let joined = chapters
             .flatMap { [$0["title"] as? String ?? "", $0["url"] as? String ?? "",
                         $0["collectionName"] as? String ?? ""] }
             .joined()
