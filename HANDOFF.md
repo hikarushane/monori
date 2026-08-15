@@ -5,7 +5,7 @@
 
 ## 狀態
 AsianFanfics 於 2026 年出了一次 Tailwind 前端改版（`body.goth-shell`），舊選擇器全滅，任何故事匯入都跳 `未找到章節` / `此頁面未找到章節連結`。已定位根因、改鎖語意化屬性重寫適配器，並在 Simulator 對正式站 end-to-end 驗證通過。
-- 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認；277 XCTest + 11 swift-testing，0 failures）
+- 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認；279 XCTest + 11 swift-testing，0 failures）
 - 分支 ＠ 最後 commit：`fix/aff-2026-redesign @ 028ff85`
 - 工作樹：clean（`brag-output/`、`skills-staging/` 為未追蹤的暫存目錄，刻意不 commit）
 
@@ -17,7 +17,7 @@ AsianFanfics 於 2026 年出了一次 Tailwind 前端改版（`body.goth-shell`�
 - Reader 樣式表改鎖定 `#bodyText`，並收斂 `aside` 隱藏規則的作用範圍
 - Browse 模式下隱藏改版新增的廣告／推廣版位
 - 9 個 commit（`07e5034`…`028ff85`，逐一列表見 ADR-0009）＋ ADR-0009 記錄決策、證據與接受的風險
-- 驗證：`./scripts/verify.sh` 綠燈（`** BUILD SUCCEEDED **`，277 XCTest + 11 swift-testing，0 failures）；iOS Simulator 對正式站 end-to-end 驗證：banner 顯示真實標題「Paper Ghosts (Ipsum)」、匯入回報「已匯入 5 個章節」、書庫依序列出 Chapter 1-5（無 Foreword、無 Continue 列）、Chapter 2 開啟後為乾淨文字、無網站 nav/footer/浮動底部列/廣告。截圖：`build/smoke/ui/step-245-11-import-tapped.png`、`step-248-14-toc-open.png`、`step-249-15-chapter2-reader.png`
+- 驗證：`./scripts/verify.sh` 綠燈（`** BUILD SUCCEEDED **`，279 XCTest + 11 swift-testing，0 failures）；iOS Simulator 對正式站 end-to-end 驗證：banner 顯示真實標題「Paper Ghosts (Ipsum)」、匯入回報「已匯入 5 個章節」、書庫依序列出 Chapter 1-5（無 Foreword、無 Continue 列）、Chapter 2 開啟後為乾淨文字、無網站 nav/footer/浮動底部列/廣告。截圖：`build/smoke/ui/step-245-11-import-tapped.png`、`step-248-14-toc-open.png`、`step-249-15-chapter2-reader.png`
 - 已知瑕疵（非本次修復範圍，記在 ADR-0009 Consequences）：reader 背景色是 AFF 自己的深藍（wrapper 的 `dark:bg-[#0f172a]`）而非 ruleset 的 `#1c1b19`，因為 `AFFReaderRuleset.css` 只畫 `body`，wrapper 蓋在上面；文字仍可讀，未修
 
 ## 🔄 進行中
