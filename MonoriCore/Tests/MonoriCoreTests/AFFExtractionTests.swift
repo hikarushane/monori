@@ -93,10 +93,11 @@ final class AFFExtractionTests: XCTestCase {
             fixture: "aff-story-foreword-no-toc",
             pageURL: "https://www.asianfanfics.com/story/view/1470000/companion")
         XCTAssertEqual(chapters.count, 1)
-        XCTAssertEqual(chapters[0]["url"] as? String,
+        let first = try XCTUnwrap(chapters.first)
+        XCTAssertEqual(first["url"] as? String,
                        "https://www.asianfanfics.com/story/view/1470000/1/companion")
-        XCTAssertEqual(chapters[0]["title"] as? String, "Chapter 1: Companion",
+        XCTAssertEqual(first["title"] as? String, "Chapter 1: Companion",
                        "the longest visible label for a chapter number wins over 'Start reading →'")
-        XCTAssertEqual(chapters[0]["collectionName"] as? String, "Companion")
+        XCTAssertEqual(first["collectionName"] as? String, "Companion")
     }
 }
