@@ -31,13 +31,13 @@ final class AFFExtractionTests: XCTestCase {
 
     func testImportsEveryChapterOnce() async throws {
         let chapters = try await importChapters()
-        XCTAssertEqual(chapters.count, 5,
+        XCTAssertEqual(chapters.count, 12,
                        "aside and dialog each render the full TOC; both copies must collapse to one")
     }
 
     func testSkipsForewordAndContinueRow() async throws {
         let titles = try await importChapters().compactMap { $0["title"] as? String }
-        XCTAssertEqual(titles.count, 5)
+        XCTAssertEqual(titles.count, 12)
         XCTAssertFalse(titles.contains { $0.localizedCaseInsensitiveContains("Foreword") })
         XCTAssertFalse(titles.contains { $0.contains("▶") })
         XCTAssertFalse(titles.contains { $0.contains("Continue") })
@@ -45,30 +45,46 @@ final class AFFExtractionTests: XCTestCase {
 
     func testTitlesDropTheNumberBadge() async throws {
         let titles = try await importChapters().compactMap { $0["title"] as? String }
+        // Chapters 10-12 must sort numerically after 9, not lexically between 1 and 2.
         XCTAssertEqual(titles, [
             "Chapter 1: The Signal in the Static",
             "Chapter 2: Cartography of Forgetting",
             "Chapter 3: Letters Never Sent",
             "Chapter 4: The Geometry of Rain",
             "Chapter 5: Exit Wounds",
+            "Chapter 6: The Weight of Ash",
+            "Chapter 7: What the Tide Keeps",
+            "Chapter 8: A Grammar of Absence",
+            "Chapter 9: The Last Known Address",
+            "Chapter 10: Static Bloom",
+            "Chapter 11: The Distance Between Sentences",
+            "Chapter 12: Everything We Didn't Say",
         ])
     }
 
     func testURLsAreAbsoluteAndOrdered() async throws {
         let chapters = try await importChapters()
+        // Chapters 10-12 must sort numerically after 9, not lexically between 1 and 2.
         XCTAssertEqual(chapters.compactMap { $0["url"] as? String }, [
             "https://www.asianfanfics.com/story/view/1754805/1/paper-ghosts-ipsum",
             "https://www.asianfanfics.com/story/view/1754805/2/paper-ghosts-ipsum",
             "https://www.asianfanfics.com/story/view/1754805/3/paper-ghosts-ipsum",
             "https://www.asianfanfics.com/story/view/1754805/4/paper-ghosts-ipsum",
             "https://www.asianfanfics.com/story/view/1754805/5/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/6/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/7/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/8/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/9/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/10/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/11/paper-ghosts-ipsum",
+            "https://www.asianfanfics.com/story/view/1754805/12/paper-ghosts-ipsum",
         ])
-        XCTAssertEqual(chapters.compactMap { $0["domOrder"] as? Int }, [0, 1, 2, 3, 4])
+        XCTAssertEqual(chapters.compactMap { $0["domOrder"] as? Int }, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
     }
 
     func testCarriesStoryMetadataFromHeader() async throws {
         let chapters = try await importChapters()
-        XCTAssertEqual(chapters.count, 5)
+        XCTAssertEqual(chapters.count, 12)
         XCTAssertTrue(chapters.allSatisfy { $0["collectionName"] as? String == "Paper Ghosts (Ipsum)" })
         XCTAssertTrue(chapters.allSatisfy { $0["creatorName"] as? String == "shane245" })
         XCTAssertTrue(chapters.allSatisfy {
@@ -78,7 +94,7 @@ final class AFFExtractionTests: XCTestCase {
 
     func testNeverLeaksBodyText() async throws {
         let chapters = try await importChapters()
-        XCTAssertEqual(chapters.count, 5)
+        XCTAssertEqual(chapters.count, 12)
         let joined = chapters
             .flatMap { [$0["title"] as? String ?? "", $0["url"] as? String ?? "",
                         $0["collectionName"] as? String ?? ""] }
