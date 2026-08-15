@@ -1,6 +1,11 @@
-/* Hide ads in AFF browse mode */
-#ad-top,
-#bottom-ad,
+/* Hide ads and promo blocks in AFF browse mode. The 2026 redesign renders ad
+   slots as body-level <ins class="adsbygoogle"> plus in-article promo
+   sections; the consent dialog is deliberately left visible so the user can
+   answer it. */
+body > ins,
+.adsbygoogle,
+#story-promote,
+#story-feed,
 .ad-main,
 [class*="ad_responsive"],
 #ad_calendar_rated {

@@ -53,7 +53,7 @@ final class WebViewModel: NSObject {
       {"trigger":{"url-filter":"google-analytics\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
       {"trigger":{"url-filter":"shareasale\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
       {"trigger":{"url-filter":"cloudflareinsights\\.com","if-domain":["*asianfanfics.com"]},"action":{"type":"block"}},
-      {"trigger":{"url-filter":".*","if-domain":["*asianfanfics.com"]},"action":{"type":"css-display-none","selector":"#ad-top, #bottom-ad, .ad-main, [class*='ad_responsive'], #ad_calendar_rated, .excerpt-promoted"}}
+      {"trigger":{"url-filter":".*","if-domain":["*asianfanfics.com"]},"action":{"type":"css-display-none","selector":"ins.adsbygoogle, .adsbygoogle, #story-promote, #story-feed, .ad-main, [class*='ad_responsive'], #ad_calendar_rated"}}
     ]
     """#
 
