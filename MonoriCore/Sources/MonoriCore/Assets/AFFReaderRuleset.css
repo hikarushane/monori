@@ -32,6 +32,13 @@ aside {
   display: none !important;
 }
 
+/* …but an aside the author put inside the chapter text, or one belonging to
+   the comment thread, is content — the sidebar rule above must not eat it. */
+#bodyText aside,
+#comments aside {
+  display: block !important;
+}
+
 /* Catch-all for ad and promo blocks anywhere */
 .adsbygoogle,
 #story-promote,
