@@ -59,11 +59,20 @@ final class WebViewModel: NSObject {
 
     private static func installAFFAdBlockRules(on webView: WKWebView) {
         Task { @MainActor in
-            guard let list = try? await WKContentRuleListStore.default().compileContentRuleList(
-                forIdentifier: "monori-aff-ads",
-                encodedContentRuleList: affAdBlockRules
-            ) else { return }
-            webView.configuration.userContentController.add(list)
+            do {
+                guard let list = try await WKContentRuleListStore.default().compileContentRuleList(
+                    forIdentifier: "monori-aff-ads",
+                    encodedContentRuleList: affAdBlockRules
+                ) else {
+                    DiagnosticLog.shared.error(category: "webview",
+                        "AFF ad-block rule list compiled to nil with no thrown error")
+                    return
+                }
+                webView.configuration.userContentController.add(list)
+            } catch {
+                DiagnosticLog.shared.error(category: "webview",
+                    "AFF ad-block rule list failed to compile: \(error.localizedDescription)")
+            }
         }
     }
 
