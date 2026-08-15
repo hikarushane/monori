@@ -162,4 +162,91 @@ final class AFFExtractionTests: XCTestCase {
             pageURL: "https://www.asianfanfics.com/story/view/1754805/3/paper-ghosts-ipsum")
         XCTAssertTrue(bodies.isEmpty, "the banner belongs on the foreword page only")
     }
+
+    // MARK: - CSS ruleset coverage
+    //
+    // AFFReaderRuleset.css and AFFBrowseRuleset.css are pure presentation —
+    // nothing about them is exercised by the JS import/detect tests above.
+    // These load the same foreword fixture into a live WKWebView, inject the
+    // real stylesheet via ReaderStyler, and read back `getComputedStyle` so a
+    // future redesign that silently breaks either ruleset fails loudly here
+    // instead of just breaking the reader chrome on-device.
+
+    /// Loads the foreword fixture at its real AFF URL and injects `script`
+    /// (a `ReaderStyler` injection script) into the resulting page.
+    private func loadAFFFixtureAndInject(_ script: String) async throws -> WKWebView {
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 844),
+                                configuration: WKWebViewConfiguration())
+        let url = Bundle.module.url(forResource: "aff-story-foreword", withExtension: "html")!
+        let html = try String(contentsOf: url, encoding: .utf8)
+        webView.loadHTMLString(
+            html,
+            baseURL: URL(string: "https://www.asianfanfics.com/story/view/1754805/paper-ghosts-ipsum")!)
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        _ = try await webView.evaluateJavaScript(script)
+        return webView
+    }
+
+    /// Computed `display` of the first element matching `selector`. Throws
+    /// (failing the test) if the selector matches nothing, rather than
+    /// silently comparing against `nil`.
+    private func computedDisplay(_ selector: String, in webView: WKWebView) async throws -> String {
+        let result = try await webView.evaluateJavaScript("""
+        getComputedStyle(document.querySelector('\(selector)')).display
+        """)
+        return try XCTUnwrap(result as? String,
+                             "selector '\(selector)' matched nothing in the fixture")
+    }
+
+    /// Computed `display` of every element matching `selector`, in document order.
+    private func computedDisplays(_ selector: String, in webView: WKWebView) async throws -> [String] {
+        let result = try await webView.evaluateJavaScript("""
+        Array.from(document.querySelectorAll('\(selector)')).map(function (el) {
+          return getComputedStyle(el).display;
+        })
+        """)
+        return (result as? [String]) ?? []
+    }
+
+    func testAffReaderRulesetHidesSiteChromeButKeepsChapterAndComments() async throws {
+        let webView = try await loadAFFFixtureAndInject(ReaderStyler.affInjectionScript())
+
+        // The fixture has two `body > header` elements (language bar + site
+        // nav); both must go, including the one with #site-header.
+        let headerDisplays = try await computedDisplays("body > header", in: webView)
+        XCTAssertFalse(headerDisplays.isEmpty,
+                       "fixture must contain body > header elements to exercise this rule")
+        XCTAssertTrue(headerDisplays.allSatisfy { $0 == "none" },
+                      "every body > header, including #site-header, must be hidden")
+
+        let footerDisplay = try await computedDisplay("footer#site-footer", in: webView)
+        XCTAssertEqual(footerDisplay, "none")
+        let dialogDisplay = try await computedDisplay("dialog", in: webView)
+        XCTAssertEqual(dialogDisplay, "none", "the mobile TOC dialog must be hidden")
+        let asideDisplay = try await computedDisplay("aside", in: webView)
+        XCTAssertEqual(asideDisplay, "none", "the desktop TOC sidebar must be hidden in reader mode")
+        let adDisplay = try await computedDisplay("ins.adsbygoogle", in: webView)
+        XCTAssertEqual(adDisplay, "none")
+
+        let bodyTextDisplay = try await computedDisplay("#bodyText", in: webView)
+        XCTAssertNotEqual(bodyTextDisplay, "none", "chapter text must stay visible")
+        let commentsDisplay = try await computedDisplay("section#comments", in: webView)
+        XCTAssertNotEqual(commentsDisplay, "none", "the comment thread must stay visible")
+    }
+
+    func testAffBrowseRulesetOnlyHidesAds() async throws {
+        let webView = try await loadAFFFixtureAndInject(ReaderStyler.affBrowseInjectionScript())
+
+        let adDisplay = try await computedDisplay("ins.adsbygoogle", in: webView)
+        XCTAssertEqual(adDisplay, "none")
+
+        // Browse mode keeps the site chrome — it only hides ads.
+        let bodyTextDisplay = try await computedDisplay("#bodyText", in: webView)
+        XCTAssertNotEqual(bodyTextDisplay, "none", "browse mode must not touch the article body")
+        let headerDisplay = try await computedDisplay("#site-header", in: webView)
+        XCTAssertNotEqual(headerDisplay, "none", "browse mode must keep the site header, unlike reader mode")
+    }
 }
