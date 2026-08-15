@@ -1,43 +1,38 @@
 # HANDOFF
 
-> 上次 session: 2026-08-12（Patreon Google 登入根因調查與修復 + TestFlight build 3）
+> 上次 session: 2026-08-15（AsianFanfics 2026 改版適配修復）
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-內測人員回報的 Patreon Google 登入失效已找到根因並修好，Facebook 登入的獨立 bug 一併修掉。
-- 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認；265 XCTest + 11 swift-testing，0 failures）
-- 分支 ＠ 最後 commit：`main @ e9b2235`
-- 工作樹：clean（`.asc/`、`brag-output/`、`skills-staging/` 為未追蹤的暫存目錄，刻意不 commit）
+AsianFanfics 於 2026 年出了一次 Tailwind 前端改版（`body.goth-shell`），舊選擇器全滅，任何故事匯入都跳 `未找到章節` / `此頁面未找到章節連結`。已定位根因、改鎖語意化屬性重寫適配器，並在 Simulator 對正式站 end-to-end 驗證通過。
+- 測試/建置狀態：✅ 綠（跑 `./scripts/verify.sh` 確認；277 XCTest + 11 swift-testing，0 failures）
+- 分支 ＠ 最後 commit：`fix/aff-2026-redesign @ 028ff85`
+- 工作樹：clean（`brag-output/`、`skills-staging/` 為未追蹤的暫存目錄，刻意不 commit）
 
 ## ✅ 本次完成
-- 定位根因：WKWebView 預設 UA 沒有 `Version/` 與 `Safari/` token → Google 對 `accounts.google.com/gsi/client` 回 403 → Patreon 的 Google 按鈕拿不到 SDK 而停用
-- `BrowserIdentity.userAgentSuffix` + `applicationNameForUserAgent`，WebView 對外呈現為 Safari
-- `NavigationPolicy` 補上 Facebook OAuth 主機（decide 用 suffix、popup 判定用精確比對）
-- 新增 `BrowserIdentityTests`、`NavigationPolicyFacebookTests`（先紅後綠）
-- ADR-0008 記錄決策、證據與接受的風險；README 已知限制補上失效症狀與繞道
-- MEMORY.md 補三筆坑與兩筆架構決策
-- build number 提升到 3（釘在 `project.yml`）
-- TestFlight build 3 已上傳並通過處理（processingState `VALID`，build id `32ac3ca7-8fb5-486f-8bea-3ae53aadce3b`）。`Monori 內測` 是 internal 群組且 `hasAccessToAllBuilds: True`，新 build 自動可用，不需 Beta App Review
+- 定位根因：AsianFanfics 改版後 `#story-title`、`.widget--chapters`、`select[name="chapter-nav"]`、`main.primary`、`#user-submitted-body` 全部消失或回 0 nodes。2026-08-15 於正式站 1280px（桌機）/375px（手機）、登出狀態驗證，並用另一篇不同作者的故事（`/story/view/1470000`）交叉確認為全站性，非單篇或單版型問題
+- 章節清單改鎖 `data-toc-chapter`：TOC 桌機 `aside` + 手機 `dialog` 各渲染一份，依章節編號去重；`0` = Foreword 視為 metadata、非章節；client 插入的「▶ Continue」列沒有 `data-toc-chapter`，天然被排除
+- 故事標題／作者改抓「第一個含 `<h1>` 的 `<header>`」
+- 章節網址加上 slug 段（如 `/story/view/1754805/3/paper-ghosts-ipsum`）的正規化涵蓋
+- Reader 樣式表改鎖定 `#bodyText`，並收斂 `aside` 隱藏規則的作用範圍
+- Browse 模式下隱藏改版新增的廣告／推廣版位
+- 9 個 commit（`07e5034`…`028ff85`，逐一列表見 ADR-0009）＋ ADR-0009 記錄決策、證據與接受的風險
+- 驗證：`./scripts/verify.sh` 綠燈（`** BUILD SUCCEEDED **`，277 XCTest + 11 swift-testing，0 failures）；iOS Simulator 對正式站 end-to-end 驗證：banner 顯示真實標題「Paper Ghosts (Ipsum)」、匯入回報「已匯入 5 個章節」、書庫依序列出 Chapter 1-5（無 Foreword、無 Continue 列）、Chapter 2 開啟後為乾淨文字、無網站 nav/footer/浮動底部列/廣告。截圖：`build/smoke/ui/step-245-11-import-tapped.png`、`step-248-14-toc-open.png`、`step-249-15-chapter2-reader.png`
+- 已知瑕疵（非本次修復範圍，記在 ADR-0009 Consequences）：reader 背景色是 AFF 自己的深藍（wrapper 的 `dark:bg-[#0f172a]`）而非 ruleset 的 `#1c1b19`，因為 `AFFReaderRuleset.css` 只畫 `body`，wrapper 蓋在上面；文字仍可讀，未修
 
 ## 🔄 進行中
-- **等內測回報複測結果**
-  - 做到：build 3 已在 TestFlight，回報問題的測試者（`paulalin880416@gmail.com`）在 `Monori 內測` 群組內
-  - 未完成：沒有發推播通知（`--notify` 刻意沒帶）。要通知就跑
-    `asc testflight notifications create --app 6799533673 --build 32ac3ca7-8fb5-486f-8bea-3ae53aadce3b`（先用 `--help` 確認旗標）
-  - 完成判準：測試者能用 Google 帳號登入 Patreon 並看到書庫
+- **Google Docs 登入彈出視窗導覽 bug（獨立問題，尚未修復）**：密碼＋2FA 通過後，Drive 會在手機瀏覽器開啟，app 端卡在空白頁。這是與本次 AFF 修復無關的獨立調查，計畫在 `docs/superpowers/plans/2026-08-15-google-login-popup-navigation.md`。**根因尚未確認**，不要當成已修好或已診斷。
 
 ## 🚧 試過但行不通（避免重踩）
 - **不要靠加碼偽裝去對抗 Google 的再次封鎖**：UA 標示為 Safari 只是暫時有效。Google 的 embedded webview 檢查是防釣魚保護，針對的正是會對頁面注入 JS 的 app，Monori 確實會注入。再壞時改走引導使用者的路（見 ADR-0008）
 - **只改 `App/Info.plist` 的版本號沒用**：xcodegen 會重新產生該檔並重設為 1.0 / 1，必須改 `project.yml` 的 `info.properties`
 - **`swift test` 報 `build.db: disk I/O error`**：跑 `swift package clean` 修復（xcodebuild 的 SWBBuildService 佔用）
+- **AFF 選擇器綁 Tailwind utility class 會再壞**：這次全滅的 `#story-title`／`.widget--chapters`／`select[name="chapter-nav"]`／`main.primary`／`#user-submitted-body` 就是教訓。下次改動或新增 AFF 選擇器，改鎖語意化的 `data-toc-*` 屬性（或等同穩定 hook），不要綁 `span.truncate` 這類會隨改版重生成的 class（見 ADR-0009）
 
 ## ⚡ 接手要做的事
-1. **請回報的內測人員複測**：登入頁應該長成 SSO 三顆在上、email 欄在下、底下有「需要登入方面的協助？」；Google 按鈕點下去會開出 app 內的 Google 授權頁
-2. **若複測仍失敗**：先跑「相關資源」裡的 curl 確認是不是又被 403。是 → 依 ADR-0008 走引導路線，不要加碼偽裝；否 → 收 `--console-pty` log 看 `[NAV] window.open` 有沒有出現
-3. **下次要再出 build**：先把 `project.yml` 的 `CFBundleVersion` 加一，再跑
-   `asc xcode archive --project Monori.xcodeproj --scheme Monori --configuration Release --archive-path .asc/artifacts/Monori.xcarchive --overwrite --xcodebuild-flag -allowProvisioningUpdates`
-   → `asc xcode export --archive-path .asc/artifacts/Monori.xcarchive --ipa-path .asc/artifacts/Monori.ipa --overwrite --xcodebuild-flag -allowProvisioningUpdates`
-   → `asc publish testflight --app 6799533673 --ipa .asc/artifacts/Monori.ipa --group 285e0421-0ff0-4036-b4a5-8f23ee73703e --wait`
+1. **AFF 沒有待辦**：本次修復已在正式站 end-to-end 驗證通過，不需複測。若 AFF 未來又改版，先用瀏覽器對正式站即時 DOM 重新檢查（如這次的 1280px/375px、登出流程），不要沿用舊選擇器假設
+2. **Google Docs 登入彈出視窗導覽 bug**：獨立問題，計畫見 `docs/superpowers/plans/2026-08-15-google-login-popup-navigation.md`；根因尚未確認，下一步是照計畫診斷，不要直接套用 AFF 或 Patreon 登入的既有假設
+3. **這個分支要收尾**：目前在 `fix/aff-2026-redesign @ 028ff85`（加上本次的 docs commit）。決定 merge/PR 流程時可參考 `superpowers:finishing-a-development-branch`
 
 ## ⚠️ 注意事項
 - 真實 Patreon 登入沒有跑過。本次只驗到「SDK 載入成功、授權頁開得出來」，整條登入走完會不會拿到 session 尚未證實 —— 那是手動使用者步驟
@@ -46,18 +41,21 @@
 - 測試用的模擬器是 iPhone 17 Pro Max（已關機），上面裝了 Debug build 但沒有 Patreon 登入狀態；使用者原本 iPhone 17 Pro 上那份沒有被動到
 
 ## 📁 本次修改的檔案
-- `MonoriCore/Sources/MonoriCore/BrowserIdentity.swift` — 新增，UA 後綴常數
-- `App/WebView/WebViewModel.swift` — 設 `applicationNameForUserAgent`
-- `MonoriCore/Sources/MonoriCore/NavigationPolicy.swift` — Facebook 主機進兩份白名單
-- `MonoriCore/Tests/MonoriCoreTests/BrowserIdentityTests.swift` — 新增
-- `MonoriCore/Tests/MonoriCoreTests/NavigationPolicyFacebookTests.swift` — 新增
-- `docs/decisions/0008-identify-as-safari-in-user-agent.md` — 新增
-- `README.md` — 已知限制 + 修正 SSO 敘述
-- `MEMORY.md` — 三筆坑、兩筆架構決策、兩筆待辦
-- `project.yml`、`App/Info.plist` — build number 3
+- `MonoriCore/Sources/MonoriCore/Assets/AFFStoryImport.js` — 章節清單改鎖 `data-toc-chapter`（去重、排除 Foreword/Continue 列）、標題/作者改抓含 `<h1>` 的 `<header>`
+- `MonoriCore/Sources/MonoriCore/Assets/AFFStoryDetect.js` — 配合改版後的頁面結構調整偵測邏輯
+- `MonoriCore/Sources/MonoriCore/Assets/AFFReaderRuleset.css` — 樣式表改鎖定 `#bodyText`，收斂 `aside` 隱藏規則的作用範圍
+- `MonoriCore/Sources/MonoriCore/Assets/AFFBrowseRuleset.css` — 隱藏改版新增的廣告／推廣版位
+- `App/WebView/WebViewModel.swift` — content rule list 選擇器換成改版後的廣告/推廣版位（`ins.adsbygoogle`、`#story-promote`、`#story-feed` 等）
+- `MonoriCore/Tests/MonoriCoreTests/AFFExtractionTests.swift` — 新增，改版 fixture 的章節/標題/作者抽取測試
+- `MonoriCore/Tests/MonoriCoreTests/URLNormalizerAFFTests.swift` — 新增，slug 後綴章節網址（`/story/view/1754805/3/paper-ghosts-ipsum`）正規化測試
+- `MonoriCore/Tests/MonoriCoreTests/Fixtures/aff-story-foreword.html`、`aff-story-foreword-no-toc.html` — 新增，改版頁面的縮版 fixture
+- `docs/decisions/0009-asianfanfics-2026-redesign-selectors.md` — 新增
+- `HANDOFF.md`、`MEMORY.md` — 本次記錄
 
 ## 🔗 相關資源
-- ADR-0008：`docs/decisions/0008-identify-as-safari-in-user-agent.md`
+- ADR-0009（本次）：`docs/decisions/0009-asianfanfics-2026-redesign-selectors.md`
+- ADR-0008（Safari UA）：`docs/decisions/0008-identify-as-safari-in-user-agent.md`
 - ADR-0007（popup 只給 OAuth）：`docs/decisions/0007-popup-windows-only-for-oauth.md`
+- Google Docs 登入彈出視窗導覽 bug 的計畫：`docs/superpowers/plans/2026-08-15-google-login-popup-navigation.md`
 - App Store Connect app id：`6799533673`
-- 重現 403 的最短指令：`curl -A "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148" -o /dev/null -w "%{http_code}\n" https://accounts.google.com/gsi/client`
+- 重現 Patreon Google 403 的最短指令：`curl -A "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148" -o /dev/null -w "%{http_code}\n" https://accounts.google.com/gsi/client`

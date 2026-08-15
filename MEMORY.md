@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-12（WebView UA 標示為 Safari，修好 Patreon Google／Facebook 登入）
+> 最後更新：2026-08-15（AsianFanfics 2026 Tailwind 改版適配修復，見 ADR-0009）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -100,6 +100,9 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
 
 ## 踩過的坑
+- **AsianFanfics 2026 年前端全面 Tailwind 改版，舊選擇器全滅**（2026-08-15）：`#story-title`、`.widget--chapters`、`select[name="chapter-nav"]`、`main.primary`、`#user-submitted-body` 全部消失或回 0 nodes，任何故事匯入都跳「未找到章節」。2026-08-15 於正式站 1280px（桌機）/375px（手機）、登出狀態驗證為全站性（非單篇或單版型問題），並用另一篇不同作者的故事 `/story/view/1470000` 交叉確認。修法見 ADR-0009：章節清單改鎖 `data-toc-chapter`（TOC 桌機 `aside` + 手機 `dialog` 各渲染一份，依章節編號去重；`0` = Foreword 視為 metadata、非章節）、標題/作者改抓「第一個含 `<h1>` 的 `<header>`」、reader CSS 改鎖 `#bodyText`。**任何 AFF 選擇器改動，動手前都要先對正式站即時 DOM 重新驗證，不能只憑這份記錄裡的假設**——AFF 一改版視覺，Tailwind utility class 就會整批重生成，下次同類壞法幾乎必然重演。
+  📍 出現位置：AFF adapter（`AFFStoryImport.js`／`AFFStoryDetect.js`／`AFFReaderRuleset.css`）；ADR-0009
+
 - **WKWebView 預設 UA 讓 Google 擋掉 Patreon 的 Google 登入**（2026-08-12）：內測人員回報「以 Google 繼續登入」變灰、按不動。WKWebView 的預設 UA 停在 `Mobile/15E148`，沒有 `Version/` 也沒有 `Safari/` token；Google 判定為 embedded webview，對 `https://accounts.google.com/gsi/client` 回 403 → Patreon 那顆按鈕沒有 SDK 可用就變成停用狀態。同一支 URL 換 UA 測：預設 UA 403、加上兩個 token 200（266 KB）。解法見 ADR-0008。
   📍 出現位置：`App/WebView/WebViewModel.swift` init 的 `applicationNameForUserAgent`
   ⚠️ **會再壞**：Google 這個檢查是防釣魚保護，針對的正是會對頁面注入 JS 的 app —— Monori 確實會注入（reader CSS、collection 偵測）。Google 隨時可以加 UA 以外的判斷，症狀會一模一樣。再次發生時視為預期，**不要靠加碼偽裝去對抗**，改走引導使用者的路。
