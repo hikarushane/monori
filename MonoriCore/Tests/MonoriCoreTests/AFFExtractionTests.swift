@@ -100,4 +100,50 @@ final class AFFExtractionTests: XCTestCase {
                        "the longest visible label for a chapter number wins over 'Start reading →'")
         XCTAssertEqual(first["collectionName"] as? String, "Companion")
     }
+
+    private final class Collector: NSObject, WKScriptMessageHandler {
+        var bodies: [Any] = []
+        func userContentController(_ ucc: WKUserContentController,
+                                   didReceive message: WKScriptMessage) {
+            bodies.append(message.body)
+        }
+    }
+
+    private func runDetect(fixture: String, pageURL: String) async throws -> [Any] {
+        let collector = Collector()
+        let config = WKWebViewConfiguration()
+        config.userContentController.add(collector, name: "monoriCollectionLink")
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 844),
+                                configuration: config)
+        let url = Bundle.module.url(forResource: fixture, withExtension: "html")!
+        let html = try String(contentsOf: url, encoding: .utf8)
+        webView.loadHTMLString(html, baseURL: URL(string: pageURL)!)
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        _ = try? await webView.evaluateJavaScript(JSAssets.affStoryDetect)
+        try await Task.sleep(for: .milliseconds(200))
+        return collector.bodies
+    }
+
+    func testDetectPostsStoryTitleAndAuthor() async throws {
+        let bodies = try await runDetect(
+            fixture: "aff-story-foreword",
+            pageURL: "https://www.asianfanfics.com/story/view/1754805/paper-ghosts-ipsum")
+        XCTAssertEqual(bodies.count, 1)
+        let body = try XCTUnwrap(bodies.first)
+        let link = try PayloadValidator.validateCollectionLink(body).get()
+        XCTAssertEqual(link.collectionName, "Paper Ghosts (Ipsum)")
+        XCTAssertEqual(link.creatorName, "shane245")
+        XCTAssertEqual(link.collectionURL,
+                       "https://www.asianfanfics.com/story/view/1754805/paper-ghosts-ipsum")
+    }
+
+    func testDetectStaysSilentOnChapterPages() async throws {
+        let bodies = try await runDetect(
+            fixture: "aff-story-foreword",
+            pageURL: "https://www.asianfanfics.com/story/view/1754805/3/paper-ghosts-ipsum")
+        XCTAssertTrue(bodies.isEmpty, "the banner belongs on the foreword page only")
+    }
 }

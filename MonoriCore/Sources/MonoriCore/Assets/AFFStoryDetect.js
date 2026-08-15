@@ -8,19 +8,24 @@
   if (parts.length >= 4 && /^\d+$/.test(parts[3])) return;
   if (parts.length >= 5) return;
 
-  var title = document.getElementById('story-title');
-  if (!title) return;
+  // Three <header> elements exist (language bar, site nav, story header);
+  // only the story header holds an <h1>. See AFFStoryImport.js.
+  var storyHeader = null;
+  var headerCandidates = document.querySelectorAll('header');
+  for (var i = 0; i < headerCandidates.length; i++) {
+    if (headerCandidates[i].querySelector('h1')) { storyHeader = headerCandidates[i]; break; }
+  }
+  if (!storyHeader) return;
 
   var handler = window.webkit && window.webkit.messageHandlers
     && window.webkit.messageHandlers.monoriCollectionLink;
   if (!handler) return;
 
-  var authorLink = document.querySelector('.row-meta a[href^="/profile/u/"]');
-  var creatorName = authorLink ? authorLink.textContent.trim() : null;
+  var authorLink = storyHeader.querySelector('a[href^="/profile/u/"]');
 
   handler.postMessage({
-    collectionName: title.textContent.trim(),
+    collectionName: storyHeader.querySelector('h1').textContent.trim(),
     collectionURL: location.href,
-    creatorName: creatorName
+    creatorName: authorLink ? authorLink.textContent.trim() : null
   });
 })();
