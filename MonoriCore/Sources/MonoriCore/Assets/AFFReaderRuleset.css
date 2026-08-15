@@ -2,68 +2,78 @@
   color-scheme: light dark;
 }
 
-/* ── Whitelist approach: hide everything, then show content + comments ── */
+/* ── Whitelist approach: hide the site shell, keep #bodyText + #comments ── */
 
-/* Body-level: hide all headers, ad wrappers, iframes */
+/* Body level: nav headers, standalone ad slots, tracking iframes, consent UI. */
 body > header,
-body > div:not(#main-container),
-body > iframe {
+body > ins,
+body > iframe,
+body > div:not(#main-container) {
   display: none !important;
 }
 
-/* Inside main.primary: hide all direct children except #bodyText and #comments */
-main.primary > *:not(#bodyText):not(#comments) {
+/* Inside #main-container the article wrapper has siblings: the mobile bottom
+   bar, the table-of-contents dialog, report/meta modals and the site footer. */
+#main-container > footer,
+#main-container > dialog,
+#main-container > div[id$="-modal"],
+#main-container > div#storyViewMeta,
+#main-container > div[class*="fixed"] {
   display: none !important;
 }
 
-/* Sidebar */
-aside.secondary {
+/* Inside main: keep only the chapter text and the comment thread. */
+main > *:not(#bodyText):not(#comments) {
   display: none !important;
 }
 
-/* Catch-all for ad elements anywhere */
+/* Table-of-contents sidebar */
+aside {
+  display: none !important;
+}
+
+/* Catch-all for ad and promo blocks anywhere */
+.adsbygoogle,
+#story-promote,
+#story-feed,
+#story-author-about,
+.fc-consent-root,
 .ad-main,
-[id*="ad-"],
-[class*="ad_responsive"],
-#ad_calendar_rated,
-.promote-section,
-[class*="promote"],
-[class*="bid"] {
+[class*="ad_responsive"] {
   display: none !important;
 }
 
 /* ── Layout: full-width content ── */
 
-.aff-stack--x {
-  display: block !important;
-}
-
-.aff-col {
-  width: 100% !important;
-  max-width: 100% !important;
+/* The TOC dialog sets body { overflow: hidden } while open; the dialog is
+   hidden here, so scrolling has to be handed back explicitly. */
+html,
+body {
+  overflow: auto !important;
 }
 
 #main-container {
   margin-top: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
 /* ── Content styling ── */
 
-#user-submitted-body,
-#post-react {
+#bodyText {
   max-width: 42em !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding: 1em 16px !important;
 }
 
-#user-submitted-body p,
-#user-submitted-body div,
-#user-submitted-body li,
-#user-submitted-body blockquote,
-#user-submitted-body span {
+#bodyText p,
+#bodyText div,
+#bodyText li,
+#bodyText blockquote,
+#bodyText span {
   font-size: var(--monori-font-size, 19px) !important;
   line-height: var(--monori-line-height, 1.75) !important;
 }
@@ -87,11 +97,11 @@ body {
   body {
     background-color: #1c1b19 !important;
   }
-  #user-submitted-body p,
-  #user-submitted-body div,
-  #user-submitted-body span,
-  #user-submitted-body li,
-  #user-submitted-body blockquote {
+  #bodyText p,
+  #bodyText div,
+  #bodyText span,
+  #bodyText li,
+  #bodyText blockquote {
     color: #e8e6e3 !important;
   }
 }
