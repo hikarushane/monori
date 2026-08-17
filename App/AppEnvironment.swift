@@ -248,15 +248,18 @@ final class AppEnvironment {
         ao3ImportTotal = 0
         ao3ImportCurrent = 0
 
-        let detectedTitle = model.detectedCollection?.collectionName
-        let scrapedTitle = try? await model.webView.callAsyncJavaScript(
-            "document.querySelector('h2.title.heading')?.textContent?.trim() ?? null",
-            contentWorld: .page) as? String
-        let workTitle = detectedTitle ?? scrapedTitle ?? "AO3 Work"
+        // Detection is the primary source; the page scrape covers the case where
+        // the banner payload never arrived (e.g. detect ran before the preface
+        // rendered). Both must survive — see AO3WorkMeta.js on why it `return`s.
+        let metaResult = try? await model.webView.callAsyncJavaScript(
+            JSAssets.ao3WorkMeta, contentWorld: .page)
+        let meta = metaResult as? [String: Any]
 
-        let authorName = try? await model.webView.callAsyncJavaScript(
-            "document.querySelector('a[rel=\"author\"]')?.textContent?.trim() ?? null",
-            contentWorld: .page) as? String
+        let workTitle = model.detectedCollection?.collectionName
+            ?? (meta?["title"] as? String)
+            ?? "AO3 Work"
+        let authorName = model.detectedCollection?.creatorName
+            ?? (meta?["author"] as? String)
 
         guard let navigateHTML = await model.fetchAO3NavigatePage() else {
             DiagnosticLog.shared.error(category: "import",
@@ -266,9 +269,9 @@ final class AppEnvironment {
         let entries = AO3ChapterSplitter.parseNavigatePage(html: navigateHTML)
 
         if entries.isEmpty {
-            let contentJS = "document.querySelector('.userstuff')?.innerHTML ?? null"
-            guard let content = try? await model.webView.callAsyncJavaScript(
-                contentJS, contentWorld: .page) as? String, !content.isEmpty else {
+            let contentResult = try? await model.webView.callAsyncJavaScript(
+                JSAssets.ao3WorkContent, contentWorld: .page)
+            guard let content = contentResult as? String, !content.isEmpty else {
                 DiagnosticLog.shared.error(category: "import",
                     "ao3: single-chapter content extraction failed")
                 return 0

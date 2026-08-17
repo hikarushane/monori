@@ -214,6 +214,13 @@ final class WebViewModel: NSObject {
             Task { @MainActor in
                 try? await webView.evaluateJavaScript(JSAssets.collectionDetect)
             }
+        } else if isOnAO3WorkPage {
+            // The document-end user script also posts, but `didFinish` clears
+            // `detectedCollection` after that message lands — without this
+            // re-run the banner and the import both lose the work title.
+            Task { @MainActor in
+                try? await webView.evaluateJavaScript(JSAssets.ao3WorkDetect)
+            }
         } else if isOnVocusRoomPage {
             Task { @MainActor in
                 try? await webView.evaluateJavaScript(JSAssets.vocusRoomDetect)

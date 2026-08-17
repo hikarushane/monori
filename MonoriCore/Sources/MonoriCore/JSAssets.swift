@@ -16,6 +16,8 @@ public enum JSAssets {
     public static var drawerDiagnostics: String { script(named: "DrawerDiagnostics") }
     public static var suppressLoadingBar: String { script(named: "SuppressLoadingBar") }
     public static var ao3WorkDetect: String { script(named: "AO3WorkDetect") }
+    public static var ao3WorkMeta: String { script(named: "AO3WorkMeta") }
+    public static var ao3WorkContent: String { script(named: "AO3WorkContent") }
     public static var vocusRoomDetect: String { script(named: "VocusRoomDetect") }
     public static var vocusRoomImport: String { script(named: "VocusRoomImport") }
     public static var affStoryDetect: String { script(named: "AFFStoryDetect") }
