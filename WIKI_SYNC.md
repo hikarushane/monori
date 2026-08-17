@@ -1,7 +1,7 @@
 # WIKI_SYNC
 
 > 來源 project: monori
-> 產出日期: 2026-08-16
+> 產出日期: 2026-08-17
 > 同步目標: knowledge-wiki/wiki-pages/専案管理/
 
 使用方式：在 knowledge-wiki session 中執行「専案管理 update」，將以下內容分別寫入對應路徑。

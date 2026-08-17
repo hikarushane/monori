@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-16（AsianFanfics 2026 Tailwind 改版適配修復並 merge，見 ADR-0009）
+> 最後更新：2026-08-17（Google Docs OAuth popup navigationDelegate 修復；AFF 改版修復見 ADR-0009）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
