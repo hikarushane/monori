@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-15（AsianFanfics 2026 Tailwind 改版適配修復，見 ADR-0009）
+> 最後更新：2026-08-16（AsianFanfics 2026 Tailwind 改版適配修復並 merge，見 ADR-0009）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -31,6 +31,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Google Docs 標題去尾標點 | `stripTrailingPunctuation` 去除 。！？.!? | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
 | WebView 身分 | `applicationNameForUserAgent = BrowserIdentity.userAgentSuffix`（`Version/18.7 Safari/604.1`），對外呈現為 Safari | → docs/decisions/0008-identify-as-safari-in-user-agent.md | active | 2026-08-12 |
 | Facebook OAuth 主機 | `decide` 用 `.facebook.com` suffix match、`requiresPopupWindow` 用 `m.` / `www.` 精確比對 | OAuth 流程會在 `m.` / `www.` / `staticxx.` 之間跳，收窄成單一主機會讓登入半途壞掉；popup 判定維持 ADR-0007 的精確比對防 lookalike | active | 2026-08-12 |
+| AsianFanfics 選擇器策略 | 錨定 `data-toc-chapter` 屬性與「第一個含 `<h1>` 的 `<header>`」，不用 Tailwind utility class | → docs/decisions/0009-asianfanfics-2026-redesign-selectors.md | active | 2026-08-15 |
 
 ## 規範
 ### Patreon DOM
@@ -102,6 +103,9 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 ## 踩過的坑
 - **AsianFanfics 2026 年前端全面 Tailwind 改版，舊選擇器全滅**（2026-08-15）：`#story-title`、`.widget--chapters`、`select[name="chapter-nav"]`、`main.primary`、`#user-submitted-body` 全部消失或回 0 nodes，任何故事匯入都跳「未找到章節」。2026-08-15 於正式站 1280px（桌機）/375px（手機）、登出狀態驗證為全站性（非單篇或單版型問題），並用另一篇不同作者的故事 `/story/view/1470000` 交叉確認。修法見 ADR-0009：章節清單改鎖 `data-toc-chapter`（TOC 桌機 `aside` + 手機 `dialog` 各渲染一份，依章節編號去重；`0` = Foreword 視為 metadata、非章節）、標題/作者改抓「第一個含 `<h1>` 的 `<header>`」、reader CSS 改鎖 `#bodyText`。**任何 AFF 選擇器改動，動手前都要先對正式站即時 DOM 重新驗證，不能只憑這份記錄裡的假設**——AFF 一改版視覺，Tailwind utility class 就會整批重生成，下次同類壞法幾乎必然重演。
   📍 出現位置：AFF adapter（`AFFStoryImport.js`／`AFFStoryDetect.js`／`AFFReaderRuleset.css`）；ADR-0009
+
+- **`WKContentRuleListStore` 編譯失敗被 `try?` 吞掉、完全無 log**（2026-08-15）：`installAFFAdBlockRules(on:)` 原本是 `guard let list = try? await compileContentRuleList(...) else { return }`——rule list JSON 一旦被 WebKit 判定無效，廣告封鎖悄悄失效，沒有任何診斷線索。這條路是本次 AFF 改版直接改到 `affAdBlockRules` selector 才被最終 review 抓到；`try?` 同時吞掉「拋出錯誤」與「回傳 nil」兩種失敗，改成 `do`/`catch` 且兩個分支都寫 `DiagnosticLog.shared.error`。**觸碰任何用 `try?` 包住的編譯/解析呼叫時，順手檢查失敗路徑有沒有留下痕跡**，這類 silent-swallow 是可複用的程式碼異味，不只在這裡出現。
+  📍 出現位置：`App/WebView/WebViewModel.swift` `installAFFAdBlockRules(on:)`
 
 - **WKWebView 預設 UA 讓 Google 擋掉 Patreon 的 Google 登入**（2026-08-12）：內測人員回報「以 Google 繼續登入」變灰、按不動。WKWebView 的預設 UA 停在 `Mobile/15E148`，沒有 `Version/` 也沒有 `Safari/` token；Google 判定為 embedded webview，對 `https://accounts.google.com/gsi/client` 回 403 → Patreon 那顆按鈕沒有 SDK 可用就變成停用狀態。同一支 URL 換 UA 測：預設 UA 403、加上兩個 token 200（266 KB）。解法見 ADR-0008。
   📍 出現位置：`App/WebView/WebViewModel.swift` init 的 `applicationNameForUserAgent`

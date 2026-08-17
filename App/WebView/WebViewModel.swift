@@ -457,6 +457,7 @@ extension WebViewModel: WKUIDelegate {
                 return nil
             }
             let popup = WKWebView(frame: .zero, configuration: configuration)
+            popup.navigationDelegate = self
             popup.uiDelegate = self
             popupWebView = popup
             return popup
