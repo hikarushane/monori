@@ -30,7 +30,7 @@ The source selector at the top of the Browser tab provides five supported source
 
 Each source uses its own website session.
 
-![Browser source selector](01-browser-source-selector.png)
+<img src="01-browser-source-selector.png" alt="Browser source selector" width="300">
 
 ---
 
@@ -73,7 +73,7 @@ For App Review testing, please use the demo content listed below.
 5. The **Import / 匯入** button appears on the supported room page.
 6. Tap **Import / 匯入**.
 
-![Vocus demo room](02-vocus-demo.png)
+<img src="02-vocus-demo.png" alt="Vocus demo room" width="300">
 
 The imported work will appear in the **Library** tab.
 
@@ -93,7 +93,7 @@ The imported work will appear in the **Library** tab.
 6. The **Import / 匯入** control is available on the Collection page.
 7. Tap **Import / 匯入**.
 
-![Patreon Collection](03-patreon-collection.png)
+<img src="03-patreon-collection.png" alt="Patreon Collection" width="300">
 
 The Patreon demo content belongs to the developer's account.
 
@@ -114,7 +114,7 @@ The Collection page is the intended testing page for the Patreon importer.
 5. The **Import / 匯入** control appears on the work page.
 6. Tap **Import / 匯入**.
 
-![AO3 demo work](04-ao3-demo.png)
+<img src="04-ao3-demo.png" alt="AO3 demo work" width="300">
 
 No account is required for this demo work.
 
@@ -134,7 +134,7 @@ No account is required for this demo work.
 6. The **Import / 匯入** control appears in the supported document view.
 7. Tap **Import / 匯入**.
 
-![Google Docs demo document](05-google-docs-demo.png)
+<img src="05-google-docs-demo.png" alt="Google Docs demo document" width="300">
 
 The document was created by the developer specifically for App Review testing.
 
@@ -155,7 +155,7 @@ Google Docs is treated as a static document. Automatic chapter-update detection 
 5. The **Import / 匯入** control appears on the supported story page.
 6. Tap **Import / 匯入**.
 
-![AsianFanfics demo story](06-aff-demo.png)
+<img src="06-aff-demo.png" alt="AsianFanfics demo story" width="300">
 
 No account is required for this demo story.
 
@@ -167,7 +167,7 @@ No account is required for this demo story.
 
 After a successful import, Monori displays a confirmation message showing the number of imported chapters.
 
-![Import confirmation](07-import-success.png)
+<img src="07-import-success.png" alt="Import confirmation" width="300">
 
 When the same work is imported again, existing chapters are merged with the collection instead of creating duplicate chapters.
 
@@ -175,11 +175,11 @@ After importing a work, open the **Library** tab.
 
 Imported works appear as collections in the user's local reading library.
 
-![Library collection](08-library.png)
+<img src="08-library.png" alt="Library collection" width="300">
 
 Tap a collection to view its chapters.
 
-![Library chapter list](09-library-chapters.png)
+<img src="09-library-chapters.png" alt="Library chapter list" width="300">
 
 The Library provides:
 
@@ -197,7 +197,7 @@ The Library provides:
 
 Open any imported chapter to enter the Reader.
 
-![Reader features](10-reader-features.png)
+<img src="10-reader-features.png" alt="Reader features" width="300">
 
 The Reader provides the following features:
 
