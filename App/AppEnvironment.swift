@@ -12,7 +12,7 @@ enum CollectionRefreshOutcome: Equatable {
     case needsLogin
     /// CAPTCHA / Cloudflare interstitial — needs the user, stop this source for the round.
     case blocked
-    /// Source has no offscreen refresh path (Google Docs, AO3 for now).
+    /// Source has no offscreen refresh path (Google Docs).
     case unsupported
     case failed
 }
