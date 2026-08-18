@@ -459,19 +459,12 @@ final class AppEnvironment {
             // wait it out before counting.
             try? await Task.sleep(for: .milliseconds(600))
         case .vocus:
-            // Staged behind SourceKind.supportsAutoCheck (still false for .vocus
-            // pending on-device verification). Unreachable until that flag flips —
-            // the guard at the top returns .unsupported first — but ready so
-            // enabling vocus auto-check is a one-line capability change.
             let ok = await runVocusRefresherImport(for: collection)
             guard ok else {
                 refresher.webView.loadHTMLString("", baseURL: nil)
                 return .failed
             }
         case .asianFanfics:
-            // Staged behind SourceKind.supportsAutoCheck (still false for
-            // .asianFanfics pending on-device verification). Unreachable until
-            // that flag flips; ready so enabling is a one-line capability change.
             let ok = await runAFFRefresherImport(for: collection)
             guard ok else {
                 refresher.webView.loadHTMLString("", baseURL: nil)
@@ -496,8 +489,7 @@ final class AppEnvironment {
     /// Re-runs the Vocus room import against the offscreen refresher.
     /// Titles/creator come from the stored collection (the offscreen refresher
     /// has no `detectedCollection`). Returns false when the script yields no
-    /// articles (layout change, error page). Staged: reachable once
-    /// `SourceKind.vocus.supportsAutoCheck` flips true after on-device checks.
+    /// articles (layout change, error page).
     private func runVocusRefresherImport(for collection: LocalCollectionModel) async -> Bool {
         let result = try? await refresher.webView.callAsyncJavaScript(
             JSAssets.vocusRoomImport, contentWorld: .page)
@@ -523,8 +515,7 @@ final class AppEnvironment {
 
     /// Re-runs the AsianFanfics story import against the offscreen refresher.
     /// Titles/creator come from the stored collection. Returns false when the
-    /// script yields no chapters. Staged: reachable once
-    /// `SourceKind.asianFanfics.supportsAutoCheck` flips true after on-device checks.
+    /// script yields no chapters.
     private func runAFFRefresherImport(for collection: LocalCollectionModel) async -> Bool {
         let result = try? await refresher.webView.callAsyncJavaScript(
             JSAssets.affStoryImport, contentWorld: .page)
