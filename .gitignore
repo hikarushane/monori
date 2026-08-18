@@ -1,12 +1,13 @@
 .DS_Store
+.recall/
+.build/
 xcuserdata/
 DerivedData/
 .build/
 *.xcodeproj
 *.log
-build/
 MonoriCore/build/
-.recall/
+
 
 # secrets
 .env
@@ -17,8 +18,13 @@ AuthKey_*
 
 # vendor docs
 docs/superpowers/
-docs/lipsum/
-Docs/demo/
+docs/ipsum/
+docs/demo/
+docs/screenshot/
+docs/design/
+
+brag-output/
+skills-staging/
 
 # Claude Code local state (team settings tracked at .claude/ root)
 .claude/worktrees/
