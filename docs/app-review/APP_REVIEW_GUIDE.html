@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monori App Review Guide</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #222;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 22px; border-bottom: 2px solid #333; padding-bottom: 6px; margin-top: 32px; }
+  h2 { font-size: 18px; margin-top: 28px; }
+  h3 { font-size: 15px; margin-top: 20px; }
+  h4 { font-size: 14px; margin-top: 16px; }
+  hr { border: none; border-top: 1px solid #ccc; margin: 24px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #f5f5f5; font-weight: 600; }
+  td:nth-child(1) { white-space: nowrap; }
+  code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 13px; }
+  img { max-width: 240px; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0; }
+  ul, ol { padding-left: 24px; }
+  li { margin: 4px 0; }
+  .center { text-align: center; }
+  @media print {
+    body { margin: 20px; }
+    h1 { page-break-before: avoid; }
+    img { max-width: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Monori App Review Guide</h1>
+
+<p>This guide is provided for App Review to explain how to test Monori's main features.</p>
+<p>Monori is a local-first reading app. It allows users to browse content through supported websites and explicitly import accessible content into a local Library for reading.</p>
+<p>Monori does not operate a backend server, content proxy, cloud library, or cross-user content service.</p>
+
+<hr>
+
+<h1>1. App Navigation</h1>
+
+<p>Monori has three main tabs:</p>
+
+<table>
+  <tr><th>Tab</th><th>Purpose</th></tr>
+  <tr><td><strong>Browser</strong></td><td>Browse supported websites and import content</td></tr>
+  <tr><td><strong>Library</strong></td><td>Read imported works and manage reading progress</td></tr>
+  <tr><td><strong>Settings</strong></td><td>Configure app and reading preferences</td></tr>
+</table>
+
+<h3>Browser</h3>
+<p>The source selector at the top of the Browser tab provides five supported sources:</p>
+<ol>
+  <li>Patreon</li>
+  <li>Vocus</li>
+  <li>Archive of Our Own (AO3)</li>
+  <li>Google Docs</li>
+  <li>AsianFanfics (AFF)</li>
+</ol>
+<p>Each source uses its own website session.</p>
+<p><img src="01-browser-source-selector.png" alt="Browser source selector"></p>
+
+<hr>
+
+<h1>2. Demo Content</h1>
+
+<p>The following works were created or uploaded by the developer specifically for App Review testing.</p>
+<p>They are intended to provide predictable content without requiring reviewers to search for arbitrary third-party works.</p>
+
+<table>
+  <tr><th>Source</th><th>Login</th><th>Demo account / search</th><th>Demo content</th></tr>
+  <tr><td>Vocus</td><td>No</td><td>Search <code>hikaruHa</code></td><td>「我在便利商店等一場雪」</td></tr>
+  <tr><td>Patreon</td><td>Yes</td><td>Search <code>hikaruHa</code></td><td>「霧港三號倉庫」</td></tr>
+  <tr><td>AO3</td><td>No</td><td>Search <code>shane_y747</code></td><td>「紙上幽靈」</td></tr>
+  <tr><td>Google Docs</td><td>Yes</td><td>Shared with me</td><td>「鏽鐵之夏」</td></tr>
+  <tr><td>AsianFanfics</td><td>No</td><td>Search <code>monoriappdemo</code></td><td>「第十七次登出：一個沒有伺服器的世界」</td></tr>
+</table>
+
+<p>Google Docs requires a Google account. The credentials are provided in App Store Connect's App Review Information.</p>
+<p>Patreon uses the same Google account for sign-in (tap "Continue with Google" on the Patreon login page).</p>
+
+<hr>
+
+<h1>3. Importing Content</h1>
+
+<p>The Import button appears only on supported page types.</p>
+<p>For App Review testing, please use the demo content listed below.</p>
+
+<h2>3.1 Vocus</h2>
+<p><strong>Login required:</strong> No</p>
+<h3>Steps</h3>
+<ol>
+  <li>Open <strong>Browser</strong>.</li>
+  <li>Select <strong>Vocus</strong> from the source selector.</li>
+  <li>Search for <code>hikaruHa</code>.</li>
+  <li>Open the room <strong>「我在便利商店等一場雪」</strong>.</li>
+  <li>The <strong>Import / 匯入</strong> button appears on the supported room page.</li>
+  <li>Tap <strong>Import / 匯入</strong>.</li>
+</ol>
+<p><img src="02-vocus-demo.png" alt="Vocus demo room"></p>
+<p>The imported work will appear in the <strong>Library</strong> tab.</p>
+
+<hr>
+
+<h2>3.2 Patreon</h2>
+<p><strong>Login required:</strong> Yes</p>
+<h3>Steps</h3>
+<ol>
+  <li>Open <strong>Browser</strong>.</li>
+  <li>Select <strong>Patreon</strong>.</li>
+  <li>Sign in using the Google account provided in App Store Connect (tap <strong>Continue with Google</strong>).</li>
+  <li>Search for <code>hikaruHa</code>.</li>
+  <li>Open the Collection <strong>「霧港三號倉庫」</strong>.</li>
+  <li>The <strong>Import / 匯入</strong> control is available on the Collection page.</li>
+  <li>Tap <strong>Import / 匯入</strong>.</li>
+</ol>
+<p><img src="03-patreon-collection.png" alt="Patreon Collection"></p>
+<p>The Patreon demo content belongs to the developer's account.</p>
+<p>The Collection page is the intended testing page for the Patreon importer.</p>
+
+<hr>
+
+<h2>3.3 Archive of Our Own (AO3)</h2>
+<p><strong>Login required:</strong> No</p>
+<h3>Steps</h3>
+<ol>
+  <li>Open <strong>Browser</strong>.</li>
+  <li>Select <strong>AO3</strong>.</li>
+  <li>Search for <code>shane_y747</code>.</li>
+  <li>Open the work <strong>「紙上幽靈」</strong>.</li>
+  <li>The <strong>Import / 匯入</strong> control appears on the work page.</li>
+  <li>Tap <strong>Import / 匯入</strong>.</li>
+</ol>
+<p><img src="04-ao3-demo.png" alt="AO3 demo work"></p>
+<p>No account is required for this demo work.</p>
+
+<hr>
+
+<h2>3.4 Google Docs</h2>
+<p><strong>Login required:</strong> Yes</p>
+<h3>Steps</h3>
+<ol>
+  <li>Open <strong>Browser</strong>.</li>
+  <li>Select <strong>Google Docs</strong>.</li>
+  <li>Sign in using the Google account provided in App Store Connect.</li>
+  <li>Open <strong>Shared with me / 與我共享</strong>.</li>
+  <li>Open the document <strong>「鏽鐵之夏」</strong>.</li>
+  <li>The <strong>Import / 匯入</strong> control appears in the supported document view.</li>
+  <li>Tap <strong>Import / 匯入</strong>.</li>
+</ol>
+<p><img src="05-google-docs-demo.png" alt="Google Docs demo document"></p>
+<p>The document was created by the developer specifically for App Review testing.</p>
+<p>Google Docs is treated as a static document. Automatic chapter-update detection is not available for this source.</p>
+
+<hr>
+
+<h2>3.5 AsianFanfics (AFF)</h2>
+<p><strong>Login required:</strong> No</p>
+<h3>Steps</h3>
+<ol>
+  <li>Open <strong>Browser</strong>.</li>
+  <li>Select <strong>AFF</strong>.</li>
+  <li>Search for <code>monoriappdemo</code>.</li>
+  <li>Open the story <strong>「第十七次登出：一個沒有伺服器的世界」</strong>.</li>
+  <li>The <strong>Import / 匯入</strong> control appears on the supported story page.</li>
+  <li>Tap <strong>Import / 匯入</strong>.</li>
+</ol>
+<p><img src="06-aff-demo.png" alt="AsianFanfics demo story"></p>
+<p>No account is required for this demo story.</p>
+
+<hr>
+
+<h1>4. Library</h1>
+
+<h2>4.1 Import confirmation</h2>
+<p>After a successful import, Monori displays a confirmation message showing the number of imported chapters.</p>
+<p><img src="07-import-success.png" alt="Import confirmation"></p>
+<p>When the same work is imported again, existing chapters are merged with the collection instead of creating duplicate chapters.</p>
+<p>After importing a work, open the <strong>Library</strong> tab.</p>
+<p>Imported works appear as collections in the user's local reading library.</p>
+<p><img src="08-library.png" alt="Library collection"></p>
+<p>Tap a collection to view its chapters.</p>
+<p><img src="09-library-chapters.png" alt="Library chapter list"></p>
+
+<p>The Library provides:</p>
+<ul>
+  <li>Collection management</li>
+  <li>Chapter navigation</li>
+  <li>Reading progress</li>
+  <li>Reading status</li>
+  <li>Bookmarks</li>
+  <li>Search and sorting</li>
+  <li>Following / update checking for supported sources</li>
+</ul>
+
+<hr>
+
+<h1>5. Reader</h1>
+<p>Open any imported chapter to enter the Reader.</p>
+<p><img src="10-reader-features.png" alt="Reader features"></p>
+
+<p>The Reader provides the following features:</p>
+<ul>
+  <li>Previous / Next chapter navigation</li>
+  <li>Bookmarks</li>
+  <li>Font size adjustment</li>
+  <li>Line spacing adjustment</li>
+</ul>
+<p>These features are provided by Monori and are available across the supported sources.</p>
+
+<h3>Previous / Next chapter</h3>
+<p>The bottom toolbar provides <strong>Previous Chapter</strong> and <strong>Next Chapter</strong> navigation.</p>
+<p>This navigation is available across all five supported sources.</p>
+
+<h3>Bookmarks</h3>
+<p>Tap the bookmark control in the Reader to bookmark the current chapter.</p>
+<p>Bookmarks are stored locally on the device.</p>
+
+<h3>Font size and line spacing</h3>
+<p>Open the reading preferences panel using the <strong>T</strong> control in the Reader.</p>
+<p>The following settings are available:</p>
+<ul>
+  <li>Font size</li>
+  <li>Line spacing</li>
+</ul>
+<p>These reading preferences are provided by Monori and are available across all five supported sources.</p>
+
+<hr>
+
+<h1>6. Automatic Chapter Updates</h1>
+<p>Collections can be marked as being followed.</p>
+<p>For supported dynamic sources, Monori can check whether new chapters have appeared.</p>
+<p>When a new chapter is detected:</p>
+<ul>
+  <li>The collection can show an update indicator.</li>
+  <li>New chapters can receive an unread indicator.</li>
+  <li>The chapter list can show a visual indication of new content.</li>
+</ul>
+<p>Automatic update detection requires an actual new chapter to be published on the source website.</p>
+<p>Therefore, App Review may not see a new-chapter notification during a normal review session because the developer's demo works are intentionally stable.</p>
+
+<h3>Google Docs</h3>
+<p>Google Docs does not support automatic chapter-update detection.</p>
+<p>A Google Docs document is treated as a static document rather than a continuously updated chapter-based source.</p>
+
+<hr>
+
+<h1>7. Authentication</h1>
+<p>Monori does not have its own user account system.</p>
+<p>For sources that require authentication, the user signs in directly to the corresponding website inside the Browser.</p>
+
+<p>The following demo sources do not require login:</p>
+<ul>
+  <li>Vocus</li>
+  <li>AO3</li>
+  <li>AsianFanfics</li>
+</ul>
+
+<p>The following demo sources require login:</p>
+<ul>
+  <li>Patreon</li>
+  <li>Google Docs</li>
+</ul>
+
+<p>Both Patreon and Google Docs use the same Google account. The credentials are provided in App Store Connect's App Review Information.</p>
+<p>Monori does not ask the reviewer to create a Monori account.</p>
+
+<hr>
+
+<h1>8. Local Data and Network Architecture</h1>
+<p>Monori does not operate a backend server.</p>
+<p>Website content is accessed directly through the website's own infrastructure using the WebView.</p>
+<p>Monori does not act as a network proxy between the user and supported websites.</p>
+<p>Depending on the source and import method, imported data may be stored locally on the device for the Library and Reader.</p>
+
+<p>Local data may include:</p>
+<ul>
+  <li>Collection titles</li>
+  <li>Chapter titles</li>
+  <li>Source URLs</li>
+  <li>Author information</li>
+  <li>Reading progress</li>
+  <li>Reading status</li>
+  <li>Bookmarks</li>
+  <li>Reading preferences</li>
+  <li>Imported chapter or document content where required by the source</li>
+</ul>
+
+<p>This data is not uploaded to a Monori cloud service.</p>
+
+<p>Monori does not provide:</p>
+<ul>
+  <li>Cross-user content sharing</li>
+  <li>Cloud content storage</li>
+  <li>A content proxy</li>
+  <li>A content export service</li>
+  <li>Third-party AI processing of imported content</li>
+  <li>A Monori account system</li>
+</ul>
+
+<hr>
+
+<h1>9. Testing Limitations</h1>
+
+<h3>Source websites may change</h3>
+<p>The supported websites control their own page layouts and authentication flows.</p>
+<p>A website layout or authentication change can temporarily affect the Import button or Reader presentation.</p>
+
+<h3>Automatic update detection</h3>
+<p>Automatic update testing requires a new chapter to exist on the source website.</p>
+<p>The demo content is intentionally stable, so this feature may not produce a notification during App Review.</p>
+
+<h3>Google Docs</h3>
+<p>Google Docs is treated as a static source.</p>
+<p>It supports importing and reading but does not support automatic chapter-update detection.</p>
+
+<h3>Login</h3>
+<p>Only Patreon and Google Docs require the App Review credentials supplied in App Store Connect.</p>
+<p>The other three demo sources can be tested without an account.</p>
+
+<hr>
+
+<h1>10. Troubleshooting</h1>
+
+<h3>The Import button is not visible</h3>
+<p>Please make sure the exact demo page listed in this guide is open.</p>
+<p>The Import control is context-sensitive and appears only when Monori recognizes a supported page type.</p>
+
+<h3>The page is still loading</h3>
+<p>Please wait for the website to finish loading before looking for the Import control.</p>
+
+<h3>Patreon login does not work with Google</h3>
+<p>If the Google login option is unavailable inside Patreon, use the email/password credentials supplied for App Review if available.</p>
+<p>This behavior depends on Google's authentication policies for embedded web environments.</p>
+
+<h3>No new chapter notification appears</h3>
+<p>This is expected if no new chapter has been published since the last check.</p>
+<p>Automatic update detection is not simulated by Monori.</p>
+
+<hr>
+
+<h1>11. Feature Coverage</h1>
+
+<table>
+  <tr>
+    <th>Feature</th><th>Patreon</th><th>Vocus</th><th>AO3</th><th>Google Docs</th><th>AFF</th>
+  </tr>
+  <tr><td>Browse in Browser</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Import</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Library</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Previous / Next chapter</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Bookmarks</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Font size</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Line spacing</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td></tr>
+  <tr><td>Automatic chapter updates</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&#10003;</td><td style="text-align:center">&mdash;</td><td style="text-align:center">&#10003;</td></tr>
+</table>
+
+<hr>
+
+<h1>12. Contact</h1>
+<p>If App Review encounters a problem that is not covered by this guide, please use the contact information provided in App Store Connect.</p>
+
+</body>
+</html>
