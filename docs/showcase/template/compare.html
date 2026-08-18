@@ -1,0 +1,72 @@
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1179px; height: 2556px; }
+  body {
+    background: #A8B9A0;
+    font-family: "PingFang TC", "Hiragino Sans", sans-serif;
+    color: #1C1B19;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mark { position: absolute; left: 80px; top: 104px; }
+
+  h1 {
+    position: absolute;
+    left: 80px; right: 80px; top: 268px;
+    font-size: 104px;
+    font-weight: 600;
+    line-height: 1.26;
+    letter-spacing: 1px;
+    -webkit-text-stroke: 2.2px #1C1B19;
+  }
+  h1 .l2 { display: block; text-align: right; }
+
+  .row {
+    position: absolute;
+    left: 50px; top: 900px;
+    display: flex; gap: 55px;
+  }
+  .panel { width: 512px; }
+  .cap {
+    font-size: 31px; font-weight: 600;
+    letter-spacing: .5px;
+    color: rgba(28,27,25,.62);
+    margin-bottom: 18px; padding-left: 4px;
+  }
+  .panel img {
+    width: 512px; display: block;
+    border-radius: 26px;
+    box-shadow: 0 22px 48px rgba(28,27,25,.22);
+  }
+
+  .foot {
+    position: absolute;
+    left: 80px; right: 80px; top: 2035px;
+    font-size: 36px; font-weight: 500;
+    line-height: 1.6;
+    color: rgba(28,27,25,.78);
+  }
+</style>
+
+<svg class="mark" width="86" height="86" viewBox="280 270 464 484" xmlns="http://www.w3.org/2000/svg">
+  <rect x="290" y="364" width="120" height="380" fill="#1C1B19"/>
+  <path d="M452 280V744H572V280L512 330L452 280Z" fill="#1C1B19"/>
+  <rect x="614" y="364" width="120" height="380" fill="#1C1B19"/>
+</svg>
+
+<h1>你想讀的是小說，<span class="l2">不是這一堆按鈕</span></h1>
+
+<div class="row">
+  <div class="panel">
+    <div class="cap">平台原本的頁面</div>
+    <img src="before.png">
+  </div>
+  <div class="panel">
+    <div class="cap">Monori 閱讀器</div>
+    <img src="after.png">
+  </div>
+</div>
+
+<div class="foot">Monori 不改平台的頁面。<br>它只是給同一篇文章，另一個安靜的地方讀。</div>
