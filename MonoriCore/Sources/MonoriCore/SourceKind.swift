@@ -61,12 +61,11 @@ public enum SourceRegistry {
 
 public extension SourceKind {
     /// Sources whose collections can be re-crawled by the offscreen refresher.
-    /// AO3 needs its own content-preserving merge (separate plan); Google Docs
-    /// stays manual by design.
+    /// Google Docs stays manual by design.
     var supportsAutoCheck: Bool {
         switch self {
-        case .patreon, .vocus, .asianFanfics: return true
-        case .googleDocs, .ao3: return false
+        case .patreon, .vocus, .asianFanfics, .ao3: return true
+        case .googleDocs: return false
         }
     }
 }

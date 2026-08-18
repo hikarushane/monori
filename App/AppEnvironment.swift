@@ -470,7 +470,13 @@ final class AppEnvironment {
                 refresher.webView.loadHTMLString("", baseURL: nil)
                 return .failed
             }
-        case .googleDocs, .ao3:
+        case .ao3:
+            let ok = await runAO3RefresherImport(for: collection)
+            guard ok else {
+                refresher.webView.loadHTMLString("", baseURL: nil)
+                return .failed
+            }
+        case .googleDocs:
             return .unsupported
         }
         let delta = collection.chapters.count - countBefore
@@ -535,6 +541,62 @@ final class AppEnvironment {
                         ?? (dict["url"] as? String) ?? "",
                     orderIndex: (dict["domOrder"] as? Int) ?? index)
             })
+        try? store.applyDocImport(imported)
+        return true
+    }
+
+    /// Re-checks the AO3 work's navigate page for new chapters.
+    /// Fetches content HTML only for chapters not already in the collection,
+    /// preserving stored offline content for existing chapters.
+    private func runAO3RefresherImport(for collection: LocalCollectionModel) async -> Bool {
+        guard let navigateHTML = await refresher.fetchAO3NavigatePage() else {
+            DiagnosticLog.shared.error(category: "refresh",
+                "ao3: navigate page fetch failed")
+            return false
+        }
+        let entries = AO3ChapterSplitter.parseNavigatePage(html: navigateHTML)
+        guard !entries.isEmpty else {
+            DiagnosticLog.shared.error(category: "refresh",
+                "ao3: navigate page returned no chapters")
+            return false
+        }
+
+        let existingURLs = Set(collection.chapters.map(\.urlString))
+        let canonicalURL = URLNormalizer.canonicalAO3WorkURL(
+            collection.sourceURLString) ?? collection.sourceURLString
+
+        var chapters: [ImportedChapter] = []
+        for (index, entry) in entries.enumerated() {
+            let chapterURL = URLNormalizer.canonicalAO3ChapterURL(
+                "https://archiveofourown.org\(entry.chapterPath)")
+                ?? "https://archiveofourown.org\(entry.chapterPath)"
+
+            if existingURLs.contains(chapterURL) {
+                // Existing chapter — pass nil contentHTML; Task 1 fix preserves stored content
+                chapters.append(ImportedChapter(
+                    title: entry.title, urlString: chapterURL,
+                    orderIndex: index))
+            } else {
+                // New chapter — fetch content
+                if !chapters.isEmpty || index > 0 {
+                    try? await Task.sleep(for: .seconds(1))
+                }
+                var contentHTML: String?
+                if let chapterPage = await refresher.fetchAO3ChapterPage(path: entry.chapterPath) {
+                    contentHTML = AO3ChapterSplitter.extractChapterContent(html: chapterPage)
+                }
+                chapters.append(ImportedChapter(
+                    title: entry.title, urlString: chapterURL,
+                    orderIndex: index, contentHTML: contentHTML))
+            }
+        }
+
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL,
+            title: collection.title,
+            creatorName: collection.creatorName,
+            sourceKind: .ao3,
+            chapters: chapters)
         try? store.applyDocImport(imported)
         return true
     }
