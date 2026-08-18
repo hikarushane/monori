@@ -114,7 +114,7 @@ struct LibraryView: View {
                 HStack(spacing: 6) {
                     Text("\(collection.chapters.count) 章")
                     if let updated = collection.lastNewChapterAt {
-                        Text("・更新於 \(updated.formatted(.relative(presentation: .named)))")
+                        Text("・更新於 \(updated.formatted(.relative(presentation: .named).locale(Locale(identifier: "zh-Hant"))))")
                     }
                 }
                 .font(.subheadline)
