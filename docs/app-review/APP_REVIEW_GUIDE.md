@@ -48,7 +48,9 @@ They are intended to provide predictable content without requiring reviewers to 
 | Google Docs  | Yes   | Shared with me         | 「鏽鐵之夏」              |
 | AsianFanfics | No    | Search `monoriappdemo` | 「第十七次登出：一個沒有伺服器的世界」 |
 
-The Patreon and Google Docs accounts require the credentials provided separately in App Store Connect's App Review Information.
+Google Docs requires a Google account. The credentials are provided in App Store Connect's App Review Information.
+
+Patreon uses the same Google account for sign-in (tap "Continue with Google" on the Patreon login page).
 
 ---
 
@@ -85,7 +87,7 @@ The imported work will appear in the **Library** tab.
 
 1. Open **Browser**.
 2. Select **Patreon**.
-3. Sign in using the App Review credentials provided in App Store Connect.
+3. Sign in using the Google account provided in App Store Connect (tap **Continue with Google**).
 4. Search for `hikaruHa`.
 5. Open the Collection **「霧港三號倉庫」**.
 6. The **Import / 匯入** control is available on the Collection page.
@@ -126,7 +128,7 @@ No account is required for this demo work.
 
 1. Open **Browser**.
 2. Select **Google Docs**.
-3. Sign in using the App Review credentials provided in App Store Connect.
+3. Sign in using the Google account provided in App Store Connect.
 4. Open **Shared with me / 與我共享**.
 5. Open the document **「鏽鐵之夏」**.
 6. The **Import / 匯入** control appears in the supported document view.
@@ -272,7 +274,7 @@ The following demo sources require login:
 * Patreon
 * Google Docs
 
-The required App Review credentials are provided separately through App Store Connect.
+Both Patreon and Google Docs use the same Google account. The credentials are provided in App Store Connect's App Review Information.
 
 Monori does not ask the reviewer to create a Monori account.
 
