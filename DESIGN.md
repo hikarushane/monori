@@ -16,18 +16,42 @@ private library", not "media app".
 
 ## 2. Color Palette & Roles
 
-- **Sage Accent** (`#5C7150`, RGB 0.361/0.443/0.314) — `AccentColor`. Selected
-  tab, active controls, bookmarks, the loading bar fill, primary buttons.
-- **Brand Sage** (`#A8B9A0`, RGB 0.659/0.725/0.627) — `BrandSage`. App-icon
-  ground, launch screen, large brand surfaces.
-- **Ink** (`#1C1B19`) — primary text / filled icon marks on light surfaces.
-- **System Secondary** — metadata, unselected icons (`.foregroundStyle(.secondary)`).
-- **System background / `.bar`** — surfaces and the source picker / tab bar.
+The canonical palette is **Uguisu Zen** —
+[`docs/design/.../uguisu_zen/DESIGN.md`](docs/design/stitch_monori_app_icon_identity/uguisu_zen/DESIGN.md)
+holds the full token set. Only the color layer of that system applies here;
+its web typography does not (see §3). Named tokens below are the ones Monori
+actually uses — quote these hexes, not ad-hoc ones.
+
+| Token | Hex | Lives in | Role |
+| --- | --- | --- | --- |
+| `uguisu-iro` | `#A8B9A0` | `BrandSage` colorset, app icon, App Store showcase | App-icon ground, launch screen, large brand surfaces |
+| `primary` | `#53634E` | — (see delta below) | Selected tab, active controls, bookmarks, loading-bar fill, primary buttons |
+| `on-surface` | `#1B1C1C` | showcase headline + logo mark | Primary text / filled icon marks on light surfaces |
+| `sumi-ink` | `#1A1A1A` | — | Reading body ink at maximum legibility |
+| `charcoal` | `#333333` | `monori_icon_charcoal` | UI chrome and secondary text |
+| `washi-white` | `#F9F9F7` | showcase light shapes | Paper ground — the substitute for pure `#FFFFFF` |
+| `surface` | `#FBF9F8` | — | Light canvas |
+| `outline-variant` | `#C4C8BF` | — | Hairline dividers |
+| `error` | `#BA1A1A` | — | Destructive actions only |
+
+Everything else stays system-driven: **System Secondary** for metadata and
+unselected icons (`.foregroundStyle(.secondary)`), **system background / `.bar`**
+for surfaces and the source picker / tab bar.
+
+**Known deltas between the tokens and shipped code** (documented, not silently
+reconciled — closing either one repaints the app):
+
+- `AccentColor.colorset` ships `#5C7150` (RGB 0.361/0.443/0.314), while the
+  Uguisu Zen `primary` token is `#53634E`.
+- The three reader rulesets (`ReaderRuleset.css`, `AFFReaderRuleset.css`,
+  `VocusReaderRuleset.css`) paint the dark-mode body `#1c1b19`; the matching
+  token is `on-surface` `#1B1C1C`.
 
 Rules: exactly **one** accent (sage). No second accent anywhere — a sage app
 never grows a blue CTA or a teal badge. No rainbow gradients (Patreon's own
 gradient loading bar is actively suppressed; see `SuppressLoadingBar.js`). Never
-pure black; use Ink. Respect dark mode via system colors.
+pure black, and never pure white — use `on-surface` and `washi-white`. Respect
+dark mode via system colors.
 
 ## 3. Typography
 
@@ -35,6 +59,8 @@ System font (San Francisco) throughout, weight- and color-driven hierarchy:
 titles `.headline`, metadata `.subheadline`/`.caption` in secondary. Reader body
 size and line-height are user-controlled (`ReaderPreferences`). Chinese UI copy
 is Traditional (繁體中文). No custom font bundling; no serif for UI chrome.
+Uguisu Zen names Manrope and Source Serif 4; Monori deliberately does not adopt
+them — a native iOS shell should read as San Francisco.
 
 ## 4. Icon System (the core of this document)
 
