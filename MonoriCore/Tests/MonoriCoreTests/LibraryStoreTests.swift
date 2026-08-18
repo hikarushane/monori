@@ -376,4 +376,30 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertNil(c.lastNewChapterAt)
         XCTAssertNil(c.lastReadAt)
     }
+
+    func testApplyDocImportPreservesContentHTMLWhenIncomingIsNil() throws {
+        let initial = ImportedCollection(
+            sourceURLString: "https://archiveofourown.org/works/12345",
+            title: "Test Work", creatorName: "Author",
+            sourceKind: .ao3,
+            chapters: [ImportedChapter(title: "Ch 1",
+                                        urlString: "https://archiveofourown.org/works/12345/chapters/111",
+                                        orderIndex: 0, contentHTML: "<p>Saved content</p>")])
+        try store.applyDocImport(initial)
+
+        let reimport = ImportedCollection(
+            sourceURLString: "https://archiveofourown.org/works/12345",
+            title: "Test Work", creatorName: "Author",
+            sourceKind: .ao3,
+            chapters: [ImportedChapter(title: "Ch 1 (updated title)",
+                                        urlString: "https://archiveofourown.org/works/12345/chapters/111",
+                                        orderIndex: 0, contentHTML: nil)])
+        try store.applyDocImport(reimport)
+
+        let collections = try store.collections()
+        let chapter = collections.first!.chapters.first!
+        XCTAssertEqual(chapter.title, "Ch 1 (updated title)")
+        XCTAssertEqual(chapter.contentHTML, "<p>Saved content</p>",
+                       "nil contentHTML must not overwrite stored content")
+    }
 }

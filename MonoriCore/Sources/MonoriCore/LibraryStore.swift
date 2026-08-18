@@ -116,7 +116,9 @@ public final class LibraryStore {
             if let chapter = existingByURL[ic.urlString] {
                 chapter.title = ic.title
                 chapter.orderIndex = ic.orderIndex
-                chapter.contentHTML = ic.contentHTML
+                if let html = ic.contentHTML {
+                    chapter.contentHTML = html
+                }
             } else {
                 let chapter = LocalChapterModel(title: ic.title, urlString: ic.urlString,
                                                 orderIndex: ic.orderIndex)
