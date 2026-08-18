@@ -1,12 +1,13 @@
 .DS_Store
 .recall/
-.build/
+
 xcuserdata/
 DerivedData/
-.build/
+build/
+MonoriCore/build/
+
 *.xcodeproj
 *.log
-MonoriCore/build/
 
 
 # secrets
