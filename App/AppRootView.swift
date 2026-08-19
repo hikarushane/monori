@@ -8,6 +8,8 @@ struct AppRootView: View {
 
     var body: some View {
         GeometryReader { proxy in
+            let tabBarHeight = min(max(proxy.size.height * 0.075, 64), 80)
+
             TabView(selection: tabSelection) {
                 BrowseView()
                     .tabItem { Label { Text("瀏覽") } icon: { MonoriTabIcon.browse } }
@@ -24,10 +26,10 @@ struct AppRootView: View {
             }
             .toolbar(.hidden, for: .tabBar)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Color.clear.frame(height: 64)
+                Color.clear.frame(height: tabBarHeight)
             }
             .overlay(alignment: .bottom) {
-                tabBar(bottomInset: proxy.safeAreaInsets.bottom)
+                tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom)
             }
             .preferredColorScheme(env.appPrefs.appearance.colorScheme)
             .environment(env)
@@ -57,7 +59,7 @@ struct AppRootView: View {
             })
     }
 
-    private func tabBar(bottomInset: CGFloat) -> some View {
+    private func tabBar(height: CGFloat, bottomInset: CGFloat) -> some View {
         GeometryReader { proxy in
             let iconSize = min(max(proxy.size.height * 0.28, 24), 30)
 
@@ -72,7 +74,7 @@ struct AppRootView: View {
             .frame(width: proxy.size.width * 0.8)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 64 + bottomInset)
+        .frame(height: height + bottomInset)
         .background(Color(.systemBackground))
         .overlay(alignment: .top) {
             Rectangle()
