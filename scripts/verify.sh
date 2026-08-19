@@ -20,6 +20,10 @@ echo "=== Step 0: Hook config regression check (guards fa5bb64) ==="
 "$PROJECT_DIR/scripts/check-hooks.sh"
 
 echo ""
+echo "=== Step 0.5: Design guard (Uguisu Zen regression check) ==="
+"$PROJECT_DIR/scripts/design-guard.sh"
+
+echo ""
 echo "=== Step 1: Ensure Xcode project (XcodeGen) ==="
 if [ ! -d "$PROJECT" ]; then
   echo "$PROJECT missing — generating with xcodegen"
