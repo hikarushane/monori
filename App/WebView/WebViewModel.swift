@@ -468,7 +468,7 @@ extension WebViewModel: WKNavigationDelegate {
                  withError error: Error) {
         let surface: NavigationTrace.Surface = (webView === popupWebView) ? .popup : .main
         DiagnosticLog.shared.log(category: "nav",
-            "\(surface.rawValue) provisionalFailed code=\((error as NSError).code) \(error.localizedDescription)")
+            "\(surface.rawValue) provisionalFailed domain=\((error as NSError).domain) code=\((error as NSError).code)")
     }
 }
 
