@@ -27,6 +27,7 @@ struct LibraryView: View {
                     listContent
                 }
             }
+            .background(MonoriPalette.canvas)
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .top, spacing: 0) { libraryHeader }
             .sheet(isPresented: $showsSearch) {
@@ -43,11 +44,11 @@ struct LibraryView: View {
     }
 
     private var libraryHeader: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
             HStack(alignment: .firstTextBaseline) {
                 Text("書庫")
-                    .font(.system(size: 36, weight: .bold, design: .default))
-                    .tracking(-1.2)
+                    .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
+                    .tracking(-0.6)
 
                 Spacer()
 
@@ -56,7 +57,7 @@ struct LibraryView: View {
                         showsSearch = true
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .font(.system(size: 21, weight: .medium))
+                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .medium))
                             .frame(width: 32, height: 32)
                     }
                     .buttonStyle(.plain)
@@ -67,37 +68,43 @@ struct LibraryView: View {
                         sortFilterMenu
                     } label: {
                         Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .semibold))
                             .frame(width: 32, height: 32)
                     }
                     .accessibilityLabel("書庫選項")
                     .accessibilityIdentifier("smoke.librarySortMenu")
                 }
-                .foregroundStyle(.primary)
+                .foregroundStyle(MonoriPalette.ink)
             }
 
             Text("共 \(allCollections.count) 部作品")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                .tracking(MonoriTypography.uiTracking)
+                .foregroundStyle(MonoriPalette.secondaryInk)
                 .accessibilityIdentifier("smoke.librarySummary")
 
             sourceFilterPicker
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 10)
-        .background(Color(.systemBackground))
+        .padding(.horizontal, MonoriSpacing.x3)
+        .padding(.top, MonoriSpacing.x3)
+        .padding(.bottom, MonoriSpacing.x2)
+        .background(MonoriPalette.canvas)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
+        }
     }
 
     private var sourceFilterPicker: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 9) {
+            HStack(spacing: MonoriSpacing.x1) {
                 sourceFilterChip(nil, title: "全部")
                 ForEach(SourceRegistry.all) { provider in
                     sourceFilterChip(provider.kind, title: provider.displayName)
                 }
             }
-            .padding(.vertical,8)
+            .padding(.vertical, MonoriSpacing.x1)
         }
         .contentMargins(.horizontal, 0, for: .scrollContent)
         .scrollIndicators(.hidden)
@@ -110,13 +117,20 @@ struct LibraryView: View {
             sourceFilter = kind
         } label: {
             Text(title)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(isSelected ? .white : .primary)
+                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                           weight: isSelected ? .semibold : .medium))
+                .tracking(MonoriTypography.uiTracking)
+                .foregroundStyle(MonoriPalette.ink)
                 .lineLimit(1)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(isSelected ? Color.accentColor : Color(.secondarySystemFill),
-                            in: Capsule())
+                .padding(.horizontal, MonoriSpacing.x2)
+                .padding(.vertical, 10)
+                .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
+                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                .overlay {
+                    RoundedRectangle(cornerRadius: MonoriRadius.control)
+                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
+                                lineWidth: 1)
+                }
         }
         .buttonStyle(.plain)
         .accessibilityLabel("來源：\(title)")
@@ -129,12 +143,18 @@ struct LibraryView: View {
                 NavigationLink(value: collection.id) {
                     row(collection)
                 }
+                .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
+                                           bottom: 0, trailing: MonoriSpacing.x3))
+                .listRowBackground(MonoriPalette.canvas)
             }
             .onDelete { offsets in
                 for i in offsets { env.store.deleteCollection(collections[i]) }
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(MonoriPalette.canvas)
+        .listRowSeparatorTint(MonoriPalette.divider)
         .refreshable { await env.autoCheck.runForced() }
         .navigationDestination(for: String.self) { id in
             if let collection = allCollections.first(where: { $0.id == id }) {
@@ -161,32 +181,44 @@ struct LibraryView: View {
     @ViewBuilder
     private var runningOverlay: some View {
         if env.autoCheck.isRunning {
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
+            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                 Text("檢查新章節中 \(env.autoCheck.checkedCount)/\(env.autoCheck.totalCount)")
-                    .font(.footnote)
+                    .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .medium))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.ink)
+                ProgressView()
+                    .tint(MonoriPalette.highlight)
+                    .progressViewStyle(.linear)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(.bar, in: Capsule())
-            .padding(.bottom, 12)
+            .padding(MonoriSpacing.x2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(MonoriPalette.surface,
+                        in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+            .overlay {
+                RoundedRectangle(cornerRadius: MonoriRadius.container)
+                    .stroke(MonoriPalette.divider, lineWidth: 1)
+            }
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.bottom, MonoriSpacing.x2)
             .accessibilityIdentifier("smoke.autoCheckSpinner")
         }
     }
 
     private func row(_ collection: LocalCollectionModel) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: MonoriSpacing.x2) {
             SourceGlyph(kind: collection.sourceKind)
                 .frame(width: 22, height: 22)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(MonoriPalette.secondaryInk)
                 .frame(width: 28)
                 .accessibilityIdentifier("smoke.collectionSourceIcon")
-            VStack(alignment: .leading, spacing: 4) {
-                Text(collection.title).font(.headline)
+            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                Text(collection.title)
+                    .font(MonoriTypography.ui(17, relativeTo: .headline, weight: .semibold))
+                    .foregroundStyle(MonoriPalette.ink)
                 if let creator = collection.creatorName, !creator.isEmpty {
                     Text("作者：\(creator)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .foregroundStyle(MonoriPalette.secondaryInk)
                 }
                 HStack(spacing: 6) {
                     Text("\(collection.chapters.count) 章")
@@ -194,35 +226,41 @@ struct LibraryView: View {
                         Text("・更新於 \(updated.formatted(.relative(presentation: .named).locale(Locale(identifier: "zh-Hant"))))")
                     }
                 }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                .foregroundStyle(MonoriPalette.secondaryInk)
             }
             Spacer()
             if env.autoCheck.needsLoginCollectionIDs.contains(collection.id) {
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(MonoriPalette.secondaryInk)
                     .accessibilityLabel("需要登入")
             }
             if collection.unreadCount > 0 {
                 Text("\(collection.unreadCount)")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Color.accentColor, in: Capsule())
+                    .font(MonoriTypography.ui(11, relativeTo: .caption2, weight: .bold))
+                    .foregroundStyle(MonoriPalette.ink)
+                    .frame(minWidth: 28, minHeight: 28)
+                    .background(MonoriPalette.highlight,
+                                in: RoundedRectangle(cornerRadius: MonoriRadius.control))
                     .accessibilityIdentifier("smoke.libraryUnreadBadge")
                     .accessibilityLabel("\(collection.unreadCount) 個新章節")
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, MonoriSpacing.x2)
     }
 
     private var emptyState: some View {
-        ContentUnavailableView {
-            Label("尚無收藏", systemImage: "books.vertical")
-        } description: {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+            Text("尚無收藏")
+                .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .semibold))
+                .foregroundStyle(MonoriPalette.ink)
             Text("在「瀏覽」分頁開啟 Patreon 文章的系列頁面，然後點選「匯入」。")
+                .font(MonoriTypography.ui(16, relativeTo: .body))
+                .foregroundStyle(MonoriPalette.secondaryInk)
+                .lineSpacing(6)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(MonoriSpacing.x3)
     }
 }
 
@@ -249,23 +287,31 @@ private struct LibrarySearchSheet: View {
                             dismiss()
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(collection.title).font(.headline)
+                                Text(collection.title)
+                                    .font(MonoriTypography.ui(17, relativeTo: .headline,
+                                                              weight: .semibold))
                                 if let creator = collection.creatorName, !creator.isEmpty {
                                     Text("作者：\(creator)")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(MonoriPalette.ink)
                     }
                 }
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(MonoriPalette.canvas)
+            .listRowSeparatorTint(MonoriPalette.divider)
             .navigationTitle("搜尋書庫")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "書名或作者")
+            .tint(MonoriPalette.ink)
+            .toolbarBackground(MonoriPalette.canvas, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("完成") { dismiss() }
