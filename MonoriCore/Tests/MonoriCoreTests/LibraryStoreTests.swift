@@ -172,6 +172,69 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(diskStore.chapter(withPageURL: pageURL)?.isBookmarked, false)
     }
 
+    func testToggleBookmarkClearsSiblingsInSameCollection() throws {
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1-1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2-2", order: 1),
+            payload("Ch3", "https://patreon.com/posts/3-3", order: 2)
+        ])
+        let chapters = store.orderedChapters(of: try store.collections()[0])
+        let ch1 = chapters[0], ch2 = chapters[1], ch3 = chapters[2]
+
+        store.toggleBookmark(ch1)
+        XCTAssertTrue(ch1.isBookmarked)
+
+        store.toggleBookmark(ch2)
+        XCTAssertTrue(ch2.isBookmarked)
+        XCTAssertFalse(ch1.isBookmarked, "old bookmark should be cleared")
+
+        store.toggleBookmark(ch3)
+        XCTAssertTrue(ch3.isBookmarked)
+        XCTAssertFalse(ch1.isBookmarked)
+        XCTAssertFalse(ch2.isBookmarked)
+    }
+
+    func testUnbookmarkDoesNotAffectSiblings() throws {
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1-1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2-2", order: 1)
+        ])
+        let chapters = store.orderedChapters(of: try store.collections()[0])
+        let ch1 = chapters[0], ch2 = chapters[1]
+
+        store.toggleBookmark(ch1)
+        XCTAssertTrue(ch1.isBookmarked)
+
+        // Unbookmark ch1
+        store.toggleBookmark(ch1)
+        XCTAssertFalse(ch1.isBookmarked)
+        XCTAssertFalse(ch2.isBookmarked, "sibling should stay unchanged")
+    }
+
+    func testBookmarkInOneCollectionDoesNotAffectAnother() throws {
+        try store.applyImport([payload("A-ch1", "https://patreon.com/posts/a-1", order: 0,
+                                       collection: "Collection A")])
+        // Second collection needs a different collectionURL
+        let bPayload = ImporterChapterPayload(
+            title: "B-ch1", url: "https://patreon.com/posts/b-1",
+            visibleDateText: nil, excerpt: nil, creatorName: "author",
+            collectionName: "Collection B",
+            collectionURL: "https://www.patreon.com/collection/8888",
+            domOrder: 0)
+        try store.applyImport([bPayload])
+
+        let collections = try store.collections()
+        let colA = collections.first { $0.title == "Collection A" }!
+        let colB = collections.first { $0.title == "Collection B" }!
+        let chA = store.orderedChapters(of: colA)[0]
+        let chB = store.orderedChapters(of: colB)[0]
+
+        store.toggleBookmark(chA)
+        store.toggleBookmark(chB)
+        XCTAssertTrue(chA.isBookmarked, "different collection — must stay bookmarked")
+        XCTAssertTrue(chB.isBookmarked)
+    }
+
     func testChapterLookupMatchesByPatreonPostIDWhenSlugChanges() throws {
         try store.applyImport([payload("Chapter", "https://patreon.com/posts/160628832", order: 0)])
         let chapter = store.chapter(
@@ -359,6 +422,32 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertFalse(newChapter.isNew)
         XCTAssertNotNil(c.lastReadAt)
         XCTAssertEqual(c.unreadCount, 0)
+    }
+
+    func testMarkAllReadClearsEveryNewFlag() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        try store.applyImport([
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1),
+            payload("6 傷", "https://patreon.com/posts/6-4", order: 2)
+        ])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 2)
+
+        store.markAllRead(c)
+
+        XCTAssertEqual(c.unreadCount, 0)
+        XCTAssertTrue(c.chapters.allSatisfy { !$0.isNew })
+        XCTAssertNotNil(c.lastReadAt)
+    }
+
+    func testMarkAllReadOnAlreadyReadCollectionIsNoOp() throws {
+        try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 0)
+        store.markAllRead(c)
+        XCTAssertEqual(c.unreadCount, 0)
+        XCTAssertNotNil(c.lastReadAt)
     }
 
     func testSetReadingStatusPersists() throws {

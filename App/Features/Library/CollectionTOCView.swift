@@ -64,6 +64,13 @@ struct CollectionTOCView: View {
         }
         .accessibilityIdentifier("smoke.collectionStatusMenu")
         Button {
+            env.store.markAllRead(collection)
+        } label: {
+            Label("全部標示為已閱讀", systemImage: "checkmark.circle")
+        }
+        .disabled(collection.unreadCount == 0)
+        .accessibilityIdentifier("smoke.markAllReadButton")
+        Button {
             collection.sortDirection =
                 collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
         } label: {
@@ -107,11 +114,13 @@ struct CollectionTOCView: View {
             }
         }
         .listStyle(.plain)
-        .navigationTitle(collection.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                MarqueeText(collection.title)
+            }
             ToolbarItem(placement: .topBarTrailing) {
-                // A single trailing control keeps the inline navigation title
+                // A single trailing control keeps the principal marquee title
                 // optically centered on the screen (Dynamic Island): one back
                 // button leading, one menu trailing. Reverse-order and check-for-
                 // chapters are occasional management actions — the primary action

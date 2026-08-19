@@ -214,7 +214,16 @@ public final class LibraryStore {
     // MARK: edits
 
     public func toggleBookmark(_ chapter: LocalChapterModel) {
-        chapter.isBookmarked.toggle()
+        if chapter.isBookmarked {
+            chapter.isBookmarked = false
+        } else {
+            if let collection = chapter.collection {
+                for sibling in collection.chapters where sibling.id != chapter.id && sibling.isBookmarked {
+                    sibling.isBookmarked = false
+                }
+            }
+            chapter.isBookmarked = true
+        }
         try? context.save()
     }
 
@@ -247,6 +256,15 @@ public final class LibraryStore {
     public func markChapterOpened(_ chapter: LocalChapterModel, at date: Date = .now) {
         chapter.isNew = false
         chapter.collection?.lastReadAt = date
+        try? context.save()
+    }
+
+    /// Clears the unread dot on every chapter in the collection at once.
+    public func markAllRead(_ collection: LocalCollectionModel, at date: Date = .now) {
+        for chapter in collection.chapters where chapter.isNew {
+            chapter.isNew = false
+        }
+        collection.lastReadAt = date
         try? context.save()
     }
 
