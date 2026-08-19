@@ -22,6 +22,12 @@
 	<string>5</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Manrope[wght].ttf</string>
+		<string>SourceSerif4Variable-Roman.ttf</string>
+		<string>NotoSerifTC-VF.ttf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>

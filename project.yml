@@ -44,6 +44,10 @@ targets:
         CFBundleVersion: "5"
         UILaunchStoryboardName: LaunchScreen
         ITSAppUsesNonExemptEncryption: false
+        UIAppFonts:
+          - Manrope[wght].ttf
+          - SourceSerif4Variable-Roman.ttf
+          - NotoSerifTC-VF.ttf
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
