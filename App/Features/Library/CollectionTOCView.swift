@@ -7,6 +7,7 @@ struct ReaderTarget: Identifiable {
 
 struct CollectionTOCView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.dismiss) private var dismiss
     let collection: LocalCollectionModel
     @State private var readerTarget: ReaderTarget?
     @State private var refreshing = false
@@ -96,35 +97,51 @@ struct CollectionTOCView: View {
     }
 
     var body: some View {
-        List {
-            ForEach(chapters) { chapter in
-                chapterRow(chapter)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        env.store.markChapterOpened(chapter)
-                        readerTarget = ReaderTarget(id: chapter.id)
-                    }
-                    .swipeActions {
-                        Button("刪除", role: .destructive) { env.store.delete(chapter) }
-                        Button("重新命名") {
-                            renameTarget = chapter
-                            renameText = chapter.title
+        VStack(alignment: .leading, spacing: 0) {
+            collectionHeader
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
+                .padding(.bottom, 12)
+
+            List {
+                ForEach(chapters) { chapter in
+                    chapterRow(chapter)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            env.store.markChapterOpened(chapter)
+                            readerTarget = ReaderTarget(id: chapter.id)
                         }
-                    }
+                        .swipeActions {
+                            Button("刪除", role: .destructive) { env.store.delete(chapter) }
+                            Button("重新命名") {
+                                renameTarget = chapter
+                                renameText = chapter.title
+                            }
+                        }
+                }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
-        .listStyle(.plain)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                MarqueeText(collection.title)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                // A single trailing control keeps the principal marquee title
-                // optically centered on the screen (Dynamic Island): one back
-                // button leading, one menu trailing. Reverse-order and check-for-
-                // chapters are occasional management actions — the primary action
-                // on this screen is tapping a chapter — so they live in the menu.
+        .background(Color(.systemBackground))
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("返回書庫")
+
+                Spacer()
+
                 if refreshing {
                     ProgressView().controlSize(.small)
                         .accessibilityIdentifier("smoke.refreshChaptersButton")
@@ -133,10 +150,18 @@ struct CollectionTOCView: View {
                         chapterOptionsMenu
                     } label: {
                         Image(systemName: "ellipsis")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel("章節選項")
                 }
             }
+            .padding(.horizontal, 18)
+            .frame(height: 54)
+            .background(Color(.systemBackground))
         }
         .fullScreenCover(item: $readerTarget) { target in
             if let chapter = chapters.first(where: { $0.id == target.id }) {
@@ -174,50 +199,89 @@ struct CollectionTOCView: View {
         }
     }
 
+    private var collectionHeader: some View {
+        let sourceName = SourceRegistry.provider(for: collection.sourceKind).displayName
+        let author = collection.creatorName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return VStack(alignment: .leading, spacing: 12) {
+            sourceChip(sourceName)
+
+            Text(collection.title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(3)
+                .layoutPriority(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 5) {
+                if let author, !author.isEmpty {
+                    metadataLine(label: "作者", value: author)
+                }
+                Text("共 \(chapters.count) 章")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func sourceChip(_ sourceName: String) -> some View {
+        HStack(spacing: 7) {
+            SourceGlyph(kind: collection.sourceKind)
+                .frame(width: 14, height: 14)
+            Text(sourceName)
+                .font(.caption.weight(.medium))
+        }
+        .foregroundStyle(Color.accentColor)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.accentColor.opacity(0.10), in: Capsule())
+    }
+
+    private func metadataLine(label: String, value: String) -> some View {
+        HStack(spacing: 6) {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .foregroundStyle(.primary.opacity(0.72))
+        }
+        .font(.subheadline)
+    }
+
     private func chapterRow(_ chapter: LocalChapterModel) -> some View {
         let text = ChapterTextFormatter.presentation(storedTitle: chapter.title,
                                                      urlString: chapter.urlString)
-        let previewText = chapter.excerpt ?? text.preview
 
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        if chapter.isNew {
-                            Circle()
-                                .fill(Color.accentColor)
-                                .frame(width: 8, height: 8)
-                                .accessibilityLabel("新章節")
-                        }
-                        Text(text.title)
-                            .font(.body.weight(.medium))
-                    }
-                    if let date = chapter.visibleDateText {
-                        Text(date).font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                Button {
-                    env.store.toggleBookmark(chapter)
-                    DiagnosticLog.shared.log(category: "bookmark",
-                        "TOC bookmark \(chapter.isBookmarked ? "set" : "cleared")")
-                } label: {
-                    Image(systemName: chapter.isBookmarked ? "bookmark.fill" : "bookmark")
-                        .foregroundStyle(chapter.isBookmarked ? Color.accentColor : Color.secondary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.borderless)
-                .accessibilityLabel(chapter.isBookmarked ? "移除書籤" : "加入書籤")
-                .accessibilityIdentifier("smoke.chapterBookmarkButton")
+        return HStack(alignment: .center, spacing: 8) {
+            Text(text.title)
+                .font(.body.weight(.regular))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 12)
+            if chapter.isNew {
+                Text("新")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .accessibilityLabel("新章節")
             }
-            if let preview = previewText {
-                Text(preview)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
+            Button {
+                env.store.toggleBookmark(chapter)
+                DiagnosticLog.shared.log(category: "bookmark",
+                    "TOC bookmark \(chapter.isBookmarked ? "set" : "cleared")")
+            } label: {
+                Image(systemName: chapter.isBookmarked ? "bookmark.fill" : "bookmark")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(chapter.isBookmarked ? Color.accentColor : Color.secondary)
+                    .frame(width: 30, height: 30)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.borderless)
+            .accessibilityLabel(chapter.isBookmarked ? "移除書籤" : "加入書籤")
+            .accessibilityIdentifier("smoke.chapterBookmarkButton")
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
+        .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 18))
     }
 }
