@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-17（Google Docs OAuth popup navigationDelegate 修復；AFF 改版修復見 ADR-0009）
+> 最後更新：2026-08-19（Uguisu Zen 設計系統重寫；Google Docs OAuth popup navigationDelegate 修復；AFF 改版修復見 ADR-0009）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -27,6 +27,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Collection refresh visibility | refresh 時保留 toolbar spinner，另加 bottom capsule status banner `smoke.refreshStatusBanner` | 長 collection check 可能跑數分鐘，單 toolbar spinner 太不明顯；banner 明確告知正在檢查 | active | 2026-06-13 |
 | Agent-driven simulator workflow | `SIMULATOR_PLAYBOOK.md` + `scripts/ui-preflight.sh` + `scripts/ui-driver.sh` | 使用者不是專業 iOS dev；agent 應先用 script/driver 收集可重現診斷，不要求使用者口述 Xcode/畫面狀態 | active | 2026-06-13 |
 | Claude→Codex workflow source | `CLAUDE.md` + `.claude/settings.json` canonical；Codex 透過 `AGENTS.md` + `.codex/hooks.json` + `scripts/codex-hook-adapter.py` 轉接 | 避免 Claude/Codex 雙份 hook command 漂移；`scripts/check-hooks.sh` 檢查 event parity、repo-local path、adapter trackedness、Codex payload regression，且新增 `.claude/commands`/`.claude/agents`/repo MCP config 時 fail-fast 要求 migration decision | active | 2026-08-19 |
+| Uguisu Zen 設計系統 | `DESIGN.md` + `MonoriDesignSystem.swift`；UI 用 Manrope，閱讀器以 Source Serif 4／Noto Serif TC 為核心 | 以 Washi White／Stone Grey 的不透明微差建立層次；Uguisu Green 僅限導航與品牌，禁止玻璃膠囊；批次 0 已內嵌字型與語義色 token，批次 1 已套用 Launch Screen、App 外殼與 WKWebView 背板，批次 2 已套用書庫／搜尋 sheet／目錄且修正深色 List cell 背景，批次 3 已套用 Browse chrome／collection banner 且保留第三方網站內容，批次 4 已套用設定頁的扁平分組與矩形表單控制，批次 5 已套用閱讀器 chrome、偏好面板與章節切換提示；Reader 本文排版仍待後續批次 | active | 2026-08-19 |
 | Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
 | Google Docs 章節偵測：font-size 主、text pattern 副 | 雙層策略：`largeFontTitle` (≥18pt) 主、`chapterTitlePattern` 副 | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
 | Google Docs 標題去尾標點 | `stripTrailingPunctuation` 去除 。！？.!? | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
