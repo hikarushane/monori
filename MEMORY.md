@@ -26,6 +26,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Browse 返回感知 | default Browse webview back path 加 transient snapshot slide animation；慢載入用 `WKWebView.estimatedProgress` top progress bar | `goBack()` 原本原地換內容沒有 native transition，Patreon SPA/跨文件 reload 又慢；不做自訂 cache/webview stack，先用低風險感知性修正 | active | 2026-06-13 |
 | Collection refresh visibility | refresh 時保留 toolbar spinner，另加 bottom capsule status banner `smoke.refreshStatusBanner` | 長 collection check 可能跑數分鐘，單 toolbar spinner 太不明顯；banner 明確告知正在檢查 | active | 2026-06-13 |
 | Agent-driven simulator workflow | `SIMULATOR_PLAYBOOK.md` + `scripts/ui-preflight.sh` + `scripts/ui-driver.sh` | 使用者不是專業 iOS dev；agent 應先用 script/driver 收集可重現診斷，不要求使用者口述 Xcode/畫面狀態 | active | 2026-06-13 |
+| Claude→Codex workflow source | `CLAUDE.md` + `.claude/settings.json` canonical；Codex 透過 `AGENTS.md` + `.codex/hooks.json` + `scripts/codex-hook-adapter.py` 轉接 | 避免 Claude/Codex 雙份 hook command 漂移；`scripts/check-hooks.sh` 檢查 event parity、repo-local path、adapter trackedness、Codex payload regression，且新增 `.claude/commands`/`.claude/agents`/repo MCP config 時 fail-fast 要求 migration decision | active | 2026-08-19 |
 | Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
 | Google Docs 章節偵測：font-size 主、text pattern 副 | 雙層策略：`largeFontTitle` (≥18pt) 主、`chapterTitlePattern` 副 | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
 | Google Docs 標題去尾標點 | `stripTrailingPunctuation` 去除 。！？.!? | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
@@ -157,6 +158,10 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **`smoke-diagnostics.sh` 重新 launch 會漏掉 launch 前手勢 log**（2026-06-13）：使用者先在 simulator 手動左滑，再跑 script；`grep back_swipe build/smoke/app.log` 無命中，因 script 重新 launch 並只收 `--last 2m` 的 `dev.monori/smoke-diagnostics` log，最後只有 launch-time smoke state。修法：需要手勢 log 時，在 script launch 後重現，或改用 live log capture；不要把「無 back_swipe log」誤判成 H1/H2/H3。
 
 - **`smoke-auto.sh` 會讀 `.env`**（2026-06-13）：腳本開頭會 `source "$PROJECT_DIR/.env"` 取得 `SMOKE_TEST_URL`。若 agent session 有「嚴禁讀 `.env`」約束，就不能直接跑此腳本。修法：請使用者明確允許、由使用者自行跑，或新增/使用不讀 `.env` 的安全參數化入口。
+
+- **Codex shell 讀檔會繞過 Claude `Read|Glob` matcher**（2026-08-19）：Codex 常用 `functions.exec_command` 執行 `nl`/`sed`/`cat` 讀檔，Claude hook 看到的不是 `Read` tool。若只把 `functions.exec_command` 映射為 `Bash`，source-read graphify advisory 會漏掉。`scripts/codex-hook-adapter.py` 現在對 shell source-read 建 synthetic `Read` payload，`scripts/check-hooks.sh` 有 regression test。
+
+- **不要把 `.claude/settings.local.json` 當 repo safety policy 搬到 Codex**（2026-08-19）：它是 Claude-local permission allowlist（WebSearch/WebFetch/git allow），Codex 權限由 app/session 控制。Repo workflow 只同步 canonical 行為規則：`CLAUDE.md`、`.claude/settings.json`、`critical_rules.txt`、`SIMULATOR_PLAYBOOK.md`。
 
 - **fb-idb 1.1.7 在 Python 3.14 崩潰**（2026-06-13）：`asyncio.get_event_loop()` 在 Python 3.14 丟出 `RuntimeError: There is no current event loop in thread 'MainThread'`（3.14 移除了隱式 event loop 建立）。修：`pipx uninstall fb-idb && pipx install fb-idb --python python3.12`。Python 3.12 只有 DeprecationWarning，正常執行。
   📍 出現位置：任何呼叫 `idb` CLI 的地方（此為 cross-project 坑，見 WIKI_SYNC.md）
