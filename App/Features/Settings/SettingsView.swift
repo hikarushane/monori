@@ -16,96 +16,271 @@ struct SettingsView: View {
 
     var body: some View {
         @Bindable var prefs = env.prefs
-        NavigationStack {
-            Form {
-                Section("外觀") {
-                    Picker("主題", selection: Binding(
-                        get: { env.appPrefs.appearance },
-                        set: { env.appPrefs.appearance = $0 }
-                    )) {
-                        ForEach(AppearanceMode.allCases, id: \.self) { mode in
-                            Text(mode.label).tag(mode)
+
+        ScrollView {
+            VStack(alignment: .leading, spacing: MonoriSpacing.x5) {
+                Text("設定")
+                    .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
+                    .tracking(-0.6)
+                    .foregroundStyle(MonoriPalette.ink)
+
+                settingsSection("外觀") {
+                    VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                        Text("主題")
+                            .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                                      weight: .medium))
+                            .tracking(MonoriTypography.uiTracking)
+                            .foregroundStyle(MonoriPalette.secondaryInk)
+                        HStack(spacing: MonoriSpacing.x1) {
+                            ForEach(AppearanceMode.allCases, id: \.self) { mode in
+                                appearanceOption(mode)
+                            }
                         }
                     }
-                    .pickerStyle(.segmented)
                 }
 
-                Section("閱讀") {
-                    Stepper("字體大小：\(prefs.fontSize)", value: $prefs.fontSize, in: 14...32)
-                }
-
-                Section {
-                    Toggle("自動檢查新章節", isOn: Binding(
-                        get: { env.appPrefs.autoCheckEnabled },
-                        set: { env.appPrefs.autoCheckEnabled = $0 }
-                    ))
-                    .accessibilityIdentifier("smoke.autoCheckToggle")
-                } header: {
-                    Text("書庫")
-                } footer: {
-                    Text("開啟書庫時自動為「追更中」的收藏檢查新章節。僅在 app 使用中執行，不會在背景連線。")
-                }
-
-                Section {
-                    Button("清除書庫資料", role: .destructive) { confirmClearLibrary = true }
-                        .accessibilityIdentifier("smoke.clearDataButton")
-                    Button("清除瀏覽器資料", role: .destructive) { confirmLogout = true }
-                        .accessibilityIdentifier("smoke.logoutButton")
-                } header: {
-                    Text("資料")
-                } footer: {
-                    Text("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。")
-                }
-
-                Section {
-                    Button("匯出診斷記錄") {
-                        guard let text = DiagnosticLog.shared.exportText() else {
-                            showNoLogsAlert = true
-                            return
+                settingsSection("閱讀") {
+                    HStack(spacing: MonoriSpacing.x2) {
+                        VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                            Text("字體大小")
+                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .foregroundStyle(MonoriPalette.ink)
+                            Text("\(prefs.fontSize) pt")
+                                .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                .foregroundStyle(MonoriPalette.secondaryInk)
                         }
-                        let url = FileManager.default.temporaryDirectory
-                            .appendingPathComponent("monori-diagnostic-log.txt")
-                        do {
-                            try text.write(to: url, atomically: true, encoding: .utf8)
-                            logExport = LogExport(url: url)
-                        } catch {
-                            showExportFailedAlert = true
+                        Spacer()
+                        HStack(spacing: MonoriSpacing.x1) {
+                            valueButton(symbol: "−", accessibilityLabel: "字體大小減少",
+                                        identifier: "Decrement",
+                                        disabled: prefs.fontSize <= 14) {
+                                prefs.fontSize -= 1
+                            }
+                            valueButton(symbol: "+", accessibilityLabel: "字體大小增加",
+                                        identifier: "Increment",
+                                        disabled: prefs.fontSize >= 32) {
+                                prefs.fontSize += 1
+                            }
                         }
                     }
-                    .accessibilityIdentifier("smoke.exportLogsButton")
-                } header: {
-                    Text("診斷")
-                } footer: {
-                    Text("記錄操作事件與錯誤，不含文章內容、密碼或登入資訊。")
                 }
 
-                Section("關於") {
-                    LabeledContent("版本", value: MonoriCore.version)
-                    Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由各平台控制。")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("書庫")
+                    settingsGroup {
+                        HStack(spacing: MonoriSpacing.x2) {
+                            Text("自動檢查新章節")
+                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .foregroundStyle(MonoriPalette.ink)
+                            Spacer()
+                            Button {
+                                env.appPrefs.autoCheckEnabled.toggle()
+                            } label: {
+                                autoCheckControl(isOn: env.appPrefs.autoCheckEnabled)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("自動檢查新章節")
+                            .accessibilityValue(env.appPrefs.autoCheckEnabled ? "開啟" : "關閉")
+                            .accessibilityIdentifier("smoke.autoCheckToggle")
+                        }
+                    }
+                    sectionFootnote("開啟書庫時自動為「追更中」的收藏檢查新章節。僅在 app 使用中執行，不會在背景連線。")
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("資料")
+                    settingsGroup {
+                        settingsAction("清除書庫資料", destructive: true) {
+                            confirmClearLibrary = true
+                        }
+                        Divider().overlay(MonoriPalette.divider)
+                        settingsAction("清除瀏覽器資料", destructive: true) {
+                            confirmLogout = true
+                        }
+                    }
+                    sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。")
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("診斷")
+                    settingsGroup {
+                        settingsAction("匯出診斷記錄") {
+                            exportDiagnosticLog()
+                        }
+                    }
+                    sectionFootnote("記錄操作事件與錯誤，不含文章內容、密碼或登入資訊。")
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("關於")
+                    settingsGroup {
+                        HStack {
+                            Text("版本")
+                                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                                          weight: .medium))
+                                .foregroundStyle(MonoriPalette.secondaryInk)
+                            Spacer()
+                            Text(MonoriCore.version)
+                                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                                          weight: .medium))
+                                .foregroundStyle(MonoriPalette.ink)
+                        }
+                        Divider().overlay(MonoriPalette.divider)
+                        Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由各平台控制。")
+                            .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                            .foregroundStyle(MonoriPalette.secondaryInk)
+                            .lineSpacing(6)
+                    }
                 }
             }
-            .navigationTitle("設定")
-            .confirmationDialog("刪除所有收藏、章節與書籤？",
-                                isPresented: $confirmClearLibrary, titleVisibility: .visible) {
-                Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.top, MonoriSpacing.x3)
+            .padding(.bottom, MonoriSpacing.x8)
+        }
+        .background(MonoriPalette.canvas)
+        .tint(MonoriPalette.ink)
+        .confirmationDialog("刪除所有收藏、章節與書籤？",
+                            isPresented: $confirmClearLibrary, titleVisibility: .visible) {
+            Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
+        }
+        .confirmationDialog("清除內建瀏覽器的所有 cookie 與登入狀態？",
+                            isPresented: $confirmLogout, titleVisibility: .visible) {
+            Button("清除瀏覽器資料", role: .destructive) {
+                Task { await env.clearBrowserData() }
             }
-            .confirmationDialog("清除內建瀏覽器的所有 cookie 與登入狀態？",
-                                isPresented: $confirmLogout, titleVisibility: .visible) {
-                Button("清除瀏覽器資料", role: .destructive) {
-                    Task { await env.clearBrowserData() }
+        }
+        .sheet(item: $logExport) { export in
+            ActivityView(items: [export.url])
+        }
+        .alert("尚無診斷記錄", isPresented: $showNoLogsAlert) {
+            Button("好", role: .cancel) {}
+        }
+        .alert("匯出失敗", isPresented: $showExportFailedAlert) {
+            Button("好", role: .cancel) {}
+        }
+    }
+
+    private func appearanceOption(_ mode: AppearanceMode) -> some View {
+        let isSelected = env.appPrefs.appearance == mode
+        return Button {
+            env.appPrefs.appearance = mode
+        } label: {
+            Text(mode.label)
+                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                          weight: isSelected ? .semibold : .medium))
+                .tracking(MonoriTypography.uiTracking)
+                .foregroundStyle(MonoriPalette.ink)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(isSelected ? MonoriPalette.canvas : MonoriPalette.surface,
+                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                .overlay {
+                    RoundedRectangle(cornerRadius: MonoriRadius.control)
+                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
+                                lineWidth: 1)
                 }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func valueButton(symbol: String, accessibilityLabel: String, identifier: String,
+                             disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(symbol)
+                .font(MonoriTypography.ui(22, relativeTo: .title3, weight: .medium))
+                .foregroundStyle(MonoriPalette.ink)
+                .frame(width: 44, height: 44)
+                .background(MonoriPalette.canvas,
+                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                .overlay {
+                    RoundedRectangle(cornerRadius: MonoriRadius.control)
+                        .stroke(MonoriPalette.divider, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.4 : 1)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(identifier)
+    }
+
+    private func autoCheckControl(isOn: Bool) -> some View {
+        ZStack(alignment: isOn ? .trailing : .leading) {
+            RoundedRectangle(cornerRadius: MonoriRadius.control)
+                .fill(isOn ? MonoriPalette.ink : MonoriPalette.canvas)
+                .overlay {
+                    RoundedRectangle(cornerRadius: MonoriRadius.control)
+                        .stroke(MonoriPalette.divider, lineWidth: 1)
+                }
+            RoundedRectangle(cornerRadius: 4)
+                .fill(isOn ? MonoriPalette.canvas : MonoriPalette.secondaryInk)
+                .frame(width: 16, height: 16)
+                .padding(8)
+        }
+        .frame(width: 48, height: 32)
+    }
+
+    private func settingsSection<Content: View>(_ title: String,
+                                                @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+            sectionHeading(title)
+            settingsGroup(content: content)
+        }
+    }
+
+    private func settingsGroup<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x2, content: content)
+            .padding(MonoriSpacing.x2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(MonoriPalette.surface,
+                        in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+            .overlay {
+                RoundedRectangle(cornerRadius: MonoriRadius.container)
+                    .stroke(MonoriPalette.divider, lineWidth: 1)
             }
-            .sheet(item: $logExport) { export in
-                ActivityView(items: [export.url])
-            }
-            .alert("尚無診斷記錄", isPresented: $showNoLogsAlert) {
-                Button("好", role: .cancel) {}
-            }
-            .alert("匯出失敗", isPresented: $showExportFailedAlert) {
-                Button("好", role: .cancel) {}
-            }
+    }
+
+    private func sectionHeading(_ title: String) -> some View {
+        Text(title)
+            .font(MonoriTypography.ui(15, relativeTo: .headline, weight: .semibold))
+            .tracking(MonoriTypography.uiTracking)
+            .foregroundStyle(MonoriPalette.ink)
+    }
+
+    private func sectionFootnote(_ text: String) -> some View {
+        Text(text)
+            .font(MonoriTypography.ui(13, relativeTo: .footnote))
+            .foregroundStyle(MonoriPalette.secondaryInk)
+            .lineSpacing(5)
+    }
+
+    private func settingsAction(_ title: String, destructive: Bool = false,
+                                action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                .foregroundStyle(destructive ? Color.red : MonoriPalette.ink)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(destructive
+                                 ? (title == "清除書庫資料" ? "smoke.clearDataButton" : "smoke.logoutButton")
+                                 : "smoke.exportLogsButton")
+    }
+
+    private func exportDiagnosticLog() {
+        guard let text = DiagnosticLog.shared.exportText() else {
+            showNoLogsAlert = true
+            return
+        }
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("monori-diagnostic-log.txt")
+        do {
+            try text.write(to: url, atomically: true, encoding: .utf8)
+            logExport = LogExport(url: url)
+        } catch {
+            showExportFailedAlert = true
         }
     }
 }
