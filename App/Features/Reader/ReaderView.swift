@@ -129,7 +129,7 @@ struct ReaderView: View {
     }
 
     private func handleContentTap(isCenter: Bool) {
-        withAnimation(.easeInOut(duration: 0.25)) {
+        withAnimation(.easeOut(duration: 0.2)) {
             if showPrefsPanel {
                 // Any tap on the page outside the panel closes just the panel.
                 showPrefsPanel = false
@@ -386,7 +386,7 @@ struct ReaderView: View {
                 dismissSlidingRight()
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 19, weight: .semibold))
+                    .font(MonoriTypography.ui(19, relativeTo: .body, weight: .semibold))
                     .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -403,8 +403,8 @@ struct ReaderView: View {
                         "reader bookmark \(current.isBookmarked ? "set" : "cleared")")
                 } label: {
                     Image(systemName: current.isBookmarked ? "bookmark.fill" : "bookmark")
-                        .font(.system(size: 19, weight: .medium))
-                        .foregroundStyle(current.isBookmarked ? Color.accentColor : readerChromeIconColor)
+                        .font(MonoriTypography.ui(19, relativeTo: .body, weight: .medium))
+                        .foregroundStyle(current.isBookmarked ? MonoriPalette.bookmark : readerChromeIconColor)
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
                 }
@@ -416,10 +416,10 @@ struct ReaderView: View {
             }
             Spacer(minLength: 0)
             Button {
-                withAnimation(.easeInOut(duration: 0.25)) { showPrefsPanel.toggle() }
+                withAnimation(.easeOut(duration: 0.2)) { showPrefsPanel.toggle() }
             } label: {
                 Image(systemName: "textformat.size")
-                    .font(.system(size: 21, weight: .semibold))
+                    .font(MonoriTypography.ui(21, relativeTo: .body, weight: .semibold))
                     .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -433,42 +433,56 @@ struct ReaderView: View {
         // padding keeps it clear of the side buttons; it never intercepts taps.
         .overlay {
             Text(currentTitle)
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(MonoriTypography.ui(16, relativeTo: .headline, weight: .medium))
+                .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(readerChromeTitleColor)
                 .lineLimit(1)
                 .padding(.horizontal, 100)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier("smoke.readerTitle")
         }
-        .padding(.horizontal, 6)
-        .frame(height: 56)
-        .background(readerChromeBackground)
+        .padding(.horizontal, MonoriSpacing.x2)
+        .frame(height: 64)
+        .background(MonoriPalette.canvas)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
+        }
     }
 
     private func bottomBar(bottomInset: CGFloat) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: MonoriSpacing.x2) {
             if let previous = neighbors.previous {
                 Button { open(previous) } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: MonoriSpacing.x1) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
                         Text("上一章")
-                            .font(.subheadline.weight(.medium))
+                            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                            .tracking(MonoriTypography.uiTracking)
                     }
+                    .foregroundStyle(MonoriPalette.ink)
+                    .frame(minHeight: 44)
                 }
+                .buttonStyle(.plain)
             } else {
                 Color.clear.frame(width: 88, height: 0)
             }
             Spacer(minLength: 0)
             if let next = neighbors.next {
                 Button { open(next) } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: MonoriSpacing.x1) {
                         Text("下一章")
-                            .font(.subheadline.weight(.medium))
+                            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                            .tracking(MonoriTypography.uiTracking)
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
                     }
+                    .foregroundStyle(MonoriPalette.ink)
+                    .frame(minHeight: 44)
                 }
+                .buttonStyle(.plain)
             } else {
                 Color.clear.frame(width: 88, height: 0)
             }
@@ -476,27 +490,29 @@ struct ReaderView: View {
         .overlay {
             if let chapterProgress {
                 Text(chapterProgress)
-                    .font(.footnote.weight(.light))
-                    .foregroundStyle(.tertiary)
+                    .font(MonoriTypography.ui(12, relativeTo: .footnote, weight: .regular))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.secondaryInk)
                     .monospacedDigit()
                     .allowsHitTesting(false)
             }
         }
-        .padding(.horizontal, 40)
-        .frame(height: (bottomNavigationHeight + bottomInset) )
-        .background(.bar)
-    }
-
-    private var readerChromeBackground: Color {
-        Color(red: 0.985, green: 0.984, blue: 0.965)
+        .padding(.horizontal, MonoriSpacing.x3)
+        .frame(height: max(64, bottomNavigationHeight) + bottomInset)
+        .background(MonoriPalette.canvas)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
+        }
     }
 
     private var readerChromeTitleColor: Color {
-        Color(red: 0.32, green: 0.39, blue: 0.32)
+        MonoriPalette.ink
     }
 
     private var readerChromeIconColor: Color {
-        Color(red: 0.35, green: 0.37, blue: 0.35)
+        MonoriPalette.ink
     }
 
 }
