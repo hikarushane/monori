@@ -5,6 +5,7 @@ import MonoriCore
 struct ReaderView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
     @State private var current: LocalChapterModel
     /// Reader chrome (top/bottom bars) is hidden by default; tapping the
     /// center of the page toggles it.
@@ -38,40 +39,45 @@ struct ReaderView: View {
     }
 
     var body: some View {
-        PatreonWebView(model: env.reader,
-                       onContentTap: handleContentTap(isCenter:),
-                       backSwipeOverride: handleBackSwipe,
-                       onOverscroll: { edge, progress in
-                           swipeEdge = edge
-                           swipeProgress = progress
-                       },
-                       onChapterBoundary: { edge in
-                           withAnimation(.easeInOut(duration: 0.3)) {
-                               swipeEdge = nil
-                               swipeProgress = 0
-                           }
-                           switch edge {
-                           case .top:
-                               if let prev = neighbors.previous { open(prev) }
-                           case .bottom:
-                               if let next = neighbors.next { open(next) }
-                           default: break
-                           }
-                       })
-            .accessibilityIdentifier("smoke.readerWebView")
-            .overlay(alignment: .top) { topChrome }
-            .overlay(alignment: .bottom) { bottomChrome }
-            .overlay(alignment: .top) { swipeTopIndicator }
-            .overlay(alignment: .bottom) { swipeBottomIndicator }
-            .onAppear { open(current) }
-            .onDisappear {
-                saveScrollPosition()
-                foreignTitleTask?.cancel()
-            }
-            .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
-            .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
-            .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
-            .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
+        GeometryReader { proxy in
+            PatreonWebView(model: env.reader,
+                           onContentTap: handleContentTap(isCenter:),
+                           backSwipeOverride: handleBackSwipe,
+                           onOverscroll: { edge, progress in
+                               swipeEdge = edge
+                               swipeProgress = progress
+                           },
+                           onChapterBoundary: { edge in
+                               withAnimation(.easeInOut(duration: 0.3)) {
+                                   swipeEdge = nil
+                                   swipeProgress = 0
+                               }
+                               switch edge {
+                               case .top:
+                                   if let prev = neighbors.previous { open(prev) }
+                               case .bottom:
+                                   if let next = neighbors.next { open(next) }
+                               default: break
+                               }
+                           })
+                .accessibilityIdentifier("smoke.readerWebView")
+                .overlay(alignment: .top) { topChrome }
+                .overlay(alignment: .bottom) {
+                    bottomChrome(bottomInset: proxy.safeAreaInsets.bottom)
+                }
+                .overlay(alignment: .top) { swipeTopIndicator }
+                .overlay(alignment: .bottom) { swipeBottomIndicator }
+                .onAppear { open(current) }
+                .onDisappear {
+                    saveScrollPosition()
+                    foreignTitleTask?.cancel()
+                }
+                .onChange(of: env.reader.finishedNavigationCount) { _, _ in applyReaderTreatment() }
+                .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
+                .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
+                .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
+        }
+        .ignoresSafeArea(edges: .bottom)
     }
 
     // MARK: - Chapter swipe indicators
@@ -115,9 +121,9 @@ struct ReaderView: View {
         }
     }
 
-    @ViewBuilder private var bottomChrome: some View {
+    @ViewBuilder private func bottomChrome(bottomInset: CGFloat) -> some View {
         if chromeVisible {
-            bottomBar
+            bottomBar(bottomInset: bottomInset)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
         }
     }
@@ -178,6 +184,16 @@ struct ReaderView: View {
         if let foreignPageTitle { return foreignPageTitle }
         return ChapterTextFormatter.presentation(storedTitle: current.title,
                                                  urlString: current.urlString).title
+    }
+
+    private var chapterProgress: String? {
+        guard foreignPageTitle == nil, let collection = current.collection else { return nil }
+        let chapters = collection.chapters.sorted {
+            ChapterOrdering.sortKey(urlString: $0.urlString, orderIndex: $0.orderIndex)
+                < ChapterOrdering.sortKey(urlString: $1.urlString, orderIndex: $1.orderIndex)
+        }
+        guard let index = chapters.firstIndex(where: { $0.id == current.id }) else { return nil }
+        return "\(index + 1) / \(chapters.count)"
     }
 
     private func saveScrollPosition() {
@@ -365,22 +381,19 @@ struct ReaderView: View {
     // MARK: - Bars
 
     private var topBar: some View {
-        HStack(spacing: 0) {
-            #if DEBUG
-            // Debug-only exit hatch for automated UI agents: idb cannot fire the
-            // left-edge UIScreenEdgePanGestureRecognizer that dismisses this
-            // .fullScreenCover, so expose a tappable close button. Never shipped
-            // in Release. No `chromeVisible` check needed — the whole top bar is
-            // rendered only when `chromeVisible == true` (see `topChrome`).
+        HStack(spacing: 4) {
             Button {
-                dismiss()
+                dismissSlidingRight()
             } label: {
                 Image(systemName: "chevron.left")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("關閉閱讀器")
+            .accessibilityLabel("返回書庫")
+            #if DEBUG
             .accessibilityIdentifier("smoke.readerDismissButton")
             #endif
             if foreignPageTitle == nil {
@@ -390,7 +403,8 @@ struct ReaderView: View {
                         "reader bookmark \(current.isBookmarked ? "set" : "cleared")")
                 } label: {
                     Image(systemName: current.isBookmarked ? "bookmark.fill" : "bookmark")
-                        .foregroundStyle(current.isBookmarked ? Color.accentColor : Color.secondary)
+                        .font(.system(size: 19, weight: .medium))
+                        .foregroundStyle(current.isBookmarked ? Color.accentColor : readerChromeIconColor)
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
                 }
@@ -405,6 +419,8 @@ struct ReaderView: View {
                 withAnimation(.easeInOut(duration: 0.25)) { showPrefsPanel.toggle() }
             } label: {
                 Image(systemName: "textformat.size")
+                    .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
@@ -417,52 +433,70 @@ struct ReaderView: View {
         // padding keeps it clear of the side buttons; it never intercepts taps.
         .overlay {
             Text(currentTitle)
-                .font(.subheadline.weight(.medium))
+                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .foregroundStyle(readerChromeTitleColor)
                 .lineLimit(1)
-                .padding(.horizontal, 96)
+                .padding(.horizontal, 100)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier("smoke.readerTitle")
         }
-        .padding(.horizontal, 4)
-        .background(.bar)
+        .padding(.horizontal, 6)
+        .frame(height: 56)
+        .background(readerChromeBackground)
     }
 
-    private var bottomBar: some View {
+    private func bottomBar(bottomInset: CGFloat) -> some View {
         HStack(spacing: 8) {
             if let previous = neighbors.previous {
                 Button { open(previous) } label: {
-                    Label("上一章", systemImage: "chevron.left")
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("上一章")
+                            .font(.subheadline.weight(.medium))
+                    }
                 }
             } else {
-                // Color is greedy in both axes; without a height the bar grows to fill the screen.
-                Color.clear.frame(width: 72, height: 0)
+                Color.clear.frame(width: 88, height: 0)
             }
             Spacer(minLength: 0)
             if let next = neighbors.next {
                 Button { open(next) } label: {
-                    HStack(spacing: 4) {
+                    HStack(spacing: 6) {
                         Text("下一章")
+                            .font(.subheadline.weight(.medium))
                         Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .semibold))
                     }
                 }
             } else {
-                Color.clear.frame(width: 72, height: 0)
+                Color.clear.frame(width: 88, height: 0)
             }
         }
-        // Center the title to the bar's full width (screen center), independent of
-        // the differing prev/next button widths. Padding keeps it clear of them.
         .overlay {
-            Text(currentTitle)
-                .font(.caption.weight(.medium))
-                .lineLimit(1)
-                .padding(.horizontal, 96)
-                .allowsHitTesting(false)
+            if let chapterProgress {
+                Text(chapterProgress)
+                    .font(.footnote.weight(.light))
+                    .foregroundStyle(.tertiary)
+                    .monospacedDigit()
+                    .allowsHitTesting(false)
+            }
         }
-        .font(.subheadline)
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-        // Extend the bar material down through the home-indicator safe area so it
-        // reads as docked to the screen bottom; the buttons stay above the inset.
-        .background { Rectangle().fill(.bar).ignoresSafeArea(edges: .bottom) }
+        .padding(.horizontal, 40)
+        .frame(height: (bottomNavigationHeight + bottomInset) )
+        .background(.bar)
     }
+
+    private var readerChromeBackground: Color {
+        Color(red: 0.985, green: 0.984, blue: 0.965)
+    }
+
+    private var readerChromeTitleColor: Color {
+        Color(red: 0.32, green: 0.39, blue: 0.32)
+    }
+
+    private var readerChromeIconColor: Color {
+        Color(red: 0.35, green: 0.37, blue: 0.35)
+    }
+
 }

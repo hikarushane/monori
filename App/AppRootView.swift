@@ -1,5 +1,22 @@
 import SwiftUI
 
+enum AppChromeMetrics {
+    static func bottomNavigationHeight(for viewHeight: CGFloat) -> CGFloat {
+        min(max(viewHeight * 0.075, 64), 80)
+    }
+}
+
+private struct BottomNavigationHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 64
+}
+
+extension EnvironmentValues {
+    var bottomNavigationHeight: CGFloat {
+        get { self[BottomNavigationHeightKey.self] }
+        set { self[BottomNavigationHeightKey.self] = newValue }
+    }
+}
+
 struct AppRootView: View {
     private enum AppTab: Hashable { case browse, library, settings }
 
@@ -8,7 +25,7 @@ struct AppRootView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let tabBarHeight = min(max(proxy.size.height * 0.075, 64), 80)
+            let tabBarHeight = AppChromeMetrics.bottomNavigationHeight(for: proxy.size.height)
 
             TabView(selection: tabSelection) {
                 BrowseView()
@@ -32,6 +49,7 @@ struct AppRootView: View {
                 tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom)
             }
             .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+            .environment(\.bottomNavigationHeight, tabBarHeight)
             .environment(env)
             .modelContainer(env.store.container)
             .task { env.startSmokeToolsIfNeeded() }
