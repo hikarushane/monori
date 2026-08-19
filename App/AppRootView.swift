@@ -42,6 +42,7 @@ struct AppRootView: View {
                     .tag(AppTab.settings)
             }
             .toolbar(.hidden, for: .tabBar)
+            .background(MonoriPalette.canvas)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 Color.clear.frame(height: tabBarHeight)
             }
@@ -49,6 +50,7 @@ struct AppRootView: View {
                 tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom)
             }
             .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+            .tint(MonoriPalette.ink)
             .environment(\.bottomNavigationHeight, tabBarHeight)
             .environment(env)
             .modelContainer(env.store.container)
@@ -89,37 +91,41 @@ struct AppRootView: View {
                 tabButton(.settings, title: "設定", icon: MonoriTabIcon.settings,
                           identifier: "smoke.settingsTab", iconSize: iconSize)
             }
-            .frame(width: proxy.size.width * 0.8)
+            .padding(.horizontal, MonoriSpacing.x3)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(height: height + bottomInset)
-        .background(Color(.systemBackground))
+        .background(MonoriPalette.canvas)
         .overlay(alignment: .top) {
             Rectangle()
-                .fill(Color(.separator))
-                .frame(height: 0.5)
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
         }
     }
 
     private func tabButton(_ tab: AppTab, title: String, icon: Image,
                            identifier: String, iconSize: CGFloat) -> some View {
-        Button {
+        let isSelected = selectedTab == tab
+        return Button {
             tabSelection.wrappedValue = tab
         } label: {
-            VStack(spacing: 4) {
+            VStack(spacing: MonoriSpacing.x1) {
                 icon
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
+                    .foregroundStyle(isSelected ? MonoriPalette.navigationAccent : MonoriPalette.secondaryInk)
                 Text(title)
-                    .font(.caption2.weight(.medium))
+                    .font(MonoriTypography.ui(11, relativeTo: .caption2,
+                                               weight: isSelected ? .semibold : .medium))
+                    .tracking(MonoriTypography.navigationTracking)
+                    .foregroundStyle(isSelected ? MonoriPalette.ink : MonoriPalette.secondaryInk)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.plain)
-        .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
         .accessibilityIdentifier(identifier)
         .accessibilityLabel(title)
-        .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

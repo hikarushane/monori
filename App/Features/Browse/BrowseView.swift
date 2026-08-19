@@ -39,7 +39,7 @@ struct BrowseView: View {
                 if activeModel.loadingProgress < 1 {
                     ProgressView(value: activeModel.loadingProgress)
                         .progressViewStyle(.linear)
-                        .tint(Color.accentColor)
+                        .tint(MonoriPalette.highlight)
                 }
             }
         }
@@ -71,24 +71,26 @@ struct BrowseView: View {
     private var sourcePicker: some View {
         VStack(spacing: 0) {
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                withAnimation(.easeOut(duration: 0.18)) {
                     isPickerExpanded.toggle()
                 }
             } label: {
-                HStack {
+                HStack(spacing: MonoriSpacing.x2) {
                     SourceGlyph(kind: activeKind)
                         .frame(width: 20, height: 20)
                     Text(SourceRegistry.provider(for: activeKind).displayName)
-                        .font(.subheadline.weight(.medium))
+                        .font(MonoriTypography.ui(15, relativeTo: .subheadline, weight: .semibold))
+                        .tracking(MonoriTypography.uiTracking)
                     Spacer()
                     DropdownChevron()
-                        .stroke(.secondary, style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                        .stroke(MonoriPalette.secondaryInk,
+                                style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
                         .frame(width: 12, height: 12)
                         .rotationEffect(.degrees(isPickerExpanded ? 180 : 0))
                 }
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .foregroundStyle(MonoriPalette.ink)
+                .padding(.horizontal, MonoriSpacing.x3)
+                .padding(.vertical, MonoriSpacing.x2)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -96,33 +98,42 @@ struct BrowseView: View {
 
             if isPickerExpanded {
                 ForEach(SourceRegistry.all.filter { $0.kind != activeKind }) { provider in
-                    Divider().padding(.horizontal, 16)
+                    Rectangle()
+                        .fill(MonoriPalette.divider)
+                        .frame(height: 1)
+                        .padding(.horizontal, MonoriSpacing.x3)
                     Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(.easeOut(duration: 0.18)) {
                             activeKind = provider.kind
                             ensureLoaded(provider.kind)
                             isPickerExpanded = false
                         }
                     } label: {
-                        HStack(spacing: 8) {
+                        HStack(spacing: MonoriSpacing.x2) {
                             SourceGlyph(kind: provider.kind)
                                 .frame(width: 18, height: 18)
                             Text(provider.displayName)
-                                .font(.subheadline)
+                                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                                .tracking(MonoriTypography.uiTracking)
                             Spacer()
                         }
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
+                        .foregroundStyle(MonoriPalette.secondaryInk)
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
                     .accessibilityIdentifier("smoke.sourceEntry.\(provider.kind.rawValue)")
                 }
             }
         }
         .clipped()
-        .background(.bar)
+        .background(MonoriPalette.canvas)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
+        }
     }
 }

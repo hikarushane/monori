@@ -31,15 +31,9 @@ struct WebCollectionBanner: View {
     @ViewBuilder
     private var banner: some View {
         if model.isOnAO3WorkPage {
-            HStack {
-                HStack(spacing: 6) {
-                    SourceGlyph(kind: .ao3).frame(width: 16, height: 16)
-                    Text(model.detectedCollection?.collectionName ?? "AO3 作品")
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                Spacer()
-                Button {
+            importBanner(kind: .ao3,
+                         title: model.detectedCollection?.collectionName ?? "AO3 作品",
+                         progressLabel: ao3ProgressLabel) {
                     importing = true
                     env.importedCountThisSession = 0
                     Task {
@@ -47,38 +41,10 @@ struct WebCollectionBanner: View {
                         importing = false
                         showImportConfirmation = true
                     }
-                } label: {
-                    if importing {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.mini)
-                            if env.ao3ImportTotal > 0 {
-                                Text("匯入中 \(env.ao3ImportCurrent)/\(env.ao3ImportTotal)⋯")
-                            } else {
-                                Text("匯入中⋯")
-                            }
-                        }
-                    } else {
-                        Text("匯入")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(importing)
-                .accessibilityIdentifier("smoke.importChaptersButton")
             }
-            .padding(.horizontal).padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnVocusRoomPage {
-            HStack {
-                HStack(spacing: 6) {
-                    SourceGlyph(kind: .vocus).frame(width: 16, height: 16)
-                    Text(model.detectedCollection?.collectionName ?? "Vocus 房間")
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                Spacer()
-                Button {
+            importBanner(kind: .vocus,
+                         title: model.detectedCollection?.collectionName ?? "Vocus 房間") {
                     importing = true
                     env.importedCountThisSession = 0
                     Task {
@@ -86,34 +52,10 @@ struct WebCollectionBanner: View {
                         importing = false
                         showImportConfirmation = true
                     }
-                } label: {
-                    if importing {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.mini)
-                            Text("匯入中⋯")
-                        }
-                    } else {
-                        Text("匯入")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(importing)
-                .accessibilityIdentifier("smoke.importChaptersButton")
             }
-            .padding(.horizontal).padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnAFFForewordPage {
-            HStack {
-                HStack(spacing: 6) {
-                    SourceGlyph(kind: .asianFanfics).frame(width: 16, height: 16)
-                    Text(model.detectedCollection?.collectionName ?? "AFF 故事")
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                Spacer()
-                Button {
+            importBanner(kind: .asianFanfics,
+                         title: model.detectedCollection?.collectionName ?? "AFF 故事") {
                     importing = true
                     env.importedCountThisSession = 0
                     Task {
@@ -121,30 +63,9 @@ struct WebCollectionBanner: View {
                         importing = false
                         showImportConfirmation = true
                     }
-                } label: {
-                    if importing {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.mini)
-                            Text("匯入中⋯")
-                        }
-                    } else {
-                        Text("匯入")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(importing)
-                .accessibilityIdentifier("smoke.importChaptersButton")
             }
-            .padding(.horizontal).padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnGoogleDocPage {
-            HStack {
-                Label("Google 文件", systemImage: "doc.richtext")
-                    .font(.subheadline)
-                Spacer()
-                Button {
+            importBanner(kind: .googleDocs, title: "Google 文件") {
                     importing = true
                     env.importedCountThisSession = 0
                     Task {
@@ -152,27 +73,9 @@ struct WebCollectionBanner: View {
                         importing = false
                         showImportConfirmation = true
                     }
-                } label: {
-                    if importing {
-                        HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("匯入中⋯") }
-                    } else {
-                        Text("匯入")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(importing)
-                .accessibilityIdentifier("smoke.importChaptersButton")
             }
-            .padding(.horizontal).padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.collectionBanner")
         } else if model.isOnCollectionPage {
-            HStack {
-                Label("收藏頁面", systemImage: "books.vertical")
-                    .font(.subheadline)
-                Spacer()
-                Button {
+            importBanner(kind: .patreon, title: "收藏頁面") {
                     importing = true
                     env.importedCountThisSession = 0
                     Task {
@@ -191,43 +94,102 @@ struct WebCollectionBanner: View {
                         importing = false
                         showImportConfirmation = true
                     }
-                } label: {
-                    if importing {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.mini)
-                            Text("匯入中⋯")
-                        }
-                    } else {
-                        Text("匯入")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(importing)
-                .accessibilityIdentifier("smoke.importChaptersButton")
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.collectionBanner")
         } else if let link = model.detectedCollection {
-            HStack {
-                Text("系列：\(link.collectionName)")
-                    .font(.subheadline)
-                    .lineLimit(1)
-                Spacer()
-                Button("開啟收藏") {
+            collectionBanner(title: link.collectionName) {
                     if let url = URLNormalizer.normalize(link.collectionURL) {
                         model.load(url)
                     }
                 }
-                .controlSize(.small)
+        }
+    }
+
+    private var ao3ProgressLabel: String {
+        env.ao3ImportTotal > 0
+            ? "匯入中 \(env.ao3ImportCurrent)/\(env.ao3ImportTotal)"
+            : "匯入中"
+    }
+
+    private func importBanner(kind: SourceKind, title: String,
+                              progressLabel: String = "匯入中",
+                              action: @escaping () -> Void) -> some View {
+        bannerContainer {
+            HStack(spacing: MonoriSpacing.x2) {
+                SourceGlyph(kind: kind)
+                    .frame(width: 16, height: 16)
+                Text(title)
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .tracking(MonoriTypography.uiTracking)
+                    .lineLimit(1)
+                    .foregroundStyle(MonoriPalette.ink)
+                Spacer(minLength: MonoriSpacing.x2)
+                Button(action: action) {
+                    Text(importing ? progressLabel : "匯入")
+                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+                        .tracking(MonoriTypography.uiTracking)
+                        .foregroundStyle(MonoriPalette.ink)
+                        .padding(.horizontal, MonoriSpacing.x2)
+                        .frame(minHeight: 40)
+                        .background(MonoriPalette.canvas,
+                                    in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: MonoriRadius.control)
+                                .stroke(MonoriPalette.ink, lineWidth: 1)
+                        }
+                }
+                .buttonStyle(.plain)
+                .disabled(importing)
+                .opacity(importing ? 0.7 : 1)
+                .accessibilityIdentifier("smoke.importChaptersButton")
+            }
+            if importing {
+                ProgressView()
+                    .progressViewStyle(.linear)
+                    .tint(MonoriPalette.highlight)
+            }
+        }
+        .accessibilityIdentifier("smoke.collectionBanner")
+    }
+
+    private func collectionBanner(title: String, action: @escaping () -> Void) -> some View {
+        bannerContainer {
+            HStack(spacing: MonoriSpacing.x2) {
+                Text("系列：\(title)")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .tracking(MonoriTypography.uiTracking)
+                    .lineLimit(1)
+                    .foregroundStyle(MonoriPalette.ink)
+                Spacer(minLength: MonoriSpacing.x2)
+                Button(action: action) {
+                    Text("開啟收藏")
+                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+                        .tracking(MonoriTypography.uiTracking)
+                        .foregroundStyle(MonoriPalette.ink)
+                        .padding(.horizontal, MonoriSpacing.x2)
+                        .frame(minHeight: 40)
+                        .background(MonoriPalette.canvas,
+                                    in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: MonoriRadius.control)
+                                .stroke(MonoriPalette.ink, lineWidth: 1)
+                        }
+                }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("smoke.openCollectionButton")
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.bar)
-            .accessibilityIdentifier("smoke.detectedCollectionBanner")
         }
+        .accessibilityIdentifier("smoke.detectedCollectionBanner")
+    }
+
+    private func bannerContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x1, content: content)
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+            .background(MonoriPalette.surface)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(MonoriPalette.divider)
+                    .frame(height: 1)
+            }
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import WebKit
+import UIKit
 import os
 import MonoriCore
 
@@ -133,8 +134,9 @@ final class WebViewModel: NSObject {
         // view's backdrop shows through un-backgrounded page margins as a gray
         // veil over the content (Bug 4).
         webView.isOpaque = true
-        webView.backgroundColor = .systemBackground
-        webView.scrollView.backgroundColor = .systemBackground
+        let canvas = UIColor(named: "MonoriCanvas") ?? .systemBackground
+        webView.backgroundColor = canvas
+        webView.scrollView.backgroundColor = canvas
         super.init()
 
         webView.navigationDelegate = self
