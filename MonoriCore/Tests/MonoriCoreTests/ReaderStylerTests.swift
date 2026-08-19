@@ -6,7 +6,7 @@ final class ReaderStylerTests: XCTestCase {
         let js = ReaderStyler.injectionScript()
         XCTAssertTrue(js.contains(ReaderStyler.styleElementID))
         XCTAssertTrue(js.contains("--monori-font-size"))
-        XCTAssertTrue(js.contains("data-tag")) // ruleset content embedded
+        XCTAssertTrue(js.contains("Source Serif 4"))
     }
 
     func testRemovalScriptTargetsSameId() {
@@ -64,38 +64,171 @@ final class ReaderStylerTests: XCTestCase {
 
     func testRulesetSizesParagraphDescendants() {
         let css = ReaderStyler.ruleset()
-        // The size/line-height rule must reach the text nodes, not just the
-        // container, or Patreon's per-paragraph font-size wins (Bug 1).
         XCTAssertTrue(css.contains("post-content\"] p"))
         XCTAssertTrue(css.contains("post-content\"] li"))
     }
 
     func testRulesetTargetsPatreonPostContentClass() {
         let css = ReaderStyler.ruleset()
-        // Patreon's post-detail page dropped data-tag="post-content"/<article>
-        // (Task 2 probe, 2026-06); the live container is now .patreon-post-content.
-        // Pin this selector so a future accidental revert is caught by `swift test`
-        // instead of silently shipping a reader where typography never applies.
         XCTAssertTrue(css.contains(".patreon-post-content"))
         XCTAssertTrue(css.contains(".patreon-post-content p"))
     }
 
     func testRulesetHidesPromoSectionsButKeepsComments() {
         let css = ReaderStyler.ruleset()
-        // Real Patreon tokens captured from the live logged-in reader (Opt1).
-        // "From the collection" carousel:
         XCTAssertTrue(css.contains("PostCollectionPlaylistCard"))
-        // "Related posts" cards (Patreon exposes no section data-tag; the cards
-        // themselves carry launcher-post-card):
         XCTAssertTrue(css.contains("launcher-post-card"))
-        // The comment thread must stay visible — never hidden.
         XCTAssertFalse(css.contains("content-card-comment-thread-container"))
-        // The thread must be fully readable: the reader ruleset must not hide
-        // individual comments or the reply field, or "Load more comments" loads
-        // rows that are display:none and looks like it failed.
         XCTAssertFalse(css.contains("comment-row"))
         XCTAssertFalse(css.contains("comment-field"))
     }
+
+    // MARK: - Uguisu Zen typography
+
+    func testRulesetUsesSourceSerif4() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("Source Serif 4"))
+        XCTAssertTrue(css.contains("Noto Serif TC"))
+        XCTAssertFalse(css.contains("Georgia"), "Georgia must not appear in Patreon ruleset")
+    }
+
+    func testRulesetDeclaresLocalFontFace() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains(#"local("SourceSerif4Variable-Roman")"#))
+        XCTAssertTrue(css.contains(#"local("NotoSerifTC-Regular")"#))
+    }
+
+    func testRulesetUsesWashiWhiteBackground() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("#FBF9F8"))
+        XCTAssertFalse(css.contains("#faf8f5"), "Old background color must be removed")
+    }
+
+    func testRulesetUsesSumiInkDarkBackground() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("#1C1B19"))
+    }
+
+    func testRulesetDarkModeTextColor() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("#F2F0ED"))
+    }
+
+    func testRulesetDefaultLineHeight19() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("--monori-line-height, 1.9"))
+    }
+
+    func testRulesetParagraphSpacing() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("0.85em"))
+    }
+
+    func testRulesetMaxWidth34em() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("34em"))
+        XCTAssertFalse(css.contains("42em"), "Old max-width 42em must be removed")
+    }
+
+    func testRulesetHorizontalPadding() {
+        let css = ReaderStyler.ruleset()
+        XCTAssertTrue(css.contains("clamp(24px, 6vw, 48px)"))
+    }
+
+    // MARK: - Vocus ruleset
+
+    func testVocusRulesetUsesSourceSerif4() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("Source Serif 4"))
+        XCTAssertTrue(css.contains("Noto Serif TC"))
+        XCTAssertFalse(css.contains("Georgia"))
+    }
+
+    func testVocusRulesetDeclaresLocalFontFace() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains(#"local("SourceSerif4Variable-Roman")"#))
+    }
+
+    func testVocusRulesetUsesWashiWhite() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("#FBF9F8"))
+        XCTAssertFalse(css.contains("#faf8f5"))
+    }
+
+    func testVocusRulesetDarkTextColor() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("#F2F0ED"))
+        XCTAssertFalse(css.contains("#e8e6e3"), "Old dark text color must be removed")
+    }
+
+    func testVocusRulesetDefaultLineHeight19() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("--monori-line-height, 1.9"))
+    }
+
+    func testVocusRulesetParagraphSpacing() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("0.85em"))
+    }
+
+    func testVocusRulesetMaxWidth34em() {
+        let css = ReaderStyler.vocusRuleset()
+        XCTAssertTrue(css.contains("34em"))
+        XCTAssertFalse(css.contains("42em"))
+    }
+
+    // MARK: - AFF ruleset
+
+    func testAFFRulesetUsesSourceSerif4() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("Source Serif 4"))
+        XCTAssertTrue(css.contains("Noto Serif TC"))
+        XCTAssertFalse(css.contains("Georgia"))
+    }
+
+    func testAFFRulesetDeclaresLocalFontFace() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains(#"local("SourceSerif4Variable-Roman")"#))
+    }
+
+    func testAFFRulesetUsesWashiWhite() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("#FBF9F8"))
+        XCTAssertFalse(css.contains("#faf8f5"))
+    }
+
+    func testAFFRulesetDarkTextColor() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("#F2F0ED"))
+        XCTAssertFalse(css.contains("#e8e6e3"))
+    }
+
+    func testAFFRulesetDefaultLineHeight19() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("--monori-line-height, 1.9"))
+    }
+
+    func testAFFRulesetParagraphSpacing() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("0.85em"))
+    }
+
+    func testAFFRulesetMaxWidth34em() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("34em"))
+        XCTAssertFalse(css.contains("42em"))
+    }
+
+    func testAFFRulesetKeepsCommentThread() {
+        let css = ReaderStyler.affRuleset()
+        XCTAssertTrue(css.contains("#comments"), "CSS must reference #comments")
+        XCTAssertTrue(css.contains(":not(#comments)"),
+                      "Comments are preserved via :not(#comments) exclusion")
+        XCTAssertTrue(css.contains("section#comments"),
+                      "Comment section is styled, not hidden")
+    }
+
+    // MARK: - wrappedDocument (Google Docs)
 
     func testWrappedDocumentEmbedsPrefsVariables() {
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
@@ -105,18 +238,54 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(html.contains("<p>x</p>"))
     }
 
+    func testWrappedDocumentUsesSourceSerif4() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("Source Serif 4"))
+        XCTAssertTrue(html.contains("Noto Serif TC"))
+        XCTAssertFalse(html.contains("-apple-system"), "System sans must be removed")
+        XCTAssertFalse(html.contains("PingFang"), "PingFang must be removed")
+        XCTAssertFalse(html.contains("Georgia"))
+    }
+
+    func testWrappedDocumentDeclaresLocalFontFace() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains(#"local("SourceSerif4Variable-Roman")"#))
+        XCTAssertTrue(html.contains(#"local("NotoSerifTC-Regular")"#))
+    }
+
+    func testWrappedDocumentUsesWashiWhite() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("#FBF9F8"))
+    }
+
+    func testWrappedDocumentDarkModeColors() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("#1C1B19"))
+        XCTAssertTrue(html.contains("#F2F0ED"))
+    }
+
+    func testWrappedDocumentParagraphSpacing() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("0.85em"))
+    }
+
+    func testWrappedDocumentMaxWidth34em() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertTrue(html.contains("34em"))
+    }
+
     func testWrappedDocumentOverridesInlineStylesOnProseDescendants() {
-        // Google Docs put font-size/line-height inline on every paragraph and its
-        // spans; the wrapper must override the prose descendants with !important,
-        // not just body — but must NOT flatten headings (those keep their size).
         let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
                                                 fontSizePoints: 19, lineHeight: 1.75)
         XCTAssertTrue(html.contains("body p *"))
         XCTAssertTrue(html.contains("font-size: var(--monori-font-size) !important"))
         XCTAssertTrue(html.contains("line-height: var(--monori-line-height) !important"))
-        // Headings are not in the override list, so chapter sub-headings keep
-        // their relative size (Google headings wrap text in <span>, which a bare
-        // `body span` rule would otherwise flatten).
         XCTAssertFalse(html.contains("body h1"))
         XCTAssertFalse(html.contains("body span "))
     }
@@ -135,7 +304,38 @@ final class ReaderStylerTests: XCTestCase {
                                                 fontSizePoints: 18, lineHeight: 1.6)
         XCTAssertTrue(html.contains(#"<meta name="color-scheme" content="light dark">"#))
         XCTAssertTrue(html.contains("color-scheme: light dark"))
-        XCTAssertTrue(html.contains("background: Canvas"))
-        XCTAssertTrue(html.contains("color: CanvasText"))
+    }
+
+    // MARK: - Font check in injection scripts
+
+    func testInjectionScriptContainsFontCheck() {
+        let js = ReaderStyler.injectionScript()
+        XCTAssertTrue(js.contains("document.fonts.check"))
+        XCTAssertTrue(js.contains("Source Serif 4"))
+    }
+
+    func testVocusInjectionScriptContainsFontCheck() {
+        let js = ReaderStyler.vocusInjectionScript()
+        XCTAssertTrue(js.contains("document.fonts.check"))
+    }
+
+    func testAFFInjectionScriptContainsFontCheck() {
+        let js = ReaderStyler.affInjectionScript()
+        XCTAssertTrue(js.contains("document.fonts.check"))
+    }
+
+    // MARK: - No banned fonts across all rulesets
+
+    func testNoGeorgiaAcrossAllRulesets() {
+        XCTAssertFalse(ReaderStyler.ruleset().contains("Georgia"))
+        XCTAssertFalse(ReaderStyler.vocusRuleset().contains("Georgia"))
+        XCTAssertFalse(ReaderStyler.affRuleset().contains("Georgia"))
+    }
+
+    func testNoSFProAcrossAllRulesets() {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+            XCTAssertFalse(css.contains("SF Pro"))
+            XCTAssertFalse(css.contains("-apple-system"))
+        }
     }
 }

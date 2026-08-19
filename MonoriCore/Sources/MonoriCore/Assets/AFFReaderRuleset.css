@@ -2,6 +2,20 @@
   color-scheme: light dark;
 }
 
+/* --- font declarations --- */
+@font-face {
+  font-family: "Source Serif 4";
+  src: local("SourceSerif4Variable-Roman"), local("Source Serif 4");
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif TC";
+  src: local("NotoSerifTC-Regular"), local("Noto Serif TC");
+  font-weight: 200 900;
+  font-display: swap;
+}
+
 /* ── Whitelist approach: hide the site shell, keep #bodyText + #comments ── */
 
 /* Body level: nav headers, standalone ad slots, tracking iframes, consent UI. */
@@ -70,10 +84,11 @@ body {
 /* ── Content styling ── */
 
 #bodyText {
-  max-width: 42em !important;
+  max-width: 34em !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 1em 16px !important;
+  padding: 1em clamp(24px, 6vw, 48px) !important;
+  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
 }
 
 #bodyText p,
@@ -82,33 +97,38 @@ body {
 #bodyText blockquote,
 #bodyText span {
   font-size: var(--monori-font-size, 19px) !important;
-  line-height: var(--monori-line-height, 1.75) !important;
+  line-height: var(--monori-line-height, 1.9) !important;
+}
+
+/* Paragraph spacing */
+#bodyText p {
+  margin-bottom: 0.85em !important;
 }
 
 /* ── Comments styling ── */
 
 section#comments {
-  max-width: 42em !important;
+  max-width: 34em !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 0 16px !important;
+  padding: 0 clamp(24px, 6vw, 48px) !important;
 }
 
 /* ── Background ── */
 
 body {
-  background-color: #faf8f5 !important;
+  background-color: #FBF9F8 !important;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #1c1b19 !important;
+    background-color: #1C1B19 !important;
   }
   #bodyText p,
   #bodyText div,
   #bodyText span,
   #bodyText li,
   #bodyText blockquote {
-    color: #e8e6e3 !important;
+    color: #F2F0ED !important;
   }
 }

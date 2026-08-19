@@ -12,6 +12,13 @@ public enum ReaderStyler {
         return css
     }
 
+    private static let fontCheckSnippet = """
+          document.fonts.ready.then(function () {
+            var ok = document.fonts.check('16px "Source Serif 4"');
+            if (!ok) { console.warn('[Monori] Source Serif 4 not available via local()'); }
+          });
+    """
+
     public static func injectionScript() -> String {
         let css = ruleset()
             .replacingOccurrences(of: "\\", with: "\\\\")
@@ -25,6 +32,7 @@ public enum ReaderStyler {
           style.id = "\(styleElementID)";
           style.textContent = `\(css)`;
           document.documentElement.appendChild(style);
+        \(fontCheckSnippet)
         })();
         """
     }
@@ -51,6 +59,7 @@ public enum ReaderStyler {
           style.id = "\(styleElementID)";
           style.textContent = `\(css)`;
           document.documentElement.appendChild(style);
+        \(fontCheckSnippet)
           function cleanVocusChrome() {
             var content = document.querySelector('.editor-content-block') ||
                           document.querySelector('.lexical-web-theme') ||
@@ -131,6 +140,7 @@ public enum ReaderStyler {
           style.id = "\(styleElementID)";
           style.textContent = `\(css)`;
           document.documentElement.appendChild(style);
+        \(fontCheckSnippet)
         })();
         """
     }
@@ -194,16 +204,32 @@ public enum ReaderStyler {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="color-scheme" content="light dark">
         <style>
+          @font-face {
+            font-family: "Source Serif 4";
+            src: local("SourceSerif4Variable-Roman"), local("Source Serif 4");
+            font-weight: 200 900;
+            font-display: swap;
+          }
+          @font-face {
+            font-family: "Noto Serif TC";
+            src: local("NotoSerifTC-Regular"), local("Noto Serif TC");
+            font-weight: 200 900;
+            font-display: swap;
+          }
           :root { color-scheme: light dark; --monori-font-size: \(size)px; --monori-line-height: \(lh); }
-          html, body { background: Canvas; }
-          body { margin: 0; padding: 16px 18px; color: CanvasText;
-                 font-family: -apple-system, "PingFang TC", "Heiti TC", sans-serif;
-                 word-break: break-word; }
+          html, body { background: #FBF9F8; }
+          body { margin: 0; padding: 1em clamp(24px, 6vw, 48px); color: #1C1B19;
+                 font-family: "Source Serif 4", "Noto Serif TC", serif;
+                 word-break: break-word; max-width: 34em; margin-left: auto; margin-right: auto; }
           /* Google Docs mobilebasic exports inline color:#000000 and
              background-color:#ffffff on every paragraph and span.
              Override them so the page adapts to light/dark mode. */
-          * { color: CanvasText !important; background-color: transparent !important; }
-          html, body { background: Canvas !important; }
+          * { color: inherit !important; background-color: transparent !important; }
+          html, body { background: #FBF9F8 !important; }
+          @media (prefers-color-scheme: dark) {
+            html, body { background: #1C1B19 !important; }
+            body { color: #F2F0ED; }
+          }
           /* Resize prose and everything inside it, but NOT <h1>-<h6> or their
              children, so chapter sub-headings keep their relative size. A bare
              `body span` rule would flatten Google headings, whose text is
@@ -216,6 +242,7 @@ public enum ReaderStyler {
             font-size: var(--monori-font-size) !important;
             line-height: var(--monori-line-height) !important;
           }
+          body p { margin-bottom: 0.85em; }
           img { max-width: 100%; height: auto; }
           blockquote { border-left: 3px solid rgba(128,128,128,0.3);
                        margin: 1em 0; padding: 0.5em 1em; }

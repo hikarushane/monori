@@ -1,7 +1,21 @@
-/* Monori reader ruleset.
+/* Monori reader ruleset — Uguisu Zen.
    Edit selectors here when Patreon markup changes — no rebuild needed beyond
    re-bundling. If selectors stop matching, the page simply renders as plain
    Patreon (graceful degradation, spec §3.2). */
+
+/* --- font declarations --- */
+@font-face {
+  font-family: "Source Serif 4";
+  src: local("SourceSerif4Variable-Roman"), local("Source Serif 4");
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif TC";
+  src: local("NotoSerifTC-Regular"), local("Noto Serif TC");
+  font-weight: 200 900;
+  font-display: swap;
+}
 
 /* --- hide chrome --- */
 /* Comments stay readable: the comment rows and the reply field are
@@ -24,10 +38,12 @@ div[class*="sidebar"] {
 [data-tag="post-content"],
 article,
 .patreon-post-content {
-  max-width: 42em !important;
+  max-width: 34em !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  font-family: Georgia, "Noto Serif TC", "Songti TC", serif !important;
+  padding-left: clamp(24px, 6vw, 48px) !important;
+  padding-right: clamp(24px, 6vw, 48px) !important;
+  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
 }
 
 /* Size/spacing must hit the text nodes themselves — Patreon sets per-paragraph
@@ -38,12 +54,19 @@ article p, article li, article blockquote,
 .patreon-post-content, .patreon-post-content p, .patreon-post-content li,
 .patreon-post-content blockquote, .patreon-post-content span {
   font-size: var(--monori-font-size, 19px) !important;
-  line-height: var(--monori-line-height, 1.75) !important;
+  line-height: var(--monori-line-height, 1.9) !important;
+}
+
+/* Paragraph spacing */
+[data-tag="post-content"] p,
+article p,
+.patreon-post-content p {
+  margin-bottom: 0.85em !important;
 }
 
 [data-tag="post-title"],
 article h1 {
-  font-family: Georgia, "Noto Serif TC", serif !important;
+  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
   line-height: 1.3 !important;
 }
 
@@ -64,9 +87,20 @@ article h1 {
 }
 
 body {
-  background-color: #faf8f5 !important;
+  background-color: #FBF9F8 !important;
 }
 
 @media (prefers-color-scheme: dark) {
-  body { background-color: #1c1b19 !important; }
+  body {
+    background-color: #1C1B19 !important;
+  }
+  [data-tag="post-content"], [data-tag="post-content"] p,
+  [data-tag="post-content"] span, [data-tag="post-content"] li,
+  [data-tag="post-content"] blockquote,
+  article p, article li, article blockquote,
+  .patreon-post-content, .patreon-post-content p,
+  .patreon-post-content span, .patreon-post-content li,
+  .patreon-post-content blockquote {
+    color: #F2F0ED !important;
+  }
 }
