@@ -402,8 +402,7 @@ extension WebViewModel: WKNavigationDelegate {
         guard let url = navigationAction.request.url else { return decisionHandler(.cancel) }
         let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
         let decision = NavigationPolicy.decide(url: url, isMainFrame: isMainFrame)
-        #if DEBUG
-        let navType: String = switch navigationAction.navigationType {
+        let kind: String = switch navigationAction.navigationType {
         case .linkActivated: "link"
         case .formSubmitted: "form"
         case .backForward: "back/fwd"
@@ -412,15 +411,21 @@ extension WebViewModel: WKNavigationDelegate {
         case .other: "other"
         @unknown default: "unknown"
         }
-        print("[NAV] \(navType) main=\(isMainFrame) → \(decision) | \(url.absoluteString.prefix(120))")
-        #endif
+        let surface: NavigationTrace.Surface = (webView === popupWebView) ? .popup : .main
+        if isMainFrame {
+            DiagnosticLog.shared.log(category: "nav",
+                NavigationTrace.line(surface: surface, kind: kind, isMainFrame: isMainFrame,
+                                     decision: decision, url: url))
+        }
         switch decision {
         case .allowInWebView:
-            decisionHandler(Self.allowPolicy(for: url))
+            let policy = Self.allowPolicy(for: url)
+            if isMainFrame {
+                DiagnosticLog.shared.log(category: "nav",
+                    "policy rawValue=\(policy.rawValue) for \(NavigationTrace.redact(url))")
+            }
+            decisionHandler(policy)
         case .openInSafari:
-            #if DEBUG
-            print("[NAV] ⚠️ OPENING IN SAFARI: \(url.absoluteString)")
-            #endif
             decisionHandler(.cancel)
             UIApplication.shared.open(url)
         case .block:
@@ -441,6 +446,32 @@ extension WebViewModel: WKNavigationDelegate {
             }
         }
     }
+
+    func webView(_ webView: WKWebView,
+                 didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+        let surface: NavigationTrace.Surface = (webView === popupWebView) ? .popup : .main
+        if let url = webView.url {
+            DiagnosticLog.shared.log(category: "nav",
+                "\(surface.rawValue) serverRedirect \(NavigationTrace.redact(url))")
+        }
+    }
+
+    func webView(_ webView: WKWebView,
+                 didStartProvisionalNavigation navigation: WKNavigation!) {
+        let surface: NavigationTrace.Surface = (webView === popupWebView) ? .popup : .main
+        if let url = webView.url {
+            DiagnosticLog.shared.log(category: "nav",
+                "\(surface.rawValue) provisionalStart \(NavigationTrace.redact(url))")
+        }
+    }
+
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalNavigation navigation: WKNavigation!,
+                 withError error: Error) {
+        let surface: NavigationTrace.Surface = (webView === popupWebView) ? .popup : .main
+        DiagnosticLog.shared.log(category: "nav",
+            "\(surface.rawValue) provisionalFailed domain=\((error as NSError).domain) code=\((error as NSError).code)")
+    }
 }
 
 extension WebViewModel: WKUIDelegate {
@@ -456,13 +487,15 @@ extension WebViewModel: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let url = navigationAction.request.url else { return nil }
         let decision = NavigationPolicy.decide(url: url, isMainFrame: true)
-        #if DEBUG
-        print("[NAV] window.open / _blank → \(decision) | \(url.absoluteString.prefix(120))")
-        #endif
+        DiagnosticLog.shared.log(category: "nav",
+            NavigationTrace.line(surface: .main, kind: "window.open", isMainFrame: true,
+                                 decision: decision, url: url))
         switch decision {
         case .allowInWebView:
             guard NavigationPolicy.requiresPopupWindow(url) else {
                 webView.load(navigationAction.request)
+                DiagnosticLog.shared.log(category: "nav",
+                    "window.open loaded in main \(NavigationTrace.redact(url))")
                 return nil
             }
             let popup = WKWebView(frame: .zero, configuration: configuration)
@@ -471,7 +504,8 @@ extension WebViewModel: WKUIDelegate {
             popupWebView = popup
             return popup
         case .openInSafari:
-            print("[NAV] ⚠️ OPENING IN SAFARI (popup): \(url.absoluteString)")
+            DiagnosticLog.shared.log(category: "nav",
+                "window.open handed to Safari \(NavigationTrace.redact(url))")
             UIApplication.shared.open(url)
             return nil
         case .block:

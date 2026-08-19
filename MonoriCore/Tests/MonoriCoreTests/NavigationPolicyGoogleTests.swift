@@ -26,6 +26,17 @@ final class NavigationPolicyGoogleTests: XCTestCase {
         XCTAssertEqual(decide("https://content.googleapis.com/x"), .allowInWebView)
     }
 
+    func testAllowsYouTubeDomainsInOAuthFlow() {
+        XCTAssertEqual(decide("https://accounts.youtube.com/accounts/SetSID"), .allowInWebView)
+        XCTAssertEqual(decide("https://youtube.com"), .allowInWebView)
+        XCTAssertEqual(decide("https://www.youtube.com/watch?v=abc"), .allowInWebView)
+    }
+
+    func testRejectsLookalikeDomains() {
+        XCTAssertEqual(decide("https://notyoutube.com"), .openInSafari)
+        XCTAssertEqual(decide("https://notgoogle.com"), .openInSafari)
+    }
+
     func testStillAllowsPatreonAndDefersOthers() {
         XCTAssertEqual(decide("https://www.patreon.com/home"), .allowInWebView)
         XCTAssertEqual(decide("https://example.com/x"), .openInSafari)
