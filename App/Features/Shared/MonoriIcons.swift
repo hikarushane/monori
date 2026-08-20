@@ -12,131 +12,175 @@ import MonoriCore
 // `SourceGlyph`, and it is picked up everywhere `SourceGlyph` is used (the
 // Browse source picker and the Library collection list). Do NOT fall back to
 // `iconSystemName` for user-facing source icons.
+private let monoriSourceStroke = StrokeStyle(
+    lineWidth: 1.5,
+    lineCap: .round,
+    lineJoin: .round
+)
+
+private func vx(_ x: CGFloat, in rect: CGRect) -> CGFloat {
+    rect.minX + rect.width * x / 24
+}
+
+private func vy(_ y: CGFloat, in rect: CGRect) -> CGFloat {
+    rect.minY + rect.height * y / 24
+}
+
+private func point(_ x: CGFloat, _ y: CGFloat, in rect: CGRect) -> CGPoint {
+    CGPoint(x: vx(x, in: rect), y: vy(y, in: rect))
+}
+
+private func scaledRect(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat, in rect: CGRect) -> CGRect {
+    CGRect(
+        x: vx(x, in: rect),
+        y: vy(y, in: rect),
+        width: rect.width * w / 24,
+        height: rect.height * h / 24
+    )
+}
+
+private func scaledValue(_ value: CGFloat, in rect: CGRect) -> CGFloat {
+    min(rect.width, rect.height) * value / 24
+}
+
+// MARK: - Monori icon system
+//
+// Every source icon and bottom-navigator icon in Monori is a hand-drawn
+// geometric `Shape`, never an SF Symbol. The style is minimal and constructed
+// from primitives so the whole set reads as one family and tints to a single
+// accent.
+//
+// Adding a new source: draw its mark as a `Shape` here, add a `case` to
+// `SourceGlyph`, and it is picked up everywhere `SourceGlyph` is used.
 
 // MARK: Source marks
 
-/// Patreon brand mark: a vertical rounded bar beside a circle (a pared-down "P").
+/// Patreon mark: outlined circle + rounded bar.
 struct PatreonMark: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
-        var path = Path()
-        path.addRoundedRect(
-            in: CGRect(x: w * 0.12, y: h * 0.2, width: w * 0.24, height: h * 0.6),
-            cornerSize: CGSize(width: w * 0.06, height: w * 0.06))
-        path.addEllipse(in: CGRect(x: w * 0.44, y: h * 0.2, width: w * 0.42, height: w * 0.42))
-        return path
+        var p = Path()
+        p.addEllipse(in: scaledRect(11, 3, 10, 10, in: rect))
+        p.addRoundedRect(
+            in: scaledRect(3, 3, 4, 18, in: rect),
+            cornerSize: CGSize(width: scaledValue(1, in: rect), height: scaledValue(1, in: rect))
+        )
+        return p
     }
 }
 
-/// Google Drive mark: an outlined triangle.
-struct DriveMark: Shape {
+/// Google Docs source mark, based on the provided triangular geometric icon.
+struct GoogleDocsMark: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
-        var path = Path()
-        path.move(to: CGPoint(x: w * 0.5, y: h * 0.1))
-        path.addLine(to: CGPoint(x: w * 0.93, y: h * 0.8))
-        path.addLine(to: CGPoint(x: w * 0.07, y: h * 0.8))
-        path.closeSubpath()
-        return path
+        var p = Path()
+
+        // Outer triangle
+        p.move(to: point(12, 3, in: rect))
+        p.addLine(to: point(21, 19, in: rect))
+        p.addLine(to: point(3, 19, in: rect))
+        p.closeSubpath()
+
+        // Inner lines from center to three vertices
+        p.move(to: point(12, 13.6, in: rect))
+        p.addLine(to: point(12, 3, in: rect))
+
+        p.move(to: point(12, 13.6, in: rect))
+        p.addLine(to: point(3, 19, in: rect))
+
+        p.move(to: point(12, 13.6, in: rect))
+        p.addLine(to: point(21, 19, in: rect))
+
+        return p
     }
 }
 
-/// AO3 mark: an open book — two angled pages meeting at a center spine.
+/// AO3 mark: geometric A + O + 3.
 struct AO3Mark: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
         var p = Path()
-        p.move(to: CGPoint(x: w * 0.50, y: h * 0.82))
-        p.addLine(to: CGPoint(x: w * 0.08, y: h * 0.72))
-        p.addLine(to: CGPoint(x: w * 0.08, y: h * 0.18))
-        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.28))
-        p.closeSubpath()
-        p.move(to: CGPoint(x: w * 0.50, y: h * 0.82))
-        p.addLine(to: CGPoint(x: w * 0.92, y: h * 0.72))
-        p.addLine(to: CGPoint(x: w * 0.92, y: h * 0.18))
-        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.28))
-        p.closeSubpath()
+
+        p.move(to: point(4, 20, in: rect))
+        p.addLine(to: point(10, 4, in: rect))
+        p.addLine(to: point(12, 4, in: rect))
+
+        p.move(to: point(7, 12, in: rect))
+        p.addLine(to: point(17, 12, in: rect))
+
+        p.addEllipse(in: scaledRect(8.5, 8.5, 7, 7, in: rect))
+
+        p.move(to: point(16, 4, in: rect))
+        p.addArc(
+            center: point(16, 8, in: rect),
+            radius: scaledValue(4, in: rect),
+            startAngle: .degrees(-90),
+            endAngle: .degrees(90),
+            clockwise: false
+        )
+        p.addArc(
+            center: point(16, 16, in: rect),
+            radius: scaledValue(4, in: rect),
+            startAngle: .degrees(-90),
+            endAngle: .degrees(90),
+            clockwise: false
+        )
+
         return p
     }
 }
 
-/// Vocus (方格子) mark: a 2×2 grid of outlined squares with generous gaps —
-/// lighter than the filled version for better small-size legibility.
+/// Vocus mark: 2×2 rounded-square grid.
 struct VocusMark: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
-        let inset: CGFloat = 0.10
-        let gap = w * 0.14
-        let usable = w * (1 - 2 * inset) - gap
-        let cell = usable / 2
-        let x0 = w * inset
-        let x1 = x0 + cell + gap
-        let y0 = h * inset
-        let y1 = y0 + cell + gap
-        let r = CGSize(width: cell * 0.18, height: cell * 0.18)
+        let corner = CGSize(width: scaledValue(1, in: rect), height: scaledValue(1, in: rect))
         var p = Path()
-        p.addRoundedRect(in: CGRect(x: x0, y: y0, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: x1, y: y0, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: x0, y: y1, width: cell, height: cell), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: x1, y: y1, width: cell, height: cell), cornerSize: r)
+
+        p.addRoundedRect(in: scaledRect(4, 4, 7, 7, in: rect), cornerSize: corner)
+        p.addRoundedRect(in: scaledRect(13, 4, 7, 7, in: rect), cornerSize: corner)
+        p.addRoundedRect(in: scaledRect(4, 13, 7, 7, in: rect), cornerSize: corner)
+        p.addRoundedRect(in: scaledRect(13, 13, 7, 7, in: rect), cornerSize: corner)
+
         return p
     }
 }
 
-/// AsianFanfics mark: a centered silhouette (head + shoulders) above an open
-/// book — "a reader". Filled.
+/// AsianFanfics mark: three vertical bars above a V-shaped book base.
 struct AFFMark: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
         var p = Path()
 
-        // Head
-        p.addEllipse(in: CGRect(
-            x: w * 0.34, y: h * 0.04,
-            width: w * 0.32, height: w * 0.32
-        ))
+        p.move(to: point(8, 6, in: rect))
+        p.addLine(to: point(8, 14, in: rect))
 
-        // Shoulders
-        p.addEllipse(in: CGRect(
-            x: w * 0.18, y: h * 0.36,
-            width: w * 0.64, height: h * 0.16
-        ))
+        p.move(to: point(12, 6, in: rect))
+        p.addLine(to: point(12, 15.5, in: rect))
 
-        // Open book — left page
-        p.move(to: CGPoint(x: w * 0.10, y: h * 0.58))
-        p.addLine(to: CGPoint(x: w * 0.47, y: h * 0.62))
-        p.addLine(to: CGPoint(x: w * 0.47, y: h * 0.72))
-        p.addLine(to: CGPoint(x: w * 0.10, y: h * 0.86))
-        p.closeSubpath()
+        p.move(to: point(16, 6, in: rect))
+        p.addLine(to: point(16, 14, in: rect))
 
-        // Open book — right page
-        p.move(to: CGPoint(x: w * 0.53, y: h * 0.62))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.58))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.86))
-        p.addLine(to: CGPoint(x: w * 0.53, y: h * 0.72))
-        p.closeSubpath()
+        p.move(to: point(4, 17, in: rect))
+        p.addLine(to: point(12, 20, in: rect))
+        p.addLine(to: point(20, 17, in: rect))
 
         return p
     }
 }
 
 /// The shared source icon. One source of truth for the Browse source picker and
-/// the Library collection list, so the two never drift. Renders with the current
-/// foreground style, so callers tint it via `.foregroundStyle(...)`.
+/// the Library collection list.
 struct SourceGlyph: View {
     let kind: SourceKind
+
     var body: some View {
         switch kind {
         case .patreon:
-            PatreonMark().fill(.foreground)
+            PatreonMark().stroke(.foreground, style: monoriSourceStroke)
         case .googleDocs:
-            DriveMark().stroke(.foreground, lineWidth: 1.5)
+            GoogleDocsMark().stroke(.foreground, style: monoriSourceStroke)
         case .ao3:
-            AO3Mark().stroke(.foreground, lineWidth: 1.5)
+            AO3Mark().stroke(.foreground, style: monoriSourceStroke)
         case .vocus:
-            VocusMark().stroke(.foreground, style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
+            VocusMark().stroke(.foreground, style: monoriSourceStroke)
         case .asianFanfics:
-            AFFMark().fill(.foreground)
+            AFFMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
 }
@@ -158,60 +202,114 @@ struct DropdownChevron: Shape {
 
 // MARK: Bottom-navigator marks
 
-/// Browse: a globe — outer circle, a meridian ellipse, and an equator hairline.
-struct BrowseGlobe: Shape {
+/// Browse: outlined globe + inner compass diamond.
+struct BrowseCompass: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
         var p = Path()
-        p.addEllipse(in: CGRect(x: w * 0.08, y: h * 0.08, width: w * 0.84, height: h * 0.84))
-        p.addEllipse(in: CGRect(x: w * 0.34, y: h * 0.08, width: w * 0.32, height: h * 0.84))
-        p.move(to: CGPoint(x: w * 0.10, y: h * 0.5))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.5))
+
+        p.addEllipse(in: scaledRect(2, 2, 20, 20, in: rect))
+
+        p.move(to: point(16.24, 7.76, in: rect))
+        p.addLine(to: point(14.12, 14.12, in: rect))
+        p.addLine(to: point(7.76, 16.24, in: rect))
+        p.addLine(to: point(9.88, 9.88, in: rect))
+        p.closeSubpath()
+
         return p
     }
 }
 
-/// Library: three upright rounded "spines" of varying height — the same
-/// shelved-books motif as the app icon. Filled, like `PatreonMark`.
-struct LibraryBooks: Shape {
+/// Library: outlined bookshelf.
+struct LibraryBookshelf: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
-        let bw = w * 0.18
-        let r = CGSize(width: w * 0.045, height: w * 0.045)
         var p = Path()
-        p.addRoundedRect(in: CGRect(x: w * 0.14, y: h * 0.30, width: bw, height: h * 0.58), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: w * 0.41, y: h * 0.14, width: bw, height: h * 0.74), cornerSize: r)
-        p.addRoundedRect(in: CGRect(x: w * 0.68, y: h * 0.36, width: bw, height: h * 0.52), cornerSize: r)
+
+        p.move(to: point(4, 19.5, in: rect))
+        p.addQuadCurve(
+            to: point(6.5, 17, in: rect),
+            control: point(4.35, 17.35, in: rect)
+        )
+        p.addLine(to: point(20, 17, in: rect))
+
+        p.move(to: point(6.5, 2, in: rect))
+        p.addLine(to: point(20, 2, in: rect))
+        p.addLine(to: point(20, 22, in: rect))
+        p.addLine(to: point(6.5, 22, in: rect))
+        p.addQuadCurve(
+            to: point(4, 19.5, in: rect),
+            control: point(4.35, 21.65, in: rect)
+        )
+        p.addLine(to: point(4, 4.5, in: rect))
+        p.addQuadCurve(
+            to: point(6.5, 2, in: rect),
+            control: point(4.35, 2.35, in: rect)
+        )
+        p.closeSubpath()
+
+        p.move(to: point(8, 6, in: rect))
+        p.addLine(to: point(18, 6, in: rect))
+
+        p.move(to: point(8, 10, in: rect))
+        p.addLine(to: point(18, 10, in: rect))
+
+        p.move(to: point(8, 14, in: rect))
+        p.addLine(to: point(18, 14, in: rect))
+
         return p
     }
 }
 
-/// Settings: two control sliders — full-width hairlines, each with a knob at a
-/// different position. Outlined, like `DriveMark`.
-struct SettingsSliders: Shape {
+/// Settings: gear outline + center hole.
+/// Note: this is a hand-built geometric gear in the same 24×24 coordinate space,
+/// not an SVG-path parser output.
+struct SettingsGear: Shape {
     func path(in rect: CGRect) -> Path {
-        let w = rect.width, h = rect.height
-        let knob = w * 0.12
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let outer = scaledValue(10, in: rect)
+        let inner = scaledValue(8.1, in: rect)
+        let hole = scaledValue(3, in: rect)
+
         var p = Path()
-        p.move(to: CGPoint(x: w * 0.1, y: h * 0.34))
-        p.addLine(to: CGPoint(x: w * 0.9, y: h * 0.34))
-        p.addEllipse(in: CGRect(x: w * 0.62 - knob / 2, y: h * 0.34 - knob / 2, width: knob, height: knob))
-        p.move(to: CGPoint(x: w * 0.1, y: h * 0.66))
-        p.addLine(to: CGPoint(x: w * 0.9, y: h * 0.66))
-        p.addEllipse(in: CGRect(x: w * 0.34 - knob / 2, y: h * 0.66 - knob / 2, width: knob, height: knob))
+
+        for i in 0..<16 {
+            let radius = i.isMultiple(of: 2) ? outer : inner
+            let degrees = -90.0 + Double(i) * 22.5
+            let radians = degrees * .pi / 180
+
+            let pt = CGPoint(
+                x: center.x + CGFloat(cos(radians)) * radius,
+                y: center.y + CGFloat(sin(radians)) * radius
+            )
+
+            if i == 0 {
+                p.move(to: pt)
+            } else {
+                p.addLine(to: pt)
+            }
+        }
+        p.closeSubpath()
+
+        p.addEllipse(
+            in: CGRect(
+                x: center.x - hole,
+                y: center.y - hole,
+                width: hole * 2,
+                height: hole * 2
+            )
+        )
+
         return p
     }
 }
 
 /// Pre-rendered template images for the three tab items. `TabView.tabItem` wants
 /// an `Image` (which the system tints for selected/unselected), so each glyph is
-/// rasterised once as an always-template image. Computed lazily on first use
-/// from the SwiftUI main-actor render path.
+/// rasterised once as an always-template image.
 @MainActor
 enum MonoriTabIcon {
-    static let browse = filledOrStroked(BrowseGlobe(), filled: false)
-    static let library = filledOrStroked(LibraryBooks(), filled: true)
-    static let settings = filledOrStroked(SettingsSliders(), filled: false)
+    static let browse = filledOrStroked(BrowseCompass(), filled: false)
+    static let library = filledOrStroked(LibraryBookshelf(), filled: false)
+    static let settings = filledOrStroked(SettingsGear(), filled: false)
 
     private static func filledOrStroked<S: Shape>(_ shape: S, filled: Bool, size: CGFloat = 27) -> Image {
         let canvas = CGSize(width: size, height: size)
@@ -219,8 +317,10 @@ enum MonoriTabIcon {
             if filled {
                 shape.fill(Color.black)
             } else {
-                shape.stroke(Color.black,
-                             style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                shape.stroke(
+                    Color.black,
+                    style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round)
+                )
             }
         }
         .frame(width: size, height: size)
