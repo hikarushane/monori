@@ -5,6 +5,7 @@ struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
     @State private var activeKind: SourceKind = .patreon
     @State private var isPickerExpanded = false
+    @State private var showImportConfirmation = false
 
     /// The web view shown for the selected source. Each source owns a distinct
     /// WebViewModel -- and thus a distinct WKWebView and back/forward history --
@@ -23,7 +24,7 @@ struct BrowseView: View {
     var body: some View {
         VStack(spacing: 0) {
             sourcePicker
-            WebCollectionBanner(model: activeModel)
+            WebCollectionBanner(model: activeModel, showImportConfirmation: $showImportConfirmation)
             PatreonWebView(model: activeModel,
                            allowBackSwipe: {
                 BackSwipePolicy.browseDecision(currentURL: activeModel.currentURL,
@@ -43,6 +44,15 @@ struct BrowseView: View {
                 }
             }
         }
+        .overlay {
+            if showImportConfirmation {
+                ImportConfirmationOverlay(importedCount: env.importedCountThisSession) {
+                    showImportConfirmation = false
+                }
+                .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: showImportConfirmation)
         .onAppear { ensureLoaded(activeKind) }
         .sheet(isPresented: Binding(
             get: { activeModel.popupWebView != nil },

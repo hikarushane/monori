@@ -11,6 +11,7 @@ struct ReaderView: View {
     /// center of the page toggles it.
     @State private var chromeVisible = false
     @State private var showPrefsPanel = false
+    @State private var showImportConfirmation = false
     /// Non-nil while the web view shows a page outside the library (e.g. a related
     /// post from a collection that has not been imported). Holds the display title.
     @State private var foreignPageTitle: String?
@@ -67,6 +68,15 @@ struct ReaderView: View {
                 }
                 .overlay(alignment: .top) { swipeTopIndicator }
                 .overlay(alignment: .bottom) { swipeBottomIndicator }
+                .overlay {
+                    if showImportConfirmation {
+                        ImportConfirmationOverlay(importedCount: env.importedCountThisSession) {
+                            showImportConfirmation = false
+                        }
+                        .transition(.opacity)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.3), value: showImportConfirmation)
                 .onAppear { open(current) }
                 .onDisappear {
                     saveScrollPosition()
@@ -111,7 +121,7 @@ struct ReaderView: View {
             VStack(spacing: 0) {
                 topBar
                 if foreignPageTitle != nil {
-                    WebCollectionBanner(model: env.reader)
+                    WebCollectionBanner(model: env.reader, showImportConfirmation: $showImportConfirmation)
                 }
                 if showPrefsPanel {
                     ReaderPreferencesPanel(prefs: prefs)

@@ -8,24 +8,20 @@ private let bannerLog = Logger(subsystem: "dev.monori", category: "smoke-diagnos
 /// chapter import; on a post that links to a collection it shows the series
 /// name with a shortcut to open that collection. Used by both the Browse tab
 /// and the reader.
+///
+/// The post-import confirmation popup itself (`ImportConfirmationOverlay`) is
+/// rendered by the caller (BrowseView / ReaderView), anchored to their own
+/// full-screen root — a `.overlay` attached to this banner would only cover
+/// the banner's own frame (which can be a collapsed/near-zero size outside a
+/// collection page), not the whole screen. This view only owns the trigger.
 struct WebCollectionBanner: View {
     @Environment(AppEnvironment.self) private var env
     let model: WebViewModel
-    @State private var showImportConfirmation = false
+    @Binding var showImportConfirmation: Bool
     @State private var importing = false
 
     var body: some View {
         banner
-            .alert(env.importedCountThisSession == 0 ? "未找到章節" : "已匯入章節",
-                   isPresented: $showImportConfirmation) {
-                Button("確定") {}
-            } message: {
-                if env.importedCountThisSession == 0 {
-                    Text("此頁面未找到章節連結。請確認收藏頁面已完全載入後再試一次。")
-                } else {
-                    Text("已匯入 \(env.importedCountThisSession) 個章節。已匯入的章節會合併，不會重複。")
-                }
-            }
     }
 
     @ViewBuilder
@@ -191,5 +187,93 @@ struct WebCollectionBanner: View {
                     .fill(MonoriPalette.divider)
                     .frame(height: 1)
             }
+    }
+}
+
+/// Full-screen confirmation modal shown after a chapter import attempt.
+/// Replaces the system `.alert` with a custom Washi White card over a
+/// charcoal scrim, matching the Uguisu Zen "已匯入章節" design.
+///
+/// Mounted by the caller (BrowseView / ReaderView) as a `.overlay` on their
+/// own full-screen root — see the note on `WebCollectionBanner` above.
+struct ImportConfirmationOverlay: View {
+    let importedCount: Int
+    let onConfirm: () -> Void
+
+    private var title: String {
+        importedCount == 0 ? "未找到章節" : "已匯入章節"
+    }
+
+    private var message: String {
+        importedCount == 0
+            ? "此頁面未找到章節連結。請確認收藏頁面已完全載入後再試一次。"
+            : "已匯入 \(importedCount) 個章節。已匯入的章節會合併，不會重複。"
+    }
+
+    /// Tailwind's `bg-charcoal/20` (#333333 @ 20%). Not a DESIGN.md palette
+    /// role (Sumi Ink is the closest existing near-black), so it is kept as
+    /// a scoped literal here rather than added as a new global token.
+    private var scrim: Color {
+        Color(red: 0x33 / 255, green: 0x33 / 255, blue: 0x33 / 255).opacity(0.2)
+    }
+
+    var body: some View {
+        ZStack {
+            scrim
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+
+            VStack(spacing: 0) {
+                Image("LaunchMark")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 48, height: 48)
+                    .accessibilityHidden(true)
+                    .padding(.bottom, MonoriSpacing.x2)
+
+                Text(title)
+                    .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .medium))
+                    .foregroundStyle(MonoriPalette.ink)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, MonoriSpacing.x1)
+
+                Text(message)
+                    .font(MonoriTypography.ui(16, relativeTo: .body))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, MonoriSpacing.x3)
+
+                Button(action: onConfirm) {
+                    Text("確定")
+                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .bold))
+                        .foregroundStyle(MonoriPalette.canvas)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(MonoriPalette.brandAccent,
+                                    in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                }
+                .buttonStyle(ImportConfirmButtonStyle())
+                .accessibilityLabel("確定")
+            }
+            .padding(MonoriSpacing.x3)
+            .frame(maxWidth: 320)
+            .background(MonoriPalette.canvas)
+            .overlay {
+                RoundedRectangle(cornerRadius: MonoriRadius.container)
+                    .stroke(MonoriPalette.divider, lineWidth: 1)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: MonoriRadius.container))
+            .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 8)
+            .padding(.horizontal, MonoriSpacing.x4)
+        }
+    }
+}
+
+private struct ImportConfirmButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
