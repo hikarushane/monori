@@ -8,13 +8,13 @@ struct LibraryView: View {
     @Query private var allCollections: [LocalCollectionModel]
     @State private var sortOrder: LibrarySortOrder = .title
     @State private var searchText = ""
-    @State private var statusFilter: CollectionReadingStatus?
     @State private var sourceFilter: SourceKind?
     @State private var showsSearch = false
+    @State private var showsSortMenu = false
 
     private var collections: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: sortOrder,
-                           searchText: searchText, status: statusFilter)
+                           searchText: searchText, status: nil)
             .filter { sourceFilter == nil || $0.sourceKind == sourceFilter }
     }
 
@@ -33,6 +33,26 @@ struct LibraryView: View {
             .sheet(isPresented: $showsSearch) {
                 LibrarySearchSheet(allCollections: allCollections,
                                    searchText: $searchText)
+            }
+            .overlay {
+                if showsSortMenu {
+                    Color.black.opacity(0.001)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                showsSortMenu = false
+                            }
+                        }
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if showsSortMenu {
+                    sortDropdown
+                        .padding(.top, MonoriSpacing.x1)
+                        .padding(.trailing, MonoriSpacing.x3)
+                        .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                            .combined(with: .opacity))
+                }
             }
             .overlay(alignment: .bottom) { runningOverlay }
             .task { env.autoCheck.runIfDue() }
@@ -64,13 +84,18 @@ struct LibraryView: View {
                     .accessibilityLabel("搜尋書庫")
                     .accessibilityIdentifier("smoke.librarySearchButton")
 
-                    Menu {
-                        sortFilterMenu
+                    Button {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsSortMenu.toggle()
+                        }
                     } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .semibold))
+                        SortIcon()
+                            .stroke(MonoriPalette.ink,
+                                    style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                            .frame(width: 20, height: 20)
                             .frame(width: 32, height: 32)
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel("書庫選項")
                     .accessibilityIdentifier("smoke.librarySortMenu")
                 }
@@ -163,19 +188,57 @@ struct LibraryView: View {
         }
     }
 
-    @ViewBuilder
-    private var sortFilterMenu: some View {
-        Picker("排序", selection: $sortOrder) {
-            Text("標題").tag(LibrarySortOrder.title)
-            Text("最近更新").tag(LibrarySortOrder.recentlyUpdated)
-            Text("最近閱讀").tag(LibrarySortOrder.recentlyRead)
+    private var sortDropdown: some View {
+        VStack(spacing: 0) {
+            menuOptionRow("標題", selected: sortOrder == .title) { sortOrder = .title }
+            menuGroupDivider()
+            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated) { sortOrder = .recentlyUpdated }
+            menuGroupDivider()
+            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead) { sortOrder = .recentlyRead }
+            menuGroupDivider()
+            menuOptionRow("來源", selected: sortOrder == .source) { sortOrder = .source }
         }
-        Picker("閱讀狀態", selection: $statusFilter) {
-            Text("全部").tag(CollectionReadingStatus?.none)
-            ForEach(CollectionReadingStatus.allCases, id: \.self) { status in
-                Text(status.label).tag(CollectionReadingStatus?.some(status))
+        .background(MonoriPalette.surface,
+                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+        .overlay {
+            RoundedRectangle(cornerRadius: MonoriRadius.container)
+                .stroke(MonoriPalette.divider, lineWidth: 1)
+        }
+        .frame(width: 200)
+    }
+
+    private func menuOptionRow(_ title: String, selected: Bool,
+                               action: @escaping () -> Void) -> some View {
+        Button {
+            action()
+            withAnimation(.easeOut(duration: 0.15)) {
+                showsSortMenu = false
             }
+        } label: {
+            HStack {
+                Text(title)
+                    .font(MonoriTypography.ui(16, relativeTo: .body,
+                                              weight: selected ? .semibold : .regular))
+                    .foregroundStyle(MonoriPalette.ink)
+                Spacer()
+                if selected {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(MonoriPalette.ink)
+                }
+            }
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+    }
+
+    private func menuGroupDivider() -> some View {
+        Rectangle()
+            .fill(MonoriPalette.divider)
+            .frame(height: 1)
+            .padding(.horizontal, MonoriSpacing.x3)
     }
 
     @ViewBuilder
@@ -261,6 +324,26 @@ struct LibraryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(MonoriSpacing.x3)
+    }
+}
+
+private struct SortIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        let s = min(rect.width, rect.height) / 24
+        var p = Path()
+        p.move(to: CGPoint(x: 17*s, y: 4*s))
+        p.addLine(to: CGPoint(x: 17*s, y: 20*s))
+        p.move(to: CGPoint(x: 17*s, y: 20*s))
+        p.addLine(to: CGPoint(x: 13*s, y: 16*s))
+        p.move(to: CGPoint(x: 17*s, y: 20*s))
+        p.addLine(to: CGPoint(x: 21*s, y: 16*s))
+        p.move(to: CGPoint(x: 7*s, y: 20*s))
+        p.addLine(to: CGPoint(x: 7*s, y: 4*s))
+        p.move(to: CGPoint(x: 7*s, y: 4*s))
+        p.addLine(to: CGPoint(x: 3*s, y: 8*s))
+        p.move(to: CGPoint(x: 7*s, y: 4*s))
+        p.addLine(to: CGPoint(x: 11*s, y: 8*s))
+        return p
     }
 }
 

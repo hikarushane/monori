@@ -15,6 +15,7 @@ struct CollectionTOCView: View {
     @State private var showRefreshResult = false
     @State private var renameTarget: LocalChapterModel?
     @State private var renameText = ""
+    @State private var showsOptionsMenu = false
 
     private var chapters: [LocalChapterModel] { env.store.orderedChapters(of: collection) }
 
@@ -47,53 +48,102 @@ struct CollectionTOCView: View {
         }
     }
 
-    // Extracted so the get/set closures don't bloat the toolbar ViewBuilder
-    // expression past the type-checker's time budget.
-    private var readingStatusBinding: Binding<CollectionReadingStatus> {
-        Binding(get: { collection.readingStatus },
-                set: { env.store.setReadingStatus($0, for: collection) })
-    }
+    private var optionsDropdown: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(CollectionReadingStatus.allCases.enumerated()), id: \.offset) { index, status in
+                if index > 0 { dropdownDivider() }
+                dropdownRadioRow(status.label, selected: collection.readingStatus == status) {
+                    env.store.setReadingStatus(status, for: collection)
+                }
+            }
 
-    // The ••• menu content lives here so the toolbar expression stays small
-    // enough for the Swift type-checker (inlining it times out compilation).
-    @ViewBuilder
-    private var chapterOptionsMenu: some View {
-        Picker("閱讀狀態", selection: readingStatusBinding) {
-            ForEach(CollectionReadingStatus.allCases, id: \.self) { status in
-                Text(status.label).tag(status)
+            Rectangle().fill(MonoriPalette.divider).frame(height: 1)
+
+            dropdownActionRow("全部標示為已閱讀", disabled: collection.unreadCount == 0) {
+                env.store.markAllRead(collection)
+            }
+            .accessibilityIdentifier("smoke.markAllReadButton")
+
+            dropdownDivider()
+
+            dropdownActionRow("反轉順序") {
+                collection.sortDirection =
+                    collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
+            }
+
+            if collection.sourceKind.supportsAutoCheck {
+                dropdownDivider()
+                dropdownActionRow("檢查新章節") {
+                    refreshing = true
+                    Task {
+                        refreshOutcome = await env.refreshCollection(collection)
+                        env.store.recordCheck(collection)
+                        refreshing = false
+                        showRefreshResult = true
+                    }
+                }
+                .accessibilityIdentifier("smoke.refreshChaptersButton")
             }
         }
         .accessibilityIdentifier("smoke.collectionStatusMenu")
-        Button {
-            env.store.markAllRead(collection)
-        } label: {
-            Label("全部標示為已閱讀", systemImage: "checkmark.circle")
+        .background(MonoriPalette.surface,
+                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+        .overlay {
+            RoundedRectangle(cornerRadius: MonoriRadius.container)
+                .stroke(MonoriPalette.divider, lineWidth: 1)
         }
-        .disabled(collection.unreadCount == 0)
-        .accessibilityIdentifier("smoke.markAllReadButton")
+        .frame(width: 220)
+    }
+
+    private func dropdownRadioRow(_ title: String, selected: Bool,
+                                  action: @escaping () -> Void) -> some View {
         Button {
-            collection.sortDirection =
-                collection.sortDirection == .oldestToNewest ? .newestToOldest : .oldestToNewest
+            action()
+            withAnimation(.easeOut(duration: 0.15)) { showsOptionsMenu = false }
         } label: {
-            Label("反轉順序", systemImage: "arrow.up.arrow.down")
-        }
-        if collection.sourceKind.supportsAutoCheck {
-            Button {
-                refreshing = true
-                Task {
-                    refreshOutcome = await env.refreshCollection(collection)
-                    env.store.recordCheck(collection)
-                    refreshing = false
-                    showRefreshResult = true
+            HStack {
+                Text(title)
+                    .font(MonoriTypography.ui(16, relativeTo: .body,
+                                              weight: selected ? .semibold : .regular))
+                    .foregroundStyle(MonoriPalette.ink)
+                Spacer()
+                if selected {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(MonoriPalette.ink)
                 }
-            } label: {
-                Label("檢查新章節", systemImage: "arrow.triangle.2.circlepath")
             }
-            .accessibilityIdentifier("smoke.refreshChaptersButton")
-        } else {
-            Label("此來源不支援檢查新章節", systemImage: "arrow.triangle.2.circlepath")
-                .foregroundStyle(.secondary)
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+    }
+
+    private func dropdownActionRow(_ title: String, disabled: Bool = false,
+                                   action: @escaping () -> Void) -> some View {
+        Button {
+            action()
+            withAnimation(.easeOut(duration: 0.15)) { showsOptionsMenu = false }
+        } label: {
+            Text(title)
+                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .regular))
+                .foregroundStyle(MonoriPalette.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, MonoriSpacing.x3)
+                .padding(.vertical, MonoriSpacing.x2)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.4 : 1)
+    }
+
+    private func dropdownDivider() -> some View {
+        Rectangle()
+            .fill(MonoriPalette.divider)
+            .frame(height: 1)
+            .padding(.horizontal, MonoriSpacing.x3)
     }
 
     var body: some View {
@@ -154,8 +204,10 @@ struct CollectionTOCView: View {
                         .frame(width: 44, height: 44)
                         .accessibilityIdentifier("smoke.refreshChaptersButton")
                 } else {
-                    Menu {
-                        chapterOptionsMenu
+                    Button {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsOptionsMenu.toggle()
+                        }
                     } label: {
                         Image(systemName: "ellipsis")
                             .font(MonoriTypography.ui(18, relativeTo: .title3, weight: .semibold))
@@ -174,6 +226,26 @@ struct CollectionTOCView: View {
                 Rectangle()
                     .fill(MonoriPalette.divider)
                     .frame(height: 1)
+            }
+        }
+        .overlay {
+            if showsOptionsMenu {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsOptionsMenu = false
+                        }
+                    }
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if showsOptionsMenu {
+                optionsDropdown
+                    .padding(.top, MonoriSpacing.x1)
+                    .padding(.trailing, MonoriSpacing.x2)
+                    .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                        .combined(with: .opacity))
             }
         }
         .fullScreenCover(item: $readerTarget) { target in
