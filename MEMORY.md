@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-19（Uguisu Zen 設計系統重寫；Google Docs OAuth popup navigationDelegate 修復；AFF 改版修復見 ADR-0009）
+> 最後更新：2026-08-20（Reader dark mode 黑色遮罩／原生深色背景修復，5 來源全過）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -34,6 +34,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | WebView 身分 | `applicationNameForUserAgent = BrowserIdentity.userAgentSuffix`（`Version/18.7 Safari/604.1`），對外呈現為 Safari | → docs/decisions/0008-identify-as-safari-in-user-agent.md | active | 2026-08-12 |
 | Facebook OAuth 主機 | `decide` 用 `.facebook.com` suffix match、`requiresPopupWindow` 用 `m.` / `www.` 精確比對 | OAuth 流程會在 `m.` / `www.` / `staticxx.` 之間跳，收窄成單一主機會讓登入半途壞掉；popup 判定維持 ADR-0007 的精確比對防 lookalike | active | 2026-08-12 |
 | AsianFanfics 選擇器策略 | 錨定 `data-toc-chapter` 屬性與「第一個含 `<h1>` 的 `<header>`」，不用 Tailwind utility class | → docs/decisions/0009-asianfanfics-2026-redesign-selectors.md | active | 2026-08-15 |
+| Reader dark mode 背景修復策略 | 依頁面型態分流：server-rendered（AFF）用 CSS 級聯；SPA（Patreon）改用 JS 祖先鏈精準清除 | → docs/decisions/0010-reader-dark-mode-background-strategy.md | active | 2026-08-20 |
 
 ## 規範
 ### Patreon DOM
@@ -201,6 +202,9 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 
 - **`evaluateJavaScript` 診斷排序陷阱**（2026-06-19）：診斷 JS 若排在 `injectionScript()` 之前，拿到的 computed style 是注入前狀態 → 顯示「白底」誤導分析。診斷要排在注入後才能看到 injected CSS 的效果。
   📍 出現位置：`App/Features/Reader/ReaderView.swift` `applyReaderTreatment()`（debug probe 陷阱）
+
+- **Reader dark mode 黑色遮罩／原生深色背景（多來源，2026-08-20）**：AO3／Google Docs 文章在 dark mode 呈現黑色遮罩（文字不可見）；Patreon／AFF 背景是網站原生深色而非 Monori 色彩；只有 Vocus 正常。診斷 JS（`window.matchMedia('(prefers-color-scheme: dark)').matches` + computed style）證實：`prefers-color-scheme: dark` 在所有來源都正確 match，body 背景也都正確是 `#1C1B19`，問題出在兩層：(1) stored HTML（Google Docs）的 `wrappedDocument()` 用 `* { color: inherit !important }`，把 `<html>` 的 color 強制成 initial value（黑），dark mode 的 `body { color: #F2F0ED }` 沒有 `!important` 因而輸掉——AO3 走同一份 URL-loaded ruleset，其 dark mode 文字選擇器沒涵蓋 AO3 專屬 DOM，同樣顯示黑字；(2) 中間容器元素保留各網站原生深色背景，蓋掉 body 背景——只有 `VocusReaderRuleset.css` 有 6 層 `background-color: inherit !important` 級聯才正常。修法：`wrappedDocument()` 的 `* { color: inherit }` 縮小為 `body *`，dark mode `body { color }` 加 `!important`；`ReaderRuleset.css`／`AFFReaderRuleset.css` 補齊 dark mode text color `!important`。**背景級聯不要直接複製 Vocus 的 CSS `body > * { background-color: inherit !important }` 6 層寫法**——套到 `ReaderRuleset.css`（Patreon）會讓文章整個空白，因為 Patreon 是 React SPA，暴力覆寫所有中間容器背景連動破壞版面必要樣式；改用 JS `clearAncestorBg()`，只沿實際內容容器（`[data-tag="post-content"]`／`.patreon-post-content`／`article`）的祖先鏈精準清除背景，才沒有副作用。AFF 因為是傳統 server-rendered 頁面，CSS 級聯沒有這個副作用，維持原本寫法。
+  📍 出現位置：`MonoriCore/Sources/MonoriCore/ReaderStyler.swift`（`wrappedDocument()` + `injectionScript()`）、`ReaderRuleset.css`、`AFFReaderRuleset.css`
 
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險

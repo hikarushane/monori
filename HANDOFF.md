@@ -1,75 +1,44 @@
 # HANDOFF
 
-> 最後更新: 2026-08-20（Uguisu Zen 批次 6–7 完成；全 UI 重構結案）
+> 上次 session: 2026-08-20
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-Claude Code 的 repo-local 工作流程已移植到 Codex：`CLAUDE.md` 與 `.claude/settings.json` 維持 canonical，Codex 只透過 `AGENTS.md` 與 `.codex/hooks.json` 的 adapter 讀取，不複製 hook command 邏輯。
-- 測試/建置狀態：✅ 綠（`./scripts/verify.sh`；325 XCTest + 13 swift-testing，0 failures；design-guard PASS）
-- 分支 ＠ 最後已知狀態：`main` ahead `main/main` 9 commits（本輪未 commit）
-- 工作樹：Uguisu Zen 批次 0–7 的未 staged 變更涵蓋規格、`project.yml`／生成的 `App/Info.plist`、語義色資產、字型資源、`MonoriDesignSystem.swift`、App 外殼、書庫／目錄、Browse chrome、設定、閱讀器 chrome 與閱讀器內容排版。
-- 視覺規格：Uguisu Zen 批次 0–7 全部完成：字型、色彩 token、Dynamic Type helper、深色映射、Launch Screen／底部導航／WKWebView 背板、書庫／目錄、Browse 的 Monori chrome、設定、閱讀器 chrome、閱讀器內容排版（Source Serif 4 / Noto Serif TC、@font-face local()、Washi/Sumi 色彩、34em 欄寬、1.9 行距、0.85em 段距）、設計守門腳本。
+修復閱讀器 dark mode 渲染問題：5 個來源（Patreon、AO3、Google Docs、AFF、Vocus）在 dark mode 下的黑色遮罩／原生深色背景問題已全部修復並經使用者模擬器實測確認。
+- 測試/建置狀態：✅ Build 綠、`swift test` 13/13 過；⚠️ `verify.sh` 完整跑會在 design guard 卡住（`ThemeToggle.swift:27` 用了禁用的 `Capsule()`，非本次改動造成，見下方注意事項）
+- 分支＠最後 commit：`main` ＠ `9400f01`（本輪未 commit，工作樹 dirty）
+- 工作樹：dirty，這次 dark-mode 修復跟上一輪 session 的主題切換滑塊重構疊在同一個未 commit 工作樹裡，尚未拆分
 
 ## ✅ 本次完成
-- 完成 Uguisu Zen 批次 0：加入 Manrope、Source Serif 4、Noto Serif TC 與 OFL 授權檔；在 `project.yml` 註冊 `UIAppFonts`，新增不透明淺／深色語義 token 及 typography／spacing helper；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 1：Launch Screen 改為 Washi White＋Sumi Ink；底部導航改用不透明語義色、Manrope 與寬鬆橫向 padding，且綠色僅用於選取圖示；WKWebView 空白背板改為 Monori Canvas。已在模擬器檢查 Browse 與 Settings 的外殼，未互動任何登入或第三方網站流程；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 2：書庫、搜尋 sheet 與作品目錄改為 Washi／Stone 的不透明平面結構、Manrope 與 24pt 內容邊距；來源篩選、未讀數與檢查進度移除膠囊／Material，書籤與新章節分別保留 Bookmark Red／Highlight Gold 的語義。修正深色 List cell 回退成系統黑色的問題。模擬器已檢查書庫與目錄的淺／深色，最後還原淺色；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 3：Browse 的來源列改為不透明 Canvas／分隔線結構與 Manrope，Web loading 使用 Highlight Gold 線性進度；collection banner 改為 Stone Surface 條帶、Sumi Ink 描邊按鈕與線性進度，移除 Material、prominent 系統按鈕與 spinner。Patreon／其他第三方網站內容未改動。模擬器已檢查 Browse chrome 的淺／深色與來源列展開狀態，最後還原淺色；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 4：設定頁改為 Washi Canvas／Stone Surface 的扁平不透明分組、Manrope 與寬鬆間距；主題選項、字級調整與自動檢查改為 8px 圓角矩形控制項。保留外觀、字級、開關、清除資料、登出與診斷匯出行為及 smoke ID；確認與分享仍使用系統原生介面。模擬器已檢查淺／深色，最後還原淺色；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 5：閱讀器頂／底 chrome 改為不透明 Canvas、細分隔線與 Manrope；書籤使用 Bookmark Red，章節導覽維持 Sumi Ink。`ReaderPreferencesPanel` 改為可見數值的雙列矩形控制項，並在底部加不透明留白，避免正文與面板交疊；章節切換提示亦移除 Material／Capsule。既有書籤、前後章、離開閱讀器、偏好及 smoke ID 均保留。模擬器已檢查淺／深色，最後還原淺色；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 6：四條 Reader 路徑（Patreon、Vocus、AFF、Google Docs）全部改用 Source Serif 4 → Noto Serif TC → serif（@font-face local()）；正文預設 19px、行高 1.9、段距 0.85em、欄寬 34em、padding clamp(24px,6vw,48px)；淺色 Washi #FBF9F8 / Sumi #1C1B19，深色 Dark Canvas #1C1B19 / Dark Ink #F2F0ED；移除 Georgia、-apple-system、舊 #faf8f5 與 #e8e6e3；注入腳本加入 document.fonts.check() 驗證。擴充 ReaderStylerTests 至 53 項，覆蓋字型、色彩、行高、段距與各來源 ruleset；`./scripts/verify.sh` 透過。
-- 完成 Uguisu Zen 批次 7：新增 `scripts/design-guard.sh`，檢查 App-owned Swift 與 CSS 中的禁用 token（Material、.bar、Capsule、Color.accentColor、Georgia、SF Pro、舊色碼、舊 42em）；已整合進 verify.sh。全域搜尋確認無殘留禁用 token。
-- 重寫 `DESIGN.md` 為 Uguisu Zen 規格：Manrope UI、Source Serif 4／Noto Serif TC 閱讀器、Washi White／Stone Grey 不透明層次、綠色僅用於導航／品牌，並明確禁止玻璃膠囊。
-- 新增 `scripts/codex-hook-adapter.py`：
-  - 讀 `.claude/settings.json` 作為 hook source of truth
-  - 支援 `PreToolUse`、`SessionStart`、`Stop`、`UserPromptSubmit`、`PreCompact`
-  - 將 Codex `functions.exec_command` / `exec_command` payload 正規化為 Claude `Bash`
-  - 將 shell source-read（`cat`/`sed`/`nl`/`head`/`tail` 等）轉成 synthetic `Read` payload，讓 Claude `Read|Glob` graphify advisory 也會觸發
-  - 自動補 `cwd` 與 `CLAUDE_PROJECT_DIR`
-- 更新 `.codex/hooks.json`：
-  - 移除使用者家目錄絕對路徑
-  - 將 Claude 目前使用的 hook events 全部委派到 adapter
-- 更新 `AGENTS.md`：
-  - 明確要求 Codex 讀 `CLAUDE.md`、`.claude/hooks/critical_rules.txt`、`SIMULATOR_PLAYBOOK.md`
-  - 記錄 `HANDOFF.md`/`MEMORY.md` flow-pack、Claude-local permissions、backup settings、無 `.claude/commands`/`.claude/agents`/repo MCP 設定
-- 擴充 `scripts/check-hooks.sh`：
-  - 檢查 Claude/Codex hook event parity
-  - 禁止 `.codex/hooks.json` 內 `/Users/` 絕對路徑
-  - 檢查 adapter 必須 tracked/staged
-  - 檢查未來新增 `.claude/commands`、`.claude/agents`、repo MCP config、`.claude/settings.json:mcpServers` 時必須先做 Codex migration decision
-  - 檢查 payload regression：非 commit Bash no-op、Codex search graphify advisory、Codex shell source-read graphify advisory、`UserPromptSubmit`/`PreCompact` critical-rules injection
+- 用 `superpowers:systematic-debugging` 在 `applyReaderTreatment()` 注入診斷 JS，收集 5 個來源的 `prefers-color-scheme` / body 背景 / 文字色證據，確認 `prefers-color-scheme: dark` 在所有來源都正確 match、body 背景也都正確，問題出在中間容器背景與文字色兩層
+- 修 `ReaderStyler.swift` 的 `wrappedDocument()`（Google Docs stored HTML）：`* { color: inherit !important }` 縮小作用域為 `body *`，避免覆寫 `<html>` 的 color；dark mode `body { color }` 加 `!important`
+- 修 `AFFReaderRuleset.css`：加 6 層 `background-color: inherit !important` 祖先鏈級聯（仿 VocusReaderRuleset.css）+ dark mode body color `!important`
+- 修 `ReaderRuleset.css`（Patreon/AO3）：加 `color-scheme: light dark` + dark mode body color `!important`
+- 修 `ReaderStyler.swift` 的 `injectionScript()`：加 `clearAncestorBg()` JS，沿內容容器（`[data-tag="post-content"]` / `.patreon-post-content` / `article`）的祖先鏈精準清除 background-color，取代原本失敗的 CSS 級聯方案
+- 移除 `ReaderView.swift` 的診斷 JS
+- 使用者在模擬器實測確認：5 個來源、light/dark 兩種模式全部正常
 
 ## 🔄 進行中
 無。
 
 ## 🚧 試過但行不通（避免重踩）
-- `graphify update .` 在本輪仍 fail-closed：新 graph 1474 nodes、既有 `graph.json` 1611 nodes，graphify 拒絕覆寫並提示可能缺少前次 session 的 chunk files。不要未經確認用 `--force`。
+- 在 `ReaderRuleset.css` 對 `body` 到六層子孫套用跟 Vocus 相同的 `background-color: inherit !important` CSS 級聯 → Patreon 文章直接空白（light/dark 都是）。原因：Patreon 是 React SPA，暴力覆寫所有中間容器背景會連動破壞其版面必要樣式。改用 JS 只沿實際內容容器的祖先鏈精準清除背景，才沒有副作用（AFF 是傳統 server-rendered 頁面，同樣的 CSS 級聯沒有這個副作用，維持原寫法）。
 
 ## ⚡ 接手要做的事
-- Uguisu Zen 全 7 批已完成。若要 commit，將批次 0–7 的檔案依設計基礎、外殼／Browse、書庫、設定、閱讀器 chrome、閱讀器排版與清理分成原子提交；不要把無關檔案一起掃進去。
-- 閱讀器排版已用 @font-face local() 載入 Source Serif 4 與 Noto Serif TC。可在模擬器開啟各來源章節確認字型實際生效。
-- 若未來修改 `.claude/settings.json` hook event，先跑 `./scripts/check-hooks.sh`。新增 Claude hook event 時，Codex 必須新增 `.codex/hooks.json` event registration 或明確記錄不能移植的理由。
-- 若要處理 graphify node count mismatch，先查 `graphify-out/` 的 chunk/corpus 狀態，不要直接 `graphify update . --force`。
+1. `verify.sh` 目前會在 design guard 卡住：`App/Features/Shared/ThemeToggle.swift:27` 用了 `Capsule()`，Uguisu Zen 規範禁用該 shape token（上一輪 session 主題切換元件留下的），需要換成規範允許的 shape 才能讓 `verify.sh` 全線變綠
+2. 待 design guard 修好後，完整跑一次 `./scripts/verify.sh` 確認全綠（本次只手動跑了 build + `swift test`，沒跑完整腳本）
+3. Commit 本次 dark mode 修復 + 上一輪的 ThemeToggle 變更（工作樹是兩輪 session 疊在一起，建議拆成至少兩個 atomic commit：主題切換滑塊 / reader dark mode CSS 修復）
 
 ## ⚠️ 注意事項
-- 遠端名稱是 `main` 不是 `origin`（git 會印 `refname 'main' is ambiguous` 警告）。指令中裸寫 `main` 會混淆本地分支與遠端，一律用 `refs/heads/main` 或 `main/main` 明確指定。
-- Claude `.claude/settings.local.json` 只是一份 Claude-local allowlist，不是 Codex safety policy；不要把 allow 條目照抄成 repo 規則。
-- Codex hook adapter 的設計原則：Codex 只登記 event + 呼叫 adapter；hook command 邏輯留在 `.claude/settings.json`，避免雙份規則漂移。
+- 工作樹是 dirty 的：這次 dark-mode 修復的檔案，跟上一輪 session 主題切換滑塊重構的檔案（`AppRootView.swift`、`CollectionTOCView.swift`、`LibraryView.swift`、`MonoriIcons.swift`、`LibraryQuery.swift`、新檔 `ThemeToggle.swift`）混在同一個未 commit 的工作樹裡，還沒分開
+- `verify.sh` 完整跑會在 design guard 這步 FAIL（見上）；本次驗證只用 build + `swift test` 手動確認，不是跑完整 `verify.sh`
+- 診斷用的 5 筆 log（`reader-dark-diag` category）是暫時性證據，已隨程式碼移除，不需要額外清理
 
 ## 📁 本次修改的檔案
-- `AGENTS.md` — Codex adapter / migration inventory / workflow rules
-- `.codex/hooks.json` — Codex event registrations
-- `scripts/codex-hook-adapter.py` — Claude hook compatibility adapter
-- `scripts/check-hooks.sh` — hook parity + payload regression guard
-- `scripts/design-guard.sh` — Uguisu Zen banned token regression guard
-- `scripts/verify.sh` — 加入 design-guard step
-- `HANDOFF.md` — 本輪交接更新
-- `MEMORY.md` — 長效決策更新
-- `DESIGN.md` — Uguisu Zen 視覺準則
-- `App/Features/Shared/MonoriDesignSystem.swift` — Uguisu Zen 語義 token 與 typography helper
-- `App/Resources/` — 內嵌字型與 OFL 授權檔
-- `MonoriCore/Sources/MonoriCore/Assets/ReaderRuleset.css` — Patreon 閱讀器排版（Source Serif 4 / Washi / 34em）
-- `MonoriCore/Sources/MonoriCore/Assets/VocusReaderRuleset.css` — Vocus 閱讀器排版
-- `MonoriCore/Sources/MonoriCore/Assets/AFFReaderRuleset.css` — AFF 閱讀器排版
-- `MonoriCore/Sources/MonoriCore/ReaderStyler.swift` — wrappedDocument 排版 + font-check snippet
-- `MonoriCore/Tests/MonoriCoreTests/ReaderStylerTests.swift` — 擴充至 53 項測試
+- `MonoriCore/Sources/MonoriCore/ReaderStyler.swift` — `wrappedDocument()` color inherit 縮小作用域；`injectionScript()` 加 `clearAncestorBg()`
+- `MonoriCore/Sources/MonoriCore/Assets/ReaderRuleset.css` — 加 `color-scheme`、dark mode text color `!important`
+- `MonoriCore/Sources/MonoriCore/Assets/AFFReaderRuleset.css` — 加背景祖先鏈級聯、dark mode text color `!important`
+- `App/Features/Reader/ReaderView.swift` — 移除除錯用診斷 JS
+
+## 🔗 相關資源
+- 上一輪 session 的完整交接內容（Uguisu Zen 批次 0–7、Codex adapter）已被本次覆寫；如需查閱歷史脈絡，見 git blame 或 `MEMORY.md` 的架構決策/踩過的坑（該部分為累積式，未被覆寫）
