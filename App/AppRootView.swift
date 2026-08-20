@@ -60,6 +60,7 @@ struct AppRootView: View {
                 get: { env.autopilotReaderTarget },
                 set: { env.autopilotReaderTarget = $0 })) { target in
                 ReaderView(chapter: target.chapter)
+                    .preferredColorScheme(env.appPrefs.appearance.colorScheme)
                     .environment(env)
                     .modelContainer(env.store.container)
             }

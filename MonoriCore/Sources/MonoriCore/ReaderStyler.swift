@@ -19,6 +19,23 @@ public enum ReaderStyler {
           });
     """
 
+    private static let clearAncestorBgSnippet = """
+          function clearAncestorBg() {
+            var c = document.querySelector('[data-tag="post-content"]') ||
+                    document.querySelector('.patreon-post-content') ||
+                    document.querySelector('article');
+            if (c) {
+              var p = c.parentElement;
+              while (p && p !== document.documentElement) {
+                p.style.setProperty('background-color', 'transparent', 'important');
+                p = p.parentElement;
+              }
+            }
+          }
+          clearAncestorBg();
+          setTimeout(clearAncestorBg, 1500);
+    """
+
     public static func injectionScript() -> String {
         let css = ruleset()
             .replacingOccurrences(of: "\\", with: "\\\\")
@@ -33,6 +50,7 @@ public enum ReaderStyler {
           style.textContent = `\(css)`;
           document.documentElement.appendChild(style);
         \(fontCheckSnippet)
+        \(clearAncestorBgSnippet)
         })();
         """
     }
@@ -224,11 +242,11 @@ public enum ReaderStyler {
           /* Google Docs mobilebasic exports inline color:#000000 and
              background-color:#ffffff on every paragraph and span.
              Override them so the page adapts to light/dark mode. */
-          * { color: inherit !important; background-color: transparent !important; }
+          body * { color: inherit !important; background-color: transparent !important; }
           html, body { background: #FBF9F8 !important; }
           @media (prefers-color-scheme: dark) {
             html, body { background: #1C1B19 !important; }
-            body { color: #F2F0ED; }
+            body { color: #F2F0ED !important; }
           }
           /* Resize prose and everything inside it, but NOT <h1>-<h6> or their
              children, so chapter sub-headings keep their relative size. A bare

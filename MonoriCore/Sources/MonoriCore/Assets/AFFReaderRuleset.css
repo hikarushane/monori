@@ -120,9 +120,19 @@ body {
   background-color: #FBF9F8 !important;
 }
 
+body > *,
+body > * > *,
+body > * > * > *,
+body > * > * > * > *,
+body > * > * > * > * > *,
+body > * > * > * > * > * > * {
+  background-color: inherit !important;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #1C1B19 !important;
+    color: #F2F0ED !important;
   }
   #bodyText p,
   #bodyText div,

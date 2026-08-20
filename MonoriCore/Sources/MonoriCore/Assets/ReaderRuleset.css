@@ -17,6 +17,10 @@
   font-display: swap;
 }
 
+:root {
+  color-scheme: light dark;
+}
+
 /* --- hide chrome --- */
 /* Comments stay readable: the comment rows and the reply field are
    intentionally NOT hidden here, or "Load more comments" loads entries that
@@ -93,6 +97,7 @@ body {
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #1C1B19 !important;
+    color: #F2F0ED !important;
   }
   [data-tag="post-content"], [data-tag="post-content"] p,
   [data-tag="post-content"] span, [data-tag="post-content"] li,

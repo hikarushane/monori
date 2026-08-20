@@ -179,6 +179,7 @@ struct CollectionTOCView: View {
         .fullScreenCover(item: $readerTarget) { target in
             if let chapter = chapters.first(where: { $0.id == target.id }) {
                 ReaderView(chapter: chapter)
+                    .preferredColorScheme(env.appPrefs.appearance.colorScheme)
             }
         }
         .alert("重新命名章節", isPresented: Binding(
