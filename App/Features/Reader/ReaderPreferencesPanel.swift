@@ -37,6 +37,19 @@ struct ReaderPreferencesPanel: View {
                     Image(systemName: "arrow.up")
                 }
             }
+
+            Rectangle()
+                .fill(MonoriPalette.divider)
+                .frame(height: 1)
+
+            HStack(spacing: MonoriSpacing.x2) {
+                Text("主題")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .semibold))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.ink)
+                Spacer(minLength: MonoriSpacing.x3)
+                ThemeToggle()
+            }
         }
         .padding(.horizontal, MonoriSpacing.x3)
         .padding(.top, MonoriSpacing.x2)
