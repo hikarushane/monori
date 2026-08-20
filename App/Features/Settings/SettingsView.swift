@@ -3,7 +3,7 @@ import MonoriCore
 
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
-    @State private var confirmClearLibrary = false
+@State private var confirmClearLibrary = false
     @State private var confirmLogout = false
 
     private struct LogExport: Identifiable {
@@ -19,59 +19,29 @@ struct SettingsView: View {
 
         ScrollView {
             VStack(alignment: .leading, spacing: MonoriSpacing.x5) {
-                Text("設定")
-                    .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
-                    .tracking(-0.6)
-                    .foregroundStyle(MonoriPalette.ink)
 
-                settingsSection("外觀") {
-                    VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
-                        Text("主題")
-                            .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                                      weight: .medium))
-                            .tracking(MonoriTypography.uiTracking)
-                            .foregroundStyle(MonoriPalette.secondaryInk)
-                        HStack(spacing: MonoriSpacing.x1) {
-                            ForEach(AppearanceMode.allCases, id: \.self) { mode in
-                                appearanceOption(mode)
-                            }
-                        }
-                    }
-                }
-
-                settingsSection("閱讀") {
-                    HStack(spacing: MonoriSpacing.x2) {
-                        VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
-                            Text("字體大小")
-                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
-                                .foregroundStyle(MonoriPalette.ink)
-                            Text("\(prefs.fontSize) pt")
-                                .font(MonoriTypography.ui(14, relativeTo: .subheadline))
-                                .foregroundStyle(MonoriPalette.secondaryInk)
-                        }
-                        Spacer()
-                        HStack(spacing: MonoriSpacing.x1) {
-                            valueButton(symbol: "−", accessibilityLabel: "字體大小減少",
-                                        identifier: "Decrement",
-                                        disabled: prefs.fontSize <= 14) {
-                                prefs.fontSize -= 1
-                            }
-                            valueButton(symbol: "+", accessibilityLabel: "字體大小增加",
-                                        identifier: "Increment",
-                                        disabled: prefs.fontSize >= 32) {
-                                prefs.fontSize += 1
-                            }
-                        }
-                    }
+                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                    Text("設定")
+                        .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
+                        .tracking(-0.6)
+                        .foregroundStyle(MonoriPalette.ink)
+                    Text("個人化您的閱讀體驗與應用程式偏好")
+                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .foregroundStyle(MonoriPalette.secondaryInk)
                 }
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
-                    sectionHeading("書庫")
+                    sectionHeading("閱讀設定")
                     settingsGroup {
                         HStack(spacing: MonoriSpacing.x2) {
-                            Text("自動檢查新章節")
-                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
-                                .foregroundStyle(MonoriPalette.ink)
+                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                                Text("自動檢查新章節")
+                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .foregroundStyle(MonoriPalette.ink)
+                                Text("有更新時會發出通知")
+                                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                    .foregroundStyle(MonoriPalette.secondaryInk)
+                            }
                             Spacer()
                             Button {
                                 env.appPrefs.autoCheckEnabled.toggle()
@@ -83,8 +53,77 @@ struct SettingsView: View {
                             .accessibilityValue(env.appPrefs.autoCheckEnabled ? "開啟" : "關閉")
                             .accessibilityIdentifier("smoke.autoCheckToggle")
                         }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+
+                        groupDivider()
+
+                        HStack(spacing: MonoriSpacing.x2) {
+                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                                Text("字體大小")
+                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .foregroundStyle(MonoriPalette.ink)
+                                Text("\(prefs.fontSize) pt")
+                                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                    .foregroundStyle(MonoriPalette.secondaryInk)
+                            }
+                            Spacer()
+                            HStack(spacing: MonoriSpacing.x1) {
+                                valueButton(symbol: "−", accessibilityLabel: "字體大小減少",
+                                            identifier: "Decrement",
+                                            disabled: prefs.fontSize <= 14) {
+                                    prefs.fontSize -= 1
+                                }
+                                valueButton(symbol: "+", accessibilityLabel: "字體大小增加",
+                                            identifier: "Increment",
+                                            disabled: prefs.fontSize >= 32) {
+                                    prefs.fontSize += 1
+                                }
+                            }
+                        }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
                     }
                     sectionFootnote("開啟書庫時自動為「追更中」的收藏檢查新章節。僅在 app 使用中執行，不會在背景連線。")
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("外觀")
+                    settingsGroup {
+                        HStack(spacing: MonoriSpacing.x2) {
+                            Text("主題")
+                                .font(MonoriTypography.ui(16, relativeTo: .body,
+                                                          weight: .semibold))
+                                .tracking(MonoriTypography.uiTracking)
+                                .foregroundStyle(MonoriPalette.ink)
+                            Spacer()
+                            ThemeToggle()
+                        }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+
+                        groupDivider()
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                                HStack(spacing: MonoriSpacing.x1) {
+                                    Text("閱讀字體")
+                                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                        .foregroundStyle(MonoriPalette.ink)
+                                    Text("（施工中）")
+                                        .font(MonoriTypography.ui(11, relativeTo: .caption, weight: .light))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                }
+                                Text("Source Serif 4 (預設)")
+                                    .font(MonoriTypography.reader(14, relativeTo: .subheadline))
+                                    .italic()
+                                    .foregroundStyle(MonoriPalette.secondaryInk)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
@@ -93,10 +132,16 @@ struct SettingsView: View {
                         settingsAction("清除書庫資料", destructive: true) {
                             confirmClearLibrary = true
                         }
-                        Divider().overlay(MonoriPalette.divider)
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+
+                        groupDivider()
+
                         settingsAction("清除瀏覽器資料", destructive: true) {
                             confirmLogout = true
                         }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
                     }
                     sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。")
                 }
@@ -107,6 +152,8 @@ struct SettingsView: View {
                         settingsAction("匯出診斷記錄") {
                             exportDiagnosticLog()
                         }
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
                     }
                     sectionFootnote("記錄操作事件與錯誤，不含文章內容、密碼或登入資訊。")
                 }
@@ -116,20 +163,47 @@ struct SettingsView: View {
                     settingsGroup {
                         HStack {
                             Text("版本")
-                                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                                          weight: .medium))
-                                .foregroundStyle(MonoriPalette.secondaryInk)
+                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .foregroundStyle(MonoriPalette.ink)
                             Spacer()
                             Text(MonoriCore.version)
-                                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                                          weight: .medium))
-                                .foregroundStyle(MonoriPalette.ink)
+                                .font(.system(size: 13, design: .monospaced).weight(.medium))
+                                .foregroundStyle(MonoriPalette.secondaryInk)
+                                .padding(.horizontal, MonoriSpacing.x1)
+                                .padding(.vertical, 4)
+                                .background(MonoriPalette.canvas,
+                                            in: RoundedRectangle(cornerRadius: 4))
                         }
-                        Divider().overlay(MonoriPalette.divider)
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+
+                        groupDivider()
+
+                        Link(destination: URL(string: "https://github.com/hikarushane/monori/blob/main/COMPLIANCE.md")!) {
+                            HStack {
+                                Text("隱私權政策與法律合規")
+                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .foregroundStyle(MonoriPalette.ink)
+                                Spacer()
+                                ExternalLinkIcon()
+                                    .stroke(MonoriPalette.secondaryInk.opacity(0.5),
+                                            style: StrokeStyle(lineWidth: 1.5,
+                                                               lineCap: .round,
+                                                               lineJoin: .round))
+                                    .frame(width: 14, height: 14)
+                            }
+                            .padding(.horizontal, MonoriSpacing.x3)
+                            .padding(.vertical, MonoriSpacing.x2)
+                        }
+
+                        groupDivider()
+
                         Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由各平台控制。")
                             .font(MonoriTypography.ui(14, relativeTo: .subheadline))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                             .lineSpacing(6)
+                            .padding(.horizontal, MonoriSpacing.x3)
+                            .padding(.vertical, MonoriSpacing.x2)
                     }
                 }
             }
@@ -160,28 +234,6 @@ struct SettingsView: View {
         }
     }
 
-    private func appearanceOption(_ mode: AppearanceMode) -> some View {
-        let isSelected = env.appPrefs.appearance == mode
-        return Button {
-            env.appPrefs.appearance = mode
-        } label: {
-            Text(mode.label)
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                          weight: isSelected ? .semibold : .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.ink)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(isSelected ? MonoriPalette.canvas : MonoriPalette.surface,
-                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
-                .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control)
-                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
-                                lineWidth: 1)
-                }
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
 
     private func valueButton(symbol: String, accessibilityLabel: String, identifier: String,
                              disabled: Bool, action: @escaping () -> Void) -> some View {
@@ -220,17 +272,8 @@ struct SettingsView: View {
         .frame(width: 48, height: 32)
     }
 
-    private func settingsSection<Content: View>(_ title: String,
-                                                @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
-            sectionHeading(title)
-            settingsGroup(content: content)
-        }
-    }
-
     private func settingsGroup<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x2, content: content)
-            .padding(MonoriSpacing.x2)
+        VStack(alignment: .leading, spacing: 0, content: content)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(MonoriPalette.surface,
                         in: RoundedRectangle(cornerRadius: MonoriRadius.container))
@@ -240,11 +283,18 @@ struct SettingsView: View {
             }
     }
 
+    private func groupDivider() -> some View {
+        Rectangle()
+            .fill(MonoriPalette.divider)
+            .frame(height: 1)
+            .padding(.horizontal, MonoriSpacing.x3)
+    }
+
     private func sectionHeading(_ title: String) -> some View {
         Text(title)
-            .font(MonoriTypography.ui(15, relativeTo: .headline, weight: .semibold))
-            .tracking(MonoriTypography.uiTracking)
-            .foregroundStyle(MonoriPalette.ink)
+            .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+            .tracking(MonoriTypography.navigationTracking)
+            .foregroundStyle(MonoriPalette.ink.opacity(0.8))
     }
 
     private func sectionFootnote(_ text: String) -> some View {
@@ -284,3 +334,26 @@ struct SettingsView: View {
         }
     }
 }
+
+private struct ExternalLinkIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        let s = min(rect.width, rect.height) / 24
+        let cr = 5 * s
+        var p = Path()
+        p.move(to: CGPoint(x: 21*s, y: 9*s))
+        p.addLine(to: CGPoint(x: 21*s, y: 3*s))
+        p.addLine(to: CGPoint(x: 15*s, y: 3*s))
+        p.move(to: CGPoint(x: 21*s, y: 3*s))
+        p.addLine(to: CGPoint(x: 12*s, y: 12*s))
+        p.move(to: CGPoint(x: 10*s, y: 3*s))
+        p.addArc(tangent1End: CGPoint(x: 3*s, y: 3*s),
+                 tangent2End: CGPoint(x: 3*s, y: 12*s), radius: cr)
+        p.addArc(tangent1End: CGPoint(x: 3*s, y: 21*s),
+                 tangent2End: CGPoint(x: 12*s, y: 21*s), radius: cr)
+        p.addArc(tangent1End: CGPoint(x: 21*s, y: 21*s),
+                 tangent2End: CGPoint(x: 21*s, y: 12*s), radius: cr)
+        p.addLine(to: CGPoint(x: 21*s, y: 14*s))
+        return p
+    }
+}
+
