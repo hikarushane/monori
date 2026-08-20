@@ -2,7 +2,7 @@ import SwiftUI
 
 enum AppChromeMetrics {
     static func bottomNavigationHeight(for viewHeight: CGFloat) -> CGFloat {
-        min(max(viewHeight * 0.075, 64), 80)
+        min(max(viewHeight * 0.09, 70), 90)
     }
 }
 

@@ -497,8 +497,8 @@ struct ReaderView: View {
                     .allowsHitTesting(false)
             }
         }
-        .padding(.horizontal, MonoriSpacing.x3)
-        .frame(height: max(64, bottomNavigationHeight) + bottomInset)
+        .padding(.horizontal, MonoriSpacing.x3 + 20)
+        .frame(height: bottomNavigationHeight + bottomInset)
         .background(MonoriPalette.canvas)
         .overlay(alignment: .top) {
             Rectangle()
