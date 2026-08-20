@@ -6,17 +6,27 @@ import SwiftUI
 struct ReaderPreferencesPanel: View {
     let prefs: ReaderPreferences
 
+    private let preferenceRowMinHeight: CGFloat = 44
+
     var body: some View {
         VStack(spacing: MonoriSpacing.x2) {
-            preferenceRow(title: "字體大小", value: "\(prefs.fontSize) pt") {
-                controlButton(disabled: prefs.fontSize <= ReaderPreferences.fontSizeRange.lowerBound,
-                              accessibilityLabel: "縮小字體",
-                              action: { prefs.fontSize -= 1 }) {
+            preferenceRow(
+                title: "字體大小",
+                value: "\(prefs.fontSize) pt"
+            ) {
+                controlButton(
+                    disabled: prefs.fontSize <= ReaderPreferences.fontSizeRange.lowerBound,
+                    accessibilityLabel: "縮小字體",
+                    action: { prefs.fontSize -= 1 }
+                ) {
                     Text("A−")
                 }
-                controlButton(disabled: prefs.fontSize >= ReaderPreferences.fontSizeRange.upperBound,
-                              accessibilityLabel: "放大字體",
-                              action: { prefs.fontSize += 1 }) {
+
+                controlButton(
+                    disabled: prefs.fontSize >= ReaderPreferences.fontSizeRange.upperBound,
+                    accessibilityLabel: "放大字體",
+                    action: { prefs.fontSize += 1 }
+                ) {
                     Text("A+")
                 }
             }
@@ -25,15 +35,29 @@ struct ReaderPreferencesPanel: View {
                 .fill(MonoriPalette.divider)
                 .frame(height: 1)
 
-            preferenceRow(title: "行距", value: lineSpacingValue) {
-                controlButton(disabled: prefs.lineSpacing <= ReaderPreferences.lineSpacingRange.lowerBound + 0.001,
-                              accessibilityLabel: "縮小行距",
-                              action: { prefs.lineSpacing -= ReaderPreferences.lineSpacingStep }) {
+            preferenceRow(
+                title: "行距",
+                value: lineSpacingValue
+            ) {
+                controlButton(
+                    disabled: prefs.lineSpacing
+                        <= ReaderPreferences.lineSpacingRange.lowerBound + 0.001,
+                    accessibilityLabel: "縮小行距",
+                    action: {
+                        prefs.lineSpacing -= ReaderPreferences.lineSpacingStep
+                    }
+                ) {
                     Image(systemName: "arrow.down")
                 }
-                controlButton(disabled: prefs.lineSpacing >= ReaderPreferences.lineSpacingRange.upperBound - 0.001,
-                              accessibilityLabel: "放大行距",
-                              action: { prefs.lineSpacing += ReaderPreferences.lineSpacingStep }) {
+
+                controlButton(
+                    disabled: prefs.lineSpacing
+                        >= ReaderPreferences.lineSpacingRange.upperBound - 0.001,
+                    accessibilityLabel: "放大行距",
+                    action: {
+                        prefs.lineSpacing += ReaderPreferences.lineSpacingStep
+                    }
+                ) {
                     Image(systemName: "arrow.up")
                 }
             }
@@ -42,18 +66,12 @@ struct ReaderPreferencesPanel: View {
                 .fill(MonoriPalette.divider)
                 .frame(height: 1)
 
-            HStack(spacing: MonoriSpacing.x2) {
-                Text("主題")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .semibold))
-                    .tracking(MonoriTypography.uiTracking)
-                    .foregroundStyle(MonoriPalette.ink)
-                Spacer(minLength: MonoriSpacing.x3)
+            preferenceRow(title: "主題") {
                 ThemeToggle()
             }
         }
         .padding(.horizontal, MonoriSpacing.x3)
-        .padding(.top, MonoriSpacing.x2)
-        .padding(.bottom, MonoriSpacing.x4)
+        .padding(.vertical, MonoriSpacing.x2)
         .frame(maxWidth: .infinity)
         .background(MonoriPalette.surface)
         .overlay(alignment: .bottom) {
@@ -68,37 +86,80 @@ struct ReaderPreferencesPanel: View {
         String(format: "%.1f", prefs.lineSpacing)
     }
 
-    private func preferenceRow<Controls: View>(title: String,
-                                               value: String,
-                                               @ViewBuilder controls: () -> Controls) -> some View {
+    private func preferenceRow<Controls: View>(
+        title: String,
+        value: String? = nil,
+        @ViewBuilder controls: () -> Controls
+    ) -> some View {
         HStack(spacing: MonoriSpacing.x2) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .semibold))
+                    .font(
+                        MonoriTypography.ui(
+                            14,
+                            relativeTo: .subheadline,
+                            weight: .semibold
+                        )
+                    )
                     .tracking(MonoriTypography.uiTracking)
                     .foregroundStyle(MonoriPalette.ink)
-                Text(value)
-                    .font(MonoriTypography.ui(13, relativeTo: .footnote))
-                    .foregroundStyle(MonoriPalette.secondaryInk)
+
+                if let value {
+                    Text(value)
+                        .font(
+                            MonoriTypography.ui(
+                                13,
+                                relativeTo: .footnote
+                            )
+                        )
+                        .foregroundStyle(MonoriPalette.secondaryInk)
+                }
             }
+
             Spacer(minLength: MonoriSpacing.x3)
-            HStack(spacing: MonoriSpacing.x1, content: controls)
+
+            HStack(
+                spacing: MonoriSpacing.x1,
+                content: controls
+            )
         }
+        .frame(minHeight: preferenceRowMinHeight)
     }
 
-    private func controlButton(disabled: Bool,
-                               accessibilityLabel: String,
-                               action: @escaping () -> Void,
-                               @ViewBuilder label: () -> some View) -> some View {
+    private func controlButton<Label: View>(
+        disabled: Bool,
+        accessibilityLabel: String,
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label
+    ) -> some View {
         Button(action: action) {
             label()
-                .font(MonoriTypography.ui(14, relativeTo: .body, weight: .semibold))
-                .foregroundStyle(disabled ? MonoriPalette.secondaryInk : MonoriPalette.ink)
+                .font(
+                    MonoriTypography.ui(
+                        14,
+                        relativeTo: .body,
+                        weight: .semibold
+                    )
+                )
+                .foregroundStyle(
+                    disabled
+                        ? MonoriPalette.secondaryInk
+                        : MonoriPalette.ink
+                )
                 .frame(width: 52, height: 44)
-                .background(MonoriPalette.canvas, in: RoundedRectangle(cornerRadius: MonoriRadius.control, style: .continuous))
+                .background(
+                    MonoriPalette.canvas,
+                    in: RoundedRectangle(
+                        cornerRadius: MonoriRadius.control,
+                        style: .continuous
+                    )
+                )
                 .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control, style: .continuous)
-                        .stroke(MonoriPalette.divider, lineWidth: 1)
+                    RoundedRectangle(
+                        cornerRadius: MonoriRadius.control,
+                        style: .continuous
+                    )
+                    .stroke(MonoriPalette.divider, lineWidth: 1)
                 }
                 .contentShape(Rectangle())
         }
