@@ -46,7 +46,14 @@ struct SettingsView: View {
                             Button {
                                 env.appPrefs.autoCheckEnabled.toggle()
                             } label: {
-                                autoCheckControl(isOn: env.appPrefs.autoCheckEnabled)
+                                MonoriSwitchControl(
+                                    isOn: env.appPrefs.autoCheckEnabled,
+                                    onTrackColor: MonoriPalette.ink,
+                                    offTrackColor: MonoriPalette.canvas,
+                                    borderColor: MonoriPalette.divider,
+                                    onThumbColor: MonoriPalette.canvas,
+                                    offThumbColor: MonoriPalette.secondaryInk
+                                ) { _ in EmptyView() }
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("自動檢查新章節")
@@ -99,6 +106,7 @@ struct SettingsView: View {
                             Spacer()
                             ThemeToggle()
                         }
+                        .frame(minHeight: 56)
                         .padding(.horizontal, MonoriSpacing.x3)
                         .padding(.vertical, MonoriSpacing.x2)
 
@@ -254,22 +262,6 @@ struct SettingsView: View {
         .opacity(disabled ? 0.4 : 1)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityIdentifier(identifier)
-    }
-
-    private func autoCheckControl(isOn: Bool) -> some View {
-        ZStack(alignment: isOn ? .trailing : .leading) {
-            RoundedRectangle(cornerRadius: MonoriRadius.control)
-                .fill(isOn ? MonoriPalette.ink : MonoriPalette.canvas)
-                .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control)
-                        .stroke(MonoriPalette.divider, lineWidth: 1)
-                }
-            RoundedRectangle(cornerRadius: 4)
-                .fill(isOn ? MonoriPalette.canvas : MonoriPalette.secondaryInk)
-                .frame(width: 16, height: 16)
-                .padding(8)
-        }
-        .frame(width: 48, height: 32)
     }
 
     private func settingsGroup<Content: View>(@ViewBuilder content: () -> Content) -> some View {

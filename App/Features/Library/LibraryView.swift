@@ -5,6 +5,7 @@ import MonoriCore
 struct LibraryView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
     @Query private var allCollections: [LocalCollectionModel]
     @State private var sortOrder: LibrarySortOrder = .title
     @State private var searchText = ""
@@ -180,6 +181,11 @@ struct LibraryView: View {
         .scrollContentBackground(.hidden)
         .background(MonoriPalette.canvas)
         .listRowSeparatorTint(MonoriPalette.divider)
+        .contentMargins(
+            .bottom,
+            bottomNavigationHeight + MonoriSpacing.x2,
+            for: .scrollContent
+        )
         .refreshable { await env.autoCheck.runForced() }
         .navigationDestination(for: String.self) { id in
             if let collection = allCollections.first(where: { $0.id == id }) {

@@ -44,9 +44,6 @@ struct AppRootView: View {
             .toolbar(.hidden, for: .tabBar)
             .background(MonoriPalette.canvas)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Color.clear.frame(height: tabBarHeight)
-            }
-            .overlay(alignment: .bottom) {
                 tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom)
             }
             .preferredColorScheme(env.appPrefs.appearance.colorScheme)

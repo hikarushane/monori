@@ -23,33 +23,25 @@ struct ThemeToggle: View {
                     env.appPrefs.appearance = isDark ? .light : .dark
                 }
             } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control, style: .continuous)
-                        .fill(isDark
-                              ? Color(red: 0.118, green: 0.192, blue: 0.282)
-                              : Color(red: 0.929, green: 0.878, blue: 0.753))
-
-                    ZStack {
-                        Circle()
-                            .fill(isDark
-                                  ? Color(red: 0.290, green: 0.612, blue: 0.788)
-                                  : Color(red: 0.831, green: 0.659, blue: 0.263))
-
-                        ThemeSunIcon()
-                            .stroke(Color(red: 0.984, green: 0.976, blue: 0.973),
-                                    style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
-                            .frame(width: 14, height: 14)
-                            .opacity(isDark ? 0 : 1)
-
+                MonoriSwitchControl(
+                    isOn: isDark,
+                    onTrackColor: Color(red: 0.118, green: 0.192, blue: 0.282),
+                    offTrackColor: Color(red: 0.929, green: 0.878, blue: 0.753),
+                    borderColor: .clear,
+                    onThumbColor: Color(red: 0.290, green: 0.612, blue: 0.788),
+                    offThumbColor: Color(red: 0.831, green: 0.659, blue: 0.263)
+                ) { isOn in
+                    if isOn {
                         ThemeMoonIcon()
                             .fill(Color(red: 0.984, green: 0.976, blue: 0.973))
-                            .frame(width: 13, height: 13)
-                            .opacity(isDark ? 1 : 0)
+                            .frame(width: 14, height: 14)
+                    } else {
+                        ThemeSunIcon()
+                            .stroke(Color(red: 0.984, green: 0.976, blue: 0.973),
+                                    style: StrokeStyle(lineWidth: 1, lineCap: .round))
+                            .frame(width: 14, height: 14)
                     }
-                    .frame(width: 26, height: 26)
-                    .offset(x: isDark ? 12 : -12)
                 }
-                .frame(width: 56, height: 32)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("主題切換")
