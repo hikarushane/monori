@@ -378,3 +378,42 @@ struct CollectionTOCView: View {
         .padding(.vertical, MonoriSpacing.x2)
     }
 }
+
+#if DEBUG
+#Preview("目錄・Patreon") {
+    let fixture = PreviewSupport.sampleCollection(source: .patreon, chapterCount: 10)
+    NavigationStack {
+        CollectionTOCView(collection: fixture.collection)
+    }
+    .environment(fixture.env)
+    .modelContainer(fixture.env.store.container)
+}
+
+#Preview("目錄・AO3") {
+    let fixture = PreviewSupport.sampleCollection(source: .ao3, chapterCount: 6)
+    NavigationStack {
+        CollectionTOCView(collection: fixture.collection)
+    }
+    .environment(fixture.env)
+    .modelContainer(fixture.env.store.container)
+}
+
+#Preview("目錄・大字體", traits: .fixedLayout(width: 430, height: 932)) {
+    let fixture = PreviewSupport.sampleCollection(source: .patreon, chapterCount: 8)
+    NavigationStack {
+        CollectionTOCView(collection: fixture.collection)
+    }
+    .environment(fixture.env)
+    .modelContainer(fixture.env.store.container)
+    .environment(\.dynamicTypeSize, .accessibility3)
+}
+
+#Preview("目錄・壓力測試") {
+    let fixture = PreviewSupport.stressCollection()
+    NavigationStack {
+        CollectionTOCView(collection: fixture.collection)
+    }
+    .environment(fixture.env)
+    .modelContainer(fixture.env.store.container)
+}
+#endif

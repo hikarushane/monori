@@ -353,6 +353,54 @@ private struct SortIcon: Shape {
     }
 }
 
+#if DEBUG
+#Preview("書庫・有內容") {
+    let env = PreviewSupport.sampleLibraryEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
+
+#Preview("書庫・空狀態") {
+    let env = PreviewSupport.emptyEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
+
+#Preview("書庫・有未讀") {
+    let env = PreviewSupport.unreadLibraryEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
+
+#Preview("書庫・大字體", traits: .fixedLayout(width: 430, height: 932)) {
+    let env = PreviewSupport.sampleLibraryEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+    .environment(\.dynamicTypeSize, .accessibility3)
+}
+
+#Preview("書庫・壓力測試") {
+    let env = PreviewSupport.stressEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
+#endif
+
 private struct LibrarySearchSheet: View {
     let allCollections: [LocalCollectionModel]
     @Binding var searchText: String

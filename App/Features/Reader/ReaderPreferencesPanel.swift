@@ -169,3 +169,11 @@ struct ReaderPreferencesPanel: View {
         .accessibilityLabel(accessibilityLabel)
     }
 }
+
+#if DEBUG
+#Preview("閱讀偏好面板") {
+    let env = PreviewSupport.emptyEnvironment()
+    ReaderPreferencesPanel(prefs: env.prefs)
+        .environment(env)
+}
+#endif

@@ -133,3 +133,9 @@ struct AppRootView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
+
+#if DEBUG
+#Preview("AppRoot") {
+    AppRootView(env: PreviewSupport.sampleLibraryEnvironment())
+}
+#endif

@@ -30,3 +30,13 @@ struct ChapterSwipeIndicator: View {
         .allowsHitTesting(false)
     }
 }
+
+#if DEBUG
+#Preview("章節滑動指示器") {
+    VStack(spacing: 40) {
+        ChapterSwipeIndicator(title: "上一章：黎明前的寂靜", edge: .top, progress: 0.7)
+        ChapterSwipeIndicator(title: "下一章：Chapter 5", edge: .bottom, progress: 1.0)
+    }
+    .padding()
+}
+#endif

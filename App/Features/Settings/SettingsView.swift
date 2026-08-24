@@ -327,6 +327,23 @@ struct SettingsView: View {
     }
 }
 
+#if DEBUG
+#Preview("設定") {
+    let env = PreviewSupport.emptyEnvironment()
+    SettingsView()
+        .environment(env)
+        .modelContainer(env.store.container)
+}
+
+#Preview("設定・大字體", traits: .fixedLayout(width: 430, height: 932)) {
+    let env = PreviewSupport.emptyEnvironment()
+    SettingsView()
+        .environment(env)
+        .modelContainer(env.store.container)
+        .environment(\.dynamicTypeSize, .accessibility3)
+}
+#endif
+
 private struct ExternalLinkIcon: Shape {
     func path(in rect: CGRect) -> Path {
         let s = min(rect.width, rect.height) / 24
