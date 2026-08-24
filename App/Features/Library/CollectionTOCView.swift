@@ -16,6 +16,7 @@ struct CollectionTOCView: View {
     @State private var renameTarget: LocalChapterModel?
     @State private var renameText = ""
     @State private var showsOptionsMenu = false
+    @State private var revealedChapterID: String?
 
     private var chapters: [LocalChapterModel] { env.store.orderedChapters(of: collection) }
 
@@ -158,16 +159,24 @@ struct CollectionTOCView: View {
                     chapterRow(chapter)
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            env.store.markChapterOpened(chapter)
-                            readerTarget = ReaderTarget(id: chapter.id)
+                            if revealedChapterID != nil {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                                    revealedChapterID = nil
+                                }
+                            } else {
+                                env.store.markChapterOpened(chapter)
+                                readerTarget = ReaderTarget(id: chapter.id)
+                            }
                         }
-                        .swipeActions {
-                            Button("刪除", role: .destructive) { env.store.delete(chapter) }
-                            Button("重新命名") {
+                        .chapterSwipeActions(
+                            itemID: chapter.id,
+                            revealedID: $revealedChapterID,
+                            onDelete: { env.store.delete(chapter) },
+                            onRename: {
                                 renameTarget = chapter
                                 renameText = chapter.title
                             }
-                        }
+                        )
                         .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
                                                    bottom: 0, trailing: MonoriSpacing.x3))
                         .listRowBackground(MonoriPalette.canvas)

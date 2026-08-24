@@ -12,6 +12,7 @@ struct LibraryView: View {
     @State private var sourceFilter: SourceKind?
     @State private var showsSearch = false
     @State private var showsSortMenu = false
+    @State private var revealedCollectionID: String?
 
     private var collections: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: sortOrder,
@@ -169,12 +170,14 @@ struct LibraryView: View {
                 NavigationLink(value: collection.id) {
                     row(collection)
                 }
+                .chapterSwipeActions(
+                    itemID: collection.id,
+                    revealedID: $revealedCollectionID,
+                    onDelete: { env.store.deleteCollection(collection) }
+                )
                 .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
                                            bottom: 0, trailing: MonoriSpacing.x3))
                 .listRowBackground(MonoriPalette.canvas)
-            }
-            .onDelete { offsets in
-                for i in offsets { env.store.deleteCollection(collections[i]) }
             }
         }
         .listStyle(.plain)
