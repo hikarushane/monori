@@ -79,6 +79,7 @@ body > div > div:first-child {
 
 /* --- dark mode --- */
 body {
+  margin: 0 !important;
   background-color: #FBF9F8 !important;
 }
 

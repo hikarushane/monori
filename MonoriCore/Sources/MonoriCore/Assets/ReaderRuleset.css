@@ -91,6 +91,7 @@ article h1 {
 }
 
 body {
+  margin: 0 !important;
   background-color: #FBF9F8 !important;
 }
 
