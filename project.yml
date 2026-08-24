@@ -41,7 +41,7 @@ targets:
         # for every TestFlight upload — App Store Connect rejects a build number
         # it has already seen.
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "5"
+        CFBundleVersion: "6"
         UILaunchStoryboardName: LaunchScreen
         ITSAppUsesNonExemptEncryption: false
         UIAppFonts:
