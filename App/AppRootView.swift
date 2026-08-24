@@ -20,8 +20,14 @@ extension EnvironmentValues {
 struct AppRootView: View {
     private enum AppTab: Hashable { case browse, library, settings }
 
-    @State private var env = AppEnvironment()
+    @State private var env: AppEnvironment
     @State private var selectedTab = AppTab.browse
+
+    init() { _env = State(initialValue: AppEnvironment()) }
+
+    #if DEBUG
+    init(env: AppEnvironment) { _env = State(initialValue: env) }
+    #endif
 
     var body: some View {
         GeometryReader { proxy in

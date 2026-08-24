@@ -102,6 +102,11 @@ final class AppEnvironment {
         browse.load(SourceRegistry.patreon.startURL)
     }
 
+    init(store: LibraryStore) {
+        self.store = store
+        wire(browse)
+    }
+
     func startSmokeToolsIfNeeded() {
         guard !didStartSmokeTools else { return }
         didStartSmokeTools = true
