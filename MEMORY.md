@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-20（Reader dark mode 黑色遮罩／原生深色背景修復，5 來源全過）
+> 最後更新：2026-08-24（AO3 Reader chapter URL lookup regression 修復）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -35,6 +35,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Facebook OAuth 主機 | `decide` 用 `.facebook.com` suffix match、`requiresPopupWindow` 用 `m.` / `www.` 精確比對 | OAuth 流程會在 `m.` / `www.` / `staticxx.` 之間跳，收窄成單一主機會讓登入半途壞掉；popup 判定維持 ADR-0007 的精確比對防 lookalike | active | 2026-08-12 |
 | AsianFanfics 選擇器策略 | 錨定 `data-toc-chapter` 屬性與「第一個含 `<h1>` 的 `<header>`」，不用 Tailwind utility class | → docs/decisions/0009-asianfanfics-2026-redesign-selectors.md | active | 2026-08-15 |
 | Reader dark mode 背景修復策略 | 依頁面型態分流：server-rendered（AFF）用 CSS 級聯；SPA（Patreon）改用 JS 祖先鏈精準清除 | → docs/decisions/0010-reader-dark-mode-background-strategy.md | active | 2026-08-20 |
+| Reader library chapter URL lookup | `LibraryStore.chapter(withPageURL:)` 依來源 canonicalize；AO3 與 AFF 對舊的非 canonical 儲存 URL再做雙邊 canonical fallback | Reader 的 currentURL 可能帶 query/fragment；lookup 失敗會進 foreign-page 分支並移除 Reader CSS | active | 2026-08-24 |
 
 ## 規範
 ### Patreon DOM
@@ -149,6 +150,8 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **target=_blank 連結沒有 WKUIDelegate 就完全沒反應**（2026-06-12）：Patreon 創作者頁部分連結 target=_blank，WKWebView 沒實作 `createWebViewWith` 時點擊靜默無效（「點什麼都沒反應」）。修：uiDelegate 走 NavigationPolicy 在原 webView 載入、return nil。
 
 - **Reader CSS 不能套在非 post 頁**（2026-06-12）：`ReaderRuleset.css` 會 `nav/aside/footer display:none` + `article max-width:42em`；foreign（創作者頁/集合頁）套了會藏掉導航、擠壓 feed。修：`applyReaderTreatment` foreign 路徑改跑 `removalScript()`。
+
+- **AO3 chapter lookup 漏接 canonicalizer（2026-08-24）**：AO3 匯入會把多章作品的 `LocalChapterModel.urlString` 存成 `canonicalAO3ChapterURL`，Reader 的 `WKWebView.currentURL` 則可能帶 `view_adult` query 或 fragment；但 `LibraryStore.chapter(withPageURL:)` 原本只有 Patreon、Vocus、AFF branch，AO3 URL 必然落到 nil → `syncCurrentChapter` 設成 foreign page → `applyReaderTreatment()` 執行 `ReaderStyler.removalScript()`。修：沿 AFF pattern 加 AO3 canonical exact lookup，再 canonicalize stored URLs 作舊資料 fallback；不可用 CSS、delay 或 retry 掩蓋。Regression tests 分開保護 canonical Reader URL lookup 與「stored URL 為 www + query/fragment」的舊資料 fallback；mutation check 證實只移除 fallback 時後者會失敗。
 
 - **WKWebView 原生返回手勢不支援 SPA entry**（2026-06-12）：`allowsBackForwardNavigationGestures` 對 Patreon same-document（pushState）歷史項目不會觸發，但 `goBack()` API 可以。解法：關掉原生手勢、PatreonWebView 裝自訂 `UIScreenEdgePanGestureRecognizer`（左緣、translation>60pt）呼叫 `goBack()`；兩者並存會在真導航時 double-back。
 

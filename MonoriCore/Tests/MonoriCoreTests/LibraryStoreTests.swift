@@ -340,6 +340,62 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertNil(missing)
     }
 
+    func testChapterWithPageURLMatchesAO3Chapter() throws {
+        let store = try LibraryStore.inMemory()
+        let imported = ImportedCollection(
+            sourceURLString: "https://archiveofourown.org/works/90528001",
+            title: "Test Work",
+            creatorName: "Author",
+            sourceKind: .ao3,
+            chapters: [
+                ImportedChapter(title: "Chapter 1",
+                                urlString: "https://archiveofourown.org/works/90528001/chapters/240725581",
+                                orderIndex: 0),
+                ImportedChapter(title: "Chapter 2",
+                                urlString: "https://archiveofourown.org/works/90528001/chapters/240725582",
+                                orderIndex: 1)
+            ])
+        try store.applyDocImport(imported)
+
+        // Exact canonical URL match
+        let exact = store.chapter(withPageURL: "https://archiveofourown.org/works/90528001/chapters/240725581")
+        XCTAssertEqual(exact?.title, "Chapter 1")
+
+        // URL with query and fragment (e.g. adult-content interstitial) should still resolve
+        let withQuery = store.chapter(
+            withPageURL: "https://archiveofourown.org/works/90528001/chapters/240725581?view_adult=true#comments")
+        XCTAssertEqual(withQuery?.title, "Chapter 1")
+
+        // Second chapter
+        let second = store.chapter(withPageURL: "https://archiveofourown.org/works/90528001/chapters/240725582")
+        XCTAssertEqual(second?.title, "Chapter 2")
+
+        // Non-existent chapter returns nil
+        let missing = store.chapter(withPageURL: "https://archiveofourown.org/works/90528001/chapters/000000")
+        XCTAssertNil(missing)
+    }
+
+    func testChapterWithPageURLMatchesLegacyNonCanonicalAO3ChapterURL() throws {
+        let store = try LibraryStore.inMemory()
+        let imported = ImportedCollection(
+            sourceURLString: "https://archiveofourown.org/works/90528001",
+            title: "Test Work",
+            creatorName: "Author",
+            sourceKind: .ao3,
+            chapters: [
+                ImportedChapter(
+                    title: "Legacy Chapter",
+                    urlString: "https://www.archiveofourown.org/works/90528001/chapters/240725581?view_adult=true#comments",
+                    orderIndex: 0)
+            ])
+        try store.applyDocImport(imported)
+
+        let chapter = store.chapter(
+            withPageURL: "https://archiveofourown.org/works/90528001/chapters/240725581")
+
+        XCTAssertEqual(chapter?.title, "Legacy Chapter")
+    }
+
     func testSaveAndRestoreReadingProgress() throws {
         let storeURL = try temporaryStoreURL()
         let diskStore = try onDiskStore(at: storeURL)

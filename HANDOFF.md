@@ -1,15 +1,19 @@
 # HANDOFF
 
-> 上次 session: 2026-08-20
+> 上次 session: 2026-08-24
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-修復閱讀器 dark mode 渲染問題：5 個來源（Patreon、AO3、Google Docs、AFF、Vocus）在 dark mode 下的黑色遮罩／原生深色背景問題已全部修復並經使用者模擬器實測確認。
-- 測試/建置狀態：✅ Build 綠、`swift test` 13/13 過；⚠️ `verify.sh` 完整跑會在 design guard 卡住（`ThemeToggle.swift:27` 用了禁用的 `Capsule()`，非本次改動造成，見下方注意事項）
+修復 AO3 Reader URL lookup regression：`LibraryStore.chapter(withPageURL:)` 現在會 canonicalize AO3 chapter URL，並對舊的非 canonical 儲存 URL 做 defensive fallback，避免已匯入章節被誤判為 foreign page 而移除 Reader CSS。
+- 測試/建置狀態：✅ AO3 regression tests 2/2 過；✅ `swift test --package-path MonoriCore`（XCTest 334/334 + Swift Testing 13/13）過；⚠️ `verify.sh` 完整跑會在既有 design guard 問題卡住（見下方注意事項）
 - 分支＠最後 commit：`main` ＠ `9400f01`（本輪未 commit，工作樹 dirty）
 - 工作樹：dirty，這次 dark-mode 修復跟上一輪 session 的主題切換滑塊重構疊在同一個未 commit 工作樹裡，尚未拆分
 
 ## ✅ 本次完成
+- 用 `superpowers:systematic-debugging` 追到 AO3 chapter URL 的匯入、lookup 與 Reader foreign-page removal data flow；確認不是 CSS、WebKit timing 或 parser 問題
+- 新增 `testChapterWithPageURLMatchesAO3Chapter`，涵蓋 canonical URL、query/fragment、第二章與不存在章節；另補 `testChapterWithPageURLMatchesLegacyNonCanonicalAO3ChapterURL`，直接鎖住舊資料 stored-URL fallback
+- 在乾淨 HEAD 的隔離 worktree 只套 regression test，確認修改前 1/1 失敗（lookup 回 nil）；套用最小 AO3 matching branch 後單測與完整 MonoriCore suite 全綠
+- `graphify update .` 已執行，但因新 graph node 數少於既有 graph，工具 fail-closed 拒絕覆寫；未使用 `--force` 破壞既有 graph
 - 用 `superpowers:systematic-debugging` 在 `applyReaderTreatment()` 注入診斷 JS，收集 5 個來源的 `prefers-color-scheme` / body 背景 / 文字色證據，確認 `prefers-color-scheme: dark` 在所有來源都正確 match、body 背景也都正確，問題出在中間容器背景與文字色兩層
 - 修 `ReaderStyler.swift` 的 `wrappedDocument()`（Google Docs stored HTML）：`* { color: inherit !important }` 縮小作用域為 `body *`，避免覆寫 `<html>` 的 color；dark mode `body { color }` 加 `!important`
 - 修 `AFFReaderRuleset.css`：加 6 層 `background-color: inherit !important` 祖先鏈級聯（仿 VocusReaderRuleset.css）+ dark mode body color `!important`
@@ -35,6 +39,8 @@
 - 診斷用的 5 筆 log（`reader-dark-diag` category）是暫時性證據，已隨程式碼移除，不需要額外清理
 
 ## 📁 本次修改的檔案
+- `MonoriCore/Sources/MonoriCore/LibraryStore.swift` — AO3 chapter URL canonical matching + 舊 URL fallback
+- `MonoriCore/Tests/MonoriCoreTests/LibraryStoreTests.swift` — AO3 chapter lookup regression test
 - `MonoriCore/Sources/MonoriCore/ReaderStyler.swift` — `wrappedDocument()` color inherit 縮小作用域；`injectionScript()` 加 `clearAncestorBg()`
 - `MonoriCore/Sources/MonoriCore/Assets/ReaderRuleset.css` — 加 `color-scheme`、dark mode text color `!important`
 - `MonoriCore/Sources/MonoriCore/Assets/AFFReaderRuleset.css` — 加背景祖先鏈級聯、dark mode text color `!important`

@@ -208,6 +208,22 @@ public final class LibraryStore {
             }
         }
 
+        // 4. AO3: canonicalize chapter URL then match
+        if let canonical = URLNormalizer.canonicalAO3ChapterURL(pageURL) {
+            var descriptor = FetchDescriptor<LocalChapterModel>(
+                predicate: #Predicate { $0.urlString == canonical })
+            descriptor.fetchLimit = 1
+            if let exact = try? context.fetch(descriptor).first {
+                return exact
+            }
+            // Stored URL may not be canonical (older imports); normalize both sides
+            if let chapters = try? context.fetch(FetchDescriptor<LocalChapterModel>()) {
+                return chapters.first {
+                    URLNormalizer.canonicalAO3ChapterURL($0.urlString) == canonical
+                }
+            }
+        }
+
         return nil
     }
 
