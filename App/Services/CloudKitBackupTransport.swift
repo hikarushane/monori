@@ -113,6 +113,9 @@ final class CloudKitBackupTransport: CloudBackupTransport, @unchecked Sendable {
     }
 
     private func checkAccountStatus() async throws {
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            throw CloudBackupError.noAccount
+        }
         let status = try await container.accountStatus()
         switch status {
         case .available: return
