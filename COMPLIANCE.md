@@ -69,9 +69,32 @@ Monori 沒有後端 proxy。WebView 發出的請求會直接打到平台本身�
 
 Monori 不攔截 WebView 任意的網路回應。
 
+iCloud 備份與還原時，App 透過 CloudKit 框架與使用者自己的 iCloud 帳號通訊。這些請求由 CloudKit 直接處理，不經過 Monori 的伺服器。
+
+## iCloud 備份
+
+Monori 提供手動的 iCloud 備份與還原功能。
+
+備份的內容：
+
+- Collection 與章節 metadata（標題、網址、來源、排序）。
+- 書籤與閱讀進度。
+- 閱歷（章節開啟紀錄）。
+
+不備份的內容：
+
+- 匯入的文章 HTML。
+- 認證 cookie、session、token。
+- 使用者的帳號憑證。
+- 閱讀偏好設定（字型大小、主題）。
+
+備份使用使用者自己的 iCloud 帳號，透過 CloudKit 的 private database 存取。每次備份是完整快照，不是差量同步。備份資料只有使用者自己的 iCloud 帳號可以存取。
+
+Monori 不做自動同步、不做跨裝置即時同步、不把備份資料送到 Monori 的伺服器。
+
 ## Monori 不提供的東西
 
-- 沒有 Monori 後端或雲端儲存。
+- 沒有 Monori 後端。iCloud 備份使用使用者自己的 iCloud 帳號，不經過 Monori 的伺服器。
 - 不提供跨使用者的內容分享或彙整。
 - 不會把匯入的章節／文件內容上傳到 Monori 的基礎設施。
 - 沒有內容分析、廣告分析，也沒有 AI 服務會收到匯入的內容。
@@ -88,15 +111,17 @@ Monori 不攔截 WebView 任意的網路回應。
 - 創作者名稱、看得到的日期字串。
 - 閱讀狀態、排序、閱讀進度、書籤。
 - 字型與閱讀偏好設定。
+- 閱歷（章節開啟紀錄與時間戳記）。
 - 需要本機內容才能顯示的來源，其匯入的章節／文件 HTML。
 
-這些都是本機 App 資料，Monori 不會同步到自己的雲端服務，因為沒有這個服務。
+這些都是本機 App 資料。iCloud 備份會備份上述除了文章 HTML 與偏好設定以外的 metadata，但備份資料存在使用者自己的 iCloud 帳號裡，不經過 Monori 的伺服器。
 
 ## 資料刪除
 
-- **清除 Library 資料**：刪除本機 library 的 metadata 與 App 存下的匯入內容。
+- **清除 Library 資料**：刪除本機 library 的 metadata、閱歷與 App 存下的匯入內容。iCloud 備份不受影響。
 - **登出**：可以清除 WebView 的網站資料，結束對應網站的 session。
-- 刪除 App 本身，本機資料會依 iOS 的資料管理機制一併移除。
+- **從 iCloud 還原**：以 iCloud 備份覆蓋本機書庫。還原前會先快照本機資料，還原失敗時自動 rollback。
+- 刪除 App 本身，本機資料會依 iOS 的資料管理機制一併移除。iCloud 備份會保留在使用者的 iCloud 帳號中。
 
 ## 存取權收回
 
@@ -128,3 +153,4 @@ Monori 的技術行為本身，不代表每個支援的平台都認可這些使�
 - 不做跨使用者的內容服務。
 - 不把匯入的內容上傳給第三方分析、AI 或儲存服務。
 - 不做任何以繞過平台存取控制為目的的功能。
+- 不把文章內容備份到 iCloud。
