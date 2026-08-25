@@ -53,4 +53,42 @@ final class LibraryQueryTests: XCTestCase {
         XCTAssertEqual(LibraryQuery.apply(all, sort: .title, searchText: "", status: .finished).map(\.id), [b.id])
         XCTAssertEqual(LibraryQuery.apply(all, sort: .title, searchText: "", status: nil).count, 2)
     }
+
+    func testStatusFilterReturnsOnlyMatchingStatus() throws {
+        let reading = try makeCollection(title: "Reading", url: "https://vocus.cc/room/r")
+        let finished = try makeCollection(title: "Finished", url: "https://vocus.cc/room/f")
+        let dropped = try makeCollection(title: "Dropped", url: "https://vocus.cc/room/d")
+        finished.readingStatus = .finished
+        dropped.readingStatus = .dropped
+        let all = [reading, finished, dropped]
+
+        let readingResult = LibraryQuery.apply(all, sort: .title, searchText: "", status: .reading)
+        XCTAssertEqual(readingResult.map(\.title), ["Reading"])
+
+        let finishedResult = LibraryQuery.apply(all, sort: .title, searchText: "", status: .finished)
+        XCTAssertEqual(finishedResult.map(\.title), ["Finished"])
+
+        let droppedResult = LibraryQuery.apply(all, sort: .title, searchText: "", status: .dropped)
+        XCTAssertEqual(droppedResult.map(\.title), ["Dropped"])
+    }
+
+    func testStatusFilterCombinesWithSearch() throws {
+        let a = try makeCollection(title: "焚心", creator: "Ocean", url: "https://vocus.cc/room/a")
+        let b = try makeCollection(title: "焚心外傳", url: "https://vocus.cc/room/b")
+        b.readingStatus = .finished
+        let all = [a, b]
+
+        let result = LibraryQuery.apply(all, sort: .title, searchText: "焚心", status: .reading)
+        XCTAssertEqual(result.map(\.id), [a.id])
+
+        let finishedSearch = LibraryQuery.apply(all, sort: .title, searchText: "焚心", status: .finished)
+        XCTAssertEqual(finishedSearch.map(\.id), [b.id])
+    }
+
+    func testEmptyStatusScopeReturnsEmpty() throws {
+        let a = try makeCollection(title: "A", url: "https://vocus.cc/room/a")
+        let all = [a]
+        XCTAssertTrue(LibraryQuery.apply(all, sort: .title, searchText: "", status: .finished).isEmpty)
+        XCTAssertTrue(LibraryQuery.apply(all, sort: .title, searchText: "", status: .dropped).isEmpty)
+    }
 }

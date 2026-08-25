@@ -335,7 +335,24 @@ public final class LibraryStore {
     public func setReadingStatus(_ status: CollectionReadingStatus,
                                  for collection: LocalCollectionModel) {
         collection.readingStatus = status
+        if status == .finished {
+            for chapter in collection.chapters where chapter.isNew {
+                chapter.isNew = false
+            }
+        }
         try? context.save()
+    }
+
+    public func clearReadingHistory() throws {
+        for entry in try readingHistory() { context.delete(entry) }
+        try context.save()
+    }
+
+    public func chapter(id: String) -> LocalChapterModel? {
+        var descriptor = FetchDescriptor<LocalChapterModel>(
+            predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return try? context.fetch(descriptor).first
     }
 
     /// Stamps a completed (auto or manual) new-chapter check, successful or not,
