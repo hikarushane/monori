@@ -77,6 +77,9 @@ struct LibraryView: View {
                     .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
                     .tracking(-0.6)
 
+                statusScopeMenu
+                    .padding(.leading, MonoriSpacing.x3)
+
                 Spacer()
 
                 HStack(spacing: 18) {
@@ -118,8 +121,6 @@ struct LibraryView: View {
                 .foregroundStyle(MonoriPalette.ink)
             }
 
-            statusScopePicker
-
             Text("共 \(collections.count) 部作品")
                 .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
@@ -139,39 +140,30 @@ struct LibraryView: View {
         }
     }
 
-    private var statusScopePicker: some View {
-        HStack(spacing: MonoriSpacing.x1) {
+    private var statusScopeMenu: some View {
+        Menu {
             ForEach(CollectionReadingStatus.allCases, id: \.rawValue) { status in
-                statusScopeChip(status)
-            }
-        }
-    }
-
-    private func statusScopeChip(_ status: CollectionReadingStatus) -> some View {
-        let isSelected = statusFilter == status
-        return Button {
-            statusFilter = status
-        } label: {
-            Text(status.label)
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                           weight: isSelected ? .semibold : .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.ink)
-                .lineLimit(1)
-                .padding(.horizontal, MonoriSpacing.x2)
-                .padding(.vertical, 10)
-                .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
-                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
-                .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control)
-                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
-                                lineWidth: 1)
+                Button {
+                    statusFilter = status
+                } label: {
+                    if statusFilter == status {
+                        Label(status.label, systemImage: "checkmark")
+                    } else {
+                        Text(status.label)
+                    }
                 }
+                .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Text(statusFilter.label)
+                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .medium))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+            }
+            .foregroundStyle(MonoriPalette.secondaryInk)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(status.label)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-        .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+        .accessibilityLabel("閱讀狀態：\(statusFilter.label)")
     }
 
     private var sourceFilterPicker: some View {
@@ -414,7 +406,7 @@ struct LibraryView: View {
         }
         switch statusFilter {
         case .reading: return "目前沒有追更中的作品"
-        case .finished: return "還沒有已讀完的作品"
+        case .finished: return "還沒有完食的作品"
         case .dropped: return "沒有棄坑的作品"
         }
     }
@@ -422,7 +414,7 @@ struct LibraryView: View {
     private var scopedEmptyHint: String? {
         if sourceFilter != nil { return nil }
         switch statusFilter {
-        case .finished: return "可在作品的章節選單中改成「已讀完」。"
+        case .finished: return "可在作品的章節選單中改成「完食」。"
         default: return nil
         }
     }
