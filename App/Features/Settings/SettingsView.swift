@@ -13,6 +13,12 @@ struct SettingsView: View {
     @State private var logExport: LogExport?
     @State private var showNoLogsAlert = false
     @State private var showExportFailedAlert = false
+    @State private var confirmRestore = false
+    @State private var showForceBackupConfirm = false
+    @State private var forceBackupMessage = ""
+    @State private var showResultAlert = false
+    @State private var resultAlertTitle = ""
+    @State private var resultAlertMessage = ""
 
     var body: some View {
         @Bindable var prefs = env.prefs
@@ -151,7 +157,15 @@ struct SettingsView: View {
                         .padding(.horizontal, MonoriSpacing.x3)
                         .padding(.vertical, MonoriSpacing.x2)
                     }
-                    sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節與書籤。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。")
+                    sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節、書籤與閱歷。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。iCloud 備份不受影響。")
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("iCloud 備份")
+                    settingsGroup {
+                        backupSectionContent()
+                    }
+                    sectionFootnote("僅備份書庫、書籤、閱讀進度與閱歷。不含文章內容、登入資料或個人帳號資訊。")
                 }
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
@@ -206,7 +220,7 @@ struct SettingsView: View {
 
                         groupDivider()
 
-                        Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結與書籤，不儲存文章內容。所有文章存取由各平台控制。")
+                        Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結、書籤與閱歷，不儲存文章內容。備份至 iCloud 時同樣不含文章內容。所有文章存取由各平台控制。")
                             .font(MonoriTypography.ui(14, relativeTo: .subheadline))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                             .lineSpacing(6)
@@ -221,9 +235,11 @@ struct SettingsView: View {
         }
         .background(MonoriPalette.canvas)
         .tint(MonoriPalette.ink)
-        .confirmationDialog("刪除所有收藏、章節與書籤？",
+        .confirmationDialog("刪除此裝置上的書庫資料？",
                             isPresented: $confirmClearLibrary, titleVisibility: .visible) {
             Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
+        } message: {
+            Text("會刪除此裝置上的書庫、章節、書籤、閱讀進度與閱歷。網站登入資料與 iCloud 備份不受影響。")
         }
         .confirmationDialog("清除內建瀏覽器的所有 cookie 與登入狀態？",
                             isPresented: $confirmLogout, titleVisibility: .visible) {
@@ -240,8 +256,190 @@ struct SettingsView: View {
         .alert("匯出失敗", isPresented: $showExportFailedAlert) {
             Button("好", role: .cancel) {}
         }
+        .confirmationDialog("從 iCloud 還原備份？",
+                            isPresented: $confirmRestore, titleVisibility: .visible) {
+            Button("還原", role: .destructive) {
+                Task { await performRestore() }
+            }
+        } message: {
+            Text("還原將以 iCloud 備份覆蓋此裝置上的書庫、書籤、閱讀進度與閱歷。此操作無法復原。")
+        }
+        .confirmationDialog("iCloud 上已有更新的備份",
+                            isPresented: $showForceBackupConfirm, titleVisibility: .visible) {
+            Button("覆蓋備份", role: .destructive) {
+                Task { await performForceBackup() }
+            }
+        } message: {
+            Text(forceBackupMessage)
+        }
+        .alert(resultAlertTitle, isPresented: $showResultAlert) {
+            Button("好", role: .cancel) {}
+        } message: {
+            Text(resultAlertMessage)
+        }
+        .task {
+            await env.backupService.checkAvailability()
+        }
     }
 
+
+    private static let backupDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "zh_TW")
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
+    @ViewBuilder
+    private func backupSectionContent() -> some View {
+        let bs = env.backupService
+        if bs.state == .checking {
+            HStack(spacing: MonoriSpacing.x2) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("檢查 iCloud 狀態…")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+            }
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+        } else if bs.state == .noAccount || bs.state == .restricted || bs.state == .unavailable {
+            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                Text("iCloud 無法使用")
+                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                    .foregroundStyle(MonoriPalette.ink)
+                Text(bs.state == .noAccount
+                     ? "請在系統設定中登入 iCloud"
+                     : "iCloud 目前無法使用，請稍後再試")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+            }
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+        } else {
+            if let meta = bs.lastBackupMetadata {
+                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                    Text("上次備份")
+                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .foregroundStyle(MonoriPalette.ink)
+                    Text(Self.backupDateFormatter.string(from: meta.createdAt))
+                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .foregroundStyle(MonoriPalette.secondaryInk)
+                    Text("\(meta.collectionCount) 收藏 · \(meta.chapterCount) 章節 · \(meta.historyCount) 閱歷")
+                        .font(MonoriTypography.ui(13, relativeTo: .footnote))
+                        .foregroundStyle(MonoriPalette.secondaryInk)
+                }
+                .padding(.horizontal, MonoriSpacing.x3)
+                .padding(.vertical, MonoriSpacing.x2)
+            } else {
+                Text("尚無 iCloud 備份")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+                    .padding(.horizontal, MonoriSpacing.x3)
+                    .padding(.vertical, MonoriSpacing.x2)
+            }
+
+            groupDivider()
+
+            Button {
+                Task { await performBackup() }
+            } label: {
+                HStack {
+                    Text("立即備份")
+                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .foregroundStyle(MonoriPalette.ink)
+                    Spacer()
+                    if bs.state == .backingUp {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(bs.state != .available)
+            .opacity(bs.state == .backingUp ? 0.6 : 1)
+            .accessibilityIdentifier("smoke.backupNowButton")
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+
+            groupDivider()
+
+            Button {
+                confirmRestore = true
+            } label: {
+                HStack {
+                    Text("從 iCloud 還原")
+                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .foregroundStyle(.red)
+                    Spacer()
+                    if bs.state == .restoring {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(bs.state != .available || bs.lastBackupMetadata == nil)
+            .opacity(bs.state == .restoring ? 0.6 : 1)
+            .accessibilityIdentifier("smoke.restoreFromCloudButton")
+            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.vertical, MonoriSpacing.x2)
+        }
+    }
+
+    private func performBackup() async {
+        let result = await env.backupService.backup()
+        switch result {
+        case .success:
+            resultAlertTitle = "備份完成"
+            resultAlertMessage = "已成功備份至 iCloud。"
+            showResultAlert = true
+        case .newerBackupExists(let date):
+            forceBackupMessage = "iCloud 備份時間為 \(Self.backupDateFormatter.string(from: date))，比此裝置的資料更新。確定要覆蓋？"
+            showForceBackupConfirm = true
+        case .failed(let error):
+            resultAlertTitle = "備份失敗"
+            resultAlertMessage = error.localizedMessage
+            showResultAlert = true
+        }
+    }
+
+    private func performForceBackup() async {
+        let result = await env.backupService.forceBackup()
+        switch result {
+        case .success:
+            resultAlertTitle = "備份完成"
+            resultAlertMessage = "已成功備份至 iCloud。"
+        case .newerBackupExists:
+            resultAlertTitle = "備份失敗"
+            resultAlertMessage = "備份失敗"
+        case .failed(let error):
+            resultAlertTitle = "備份失敗"
+            resultAlertMessage = error.localizedMessage
+        }
+        showResultAlert = true
+    }
+
+    private func performRestore() async {
+        let result = await env.backupService.restore()
+        switch result {
+        case .success:
+            resultAlertTitle = "還原完成"
+            resultAlertMessage = "已從 iCloud 還原書庫。"
+        case .noBackup:
+            resultAlertTitle = "無備份資料"
+            resultAlertMessage = "iCloud 上沒有備份可供還原。"
+        case .failed(let error):
+            resultAlertTitle = "還原失敗"
+            resultAlertMessage = error.localizedMessage
+        }
+        showResultAlert = true
+    }
 
     private func valueButton(symbol: String, accessibilityLabel: String, identifier: String,
                              disabled: Bool, action: @escaping () -> Void) -> some View {
