@@ -13,6 +13,7 @@ struct LibraryView: View {
     @State private var statusFilter: CollectionReadingStatus = .reading
     @State private var showsSearch = false
     @State private var showsSortMenu = false
+    @State private var showsStatusMenu = false
     @State private var revealedCollectionID: String?
 
     private var collections: [LocalCollectionModel] {
@@ -42,12 +43,13 @@ struct LibraryView: View {
                                    sourceFilter: sourceFilter)
             }
             .overlay {
-                if showsSortMenu {
+                if showsSortMenu || showsStatusMenu {
                     Color.black.opacity(0.001)
                         .ignoresSafeArea()
                         .onTapGesture {
                             withAnimation(.easeOut(duration: 0.15)) {
                                 showsSortMenu = false
+                                showsStatusMenu = false
                             }
                         }
                 }
@@ -56,6 +58,15 @@ struct LibraryView: View {
                 if showsSortMenu {
                     sortDropdown
                         .padding(.top, MonoriSpacing.x1)
+                        .padding(.trailing, MonoriSpacing.x3)
+                        .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                            .combined(with: .opacity))
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if showsStatusMenu {
+                    statusDropdown
+                        .padding(.top, 78)
                         .padding(.trailing, MonoriSpacing.x3)
                         .transition(.scale(scale: 0.95, anchor: .topTrailing)
                             .combined(with: .opacity))
@@ -118,13 +129,17 @@ struct LibraryView: View {
                 .foregroundStyle(MonoriPalette.ink)
             }
 
-            statusScopePicker
+            HStack(alignment: .firstTextBaseline) {
+                Text("共 \(collections.count) 部作品")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+                    .accessibilityIdentifier("smoke.librarySummary")
 
-            Text("共 \(collections.count) 部作品")
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.secondaryInk)
-                .accessibilityIdentifier("smoke.librarySummary")
+                Spacer()
+
+                statusScopeButton
+            }
 
             sourceFilterPicker
         }
@@ -139,39 +154,48 @@ struct LibraryView: View {
         }
     }
 
-    private var statusScopePicker: some View {
-        HStack(spacing: MonoriSpacing.x1) {
-            ForEach(CollectionReadingStatus.allCases, id: \.rawValue) { status in
-                statusScopeChip(status)
+    private var statusScopeButton: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.15)) {
+                showsStatusMenu.toggle()
             }
+        } label: {
+            HStack(spacing: 4) {
+                Text(statusFilter.label)
+                DropdownChevron()
+                    .stroke(MonoriPalette.secondaryInk,
+                            style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                    .frame(width: 10, height: 10)
+                    .rotationEffect(.degrees(showsStatusMenu ? 180 : 0))
+            }
+            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+            .tracking(MonoriTypography.uiTracking)
+            .foregroundStyle(MonoriPalette.secondaryInk)
         }
+        .offset(x: -2.5)
+        .buttonStyle(.plain)
+        .accessibilityLabel("閱讀狀態：\(statusFilter.label)")
+        .accessibilityIdentifier("smoke.libraryStatusMenu")
     }
 
-    private func statusScopeChip(_ status: CollectionReadingStatus) -> some View {
-        let isSelected = statusFilter == status
-        return Button {
-            statusFilter = status
-        } label: {
-            Text(status.label)
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
-                                           weight: isSelected ? .semibold : .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.ink)
-                .lineLimit(1)
-                .padding(.horizontal, MonoriSpacing.x2)
-                .padding(.vertical, 10)
-                .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
-                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
-                .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control)
-                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
-                                lineWidth: 1)
+    private var statusDropdown: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(CollectionReadingStatus.allCases.enumerated()), id: \.element.rawValue) { index, status in
+                if index > 0 { menuGroupDivider() }
+                menuOptionRow(status.label, selected: statusFilter == status,
+                              dismiss: $showsStatusMenu) {
+                    statusFilter = status
                 }
+                .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(status.label)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-        .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+        .background(MonoriPalette.surface,
+                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+        .overlay {
+            RoundedRectangle(cornerRadius: MonoriRadius.container)
+                .stroke(MonoriPalette.divider, lineWidth: 1)
+        }
+        .frame(width: 130)
     }
 
     private var sourceFilterPicker: some View {
@@ -256,13 +280,13 @@ struct LibraryView: View {
 
     private var sortDropdown: some View {
         VStack(spacing: 0) {
-            menuOptionRow("標題", selected: sortOrder == .title) { sortOrder = .title }
+            menuOptionRow("標題", selected: sortOrder == .title, dismiss: $showsSortMenu) { sortOrder = .title }
             menuGroupDivider()
-            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated) { sortOrder = .recentlyUpdated }
+            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated, dismiss: $showsSortMenu) { sortOrder = .recentlyUpdated }
             menuGroupDivider()
-            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead) { sortOrder = .recentlyRead }
+            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead, dismiss: $showsSortMenu) { sortOrder = .recentlyRead }
             menuGroupDivider()
-            menuOptionRow("來源", selected: sortOrder == .source) { sortOrder = .source }
+            menuOptionRow("來源", selected: sortOrder == .source, dismiss: $showsSortMenu) { sortOrder = .source }
         }
         .background(MonoriPalette.surface,
                     in: RoundedRectangle(cornerRadius: MonoriRadius.container))
@@ -274,11 +298,12 @@ struct LibraryView: View {
     }
 
     private func menuOptionRow(_ title: String, selected: Bool,
+                               dismiss: Binding<Bool>,
                                action: @escaping () -> Void) -> some View {
         Button {
             action()
             withAnimation(.easeOut(duration: 0.15)) {
-                showsSortMenu = false
+                dismiss.wrappedValue = false
             }
         } label: {
             HStack {
@@ -414,7 +439,7 @@ struct LibraryView: View {
         }
         switch statusFilter {
         case .reading: return "目前沒有追更中的作品"
-        case .finished: return "還沒有已讀完的作品"
+        case .finished: return "還沒有完食的作品"
         case .dropped: return "沒有棄坑的作品"
         }
     }
@@ -422,7 +447,7 @@ struct LibraryView: View {
     private var scopedEmptyHint: String? {
         if sourceFilter != nil { return nil }
         switch statusFilter {
-        case .finished: return "可在作品的章節選單中改成「已讀完」。"
+        case .finished: return "可在作品的章節選單中改成「完食」。"
         default: return nil
         }
     }

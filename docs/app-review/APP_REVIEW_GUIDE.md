@@ -186,10 +186,19 @@ The Library provides:
 * Collection management
 * Chapter navigation
 * Reading progress
-* Reading status
+* Reading status (追更中 / 完食 / 棄坑)
+* Reading history (閱歷)
 * Bookmarks
 * Search and sorting
 * Following / update checking for supported sources
+
+### Status scope
+
+The Library header displays a status dropdown next to the title: 追更中 (Reading), 完食 (Finished), and 棄坑 (Dropped). The default view shows works with the Reading status. Users can change a work's status from the chapter list menu. Marking a work as Finished clears its unread badges but preserves bookmarks, reading progress, and history.
+
+### Reading history
+
+Tap the clock icon in the Library header to view reading history. Each entry records when a chapter was opened, grouped by date. Tapping an entry reopens the chapter. Entries for deleted works remain visible but cannot be reopened. Users can clear all history without affecting the library.
 
 ---
 
