@@ -22,9 +22,11 @@ public final class LibraryStore {
     }
 
     public static func onDisk() throws -> LibraryStore {
+        let config = ModelConfiguration(cloudKitDatabase: .none)
         let container = try ModelContainer(
             for: LocalCollectionModel.self, LocalChapterModel.self,
-            LocalReadingHistoryEntry.self)
+            LocalReadingHistoryEntry.self,
+            configurations: config)
         return LibraryStore(container: container)
     }
 

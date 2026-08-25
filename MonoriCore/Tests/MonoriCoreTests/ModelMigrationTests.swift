@@ -13,6 +13,20 @@ final class ModelMigrationTests: XCTestCase {
         _ = store
     }
 
+    @MainActor
+    func testOnDiskContainerIsLocalOnly() throws {
+        let store = try LibraryStore.onDisk()
+        let configs = store.container.configurations
+        XCTAssertFalse(configs.isEmpty)
+        for config in configs {
+            let desc = String(describing: config.cloudKitDatabase)
+            XCTAssertTrue(desc.contains("_none: true"),
+                          "on-disk container must use cloudKitDatabase: .none, got \(desc)")
+            XCTAssertTrue(desc.contains("_automatic: false"),
+                          "on-disk container must not use automatic CloudKit, got \(desc)")
+        }
+    }
+
     func testGoogleDocsCollectionRoundTrips() throws {
         let c = LocalCollectionModel(title: "Doc", sourceURLString: "https://docs.google.com/document/d/abc",
                                      sourceKind: .googleDocs)
