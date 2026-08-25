@@ -64,3 +64,8 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     dependencies:
       - package: MonoriCore
+schemes:
+  Monori:
+    build:
+      targets:
+        Monori: all

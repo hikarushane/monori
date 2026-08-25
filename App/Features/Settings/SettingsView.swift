@@ -23,6 +23,7 @@ struct SettingsView: View {
     var body: some View {
         @Bindable var prefs = env.prefs
 
+        NavigationStack {
         ScrollView {
             VStack(alignment: .leading, spacing: MonoriSpacing.x5) {
 
@@ -118,25 +119,30 @@ struct SettingsView: View {
 
                         groupDivider()
 
-                        HStack {
-                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
-                                HStack(spacing: MonoriSpacing.x1) {
+                        NavigationLink {
+                            ReaderFontPickerView()
+                                .environment(env)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                                     Text("閱讀字體")
                                         .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
                                         .foregroundStyle(MonoriPalette.ink)
-                                    Text("（施工中）")
-                                        .font(MonoriTypography.ui(11, relativeTo: .caption, weight: .light))
+                                    Text(currentFontDisplayName)
+                                        .font(MonoriTypography.reader(14, relativeTo: .subheadline))
+                                        .italic()
                                         .foregroundStyle(MonoriPalette.secondaryInk)
                                 }
-                                Text("Source Serif 4 (預設)")
-                                    .font(MonoriTypography.reader(14, relativeTo: .subheadline))
-                                    .italic()
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(MonoriTypography.ui(14, relativeTo: .body, weight: .semibold))
                                     .foregroundStyle(MonoriPalette.secondaryInk)
                             }
-                            Spacer()
+                            .padding(.horizontal, MonoriSpacing.x3)
+                            .padding(.vertical, MonoriSpacing.x2)
+                            .contentShape(Rectangle())
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -235,6 +241,8 @@ struct SettingsView: View {
         }
         .background(MonoriPalette.canvas)
         .tint(MonoriPalette.ink)
+        .navigationBarHidden(true)
+        }
         .confirmationDialog("刪除此裝置上的書庫資料？",
                             isPresented: $confirmClearLibrary, titleVisibility: .visible) {
             Button("清除書庫資料", role: .destructive) { env.clearLibraryData() }
@@ -282,6 +290,15 @@ struct SettingsView: View {
         }
     }
 
+
+    private var currentFontDisplayName: String {
+        let id = env.prefs.selectedFontID
+        if id == ReaderFontDescriptor.builtInDefault.id {
+            return ReaderFontDescriptor.builtInDefault.displayName
+        }
+        return env.readerFontStore.descriptor(for: id)?.displayName
+            ?? ReaderFontDescriptor.builtInDefault.displayName
+    }
 
     private static let backupDateFormatter: DateFormatter = {
         let f = DateFormatter()

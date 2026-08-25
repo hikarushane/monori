@@ -36,7 +36,8 @@ struct ReaderView: View {
     private func wrappedHTML(_ inner: String) -> String {
         ReaderStyler.wrappedDocument(inner: inner,
                                      fontSizePoints: prefs.fontSize,
-                                     lineHeight: prefs.lineSpacing)
+                                     lineHeight: prefs.lineSpacing,
+                                     font: env.resolvedFontCSS())
     }
 
     var body: some View {
@@ -86,6 +87,7 @@ struct ReaderView: View {
                 .onChange(of: env.reader.currentURL) { _, newURL in syncCurrentChapter(to: newURL) }
                 .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
                 .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
+                .onChange(of: prefs.selectedFontID) { _, _ in applyFont() }
         }
         .ignoresSafeArea(edges: .bottom)
     }
@@ -322,6 +324,9 @@ struct ReaderView: View {
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
                     }
                 }
+                let fontCSS = env.resolvedFontCSS()
+                _ = try? await webView.evaluateJavaScript(
+                    ReaderStyler.fontFamilyScript(font: fontCSS))
                 _ = try? await webView.evaluateJavaScript(
                     ReaderStyler.fontSizeScript(points: prefs.fontSize))
                 _ = try? await webView.evaluateJavaScript(
@@ -350,6 +355,17 @@ struct ReaderView: View {
                 ReaderStyler.fontSizeScript(points: prefs.fontSize))
             _ = try? await webView.evaluateJavaScript(
                 ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+        }
+    }
+
+    private func applyFont() {
+        let webView = env.reader.webView
+        let expectedID = prefs.selectedFontID
+        let fontCSS = env.resolvedFontCSS()
+        Task { @MainActor in
+            guard prefs.selectedFontID == expectedID else { return }
+            _ = try? await webView.evaluateJavaScript(
+                ReaderStyler.fontFamilyScript(font: fontCSS))
         }
     }
 

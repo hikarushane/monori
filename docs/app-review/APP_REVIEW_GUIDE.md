@@ -205,6 +205,7 @@ The Reader provides the following features:
 - Bookmarks
 - Font size adjustment
 - Line spacing adjustment
+- Custom reading font (import .ttf/.otf from Files)
 
 These features are provided by Monori and are available across the supported sources.
 
@@ -230,6 +231,22 @@ The following settings are available:
 * Line spacing
 
 These reading preferences are provided by Monori and are available across all five supported sources.
+
+### Custom reading font
+
+Navigate to **Settings > Appearance > Reading Font**.
+
+From this screen:
+
+1. Tap **Import Font** to select a `.ttf` or `.otf` file from the Files app.
+2. The imported font is validated and stored locally in the app sandbox.
+3. Select an imported font to use it as the Reader body font.
+4. The Reader updates immediately without reloading the chapter.
+5. Swipe left on an imported font to delete it.
+
+Font files are stored only on the device. They are not uploaded, synced, or included in iCloud backups. Clearing library data does not remove imported fonts.
+
+The default font is Source Serif 4 with Noto Serif TC fallback for Traditional Chinese.
 
 ---
 

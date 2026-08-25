@@ -63,6 +63,7 @@ final class AppEnvironment {
         if _autoCheck == nil { _autoCheck = AutoCheckCoordinator(env: self) }
         return _autoCheck!
     }
+    let readerFontStore = ReaderFontStore()
     let prefs = ReaderPreferences()
     let appPrefs = AppPreferences()
     @ObservationIgnored private var _backupService: ICloudBackupService?
@@ -108,11 +109,27 @@ final class AppEnvironment {
         // Pre-warm the default Patreon URL so it's already loading by the time
         // BrowseView appears, reducing perceived cold start latency.
         browse.load(SourceRegistry.patreon.startURL)
+
+        validateFontSelection()
     }
 
     init(store: LibraryStore) {
         self.store = store
         wire(browse)
+    }
+
+    func validateFontSelection() {
+        let id = prefs.selectedFontID
+        guard id != ReaderPreferences.defaultFontID else { return }
+        if readerFontStore.descriptor(for: id) == nil {
+            prefs.resetFontToDefault()
+            DiagnosticLog.shared.log(category: "font",
+                "selected font \(id) missing, reset to default")
+        }
+    }
+
+    func resolvedFontCSS() -> ReaderFontCSS {
+        readerFontStore.resolveCSS(for: prefs.selectedFontID)
     }
 
     func startSmokeToolsIfNeeded() {

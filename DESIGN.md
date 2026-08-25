@@ -79,10 +79,13 @@
 - 字型載入失敗時，使用具備繁體中文覆蓋的無襯線 fallback；不得以 Inter、
   SF Pro 或系統字體作為此視覺系統的設計基準。
 
-### 閱讀內容：Source Serif 4
+### 閱讀內容：Source Serif 4（預設）；使用者可選擇本機匯入字型
 
-- 閱讀器正文一律以 **Source Serif 4** 為核心；繁體中文缺字時以 **Noto Serif
+- 閱讀器正文預設以 **Source Serif 4** 為核心；繁體中文缺字時以 **Noto Serif
   TC** 補足字形，兩者都必須維持襯線閱讀節奏。閱讀器不得回退為 UI sans-serif。
+- 使用者可從「設定 → 外觀 → 閱讀字體」匯入 `.ttf` 或 `.otf` 字型，並選擇
+  作為閱讀器正文字型。匯入字型僅存於 app sandbox，不上傳、不隨「清除書庫
+  資料」刪除。使用者匯入字型的 fallback 仍為 **Noto Serif TC** 與 serif。
 - 正文預設 18–20pt，行高 `1.9`（可在 `1.8–2.0` 間由閱讀偏好調整），段落間距
   至少 `0.85em`。行寬以約 28–34 個漢字為目標，避免寬到需要視線大幅橫移。
 - 章名可使用 Source Serif 4 semibold；作者、章節 metadata 與閱讀工具列仍使用

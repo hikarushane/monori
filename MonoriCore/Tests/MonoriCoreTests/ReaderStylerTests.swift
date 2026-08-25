@@ -324,6 +324,128 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(js.contains("document.fonts.check"))
     }
 
+    // MARK: - CSS variable --monori-font-family
+
+    func testAllRulesetsUseFontFamilyVariable() {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+            XCTAssertTrue(css.contains("--monori-font-family"),
+                          "Ruleset must declare --monori-font-family")
+            XCTAssertTrue(css.contains("var(--monori-font-family)"),
+                          "Ruleset must use var(--monori-font-family) for font-family")
+        }
+    }
+
+    func testAllRulesetsDeclareFontFamilyDefault() {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+            XCTAssertTrue(css.contains(#"--monori-font-family: "Source Serif 4", "Noto Serif TC", serif"#),
+                          "Ruleset must set default --monori-font-family value")
+        }
+    }
+
+    // MARK: - fontFamilyScript
+
+    func testFontFamilyScriptBuiltInRestoresDefaultStack() {
+        let js = ReaderStyler.fontFamilyScript(font: .builtIn)
+        XCTAssertTrue(js.contains("Source Serif 4"))
+        XCTAssertTrue(js.contains("Noto Serif TC"))
+        XCTAssertTrue(js.contains("--monori-font-family"))
+        XCTAssertTrue(js.contains(ReaderStyler.userFontStyleID))
+    }
+
+    func testFontFamilyScriptImportedCreatesMonoriUserFont() {
+        let js = ReaderStyler.fontFamilyScript(
+            font: .embeddedDataURL(mimeType: "font/ttf", base64: "AAAA"))
+        XCTAssertTrue(js.contains("MonoriUserFont"))
+        XCTAssertTrue(js.contains("@font-face"))
+        XCTAssertTrue(js.contains("data:font/ttf;base64,AAAA"))
+        XCTAssertTrue(js.contains("--monori-font-family"))
+        XCTAssertTrue(js.contains("Noto Serif TC"),
+                      "Imported font must keep Noto Serif TC fallback")
+    }
+
+    func testFontFamilyScriptTTFMime() {
+        let js = ReaderStyler.fontFamilyScript(
+            font: .embeddedDataURL(mimeType: "font/ttf", base64: "X"))
+        XCTAssertTrue(js.contains("font/ttf"))
+    }
+
+    func testFontFamilyScriptOTFMime() {
+        let js = ReaderStyler.fontFamilyScript(
+            font: .embeddedDataURL(mimeType: "font/otf", base64: "X"))
+        XCTAssertTrue(js.contains("font/otf"))
+    }
+
+    func testFontFamilyScriptImportedHasFontLoadCheck() {
+        let js = ReaderStyler.fontFamilyScript(
+            font: .embeddedDataURL(mimeType: "font/ttf", base64: "X"))
+        XCTAssertTrue(js.contains("document.fonts.load"))
+    }
+
+    func testFontFamilyScriptImportedFallsBackOnFailure() {
+        let js = ReaderStyler.fontFamilyScript(
+            font: .embeddedDataURL(mimeType: "font/ttf", base64: "X"))
+        XCTAssertTrue(js.contains("fallback"),
+                      "Script must return 'fallback' on font load failure")
+        XCTAssertTrue(js.contains(ReaderStyler.defaultFontStack),
+                      "Fallback restores default font stack")
+    }
+
+    // MARK: - removalScript clears user font
+
+    func testRemovalScriptClearsUserFontStyle() {
+        let js = ReaderStyler.removalScript()
+        XCTAssertTrue(js.contains(ReaderStyler.userFontStyleID))
+        XCTAssertTrue(js.contains("--monori-font-family"))
+    }
+
+    // MARK: - wrappedDocument with font
+
+    func testWrappedDocumentBuiltInUsesFontVariable() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9,
+                                                font: .builtIn)
+        XCTAssertTrue(html.contains("--monori-font-family"))
+        XCTAssertTrue(html.contains("var(--monori-font-family)"))
+        XCTAssertFalse(html.contains("MonoriUserFont"))
+    }
+
+    func testWrappedDocumentImportedEmbedsUserFont() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9,
+                                                font: .embeddedDataURL(mimeType: "font/otf",
+                                                                       base64: "BBBB"))
+        XCTAssertTrue(html.contains("MonoriUserFont"))
+        XCTAssertTrue(html.contains("data:font/otf;base64,BBBB"))
+        XCTAssertTrue(html.contains("var(--monori-font-family)"))
+        XCTAssertTrue(html.contains("Noto Serif TC"))
+    }
+
+    func testWrappedDocumentImportedKeepsTypographyVariables() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 21, lineHeight: 1.8,
+                                                font: .embeddedDataURL(mimeType: "font/ttf",
+                                                                       base64: "X"))
+        XCTAssertTrue(html.contains("--monori-font-size: 21px"))
+        XCTAssertTrue(html.contains("--monori-line-height: 1.80"))
+    }
+
+    func testWrappedDocumentImportedKeepsDarkMode() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9,
+                                                font: .embeddedDataURL(mimeType: "font/ttf",
+                                                                       base64: "X"))
+        XCTAssertTrue(html.contains("#1C1B19"))
+        XCTAssertTrue(html.contains("#F2F0ED"))
+        XCTAssertTrue(html.contains("prefers-color-scheme: dark"))
+    }
+
+    func testWrappedDocumentDefaultParameterIsBuiltIn() {
+        let html = ReaderStyler.wrappedDocument(inner: "<p>x</p>",
+                                                fontSizePoints: 19, lineHeight: 1.9)
+        XCTAssertFalse(html.contains("MonoriUserFont"))
+        XCTAssertTrue(html.contains("Source Serif 4"))
+    }
+
     // MARK: - No banned fonts across all rulesets
 
     func testNoGeorgiaAcrossAllRulesets() {
