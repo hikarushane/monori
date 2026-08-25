@@ -46,6 +46,6 @@ enum MonoriSpacing {
 }
 
 enum MonoriRadius {
-    static let control: CGFloat = 8
-    static let container: CGFloat = 12
+    static let control: CGFloat = 12
+    static let container: CGFloat = 20
 }
