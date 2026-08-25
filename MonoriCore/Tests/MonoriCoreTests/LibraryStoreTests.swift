@@ -35,8 +35,10 @@ final class LibraryStoreTests: XCTestCase {
 
     private func onDiskStore(at storeURL: URL) throws -> LibraryStore {
         let config = ModelConfiguration("LibraryStoreTests", url: storeURL)
-        let container = try ModelContainer(for: LocalCollectionModel.self, LocalChapterModel.self,
-                                           configurations: config)
+        let container = try ModelContainer(
+            for: LocalCollectionModel.self, LocalChapterModel.self,
+            LocalReadingHistoryEntry.self,
+            configurations: config)
         return LibraryStore(container: container)
     }
 
@@ -546,5 +548,81 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(chapter.title, "Ch 1 (updated title)")
         XCTAssertEqual(chapter.contentHTML, "<p>Saved content</p>",
                        "nil contentHTML must not overwrite stored content")
+    }
+
+    // MARK: - Reading history
+
+    func testRecordChapterOpenedCreatesHistoryEntry() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        store.recordChapterOpened(chapter)
+        let history = try store.readingHistory()
+        XCTAssertEqual(history.count, 1)
+        XCTAssertEqual(history[0].chapterID, chapter.id)
+        XCTAssertEqual(history[0].chapterTitle, "Ch1")
+        XCTAssertEqual(history[0].collectionTitle, "【更新中】焚心 The Burning Heart")
+        XCTAssertEqual(history[0].sourceKindRaw, SourceKind.patreon.rawValue)
+    }
+
+    func testRecordChapterOpenedDifferentChapterCreatesSecondEntry() throws {
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2", order: 1)
+        ])
+        let chapters = store.orderedChapters(of: try store.collections()[0])
+        store.recordChapterOpened(chapters[0])
+        store.recordChapterOpened(chapters[1])
+        let history = try store.readingHistory()
+        XCTAssertEqual(history.count, 2)
+        XCTAssertEqual(history[0].chapterID, chapters[1].id)
+        XCTAssertEqual(history[1].chapterID, chapters[0].id)
+    }
+
+    func testRecordChapterOpenedCoalescesWithinWindow() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        let t0 = Date.now
+        store.recordChapterOpened(chapter, at: t0)
+        let t1 = t0.addingTimeInterval(60)
+        store.recordChapterOpened(chapter, at: t1)
+        let history = try store.readingHistory()
+        XCTAssertEqual(history.count, 1, "should coalesce within 5-min window")
+        XCTAssertEqual(history[0].openedAt, t1, "should update openedAt to latest")
+    }
+
+    func testRecordChapterOpenedCreatesNewEntryAfterWindow() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        let t0 = Date.now
+        store.recordChapterOpened(chapter, at: t0)
+        let t1 = t0.addingTimeInterval(LibraryStore.historyCoalescingInterval + 1)
+        store.recordChapterOpened(chapter, at: t1)
+        let history = try store.readingHistory()
+        XCTAssertEqual(history.count, 2, "should create new entry after window")
+    }
+
+    func testRecordChapterOpenedPreservesIsNewAndLastReadAt() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2", order: 1)
+        ])
+        let c = try store.collections()[0]
+        let newChapter = store.orderedChapters(of: c)[1]
+        XCTAssertTrue(newChapter.isNew)
+        store.recordChapterOpened(newChapter)
+        XCTAssertFalse(newChapter.isNew)
+        XCTAssertNotNil(c.lastReadAt)
+        XCTAssertEqual(c.unreadCount, 0)
+    }
+
+    func testClearLibraryAlsoClearsHistory() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        store.recordChapterOpened(chapter)
+        XCTAssertEqual(try store.readingHistoryCount(), 1)
+        try store.clearLibrary()
+        XCTAssertEqual(try store.readingHistoryCount(), 0)
+        XCTAssertEqual(try store.collectionCount(), 0)
     }
 }

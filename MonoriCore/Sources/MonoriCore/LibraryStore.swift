@@ -6,19 +6,25 @@ public final class LibraryStore {
     public let container: ModelContainer
     private var context: ModelContext { container.mainContext }
 
+    public static let historyCoalescingInterval: TimeInterval = 300
+
     public init(container: ModelContainer) {
         self.container = container
     }
 
     public static func inMemory() throws -> LibraryStore {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: LocalCollectionModel.self, LocalChapterModel.self,
-                                           configurations: config)
+        let container = try ModelContainer(
+            for: LocalCollectionModel.self, LocalChapterModel.self,
+            LocalReadingHistoryEntry.self,
+            configurations: config)
         return LibraryStore(container: container)
     }
 
     public static func onDisk() throws -> LibraryStore {
-        let container = try ModelContainer(for: LocalCollectionModel.self, LocalChapterModel.self)
+        let container = try ModelContainer(
+            for: LocalCollectionModel.self, LocalChapterModel.self,
+            LocalReadingHistoryEntry.self)
         return LibraryStore(container: container)
     }
 
@@ -265,14 +271,54 @@ public final class LibraryStore {
 
     public func clearLibrary() throws {
         for collection in try collections() { context.delete(collection) }
+        for entry in try readingHistory() { context.delete(entry) }
         try context.save()
     }
 
-    /// Called when the user opens a chapter (TOC tap or reader prev/next).
-    public func markChapterOpened(_ chapter: LocalChapterModel, at date: Date = .now) {
+    public func readingHistory() throws -> [LocalReadingHistoryEntry] {
+        try context.fetch(FetchDescriptor<LocalReadingHistoryEntry>(
+            sortBy: [SortDescriptor(\.openedAt, order: .reverse)]))
+    }
+
+    public func readingHistoryCount() throws -> Int {
+        try context.fetchCount(FetchDescriptor<LocalReadingHistoryEntry>())
+    }
+
+    public func recordChapterOpened(_ chapter: LocalChapterModel, at date: Date = .now) {
         chapter.isNew = false
         chapter.collection?.lastReadAt = date
+        coalesceOrInsertHistory(for: chapter, at: date)
         try? context.save()
+    }
+
+    @available(*, deprecated, renamed: "recordChapterOpened(_:at:)")
+    public func markChapterOpened(_ chapter: LocalChapterModel, at date: Date = .now) {
+        recordChapterOpened(chapter, at: date)
+    }
+
+    private func coalesceOrInsertHistory(for chapter: LocalChapterModel, at date: Date) {
+        let chapterID = chapter.id
+        let threshold = date.addingTimeInterval(-Self.historyCoalescingInterval)
+        var descriptor = FetchDescriptor<LocalReadingHistoryEntry>(
+            predicate: #Predicate { $0.chapterID == chapterID && $0.openedAt > threshold },
+            sortBy: [SortDescriptor(\.openedAt, order: .reverse)])
+        descriptor.fetchLimit = 1
+        if let existing = try? context.fetch(descriptor).first {
+            existing.openedAt = date
+            return
+        }
+        let collectionID = chapter.collection?.id ?? ""
+        let collectionTitle = chapter.collection?.title ?? ""
+        let sourceKindRaw = chapter.collection?.sourceKindRaw ?? SourceKind.patreon.rawValue
+        let entry = LocalReadingHistoryEntry(
+            collectionID: collectionID,
+            chapterID: chapterID,
+            collectionTitle: collectionTitle,
+            chapterTitle: chapter.title,
+            chapterURLString: chapter.urlString,
+            sourceKindRaw: sourceKindRaw,
+            openedAt: date)
+        context.insert(entry)
     }
 
     /// Clears the unread dot on every chapter in the collection at once.

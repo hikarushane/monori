@@ -89,3 +89,33 @@ public final class LocalChapterModel {
         self.excerpt = excerpt
     }
 }
+
+@Model
+public final class LocalReadingHistoryEntry {
+    @Attribute(.unique) public var id: String
+    public var collectionID: String
+    public var chapterID: String
+    public var collectionTitle: String
+    public var chapterTitle: String
+    public var chapterURLString: String
+    public var sourceKindRaw: String
+    public var openedAt: Date
+
+    public init(id: String = UUID().uuidString,
+                collectionID: String,
+                chapterID: String,
+                collectionTitle: String,
+                chapterTitle: String,
+                chapterURLString: String,
+                sourceKindRaw: String,
+                openedAt: Date = .now) {
+        self.id = id
+        self.collectionID = collectionID
+        self.chapterID = chapterID
+        self.collectionTitle = collectionTitle
+        self.chapterTitle = chapterTitle
+        self.chapterURLString = chapterURLString
+        self.sourceKindRaw = sourceKindRaw
+        self.openedAt = openedAt
+    }
+}

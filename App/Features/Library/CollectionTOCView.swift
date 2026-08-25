@@ -164,7 +164,6 @@ struct CollectionTOCView: View {
                                     revealedChapterID = nil
                                 }
                             } else {
-                                env.store.markChapterOpened(chapter)
                                 readerTarget = ReaderTarget(id: chapter.id)
                             }
                         }
