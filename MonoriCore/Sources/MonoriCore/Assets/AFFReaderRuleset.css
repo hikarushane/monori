@@ -1,5 +1,6 @@
 :root {
   color-scheme: light dark;
+  --monori-font-family: "Source Serif 4", "Noto Serif TC", serif;
 }
 
 /* --- font declarations --- */
@@ -88,7 +89,7 @@ body {
   margin-left: auto !important;
   margin-right: auto !important;
   padding: 1em clamp(24px, 6vw, 48px) !important;
-  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
+  font-family: var(--monori-font-family) !important;
 }
 
 #bodyText p,

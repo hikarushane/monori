@@ -2,6 +2,8 @@ import Foundation
 
 public enum ReaderStyler {
     public static let styleElementID = "monori-reader-style"
+    public static let userFontStyleID = "monori-user-font-style"
+    static let defaultFontStack = #""Source Serif 4", "Noto Serif TC", serif"#
 
     public static func ruleset() -> String {
         guard let url = Bundle.module.url(forResource: "ReaderRuleset", withExtension: "css"),
@@ -235,6 +237,9 @@ public enum ReaderStyler {
         (function () {
           var old = document.getElementById("\(styleElementID)");
           if (old) { old.remove(); }
+          var uf = document.getElementById("\(userFontStyleID)");
+          if (uf) { uf.remove(); }
+          document.documentElement.style.removeProperty('--monori-font-family');
         })();
         """
     }
@@ -250,16 +255,71 @@ public enum ReaderStyler {
         return "document.documentElement.style.setProperty('--monori-line-height', '\(formatted)');"
     }
 
+    public static func fontFamilyScript(font: ReaderFontCSS) -> String {
+        switch font {
+        case .builtIn:
+            return """
+            (function () {
+              var old = document.getElementById("\(userFontStyleID)");
+              if (old) { old.remove(); }
+              document.documentElement.style.setProperty('--monori-font-family',
+                '\(defaultFontStack)');
+            })();
+            """
+        case .embeddedDataURL(let mimeType, let base64):
+            return """
+            (function () {
+              var old = document.getElementById("\(userFontStyleID)");
+              if (old) { old.remove(); }
+              var style = document.createElement("style");
+              style.id = "\(userFontStyleID)";
+              style.textContent = '@font-face { font-family: "MonoriUserFont"; ' +
+                'src: url("data:\(mimeType);base64,\(base64)"); ' +
+                'font-display: swap; }';
+              document.documentElement.appendChild(style);
+              document.documentElement.style.setProperty('--monori-font-family',
+                '"MonoriUserFont", "Noto Serif TC", serif');
+              document.fonts.load('16px "MonoriUserFont"').then(function () {
+                return "ok";
+              }).catch(function () {
+                var bad = document.getElementById("\(userFontStyleID)");
+                if (bad) { bad.remove(); }
+                document.documentElement.style.setProperty('--monori-font-family',
+                  '\(defaultFontStack)');
+                return "fallback";
+              });
+            })();
+            """
+        }
+    }
+
     /// Full HTML document wrapper for stored chapter HTML (Google Docs import).
     /// Google Docs export inline `font-size`/`line-height` on every paragraph and
     /// span, which beats a plain `body` rule — so the reader's prefs never reach
     /// the prose. The descendant rules below use `!important` so the CSS
     /// variables (also updated live by `fontSizeScript`/`lineHeightScript`) win
     /// over Google's inline styles. Headings keep their own size for hierarchy.
-    public static func wrappedDocument(inner: String, fontSizePoints: Int, lineHeight: Double) -> String {
+    public static func wrappedDocument(inner: String, fontSizePoints: Int, lineHeight: Double,
+                                       font: ReaderFontCSS = .builtIn) -> String {
         let size = min(32, max(14, fontSizePoints))
         let lh = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"),
                         min(2.4, max(1.2, lineHeight)))
+        let userFontFace: String
+        let fontFamilyValue: String
+        switch font {
+        case .builtIn:
+            userFontFace = ""
+            fontFamilyValue = defaultFontStack
+        case .embeddedDataURL(let mimeType, let base64):
+            userFontFace = """
+              @font-face {
+                font-family: "MonoriUserFont";
+                src: url("data:\(mimeType);base64,\(base64)");
+                font-display: swap;
+              }
+            """
+            fontFamilyValue = #""MonoriUserFont", "Noto Serif TC", serif"#
+        }
         return """
         <!doctype html><html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -277,24 +337,20 @@ public enum ReaderStyler {
             font-weight: 200 900;
             font-display: swap;
           }
-          :root { color-scheme: light dark; --monori-font-size: \(size)px; --monori-line-height: \(lh); }
+        \(userFontFace)
+          :root { color-scheme: light dark;
+                  --monori-font-family: \(fontFamilyValue);
+                  --monori-font-size: \(size)px; --monori-line-height: \(lh); }
           html, body { background: #FBF9F8; }
           body { margin: 0; padding: 1em clamp(24px, 6vw, 48px); color: #1C1B19;
-                 font-family: "Source Serif 4", "Noto Serif TC", serif;
+                 font-family: var(--monori-font-family);
                  word-break: break-word; max-width: 34em; margin-left: auto; margin-right: auto; }
-          /* Google Docs mobilebasic exports inline color:#000000 and
-             background-color:#ffffff on every paragraph and span.
-             Override them so the page adapts to light/dark mode. */
           body * { color: inherit !important; background-color: transparent !important; }
           html, body { background: #FBF9F8 !important; }
           @media (prefers-color-scheme: dark) {
             html, body { background: #1C1B19 !important; }
             body { color: #F2F0ED !important; }
           }
-          /* Resize prose and everything inside it, but NOT <h1>-<h6> or their
-             children, so chapter sub-headings keep their relative size. A bare
-             `body span` rule would flatten Google headings, whose text is
-             wrapped in <span> (<h2><span style="font-size:12pt">…). */
           body,
           body p, body p *,
           body li, body li *,

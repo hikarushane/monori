@@ -19,6 +19,7 @@
 
 :root {
   color-scheme: light dark;
+  --monori-font-family: "Source Serif 4", "Noto Serif TC", serif;
 }
 
 /* --- hide chrome --- */
@@ -47,7 +48,7 @@ article,
   margin-right: auto !important;
   padding-left: clamp(24px, 6vw, 48px) !important;
   padding-right: clamp(24px, 6vw, 48px) !important;
-  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
+  font-family: var(--monori-font-family) !important;
 }
 
 /* Size/spacing must hit the text nodes themselves — Patreon sets per-paragraph
@@ -70,7 +71,7 @@ article p,
 
 [data-tag="post-title"],
 article h1 {
-  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
+  font-family: var(--monori-font-family) !important;
   line-height: 1.3 !important;
 }
 

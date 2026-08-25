@@ -2,6 +2,7 @@
    vocus page in light mode even when the device is in dark mode. */
 :root {
   color-scheme: light dark;
+  --monori-font-family: "Source Serif 4", "Noto Serif TC", serif;
 }
 
 /* MonoriCore/Sources/MonoriCore/Assets/VocusReaderRuleset.css
@@ -57,7 +58,7 @@ body > div > div:first-child {
   margin-right: auto !important;
   padding-left: clamp(24px, 6vw, 48px) !important;
   padding-right: clamp(24px, 6vw, 48px) !important;
-  font-family: "Source Serif 4", "Noto Serif TC", serif !important;
+  font-family: var(--monori-font-family) !important;
 }
 
 /* Typography: use app prefs with Uguisu Zen fonts */
