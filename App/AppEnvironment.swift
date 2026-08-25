@@ -65,6 +65,14 @@ final class AppEnvironment {
     }
     let prefs = ReaderPreferences()
     let appPrefs = AppPreferences()
+    @ObservationIgnored private var _backupService: ICloudBackupService?
+    var backupService: ICloudBackupService {
+        if _backupService == nil {
+            let transport = CloudKitBackupTransport(containerID: "iCloud.dev.monori")
+            _backupService = ICloudBackupService(transport: transport, store: store)
+        }
+        return _backupService!
+    }
 
     var importedCountThisSession = 0
     var ao3ImportCurrent = 0

@@ -32,6 +32,13 @@ targets:
     type: application
     platform: iOS
     sources: [App]
+    entitlements:
+      path: App/Monori.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.dev.monori
+        com.apple.developer.icloud-services:
+          - CloudKit
     info:
       path: App/Info.plist
       properties:
