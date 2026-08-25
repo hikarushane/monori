@@ -1,6 +1,6 @@
 # Monori
 
-一個安靜、local-only 的閱讀殼層，讀你自己在 Patreon、Google Docs、AO3、方格子、AsianFanfics 上有權限看的內容。用自己的帳號登入來源網站，把系列的章節匯入 App，用乾淨的排版閱讀，支援上一章／下一章導覽，每章可以個別加書籤。
+一個安靜、local-only 的閱讀殼層，讀你自己在 Patreon、Google Docs、AO3、方格子、AsianFanfics 上有權限看的內容。用自己的帳號登入來源網站，把系列的章節匯入 App，用乾淨的排版閱讀，支援上一章／下一章導覽，每章可以個別加書籤。書庫可以手動備份到你自己的 iCloud 帳號，換機時還原。
 
 Monori 不是任何平台的 client 或 API consumer。不繞過存取控制，不把內容存到自己的伺服器，因為根本沒有這個伺服器。細節見 [COMPLIANCE.md](COMPLIANCE.md)。
 
@@ -9,12 +9,11 @@ Monori 不是任何平台的 client 或 API consumer。不繞過存取控制，�
 <table>
 <tr>
 <td align="center"><img src="docs/showcase/1.png" width="270" alt="書庫"></td>
-<td align="center"><img src="docs/showcase/3.png" width="270" alt="匯入"></td>
-<td align="center"><img src="docs/showcase/4.png" width="270" alt="閱讀模式"></td>
-</tr>
-<tr>
-<td align="center"><img src="docs/showcase/5.png" width="270" alt="書籤"></td>
 <td align="center"><img src="docs/showcase/2.png" width="270" alt="章節導覽"></td>
+<td align="center"><img src="docs/showcase/3.png" width="270" alt="匯入"></td>
+<tr>
+<td align="center"><img src="docs/showcase/4.png" width="270" alt="閱讀模式"></td>
+<td align="center"><img src="docs/showcase/5.png" width="270" alt="書籤"></td>
 <td align="center"><img src="docs/showcase/6.png" width="270" alt="隱私"></td>
 </tr>
 </table>
@@ -57,6 +56,7 @@ swift test --package-path MonoriCore
    - **Google Docs**：打開文件，banner 顯示「Google 文件」與**匯入**；同一份文件裡有多章時，會依標題樣式自動切開。
 3. **書庫與追更**（截圖 1）：Library 分頁選 collection，點章節開始讀。標成**追更中**的 collection 會自動檢查新章節（Settings 可切換），新章節有未讀標記和紅點。工具列選單可排序（標題／最近更新／最近閱讀）、搜尋、篩選；下拉重新整理所有追更中的 collection。
 4. **閱讀器**（截圖 2、4、5）：自動隱藏工具列，點畫面中間顯示／隱藏。字級與行距在偏好設定面板（右上角 aA 按鈕）調整。每章獨立書籤（左上角）。上一章／下一章在底部工具列。左邊緣滑動離開。
+5. **iCloud 備份**：Settings → iCloud 備份 → 立即備份。備份書庫 metadata、書籤、閱讀進度與閱歷到你自己的 iCloud 帳號。不備份文章內容、登入資料或偏好設定。換機或重裝時可從 iCloud 還原，還原失敗會自動 rollback，不會毀掉現有書庫。
 
 ## 已知限制
 
@@ -66,6 +66,6 @@ swift test --package-path MonoriCore
 
 ## 沒有中間人（截圖 6）
 
-沒有 Monori 的伺服器。書庫、書籤、匯入的內容都在你自己的裝置上。不擷取 cookie、不匯出憑證、不持有任何平台的 API 金鑰、不繞過付費牆。存取控制永遠由平台把關，你本來就有權限看的內容，才讀得到。
+沒有 Monori 的伺服器。書庫、書籤、匯入的內容都在你自己的裝置上。iCloud 備份存在你自己的 iCloud 帳號裡，不經過 Monori 的伺服器。不擷取 cookie、不匯出憑證、不持有任何平台的 API 金鑰、不繞過付費牆。存取控制永遠由平台把關，你本來就有權限看的內容，才讀得到。
 
 擷取 cookie、攔截網路封包、呼叫平台的官方或內部 API、把內容存到 Monori 自己的伺服器或做匯出、跨使用者分享，細節見 [COMPLIANCE.md](COMPLIANCE.md)。加這些功能的 PR 會被拒絕。
