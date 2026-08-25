@@ -10,13 +10,14 @@ struct LibraryView: View {
     @State private var sortOrder: LibrarySortOrder = .title
     @State private var searchText = ""
     @State private var sourceFilter: SourceKind?
+    @State private var statusFilter: CollectionReadingStatus = .reading
     @State private var showsSearch = false
     @State private var showsSortMenu = false
     @State private var revealedCollectionID: String?
 
     private var collections: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: sortOrder,
-                           searchText: searchText, status: nil)
+                           searchText: searchText, status: statusFilter)
             .filter { sourceFilter == nil || $0.sourceKind == sourceFilter }
     }
 
@@ -24,7 +25,9 @@ struct LibraryView: View {
         NavigationStack {
             Group {
                 if allCollections.isEmpty {
-                    emptyState
+                    globalEmptyState
+                } else if collections.isEmpty {
+                    scopedEmptyState
                 } else {
                     listContent
                 }
@@ -34,7 +37,9 @@ struct LibraryView: View {
             .safeAreaInset(edge: .top, spacing: 0) { libraryHeader }
             .sheet(isPresented: $showsSearch) {
                 LibrarySearchSheet(allCollections: allCollections,
-                                   searchText: $searchText)
+                                   searchText: $searchText,
+                                   statusFilter: statusFilter,
+                                   sourceFilter: sourceFilter)
             }
             .overlay {
                 if showsSortMenu {
@@ -75,6 +80,15 @@ struct LibraryView: View {
                 Spacer()
 
                 HStack(spacing: 18) {
+                    NavigationLink(value: LibraryRoute.history) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .medium))
+                            .frame(width: 32, height: 32)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("閱歷")
+                    .accessibilityIdentifier("smoke.readingHistoryButton")
+
                     Button {
                         showsSearch = true
                     } label: {
@@ -104,7 +118,9 @@ struct LibraryView: View {
                 .foregroundStyle(MonoriPalette.ink)
             }
 
-            Text("共 \(allCollections.count) 部作品")
+            statusScopePicker
+
+            Text("共 \(collections.count) 部作品")
                 .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(MonoriPalette.secondaryInk)
@@ -121,6 +137,41 @@ struct LibraryView: View {
                 .fill(MonoriPalette.divider)
                 .frame(height: 1)
         }
+    }
+
+    private var statusScopePicker: some View {
+        HStack(spacing: MonoriSpacing.x1) {
+            ForEach(CollectionReadingStatus.allCases, id: \.rawValue) { status in
+                statusScopeChip(status)
+            }
+        }
+    }
+
+    private func statusScopeChip(_ status: CollectionReadingStatus) -> some View {
+        let isSelected = statusFilter == status
+        return Button {
+            statusFilter = status
+        } label: {
+            Text(status.label)
+                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                                           weight: isSelected ? .semibold : .medium))
+                .tracking(MonoriTypography.uiTracking)
+                .foregroundStyle(MonoriPalette.ink)
+                .lineLimit(1)
+                .padding(.horizontal, MonoriSpacing.x2)
+                .padding(.vertical, 10)
+                .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
+                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
+                .overlay {
+                    RoundedRectangle(cornerRadius: MonoriRadius.control)
+                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
+                                lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(status.label)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
     }
 
     private var sourceFilterPicker: some View {
@@ -193,6 +244,12 @@ struct LibraryView: View {
         .navigationDestination(for: String.self) { id in
             if let collection = allCollections.first(where: { $0.id == id }) {
                 CollectionTOCView(collection: collection)
+            }
+        }
+        .navigationDestination(for: LibraryRoute.self) { route in
+            switch route {
+            case .history:
+                ReadingHistoryView()
             }
         }
     }
@@ -321,7 +378,7 @@ struct LibraryView: View {
         .padding(.vertical, MonoriSpacing.x2)
     }
 
-    private var emptyState: some View {
+    private var globalEmptyState: some View {
         VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
             Text("尚無收藏")
                 .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .semibold))
@@ -333,6 +390,41 @@ struct LibraryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(MonoriSpacing.x3)
+    }
+
+    private var scopedEmptyState: some View {
+        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+            Text(scopedEmptyTitle)
+                .font(MonoriTypography.ui(18, relativeTo: .title3, weight: .semibold))
+                .foregroundStyle(MonoriPalette.ink)
+            if let hint = scopedEmptyHint {
+                Text(hint)
+                    .font(MonoriTypography.ui(16, relativeTo: .body))
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+                    .lineSpacing(6)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(MonoriSpacing.x3)
+    }
+
+    private var scopedEmptyTitle: String {
+        if sourceFilter != nil {
+            return "此來源沒有符合目前狀態的作品"
+        }
+        switch statusFilter {
+        case .reading: return "目前沒有追更中的作品"
+        case .finished: return "還沒有已讀完的作品"
+        case .dropped: return "沒有棄坑的作品"
+        }
+    }
+
+    private var scopedEmptyHint: String? {
+        if sourceFilter != nil { return nil }
+        switch statusFilter {
+        case .finished: return "可在作品的章節選單中改成「已讀完」。"
+        default: return nil
+        }
     }
 }
 
@@ -402,16 +494,41 @@ private struct SortIcon: Shape {
     .environment(env)
     .modelContainer(env.store.container)
 }
+
+#Preview("書庫・已讀完") {
+    let env = PreviewSupport.statusVariedEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
+
+#Preview("書庫・狀態篩選為空") {
+    let env = PreviewSupport.emptyEnvironment()
+    NavigationStack {
+        LibraryView()
+    }
+    .environment(env)
+    .modelContainer(env.store.container)
+}
 #endif
+
+private enum LibraryRoute: Hashable {
+    case history
+}
 
 private struct LibrarySearchSheet: View {
     let allCollections: [LocalCollectionModel]
     @Binding var searchText: String
+    let statusFilter: CollectionReadingStatus
+    let sourceFilter: SourceKind?
     @Environment(\.dismiss) private var dismiss
 
     private var results: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: .title,
-                           searchText: searchText, status: nil)
+                           searchText: searchText, status: statusFilter)
+            .filter { sourceFilter == nil || $0.sourceKind == sourceFilter }
     }
 
     var body: some View {
