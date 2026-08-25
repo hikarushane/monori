@@ -126,23 +126,34 @@
 
 <main>
   <h1>Monori 隱私權政策</h1>
-  <p class="updated">最後更新：2026 年 8 月 10 日</p>
+  <p class="updated">最後更新：2026 年 8 月 25 日</p>
 
   <p>Monori 是一個跨平台同人文閱讀 app，支援 Patreon、AO3、Google Docs、Vocus 和 AsianFanfics。我們重視你的隱私，這份政策說明 Monori 如何處理你的資料。</p>
 
   <h2>我們不收集任何資料</h2>
-  <p>Monori 沒有後端伺服器、沒有雲端服務、沒有分析追蹤。app 不會向任何第三方傳送你的個人資訊。</p>
+  <p>Monori 沒有後端伺服器、沒有分析追蹤。app 不會向任何第三方傳送你的個人資訊。iCloud 備份功能使用你自己的 iCloud 帳號，資料不經過 Monori 的伺服器。</p>
 
   <h2>本機儲存的內容</h2>
-  <p>Monori 在你的裝置上儲存以下資料，這些資料不會離開你的手機：</p>
+  <p>Monori 在你的裝置上儲存以下資料：</p>
   <ul>
     <li>匯入的合集與章節標題、連結</li>
     <li>閱讀進度與書籤</li>
     <li>閱讀狀態標記（追更中、已完結等）</li>
+    <li>閱歷（章節開啟紀錄與時間）</li>
     <li>字型大小與行距偏好</li>
     <li>Google Docs 和 AO3 的文章內容（供離線閱讀，僅存於本機）</li>
   </ul>
   <p>Patreon、Vocus 和 AsianFanfics 的文章不儲存內容，每次開啟時從原始來源即時載入。</p>
+
+  <h2>iCloud 備份</h2>
+  <p>Monori 提供手動備份功能，可以把書庫 metadata、書籤、閱讀進度與閱歷備份到你自己的 iCloud 帳號。備份透過 Apple 的 CloudKit 框架直接與 iCloud 通訊，不經過 Monori 的伺服器。</p>
+  <p>備份不包含：</p>
+  <ul>
+    <li>匯入的文章內容</li>
+    <li>登入資料、Cookie、Token</li>
+    <li>字型大小與行距等偏好設定</li>
+  </ul>
+  <p>備份資料只有你自己的 iCloud 帳號可以存取。Monori 不做自動同步，也不做跨裝置即時同步。</p>
 
   <h2>平台登入</h2>
   <p>Monori 使用內建的網頁瀏覽器（WKWebView）載入各平台網頁。登入流程完全由各平台處理。Monori 不會存取、讀取或儲存你的密碼、Cookie、Token 或任何驗證資訊。</p>
@@ -155,7 +166,7 @@
     <li>匯入 AO3 作品或 Google Docs 文件內容</li>
     <li>檢查追更中合集是否有新章節</li>
   </ul>
-  <p>所有網路請求都直接連到各平台的原始網域。Monori 不經過任何中間伺服器。</p>
+  <p>所有網路請求都直接連到各平台的原始網域。iCloud 備份與還原時，透過 CloudKit 連接你自己的 iCloud 帳號。Monori 不經過任何中間伺服器。</p>
 
   <h2>廣告過濾</h2>
   <p>Monori 在 AsianFanfics 和 Vocus 閱讀時會過濾廣告內容。過濾在你的裝置上執行，不經過任何外部服務。</p>
