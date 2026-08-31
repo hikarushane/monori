@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct ReaderFontPickerView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.dismiss) private var dismiss
     @State private var showImporter = false
     @State private var importError: ImportAlertItem?
     @State private var confirmDeleteID: String?
@@ -103,6 +104,22 @@ struct ReaderFontPickerView: View {
             .padding(.bottom, MonoriSpacing.x8)
         }
         .background(MonoriPalette.canvas)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack {
+                MonoriBackButton(accessibilityLabel: "返回設定", action: dismiss.callAsFunction)
+                Spacer()
+            }
+            .padding(.horizontal, MonoriSpacing.x2)
+            .frame(height: 56)
+            .background(MonoriPalette.canvas)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(MonoriPalette.divider)
+                    .frame(height: 1)
+            }
+        }
         .fileImporter(isPresented: $showImporter,
                       allowedContentTypes: [.font, UTType(filenameExtension: "ttf")!, UTType(filenameExtension: "otf")!],
                       allowsMultipleSelection: false) { result in
