@@ -44,8 +44,8 @@ final class LibraryStoreTests: XCTestCase {
 
     func testImportCreatesCollectionAndChapters() throws {
         try store.applyImport([
-            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
-            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0),
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 1)
         ])
         let collections = try store.collections()
         XCTAssertEqual(collections.count, 1)
@@ -57,8 +57,8 @@ final class LibraryStoreTests: XCTestCase {
     func testReimportMergesWithoutDuplicates() throws {
         try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
         try store.applyImport([
-            payload("4 愛", "https://patreon.com/posts/4-2/", order: 0),
-            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0),
+            payload("4 愛", "https://patreon.com/posts/4-2/", order: 1)
         ])
         let chapters = store.orderedChapters(of: try store.collections()[0])
         XCTAssertEqual(chapters.map(\.title), ["4 愛", "5 脣瓣"])
@@ -93,11 +93,33 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), ["newest", "oldest"])
     }
 
-    func testReimportKeepsPublishOrderRegardlessOfScrapeDirection() throws {
+    func testPatreonOrderUsesCollectionPositionWhenPostIDsAreNonMonotonic() throws {
+        // Real subset from Patreon collection 2299876. Patreon displays the
+        // cards newest-first (14 ... 07), while its post IDs produce the field
+        // bug shown by the user: 07, 08, 13, 09, 10, 12, 11, 14.
+        try store.applyImport([
+            payload("Only Tonight 14", "https://www.patreon.com/posts/166476709", order: 0),
+            payload("Only Tonight 13", "https://www.patreon.com/posts/165978296", order: 1),
+            payload("Only Tonight 12", "https://www.patreon.com/posts/166006471", order: 2),
+            payload("Only Tonight 11", "https://www.patreon.com/posts/166130046", order: 3),
+            payload("Only Tonight 10", "https://www.patreon.com/posts/165990551", order: 4),
+            payload("Only Tonight 09", "https://www.patreon.com/posts/165978608", order: 5),
+            payload("Only Tonight 08", "https://www.patreon.com/posts/165904766", order: 6),
+            payload("Only Tonight 07", "https://www.patreon.com/posts/165314583", order: 7)
+        ])
+
+        let collection = try store.collections()[0]
+        XCTAssertEqual(store.orderedChapters(of: collection).map(\.title), [
+            "Only Tonight 07", "Only Tonight 08", "Only Tonight 09", "Only Tonight 10",
+            "Only Tonight 11", "Only Tonight 12", "Only Tonight 13", "Only Tonight 14"
+        ])
+    }
+
+    func testReimportKeepsCollectionOrderRegardlessOfScrapeDirection() throws {
         // Reproduces the field bug: a collection first imported up to ch14, then
         // refreshed once ch15-17 were posted. Patreon lists newest-first, so the
-        // crawl sees ch17 before ch15 and the merger appends them as 17,16,15 after
-        // ch14. Post IDs increase with publish time (intro oldest == smallest ID).
+        // crawl sees ch17 before ch15. The full refresh must replace the stale
+        // stored positions instead of appending 17,16,15 after ch14.
         func post(_ id: Int) -> String { "https://patreon.com/posts/c-\(id)" }
         func title(_ id: Int) -> String { id == 100 ? "人物介紹" : "守護著妳 \(id - 100)" }
 
@@ -428,13 +450,12 @@ final class LibraryStoreTests: XCTestCase {
     func testRefreshMergeMarksOnlyAddedChaptersNew() throws {
         try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
         try store.applyImport([
-            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
-            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0),
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 1)
         ])
         let c = try store.collections()[0]
-        let chapters = store.orderedChapters(of: c)
-        XCTAssertFalse(chapters[0].isNew)
-        XCTAssertTrue(chapters[1].isNew)
+        XCTAssertFalse(c.chapters.first { $0.title == "4 愛" }!.isNew)
+        XCTAssertTrue(c.chapters.first { $0.title == "5 脣瓣" }!.isNew)
         XCTAssertEqual(c.unreadCount, 1)
         XCTAssertNotNil(c.lastNewChapterAt)
     }
@@ -470,11 +491,11 @@ final class LibraryStoreTests: XCTestCase {
     func testMarkChapterOpenedClearsIsNewAndSetsLastReadAt() throws {
         try store.applyImport([payload("4 愛", "https://patreon.com/posts/4-2", order: 0)])
         try store.applyImport([
-            payload("4 愛", "https://patreon.com/posts/4-2", order: 0),
-            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 1)
+            payload("5 脣瓣", "https://patreon.com/posts/5-3", order: 0),
+            payload("4 愛", "https://patreon.com/posts/4-2", order: 1)
         ])
         let c = try store.collections()[0]
-        let newChapter = store.orderedChapters(of: c)[1]
+        let newChapter = c.chapters.first { $0.title == "5 脣瓣" }!
         XCTAssertTrue(newChapter.isNew)
         store.markChapterOpened(newChapter)
         XCTAssertFalse(newChapter.isNew)
@@ -604,11 +625,11 @@ final class LibraryStoreTests: XCTestCase {
     func testRecordChapterOpenedPreservesIsNewAndLastReadAt() throws {
         try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
         try store.applyImport([
-            payload("Ch1", "https://patreon.com/posts/1", order: 0),
-            payload("Ch2", "https://patreon.com/posts/2", order: 1)
+            payload("Ch2", "https://patreon.com/posts/2", order: 0),
+            payload("Ch1", "https://patreon.com/posts/1", order: 1)
         ])
         let c = try store.collections()[0]
-        let newChapter = store.orderedChapters(of: c)[1]
+        let newChapter = c.chapters.first { $0.title == "Ch2" }!
         XCTAssertTrue(newChapter.isNew)
         store.recordChapterOpened(newChapter)
         XCTAssertFalse(newChapter.isNew)

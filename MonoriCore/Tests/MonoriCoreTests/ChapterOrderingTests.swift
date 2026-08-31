@@ -2,21 +2,23 @@ import XCTest
 @testable import MonoriCore
 
 final class ChapterOrderingTests: XCTestCase {
-    func testKeyOrdersByPostIDAscendingRegardlessOfOrderIndex() {
-        // Older post (smaller ID) must sort before a newer post even when the
-        // scrape-time orderIndex says the opposite.
-        let older = ChapterOrdering.sortKey(urlString: "https://www.patreon.com/posts/intro-100",
-                                            orderIndex: 99)
-        let newer = ChapterOrdering.sortKey(urlString: "https://www.patreon.com/posts/c17-117",
-                                            orderIndex: 0)
+    func testPatreonKeyUsesCollectionPositionWhenPostIDsConflict() {
+        // In Patreon collection 2299876, chapter 12 appears before chapter 13
+        // even though chapter 12 has the larger post ID.
+        let older = ChapterOrdering.sortKey(
+            urlString: "https://www.patreon.com/posts/166006471?collection=2299876",
+            orderIndex: 9)
+        let newer = ChapterOrdering.sortKey(
+            urlString: "https://www.patreon.com/posts/165978296?collection=2299876",
+            orderIndex: 8)
         XCTAssertTrue(older < newer)
     }
 
-    func testKeyExtractsTrailingNumericPostID() {
+    func testPatreonKeyReversesNewestFirstCollectionPosition() {
         let key = ChapterOrdering.sortKey(urlString: "https://www.patreon.com/posts/chapter-title-160628832",
                                           orderIndex: 5)
-        XCTAssertEqual(key.0, 0)            // bucket 0 == has a post ID
-        XCTAssertEqual(key.1, 160628832)
+        XCTAssertEqual(key.0, 0)
+        XCTAssertEqual(key.1, -5)
     }
 
     func testKeyWithoutPostIDFallsBackAndSortsLast() {

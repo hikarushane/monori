@@ -39,6 +39,44 @@ final class ChapterMapMergerTests: XCTestCase {
         XCTAssertEqual(merged[2].orderIndex, 2)
     }
 
+    func testReimportRefreshesOrderIndexesFromLatestCollectionOrder() {
+        let existing = [
+            ChapterRecord(title: "3", urlString: "https://www.patreon.com/posts/3-3",
+                          visibleDateText: nil, orderIndex: 0),
+            ChapterRecord(title: "2", urlString: "https://www.patreon.com/posts/2-2",
+                          visibleDateText: nil, orderIndex: 1),
+            ChapterRecord(title: "1", urlString: "https://www.patreon.com/posts/1-1",
+                          visibleDateText: nil, orderIndex: 2)
+        ]
+        let merged = ChapterMapMerger.merge(existing: existing, incoming: [
+            payload("4", "https://www.patreon.com/posts/4-4", order: 0),
+            payload("3", "https://www.patreon.com/posts/3-3", order: 1),
+            payload("2", "https://www.patreon.com/posts/2-2", order: 2),
+            payload("1", "https://www.patreon.com/posts/1-1", order: 3)
+        ])
+
+        XCTAssertEqual(merged.sorted { $0.orderIndex < $1.orderIndex }.map(\.title),
+                       ["4", "3", "2", "1"])
+    }
+
+    func testPartialReimportKeepsMissingChaptersAfterScrapedWindow() {
+        let existing = [
+            ChapterRecord(title: "3", urlString: "https://www.patreon.com/posts/3-3",
+                          visibleDateText: nil, orderIndex: 0),
+            ChapterRecord(title: "2", urlString: "https://www.patreon.com/posts/2-2",
+                          visibleDateText: nil, orderIndex: 1),
+            ChapterRecord(title: "1", urlString: "https://www.patreon.com/posts/1-1",
+                          visibleDateText: nil, orderIndex: 2)
+        ]
+        let merged = ChapterMapMerger.merge(existing: existing, incoming: [
+            payload("4", "https://www.patreon.com/posts/4-4", order: 0),
+            payload("3", "https://www.patreon.com/posts/3-3", order: 1)
+        ])
+        let indexes = Dictionary(uniqueKeysWithValues: merged.map { ($0.title, $0.orderIndex) })
+
+        XCTAssertEqual(indexes, ["4": 0, "3": 1, "2": 2, "1": 3])
+    }
+
     func testReimportReplacesContaminatedCardTextTitle() {
         let contaminated = """
         FAKE_BODY_TEXT_MUST_NEVER_LEAK 這是一行被 Patreon 卡片連結混進來的內文。

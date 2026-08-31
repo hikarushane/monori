@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-24（AO3 Reader chapter URL lookup regression 修復）
+> 最後更新：2026-08-31（功能分支整合與 Patreon collection 排序修復）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -27,6 +27,7 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | Collection refresh visibility | refresh 時保留 toolbar spinner，另加 bottom capsule status banner `smoke.refreshStatusBanner` | 長 collection check 可能跑數分鐘，單 toolbar spinner 太不明顯；banner 明確告知正在檢查 | active | 2026-06-13 |
 | Agent-driven simulator workflow | `SIMULATOR_PLAYBOOK.md` + `scripts/ui-preflight.sh` + `scripts/ui-driver.sh` | 使用者不是專業 iOS dev；agent 應先用 script/driver 收集可重現診斷，不要求使用者口述 Xcode/畫面狀態 | active | 2026-06-13 |
 | Claude→Codex workflow source | `CLAUDE.md` + `.claude/settings.json` canonical；Codex 透過 `AGENTS.md` + `.codex/hooks.json` + `scripts/codex-hook-adapter.py` 轉接 | 避免 Claude/Codex 雙份 hook command 漂移；`scripts/check-hooks.sh` 檢查 event parity、repo-local path、adapter trackedness、Codex payload regression，且新增 `.claude/commands`/`.claude/agents`/repo MCP config 時 fail-fast 要求 migration decision | active | 2026-08-19 |
+| UI 元件優先規則 | `.claude/hooks/critical_rules.txt` 每回合注入「先搜尋／重用現有元件；沒有才依 DESIGN.md 新建」，`scripts/check-hooks.sh` 驗證 Codex adapter 輸出包含規則 | 避免相同介面控制在不同畫面產生視覺與可及性漂移；Chapter TOC／閱讀字體返回鍵已改共用 `MonoriBackButton` | active | 2026-08-31 |
 | Uguisu Zen 設計系統 | `DESIGN.md` + `MonoriDesignSystem.swift`；UI 用 Manrope，閱讀器以 Source Serif 4／Noto Serif TC 為核心 | 以 Washi White／Stone Grey 的不透明微差建立層次；Uguisu Green 僅限導航與品牌，禁止玻璃膠囊；批次 0 已內嵌字型與語義色 token，批次 1 已套用 Launch Screen、App 外殼與 WKWebView 背板，批次 2 已套用書庫／搜尋 sheet／目錄且修正深色 List cell 背景，批次 3 已套用 Browse chrome／collection banner 且保留第三方網站內容，批次 4 已套用設定頁的扁平分組與矩形表單控制，批次 5 已套用閱讀器 chrome、偏好面板與章節切換提示；Reader 本文排版仍待後續批次 | active | 2026-08-19 |
 | Reader Debug dismiss button | `#if DEBUG` only `smoke.readerDismissButton` in `ReaderView.topBar` calls `dismiss()` | idb / computer-use edge gestures cannot dismiss ReaderView `.fullScreenCover`; automation needs a tappable exit hatch that never ships in Release | active | 2026-06-13 |
 | Google Docs 章節偵測：font-size 主、text pattern 副 | 雙層策略：`largeFontTitle` (≥18pt) 主、`chapterTitlePattern` 副 | → docs/decisions/ADR-0002.md | active | 2026-06-22 |
@@ -53,6 +54,8 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - `orderIndex` 代表 Patreon DOM 位置（0 = 最新）
 - Story order（閱讀順序）= descending orderIndex（orderIndex 大 = 舊 = 故事前面）
 - `neighbors()` 用 descending orderIndex：`previous` = 更舊章節，`next` = 更新章節
+- Patreon numeric post ID 只代表 post 建立序號，不保證符合 collection／章節 chronology；不可用來排序。真實 collection `2299876` 用 ID 排序會得到 `07, 08, 13, 09, 10, 12, 11, 14`。
+- Refresh 必須依最新 scrape 的 DOM 位置重寫既有 chapter 的 `orderIndex`；partial scrape 未涵蓋的既有章節要保留在 incoming window 後方並重新編號，不能刪除或製造 index collision。
 
 ### 標題清理
 - `looksLikeBodyText()` 只檢查 `。`（中文句號）和長英文中的 `. `——**無長度門檻**，任何含 "。" 的字串都回 true

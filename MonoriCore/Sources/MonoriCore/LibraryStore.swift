@@ -74,6 +74,7 @@ public final class LibraryStore {
         for record in merged {
             if let chapter = existingByURL[record.urlString] {
                 chapter.title = record.title
+                chapter.orderIndex = record.orderIndex
                 if chapter.visibleDateText == nil {
                     chapter.visibleDateText = record.visibleDateText
                 }
@@ -165,7 +166,7 @@ public final class LibraryStore {
     public func neighbors(of chapter: LocalChapterModel)
         -> (previous: LocalChapterModel?, next: LocalChapterModel?) {
         guard let collection = chapter.collection else { return (nil, nil) }
-        // One source of truth with orderedChapters: oldest → newest by post ID.
+        // One source of truth with orderedChapters: oldest → newest.
         // previous == the older chapter, next == the newer chapter.
         let storyOrder = collection.chapters.sorted {
             ChapterOrdering.sortKey(urlString: $0.urlString, orderIndex: $0.orderIndex)

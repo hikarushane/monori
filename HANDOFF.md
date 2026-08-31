@@ -1,68 +1,47 @@
 # HANDOFF
 
-> 上次 session: 2026-08-25
+> 上次 session: 2026-08-31
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-閱歷＋Archive（已讀完）功能實作完成。
-- 測試/建置狀態：✅ `swift test --package-path MonoriCore`（399+ tests, 0 failures）；✅ Xcode build exit 0
-- 分支：`worktree-reading-history-archive`（基於 main）
+
+所有現有功能分支已合併至 `main`；Patreon 匯入排序修復與其測試已完成並通過合併後驗證。
+
+- 已合併：reader navigation/preferences、Codex hook parity、閱歷與 Archive。
+- Reader 偏好會跨章與跨故事保留；Chapter TOC 支援左緣右滑返回；閱讀字體與 TOC 共用返回控制。
+- 驗證腳本現在一律執行 `xcodegen generate`，避免使用過期的 gitignored `Monori.xcodeproj`。
+- Patreon 排序根因：post ID 是建立序號而非收藏順序；collection DOM position 才是匯入 chronology。
+- 合併後 `./scripts/verify.sh`：Xcode build 成功，MonoriCore 408/408 tests 通過。
+- `docs/decisions/0011-ptt-board-author-collection-source.md` 是既有未追蹤的使用者檔案，未修改。
 
 ## ✅ 本次完成
-- `.finished` label 從「已完結」改成「已讀完」；raw value 保持 `finished`
-- `setReadingStatus(.finished)` 原子性清除所有 `isNew`，不動 bookmark/progress/history/lastReadAt
-- `clearReadingHistory()` 只清 history，不動 collections
-- `chapter(id:)` 以 stable ID resolve chapter（供閱歷 row tap）
-- `ReadingHistoryQuery` 日期分組（injectable calendar/timezone，7 tests 含 DST 邊界）
-- `syncCurrentChapter` SPA library-chapter transition 補上 `recordChapterOpened`
-- Library status scope chips（追更中/已讀完/棄坑），預設追更中
-- 篩選後 count + 每個 scope 獨立空狀態
-- 搜尋 sheet 尊重 status + source filter
-- `ReadingHistoryView`：日期分組、row tap 重開、已移除章節顯示、清除確認
-- Library header 閱歷按鈕（clock.arrow.circlepath）
-- PreviewSupport 擴充 history/status-varied 環境 + 7 新 previews
-- APP_REVIEW_GUIDE.md 加入 status scope 和閱歷說明
-- 新增 10+ 測試（archive status, clearReadingHistory, chapter(id:), history query）
+
+- 閱歷與「已讀完」Archive：status scope chips、日期分組、重開章節、清除確認，以及相應的 Core 測試。
+- Reader preferences 移至 `MonoriCore`，以 `UserDefaults` 持久化 font／size／line spacing；URL reader 重新套用現值，stored HTML 路徑維持原行為。
+- 新增 `MonoriBackButton`，TOC 與「設定 → 外觀 → 閱讀字體」共用相同 44×44 返回控制與 56pt 頂部列。
+- TOC 左緣右滑使用可測試的 24pt 邊界、60pt 距離與水平主導 policy，且保留 chapter row swipe actions。
+- Codex hook adapter parity 測試與 fixtures 已合併。
+- Patreon refresh 依 collection DOM position 重新編號 incoming 與既有 chapters，partial refresh 保留 scrape window 外章節。
 
 ## 🔄 進行中
+
 無。
 
 ## 🚧 試過但行不通（避免重踩）
-- SPM `build.db` corruption：新增 test 檔案後 XCTest runner 找不到新 test，需刪除 `MonoriCore/.build/build.db` 重建
-- `ModelConfiguration.CloudKitDatabase` 不支援 `Equatable`，migration test 用 `String(describing:)` + `contains("_none: true")` 繞過
-- XcodeGen 會覆寫 entitlements：必須在 `project.yml` 的 `entitlements:` 下用 `properties:` 宣告內容，否則 `xcodegen generate` 產生空 `<dict/>`
+
+- Patreon numeric post ID 不能當發布時間或故事順序；真實 collection 內會非單調。
+- 只改畫面排序 key 不足以修復 refresh：merger 與 `LibraryStore` 必須同步刷新、持久化既有 chapter 的 `orderIndex`。
+- 既有 Xcode 專案可能引用已刪除檔案；驗證前必須由 XcodeGen 重新產生。
 
 ## ⚡ 接手要做的事
-1. merge 回 main，跑 `./scripts/verify.sh` 確認全綠
-2. 在 Simulator 上跑一次 smoke test，確認 status scope、閱歷 UI、章節開啟紀錄正常
-3. 確認手動 Patreon 登入後備份/還原流程（status + history round-trip）
-4. 考慮是否需要 V2 自動同步或閱歷保留政策
+
+1. 在 Simulator 手動 smoke：閱讀 status scope、閱歷、章節開啟紀錄、TOC 左緣返回，以及 reader preference continuity。
+2. 發布後，曾 refresh 過且仍顯示舊順序的收藏，執行一次「檢查新章節」以 collection 位置重寫索引。
+3. 於有 iCloud 帳號的裝置測試備份／還原（status + history round-trip），並評估 V2 自動同步與閱歷保留政策。
 
 ## ⚠️ 注意事項
-- contentHTML 絕不能進 iCloud 備份
-- SwiftData 必須保持 `cloudKitDatabase: .none`（有 migration test 鎖住）
-- 不新增 `isArchived`；Archive 直接使用 `readingStatusRaw == "finished"`
-- 不自動用 `readingProgress == 1` 判定已讀完
-- 閱歷 V1 不做自動 TTL 或數量上限
-- 清除閱歷不自動覆寫 iCloud backup
 
-## 📁 本次新增/修改的檔案
-### 新增
-- `MonoriCore/Sources/MonoriCore/ReadingHistoryQuery.swift` — 日期分組 helper
-- `MonoriCore/Tests/MonoriCoreTests/ReadingHistoryQueryTests.swift` — 7 grouping tests
-- `App/Features/Library/ReadingHistoryView.swift` — 閱歷畫面 + previews
-
-### 修改
-- `App/Features/Library/CollectionReadingStatus+Label.swift` — `.finished` → 「已讀完」
-- `MonoriCore/Sources/MonoriCore/LibraryStore.swift` — `clearReadingHistory()`, `chapter(id:)`, finished 清 isNew
-- `MonoriCore/Tests/MonoriCoreTests/LibraryStoreTests.swift` — archive status + clearHistory + chapter(id:) tests
-- `MonoriCore/Tests/MonoriCoreTests/LibraryQueryTests.swift` — status filter tests
-- `App/Features/Library/LibraryView.swift` — status scope chips, history button, scoped empty states, search filter
-- `App/Features/Reader/ReaderView.swift` — SPA transition recordChapterOpened
-- `App/Preview/PreviewSupport.swift` — history + status-varied environments
-- `docs/app-review/APP_REVIEW_GUIDE.md` — status scope + reading history docs
-- `HANDOFF.md` — 本文件
-
-## 🔗 相關資源
-- Brief：`docs/superpowers/plans/2026-08-25-Reading-History-Archive-Implementation-Brief.md`
-- iCloud backup DTO 已包含 `readingStatusRaw` 和 `ReadingHistoryBackup`，不需額外 schema 變更
+- contentHTML 絕不能進 iCloud 備份；SwiftData 必須保持 `cloudKitDatabase: .none`。
+- 不新增 `isArchived`；Archive 使用 `readingStatusRaw == "finished"`，且不由 `readingProgress == 1` 自動判定。
+- `clearReadingHistory()` 只清閱歷，不動 collections；閱歷 V1 不做自動 TTL 或數量上限。
+- 不得以 Patreon post ID 推導 chronology；partial refresh 不得刪除 scrape window 外既有章節。
