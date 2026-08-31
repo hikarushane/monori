@@ -324,13 +324,7 @@ struct ReaderView: View {
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
                     }
                 }
-                let fontCSS = env.resolvedFontCSS()
-                _ = try? await webView.evaluateJavaScript(
-                    ReaderStyler.fontFamilyScript(font: fontCSS))
-                _ = try? await webView.evaluateJavaScript(
-                    ReaderStyler.fontSizeScript(points: prefs.fontSize))
-                _ = try? await webView.evaluateJavaScript(
-                    ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+                await applyCurrentPreferences(to: webView)
                 // Spawns own Task — does not block enforceScroll (title repair is independent of scroll)
                 repairCurrentTitleIfNeeded(webView)
             } else {
@@ -342,6 +336,16 @@ struct ReaderView: View {
             _ = try? await webView.evaluateJavaScript(
                 ReaderStyler.enforceScrollScript(progress: savedProgress))
         }
+    }
+
+    private func applyCurrentPreferences(to webView: WKWebView) async {
+        let fontCSS = env.resolvedFontCSS()
+        _ = try? await webView.evaluateJavaScript(
+            ReaderStyler.fontFamilyScript(font: fontCSS))
+        _ = try? await webView.evaluateJavaScript(
+            ReaderStyler.fontSizeScript(points: prefs.fontSize))
+        _ = try? await webView.evaluateJavaScript(
+            ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
     }
 
     /// Applies the current font-size/line-spacing prefs to the web view.

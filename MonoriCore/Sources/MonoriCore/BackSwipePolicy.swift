@@ -11,6 +11,18 @@ public enum BackSwipeAction: Equatable {
 }
 
 public enum BackSwipePolicy {
+    public static func shouldDismissNavigation(
+        startX: CGFloat,
+        translationX: CGFloat,
+        translationY: CGFloat,
+        edgeWidth: CGFloat = 24,
+        activationDistance: CGFloat = 60
+    ) -> Bool {
+        guard startX <= edgeWidth,
+              translationX >= activationDistance else { return false }
+        return abs(translationX) > abs(translationY)
+    }
+
     /// Decide what a left-edge back-swipe should do on the Browse web view.
     /// Pure and UIKit-free so it is unit-testable; the view layer maps the
     /// result onto WKWebView. URL is inspected by path only.
