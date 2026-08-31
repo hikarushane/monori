@@ -1,4 +1,5 @@
 import SwiftUI
+import MonoriCore
 
 /// Full-width reading-preferences panel shown under the reader's top bar.
 /// Buttons never dismiss the panel - readers tap them repeatedly until the
