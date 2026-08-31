@@ -4,17 +4,25 @@
 > 下次接手請從「接手要做的事」開始
 
 ## 狀態
-iCloud 備份＋閱歷功能實作完成，6 個 commit 已全部建立並通過 pre-commit hook (verify.sh)。
-- 測試/建置狀態：✅ `swift test --package-path MonoriCore`（367/367 tests, 0 failures）；✅ Xcode build exit 0
-- 分支＠最後 commit：`main`
+閱歷＋Archive（已讀完）功能實作完成。
+- 測試/建置狀態：✅ `swift test --package-path MonoriCore`（399+ tests, 0 failures）；✅ Xcode build exit 0
+- 分支：`worktree-reading-history-archive`（基於 main）
 
 ## ✅ 本次完成
-- **Commit 1** (`bb12521`): `LocalReadingHistoryEntry` SwiftData model + 5 分鐘 coalescing + `recordChapterOpened()` 取代 `markChapterOpened()` + 單一 chapter-open write point (CollectionTOCView → ReaderView.open) + 6 tests
-- **Commit 2** (`cb8f02f`): `LibraryBackupEnvelope` Codable DTO + `makeBackupSnapshot()` / `restoreBackupSnapshot()` + fail-closed validation + rollback on failure + contentHTML 排除 + 12 tests
-- **Commit 3** (`989bc5f`): `ModelConfiguration(cloudKitDatabase: .none)` 明確 local-only + migration test
-- **Commit 4** (`f3ee812`): `CloudBackupTransport` protocol + `CloudKitBackupTransport` + `ICloudBackupService` + `Monori.entitlements` (iCloud/CloudKit) + `InMemoryBackupTransport` fake + 9 tests
-- **Commit 5** (`f62d4ed`): Settings UI「iCloud 備份」section（metadata 顯示、立即備份、從 iCloud 還原、force overwrite、iCloud 不可用狀態、ProgressView）+ 清除書庫確認文字更新 + 關於隱私文字更新
-- **Commit 6**: `COMPLIANCE.md` iCloud 備份段落 + `HANDOFF.md` 更新（本 commit）
+- `.finished` label 從「已完結」改成「已讀完」；raw value 保持 `finished`
+- `setReadingStatus(.finished)` 原子性清除所有 `isNew`，不動 bookmark/progress/history/lastReadAt
+- `clearReadingHistory()` 只清 history，不動 collections
+- `chapter(id:)` 以 stable ID resolve chapter（供閱歷 row tap）
+- `ReadingHistoryQuery` 日期分組（injectable calendar/timezone，7 tests 含 DST 邊界）
+- `syncCurrentChapter` SPA library-chapter transition 補上 `recordChapterOpened`
+- Library status scope chips（追更中/已讀完/棄坑），預設追更中
+- 篩選後 count + 每個 scope 獨立空狀態
+- 搜尋 sheet 尊重 status + source filter
+- `ReadingHistoryView`：日期分組、row tap 重開、已移除章節顯示、清除確認
+- Library header 閱歷按鈕（clock.arrow.circlepath）
+- PreviewSupport 擴充 history/status-varied 環境 + 7 新 previews
+- APP_REVIEW_GUIDE.md 加入 status scope 和閱歷說明
+- 新增 10+ 測試（archive status, clearReadingHistory, chapter(id:), history query）
 
 ## 🔄 進行中
 無。
@@ -25,39 +33,36 @@ iCloud 備份＋閱歷功能實作完成，6 個 commit 已全部建立並通過
 - XcodeGen 會覆寫 entitlements：必須在 `project.yml` 的 `entitlements:` 下用 `properties:` 宣告內容，否則 `xcodegen generate` 產生空 `<dict/>`
 
 ## ⚡ 接手要做的事
-1. 在實機或 Simulator 上跑一次完整 smoke test（手動 Patreon 登入後 `./scripts/smoke-auto.sh`），確認備份/還原 UI 正常運作
-2. 在有 iCloud 帳號的裝置上測試實際備份與還原流程
-3. 考慮是否需要 V2 自動同步功能
+1. merge 回 main，跑 `./scripts/verify.sh` 確認全綠
+2. 在 Simulator 上跑一次 smoke test，確認 status scope、閱歷 UI、章節開啟紀錄正常
+3. 確認手動 Patreon 登入後備份/還原流程（status + history round-trip）
+4. 考慮是否需要 V2 自動同步或閱歷保留政策
 
 ## ⚠️ 注意事項
-- contentHTML 絕不能進 iCloud 備份（`ChapterBackup` DTO 刻意沒有 `contentHTML` field，這是 release blocker）
+- contentHTML 絕不能進 iCloud 備份
 - SwiftData 必須保持 `cloudKitDatabase: .none`（有 migration test 鎖住）
-- restore 失敗會 rollback 到操作前的 local snapshot，不會毀掉使用者現有書庫
-- iCloud 備份 V1 只有手動備份/還原，沒有自動同步
+- 不新增 `isArchived`；Archive 直接使用 `readingStatusRaw == "finished"`
+- 不自動用 `readingProgress == 1` 判定已讀完
+- 閱歷 V1 不做自動 TTL 或數量上限
+- 清除閱歷不自動覆寫 iCloud backup
 
 ## 📁 本次新增/修改的檔案
 ### 新增
-- `MonoriCore/Sources/MonoriCore/LibraryBackup.swift` — backup DTO + export/restore logic
-- `MonoriCore/Sources/MonoriCore/CloudBackupTransport.swift` — transport protocol + error types
-- `MonoriCore/Tests/MonoriCoreTests/LibraryBackupTests.swift` — 12 backup tests
-- `MonoriCore/Tests/MonoriCoreTests/CloudBackupTransportTests.swift` — 9 transport tests + InMemoryBackupTransport fake
-- `App/Services/ICloudBackupService.swift` — backup service with state machine
-- `App/Services/CloudKitBackupTransport.swift` — CloudKit implementation
-- `App/Monori.entitlements` — iCloud/CloudKit entitlements (由 xcodegen 從 project.yml 生成)
+- `MonoriCore/Sources/MonoriCore/ReadingHistoryQuery.swift` — 日期分組 helper
+- `MonoriCore/Tests/MonoriCoreTests/ReadingHistoryQueryTests.swift` — 7 grouping tests
+- `App/Features/Library/ReadingHistoryView.swift` — 閱歷畫面 + previews
 
 ### 修改
-- `MonoriCore/Sources/MonoriCore/Models.swift` — 新增 `LocalReadingHistoryEntry`
-- `MonoriCore/Sources/MonoriCore/LibraryStore.swift` — `recordChapterOpened()` + history coalescing + `readingHistory()` queries + `clearLibrary()` 清閱歷
-- `MonoriCore/Tests/MonoriCoreTests/LibraryStoreTests.swift` — 6 history tests + container update
-- `MonoriCore/Tests/MonoriCoreTests/ModelMigrationTests.swift` — local-only assertion test
-- `App/AppEnvironment.swift` — lazy `backupService` property
-- `App/Features/Settings/SettingsView.swift` — iCloud 備份 section + 清除書庫/關於文字更新
-- `App/Features/Library/CollectionTOCView.swift` — 移除 duplicate `markChapterOpened()` call
-- `App/Features/Reader/ReaderView.swift` — `recordChapterOpened()` 替換
-- `project.yml` — entitlements properties
-- `COMPLIANCE.md` — iCloud 備份段落 + 資料刪除/工程紅線更新
+- `App/Features/Library/CollectionReadingStatus+Label.swift` — `.finished` → 「已讀完」
+- `MonoriCore/Sources/MonoriCore/LibraryStore.swift` — `clearReadingHistory()`, `chapter(id:)`, finished 清 isNew
+- `MonoriCore/Tests/MonoriCoreTests/LibraryStoreTests.swift` — archive status + clearHistory + chapter(id:) tests
+- `MonoriCore/Tests/MonoriCoreTests/LibraryQueryTests.swift` — status filter tests
+- `App/Features/Library/LibraryView.swift` — status scope chips, history button, scoped empty states, search filter
+- `App/Features/Reader/ReaderView.swift` — SPA transition recordChapterOpened
+- `App/Preview/PreviewSupport.swift` — history + status-varied environments
+- `docs/app-review/APP_REVIEW_GUIDE.md` — status scope + reading history docs
 - `HANDOFF.md` — 本文件
 
 ## 🔗 相關資源
-- Brief 原文在 2026-08-25 session context 的第一則 user message（28 sections）
-- `InMemoryBackupTransport` fake 可用於 app-level integration test
+- Brief：`docs/superpowers/plans/2026-08-25-Reading-History-Archive-Implementation-Brief.md`
+- iCloud backup DTO 已包含 `readingStatusRaw` 和 `ReadingHistoryBackup`，不需額外 schema 變更

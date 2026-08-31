@@ -334,5 +334,64 @@ enum PreviewSupport {
         try? ctx.save()
         return collection
     }
+    // MARK: - Reading history
+
+    static func historyEnvironment() -> AppEnvironment {
+        let store = try! LibraryStore.inMemory()
+        let env = AppEnvironment(store: store)
+        env.appPrefs.autoCheckEnabled = false
+        seedSampleCollections(into: store)
+        seedHistoryEntries(into: store)
+        return env
+    }
+
+    static func emptyHistoryEnvironment() -> AppEnvironment {
+        let store = try! LibraryStore.inMemory()
+        let env = AppEnvironment(store: store)
+        env.appPrefs.autoCheckEnabled = false
+        return env
+    }
+
+    private static func seedHistoryEntries(into store: LibraryStore) {
+        let ctx = store.container.mainContext
+        let cal = Calendar.autoupdatingCurrent
+        let now = Date()
+        let today = cal.startOfDay(for: now)
+        let yesterday = cal.date(byAdding: .day, value: -1, to: today)!
+        let twoDaysAgo = cal.date(byAdding: .day, value: -2, to: today)!
+
+        let entries: [(String, String, String, String, String, Date)] = [
+            ("c-p-1", "ch-p-1", "星辰與深淵的交界處：一部關於時間旅行者的漫長敘事", "第 3 章", "patreon",
+             today.addingTimeInterval(3600)),
+            ("c-p-1", "ch-p-2", "星辰與深淵的交界處：一部關於時間旅行者的漫長敘事", "第 2 章", "patreon",
+             today.addingTimeInterval(1800)),
+            ("c-ao3-1", "ch-ao3-1", "before sunrise", "Chapter 2: Morning", "ao3",
+             yesterday.addingTimeInterval(82800)),
+            ("c-vocus-1", "ch-vocus-1", "都市觀察筆記", "巷口的麵攤", "vocus",
+             yesterday.addingTimeInterval(72000)),
+            ("deleted-col", "deleted-ch", "已刪除的作品", "被移除的章節", "patreon",
+             twoDaysAgo.addingTimeInterval(43200)),
+        ]
+
+        for (colID, chID, colTitle, chTitle, source, date) in entries {
+            let entry = LocalReadingHistoryEntry(
+                collectionID: colID, chapterID: chID,
+                collectionTitle: colTitle, chapterTitle: chTitle,
+                chapterURLString: "https://example.com/\(chID)",
+                sourceKindRaw: source, openedAt: date)
+            ctx.insert(entry)
+        }
+        try? ctx.save()
+    }
+
+    // MARK: - Status-varied library
+
+    static func statusVariedEnvironment() -> AppEnvironment {
+        let store = try! LibraryStore.inMemory()
+        let env = AppEnvironment(store: store)
+        env.appPrefs.autoCheckEnabled = false
+        seedSampleCollections(into: store)
+        return env
+    }
 }
 #endif

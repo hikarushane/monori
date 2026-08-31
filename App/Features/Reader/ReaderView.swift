@@ -254,6 +254,7 @@ struct ReaderView: View {
             foreignPageKey = nil
             if chapter.id != current.id {
                 current = chapter
+                env.store.recordChapterOpened(chapter)
                 applyReaderTreatment()
             } else if wasForeign {
                 // SPA return to the chapter we were already on: didFinish never fires,

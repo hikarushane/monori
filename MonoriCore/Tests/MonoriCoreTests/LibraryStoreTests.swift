@@ -625,4 +625,115 @@ final class LibraryStoreTests: XCTestCase {
         XCTAssertEqual(try store.readingHistoryCount(), 0)
         XCTAssertEqual(try store.collectionCount(), 0)
     }
+
+    // MARK: - Archive status semantics
+
+    func testFinishedRawValueIsFinished() throws {
+        XCTAssertEqual(CollectionReadingStatus.finished.rawValue, "finished")
+    }
+
+    func testSetFinishedClearsAllIsNew() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2", order: 1),
+            payload("Ch3", "https://patreon.com/posts/3", order: 2)
+        ])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 2)
+
+        store.setReadingStatus(.finished, for: c)
+
+        XCTAssertEqual(c.readingStatus, .finished)
+        XCTAssertTrue(c.chapters.allSatisfy { !$0.isNew })
+        XCTAssertEqual(c.unreadCount, 0)
+    }
+
+    func testSetFinishedDoesNotMutateBookmarkProgressHistoryOrLastReadAt() throws {
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2", order: 1)
+        ])
+        let c = try store.collections()[0]
+        let chapters = store.orderedChapters(of: c)
+        store.toggleBookmark(chapters[0])
+        store.saveReadingProgress(0.75, for: chapters[1])
+        store.recordChapterOpened(chapters[0])
+        let historyBefore = try store.readingHistoryCount()
+        let lastReadBefore = c.lastReadAt
+
+        store.setReadingStatus(.finished, for: c)
+
+        XCTAssertTrue(chapters[0].isBookmarked)
+        XCTAssertEqual(chapters[1].readingProgress ?? 0, 0.75, accuracy: 0.001)
+        XCTAssertEqual(try store.readingHistoryCount(), historyBefore)
+        XCTAssertEqual(c.lastReadAt, lastReadBefore)
+    }
+
+    func testSetBackToReadingDoesNotRestoreIsNew() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        try store.applyImport([
+            payload("Ch1", "https://patreon.com/posts/1", order: 0),
+            payload("Ch2", "https://patreon.com/posts/2", order: 1)
+        ])
+        let c = try store.collections()[0]
+        XCTAssertEqual(c.unreadCount, 1)
+
+        store.setReadingStatus(.finished, for: c)
+        store.setReadingStatus(.reading, for: c)
+
+        XCTAssertEqual(c.readingStatus, .reading)
+        XCTAssertEqual(c.unreadCount, 0)
+    }
+
+    // MARK: - clearReadingHistory
+
+    func testClearReadingHistoryOnlyClearsHistory() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let c = try store.collections()[0]
+        let chapter = c.chapters[0]
+        store.toggleBookmark(chapter)
+        store.saveReadingProgress(0.5, for: chapter)
+        store.recordChapterOpened(chapter)
+        store.setReadingStatus(.finished, for: c)
+
+        try store.clearReadingHistory()
+
+        XCTAssertEqual(try store.readingHistoryCount(), 0)
+        XCTAssertEqual(try store.collectionCount(), 1)
+        XCTAssertTrue(chapter.isBookmarked)
+        XCTAssertEqual(chapter.readingProgress ?? 0, 0.5, accuracy: 0.001)
+        XCTAssertEqual(c.readingStatus, .finished)
+    }
+
+    // MARK: - chapter(id:)
+
+    func testChapterByIDFindsExistingChapter() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        let found = store.chapter(id: chapter.id)
+        XCTAssertEqual(found?.id, chapter.id)
+        XCTAssertEqual(found?.title, "Ch1")
+    }
+
+    func testChapterByIDReturnsNilAfterDeletion() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        let chapterID = chapter.id
+        store.deleteCollection(try store.collections()[0])
+        XCTAssertNil(store.chapter(id: chapterID))
+    }
+
+    func testDeleteCollectionPreservesHistorySnapshot() throws {
+        try store.applyImport([payload("Ch1", "https://patreon.com/posts/1", order: 0)])
+        let chapter = try store.collections()[0].chapters[0]
+        let chapterID = chapter.id
+        store.recordChapterOpened(chapter)
+        store.deleteCollection(try store.collections()[0])
+
+        let history = try store.readingHistory()
+        XCTAssertEqual(history.count, 1)
+        XCTAssertEqual(history[0].chapterTitle, "Ch1")
+        XCTAssertNil(store.chapter(id: chapterID))
+    }
 }
