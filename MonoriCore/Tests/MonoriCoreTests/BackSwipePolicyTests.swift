@@ -32,4 +32,38 @@ final class BackSwipePolicyTests: XCTestCase {
     func testNilURLWithHistoryGoesBack() {
         XCTAssertEqual(BackSwipePolicy.browseDecision(currentURL: nil, canGoBack: true), .goBack)
     }
+
+    func testNavigationDismissAcceptsDeliberateLeftEdgeRightSwipe() {
+        XCTAssertTrue(BackSwipePolicy.shouldDismissNavigation(
+            startX: 12,
+            translationX: 72,
+            translationY: 8
+        ))
+    }
+
+    func testNavigationDismissRejectsGestureOutsideLeftEdge() {
+        XCTAssertFalse(BackSwipePolicy.shouldDismissNavigation(
+            startX: 25,
+            translationX: 90,
+            translationY: 0
+        ))
+    }
+
+    func testNavigationDismissRejectsShortLeftwardAndVerticalGestures() {
+        XCTAssertFalse(BackSwipePolicy.shouldDismissNavigation(
+            startX: 8,
+            translationX: 59,
+            translationY: 0
+        ))
+        XCTAssertFalse(BackSwipePolicy.shouldDismissNavigation(
+            startX: 8,
+            translationX: -90,
+            translationY: 0
+        ))
+        XCTAssertFalse(BackSwipePolicy.shouldDismissNavigation(
+            startX: 8,
+            translationX: 90,
+            translationY: 100
+        ))
+    }
 }
