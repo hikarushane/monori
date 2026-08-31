@@ -24,15 +24,12 @@ echo "=== Step 0.5: Design guard (Uguisu Zen regression check) ==="
 "$PROJECT_DIR/scripts/design-guard.sh"
 
 echo ""
-echo "=== Step 1: Ensure Xcode project (XcodeGen) ==="
-if [ ! -d "$PROJECT" ]; then
-  echo "$PROJECT missing — generating with xcodegen"
-  if ! command -v xcodegen >/dev/null 2>&1; then
-    echo "ERROR: xcodegen not installed. Run: brew install xcodegen" | tee "$LOG_FILE"
-    exit 1
-  fi
-  xcodegen generate
+echo "=== Step 1: Regenerate Xcode project (XcodeGen) ==="
+if ! command -v xcodegen >/dev/null 2>&1; then
+  echo "ERROR: xcodegen not installed. Run: brew install xcodegen" | tee "$LOG_FILE"
+  exit 1
 fi
+xcodegen generate
 
 echo "=== Step 2: Build ==="
 xcodebuild build \
