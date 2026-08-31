@@ -13,6 +13,7 @@ struct LibraryView: View {
     @State private var statusFilter: CollectionReadingStatus = .reading
     @State private var showsSearch = false
     @State private var showsSortMenu = false
+    @State private var showsStatusMenu = false
     @State private var revealedCollectionID: String?
 
     private var collections: [LocalCollectionModel] {
@@ -42,12 +43,13 @@ struct LibraryView: View {
                                    sourceFilter: sourceFilter)
             }
             .overlay {
-                if showsSortMenu {
+                if showsSortMenu || showsStatusMenu {
                     Color.black.opacity(0.001)
                         .ignoresSafeArea()
                         .onTapGesture {
                             withAnimation(.easeOut(duration: 0.15)) {
                                 showsSortMenu = false
+                                showsStatusMenu = false
                             }
                         }
                 }
@@ -56,6 +58,15 @@ struct LibraryView: View {
                 if showsSortMenu {
                     sortDropdown
                         .padding(.top, MonoriSpacing.x1)
+                        .padding(.trailing, MonoriSpacing.x3)
+                        .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                            .combined(with: .opacity))
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if showsStatusMenu {
+                    statusDropdown
+                        .padding(.top, 78)
                         .padding(.trailing, MonoriSpacing.x3)
                         .transition(.scale(scale: 0.95, anchor: .topTrailing)
                             .combined(with: .opacity))
@@ -76,9 +87,6 @@ struct LibraryView: View {
                 Text("書庫")
                     .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
                     .tracking(-0.6)
-
-                statusScopeMenu
-                    .padding(.leading, MonoriSpacing.x3)
 
                 Spacer()
 
@@ -121,11 +129,17 @@ struct LibraryView: View {
                 .foregroundStyle(MonoriPalette.ink)
             }
 
-            Text("共 \(collections.count) 部作品")
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.secondaryInk)
-                .accessibilityIdentifier("smoke.librarySummary")
+            HStack(alignment: .firstTextBaseline) {
+                Text("共 \(collections.count) 部作品")
+                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .tracking(MonoriTypography.uiTracking)
+                    .foregroundStyle(MonoriPalette.secondaryInk)
+                    .accessibilityIdentifier("smoke.librarySummary")
+
+                Spacer()
+
+                statusScopeButton
+            }
 
             sourceFilterPicker
         }
@@ -140,30 +154,48 @@ struct LibraryView: View {
         }
     }
 
-    private var statusScopeMenu: some View {
-        Menu {
-            ForEach(CollectionReadingStatus.allCases, id: \.rawValue) { status in
-                Button {
-                    statusFilter = status
-                } label: {
-                    if statusFilter == status {
-                        Label(status.label, systemImage: "checkmark")
-                    } else {
-                        Text(status.label)
-                    }
-                }
-                .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+    private var statusScopeButton: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.15)) {
+                showsStatusMenu.toggle()
             }
         } label: {
             HStack(spacing: 4) {
                 Text(statusFilter.label)
-                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .medium))
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .semibold))
+                DropdownChevron()
+                    .stroke(MonoriPalette.secondaryInk,
+                            style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                    .frame(width: 10, height: 10)
+                    .rotationEffect(.degrees(showsStatusMenu ? 180 : 0))
             }
+            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+            .tracking(MonoriTypography.uiTracking)
             .foregroundStyle(MonoriPalette.secondaryInk)
         }
+        .offset(x: -2.5)
+        .buttonStyle(.plain)
         .accessibilityLabel("閱讀狀態：\(statusFilter.label)")
+        .accessibilityIdentifier("smoke.libraryStatusMenu")
+    }
+
+    private var statusDropdown: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(CollectionReadingStatus.allCases.enumerated()), id: \.element.rawValue) { index, status in
+                if index > 0 { menuGroupDivider() }
+                menuOptionRow(status.label, selected: statusFilter == status,
+                              dismiss: $showsStatusMenu) {
+                    statusFilter = status
+                }
+                .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
+            }
+        }
+        .background(MonoriPalette.surface,
+                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+        .overlay {
+            RoundedRectangle(cornerRadius: MonoriRadius.container)
+                .stroke(MonoriPalette.divider, lineWidth: 1)
+        }
+        .frame(width: 130)
     }
 
     private var sourceFilterPicker: some View {
@@ -248,13 +280,13 @@ struct LibraryView: View {
 
     private var sortDropdown: some View {
         VStack(spacing: 0) {
-            menuOptionRow("標題", selected: sortOrder == .title) { sortOrder = .title }
+            menuOptionRow("標題", selected: sortOrder == .title, dismiss: $showsSortMenu) { sortOrder = .title }
             menuGroupDivider()
-            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated) { sortOrder = .recentlyUpdated }
+            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated, dismiss: $showsSortMenu) { sortOrder = .recentlyUpdated }
             menuGroupDivider()
-            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead) { sortOrder = .recentlyRead }
+            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead, dismiss: $showsSortMenu) { sortOrder = .recentlyRead }
             menuGroupDivider()
-            menuOptionRow("來源", selected: sortOrder == .source) { sortOrder = .source }
+            menuOptionRow("來源", selected: sortOrder == .source, dismiss: $showsSortMenu) { sortOrder = .source }
         }
         .background(MonoriPalette.surface,
                     in: RoundedRectangle(cornerRadius: MonoriRadius.container))
@@ -266,11 +298,12 @@ struct LibraryView: View {
     }
 
     private func menuOptionRow(_ title: String, selected: Bool,
+                               dismiss: Binding<Bool>,
                                action: @escaping () -> Void) -> some View {
         Button {
             action()
             withAnimation(.easeOut(duration: 0.15)) {
-                showsSortMenu = false
+                dismiss.wrappedValue = false
             }
         } label: {
             HStack {
