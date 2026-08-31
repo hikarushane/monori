@@ -186,6 +186,7 @@ struct CollectionTOCView: View {
             .listRowSeparatorTint(MonoriPalette.divider)
         }
         .background(MonoriPalette.canvas)
+        .simultaneousGesture(tocBackSwipe)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .top, spacing: 0) {
@@ -291,6 +292,19 @@ struct CollectionTOCView: View {
                 .accessibilityIdentifier("smoke.refreshStatusBanner")
             }
         }
+    }
+
+    private var tocBackSwipe: some Gesture {
+        DragGesture(minimumDistance: 20, coordinateSpace: .local)
+            .onEnded { value in
+                guard BackSwipePolicy.shouldDismissNavigation(
+                    startX: value.startLocation.x,
+                    translationX: value.translation.width,
+                    translationY: value.translation.height
+                ) else { return }
+                revealedChapterID = nil
+                dismiss()
+            }
     }
 
     private var collectionHeader: some View {
