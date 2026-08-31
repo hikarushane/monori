@@ -264,6 +264,8 @@ if [ -f "$PROJECT_DIR/.claude/hooks/critical_rules.txt" ]; then
   PROMPT_OUT="$(printf '{}' | python3 "$CODEX_ADAPTER" UserPromptSubmit)"
   assert_contains "$PROMPT_OUT" '"hookEventName": "UserPromptSubmit"' \
     "UserPromptSubmit should run Claude critical-rules injection through the Codex adapter."
+  assert_contains "$PROMPT_OUT" "實作任何介面前，必須先搜尋並取用現有元件" \
+    "UserPromptSubmit must require reusing existing UI components before creating new ones."
 
   COMPACT_OUT="$(printf '{}' | python3 "$CODEX_ADAPTER" PreCompact)"
   assert_contains "$COMPACT_OUT" '"hookEventName": "PreCompact"' \

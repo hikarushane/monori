@@ -49,3 +49,20 @@ enum MonoriRadius {
     static let control: CGFloat = 12
     static let container: CGFloat = 20
 }
+
+struct MonoriBackButton: View {
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "chevron.left")
+                .font(MonoriTypography.ui(19, relativeTo: .title3, weight: .semibold))
+                .foregroundStyle(MonoriPalette.ink)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}

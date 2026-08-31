@@ -190,17 +190,7 @@ struct CollectionTOCView: View {
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .top, spacing: 0) {
             HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(MonoriTypography.ui(19, relativeTo: .title3, weight: .semibold))
-                        .foregroundStyle(MonoriPalette.ink)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("返回書庫")
+                MonoriBackButton(accessibilityLabel: "返回書庫", action: dismiss.callAsFunction)
 
                 Spacer()
 
