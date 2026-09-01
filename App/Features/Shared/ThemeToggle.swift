@@ -4,6 +4,7 @@ struct ThemeToggle: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.colorScheme) private var systemColorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.monoriUIMetrics) private var metrics
 
     private var effectivelyDark: Bool {
         switch env.appPrefs.appearance {
@@ -17,7 +18,7 @@ struct ThemeToggle: View {
         let isDark = effectivelyDark
         let anim: Animation? = reduceMotion ? nil : .easeOut(duration: 0.2)
 
-        HStack(spacing: MonoriSpacing.x1) {
+        HStack(spacing: metrics.spacing.x1) {
             Button {
                 withAnimation(anim) {
                     env.appPrefs.appearance = isDark ? .light : .dark
@@ -49,11 +50,12 @@ struct ThemeToggle: View {
             .accessibilityHint("輕點兩下以切換淺色與深色模式")
 
             Text(isDark ? "Dark" : "Light")
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                           relativeTo: .subheadline, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(MonoriPalette.ink)
                 .contentTransition(.opacity)
-                .frame(width: 38, alignment: .leading)
+                .frame(minWidth: 38, alignment: .leading)
         }
     }
 }

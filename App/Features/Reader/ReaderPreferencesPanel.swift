@@ -6,11 +6,12 @@ import MonoriCore
 /// text looks right. Tapping the page outside the panel closes it.
 struct ReaderPreferencesPanel: View {
     let prefs: ReaderPreferences
+    @Environment(\.monoriUIMetrics) private var metrics
 
     private let preferenceRowMinHeight: CGFloat = 44
 
     var body: some View {
-        VStack(spacing: MonoriSpacing.x2) {
+        VStack(spacing: metrics.spacing.x2) {
             preferenceRow(
                 title: "字體大小",
                 value: "\(prefs.fontSize) pt"
@@ -71,8 +72,8 @@ struct ReaderPreferencesPanel: View {
                 ThemeToggle()
             }
         }
-        .padding(.horizontal, MonoriSpacing.x3)
-        .padding(.vertical, MonoriSpacing.x2)
+        .padding(.horizontal, metrics.contentHorizontalPadding)
+        .padding(.vertical, metrics.spacing.x2)
         .frame(maxWidth: .infinity)
         .background(MonoriPalette.surface)
         .overlay(alignment: .bottom) {
@@ -92,12 +93,12 @@ struct ReaderPreferencesPanel: View {
         value: String? = nil,
         @ViewBuilder controls: () -> Controls
     ) -> some View {
-        HStack(spacing: MonoriSpacing.x2) {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: metrics.spacing.x2) {
+            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                 Text(title)
                     .font(
                         MonoriTypography.ui(
-                            14,
+                            metrics.bodyFontSize,
                             relativeTo: .subheadline,
                             weight: .semibold
                         )
@@ -109,7 +110,7 @@ struct ReaderPreferencesPanel: View {
                     Text(value)
                         .font(
                             MonoriTypography.ui(
-                                13,
+                            metrics.secondaryFontSize,
                                 relativeTo: .footnote
                             )
                         )
@@ -117,10 +118,10 @@ struct ReaderPreferencesPanel: View {
                 }
             }
 
-            Spacer(minLength: MonoriSpacing.x3)
+            Spacer(minLength: metrics.spacing.x3)
 
             HStack(
-                spacing: MonoriSpacing.x1,
+                spacing: metrics.spacing.x1,
                 content: controls
             )
         }
@@ -137,7 +138,7 @@ struct ReaderPreferencesPanel: View {
             label()
                 .font(
                     MonoriTypography.ui(
-                        14,
+                        metrics.buttonLabelFontSize,
                         relativeTo: .body,
                         weight: .semibold
                     )

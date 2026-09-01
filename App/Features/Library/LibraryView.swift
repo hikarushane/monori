@@ -6,8 +6,9 @@ struct LibraryView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
+    @Environment(\.monoriUIMetrics) private var metrics
     @Query private var allCollections: [LocalCollectionModel]
-    @State private var sortOrder: LibrarySortOrder = .title
+    @AppStorage("library.sortOrder") private var sortOrder: LibrarySortOrder = .title
     @State private var searchText = ""
     @State private var sourceFilter: SourceKind?
     @State private var statusFilter: CollectionReadingStatus = .reading
@@ -23,66 +24,71 @@ struct LibraryView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if allCollections.isEmpty {
-                    globalEmptyState
-                } else if collections.isEmpty {
-                    scopedEmptyState
-                } else {
-                    listContent
+        GeometryReader { proxy in
+            let contentMargin = metrics.contentMargin(in: proxy.size.width, maxContentWidth: 760)
+            NavigationStack {
+                Group {
+                    if allCollections.isEmpty {
+                        globalEmptyState
+                    } else if collections.isEmpty {
+                        scopedEmptyState
+                    } else {
+                        listContent(contentMargin: contentMargin)
+                    }
                 }
-            }
-            .background(MonoriPalette.canvas)
-            .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) { libraryHeader }
-            .sheet(isPresented: $showsSearch) {
-                LibrarySearchSheet(allCollections: allCollections,
-                                   searchText: $searchText,
-                                   statusFilter: statusFilter,
-                                   sourceFilter: sourceFilter)
-            }
-            .overlay {
-                if showsSortMenu || showsStatusMenu {
-                    Color.black.opacity(0.001)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(.easeOut(duration: 0.15)) {
-                                showsSortMenu = false
-                                showsStatusMenu = false
+                .background(MonoriPalette.canvas)
+                .toolbar(.hidden, for: .navigationBar)
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    libraryHeader(contentMargin: contentMargin)
+                }
+                .sheet(isPresented: $showsSearch) {
+                    LibrarySearchSheet(allCollections: allCollections,
+                                       searchText: $searchText,
+                                       statusFilter: statusFilter,
+                                       sourceFilter: sourceFilter)
+                }
+                .overlay {
+                    if showsSortMenu || showsStatusMenu {
+                        Color.black.opacity(0.001)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation(.easeOut(duration: 0.15)) {
+                                    showsSortMenu = false
+                                    showsStatusMenu = false
+                                }
                             }
-                        }
+                    }
                 }
-            }
-            .overlay(alignment: .topTrailing) {
-                if showsSortMenu {
-                    sortDropdown
-                        .padding(.top, MonoriSpacing.x1)
-                        .padding(.trailing, MonoriSpacing.x3)
-                        .transition(.scale(scale: 0.95, anchor: .topTrailing)
-                            .combined(with: .opacity))
+                .overlay(alignment: .topTrailing) {
+                    if showsSortMenu {
+                        sortDropdown
+                            .padding(.top, metrics.spacing.x1)
+                            .padding(.trailing, contentMargin)
+                            .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                                .combined(with: .opacity))
+                    }
                 }
-            }
-            .overlay(alignment: .topTrailing) {
-                if showsStatusMenu {
-                    statusDropdown
-                        .padding(.top, 78)
-                        .padding(.trailing, MonoriSpacing.x3)
-                        .transition(.scale(scale: 0.95, anchor: .topTrailing)
-                            .combined(with: .opacity))
+                .overlay(alignment: .topTrailing) {
+                    if showsStatusMenu {
+                        statusDropdown
+                            .padding(.top, 78)
+                            .padding(.trailing, contentMargin)
+                            .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                                .combined(with: .opacity))
+                    }
                 }
+                .overlay(alignment: .bottom) { runningOverlay }
+                .task { env.autoCheck.runIfDue() }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { env.autoCheck.runIfDue() }
+                }
+                .onDisappear { env.autoCheck.cancel() }
             }
-            .overlay(alignment: .bottom) { runningOverlay }
-            .task { env.autoCheck.runIfDue() }
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .active { env.autoCheck.runIfDue() }
-            }
-            .onDisappear { env.autoCheck.cancel() }
         }
     }
 
-    private var libraryHeader: some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+    private func libraryHeader(contentMargin: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: metrics.spacing.x1) {
             HStack(alignment: .firstTextBaseline) {
                 Text("書庫")
                     .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
@@ -93,8 +99,9 @@ struct LibraryView: View {
                 HStack(spacing: 18) {
                     NavigationLink(value: LibraryRoute.history) {
                         Image(systemName: "clock.arrow.circlepath")
-                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .medium))
-                            .frame(width: 32, height: 32)
+                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                       relativeTo: .title3, weight: .medium))
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("閱歷")
@@ -104,8 +111,9 @@ struct LibraryView: View {
                         showsSearch = true
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .medium))
-                            .frame(width: 32, height: 32)
+                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                       relativeTo: .title3, weight: .medium))
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("搜尋書庫")
@@ -119,8 +127,9 @@ struct LibraryView: View {
                         SortIcon()
                             .stroke(MonoriPalette.ink,
                                     style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                            .frame(width: 20, height: 20)
-                            .frame(width: 32, height: 32)
+                            .frame(width: metrics.primaryActionIconSize,
+                                   height: metrics.primaryActionIconSize)
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("書庫選項")
@@ -131,7 +140,8 @@ struct LibraryView: View {
 
             HStack(alignment: .firstTextBaseline) {
                 Text("共 \(collections.count) 部作品")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline, weight: .medium))
                     .tracking(MonoriTypography.uiTracking)
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .accessibilityIdentifier("smoke.librarySummary")
@@ -143,9 +153,11 @@ struct LibraryView: View {
 
             sourceFilterPicker
         }
-        .padding(.horizontal, MonoriSpacing.x3)
-        .padding(.top, MonoriSpacing.x3)
-        .padding(.bottom, MonoriSpacing.x2)
+        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, contentMargin)
+        .padding(.top, metrics.spacing.x3)
+        .padding(.bottom, metrics.spacing.x2)
         .background(MonoriPalette.canvas)
         .overlay(alignment: .bottom) {
             Rectangle()
@@ -168,7 +180,8 @@ struct LibraryView: View {
                     .frame(width: 10, height: 10)
                     .rotationEffect(.degrees(showsStatusMenu ? 180 : 0))
             }
-            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+            .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                       relativeTo: .subheadline, weight: .medium))
             .tracking(MonoriTypography.uiTracking)
             .foregroundStyle(MonoriPalette.secondaryInk)
         }
@@ -200,7 +213,7 @@ struct LibraryView: View {
 
     private var sourceFilterPicker: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: MonoriSpacing.x1) {
+            HStack(spacing: metrics.spacing.x1) {
                 sourceFilterChip(nil, title: "全部")
                 ForEach(SourceRegistry.all) { provider in
                     sourceFilterChip(provider.kind, title: provider.displayName)
@@ -219,13 +232,13 @@ struct LibraryView: View {
             sourceFilter = kind
         } label: {
             Text(title)
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline,
+                .font(MonoriTypography.ui(metrics.filterLabelFontSize, relativeTo: .subheadline,
                                            weight: isSelected ? .semibold : .medium))
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(MonoriPalette.ink)
                 .lineLimit(1)
-                .padding(.horizontal, MonoriSpacing.x2)
-                .padding(.vertical, 10)
+                .padding(.horizontal, metrics.spacing.x2)
+                .padding(.vertical, metrics.spacing.x1)
                 .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
                             in: RoundedRectangle(cornerRadius: MonoriRadius.control))
                 .overlay {
@@ -239,7 +252,7 @@ struct LibraryView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    private var listContent: some View {
+    private func listContent(contentMargin: CGFloat) -> some View {
         List {
             ForEach(collections) { collection in
                 NavigationLink(value: collection.id) {
@@ -250,8 +263,8 @@ struct LibraryView: View {
                     revealedID: $revealedCollectionID,
                     onDelete: { env.store.deleteCollection(collection) }
                 )
-                .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
-                                           bottom: 0, trailing: MonoriSpacing.x3))
+                .listRowInsets(EdgeInsets(top: 0, leading: contentMargin,
+                                           bottom: 0, trailing: contentMargin))
                 .listRowBackground(MonoriPalette.canvas)
             }
         }
@@ -261,7 +274,7 @@ struct LibraryView: View {
         .listRowSeparatorTint(MonoriPalette.divider)
         .contentMargins(
             .bottom,
-            bottomNavigationHeight + MonoriSpacing.x2,
+            bottomNavigationHeight + metrics.spacing.x2,
             for: .scrollContent
         )
         .refreshable { await env.autoCheck.runForced() }
@@ -308,7 +321,7 @@ struct LibraryView: View {
         } label: {
             HStack {
                 Text(title)
-                    .font(MonoriTypography.ui(16, relativeTo: .body,
+                    .font(MonoriTypography.ui(metrics.buttonLabelFontSize, relativeTo: .body,
                                               weight: selected ? .semibold : .regular))
                     .foregroundStyle(MonoriPalette.ink)
                 Spacer()
@@ -318,8 +331,8 @@ struct LibraryView: View {
                         .foregroundStyle(MonoriPalette.ink)
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -329,13 +342,13 @@ struct LibraryView: View {
         Rectangle()
             .fill(MonoriPalette.divider)
             .frame(height: 1)
-            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.horizontal, metrics.spacing.x3)
     }
 
     @ViewBuilder
     private var runningOverlay: some View {
         if env.autoCheck.isRunning {
-            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+            VStack(alignment: .leading, spacing: metrics.spacing.x1) {
                 Text("檢查新章節中 \(env.autoCheck.checkedCount)/\(env.autoCheck.totalCount)")
                     .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .medium))
                     .tracking(MonoriTypography.uiTracking)
@@ -344,7 +357,7 @@ struct LibraryView: View {
                     .tint(MonoriPalette.highlight)
                     .progressViewStyle(.linear)
             }
-            .padding(MonoriSpacing.x2)
+            .padding(metrics.spacing.x2)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(MonoriPalette.surface,
                         in: RoundedRectangle(cornerRadius: MonoriRadius.container))
@@ -352,26 +365,28 @@ struct LibraryView: View {
                 RoundedRectangle(cornerRadius: MonoriRadius.container)
                     .stroke(MonoriPalette.divider, lineWidth: 1)
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.bottom, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.contentHorizontalPadding)
+            .padding(.bottom, metrics.spacing.x2)
             .accessibilityIdentifier("smoke.autoCheckSpinner")
         }
     }
 
     private func row(_ collection: LocalCollectionModel) -> some View {
-        HStack(alignment: .center, spacing: MonoriSpacing.x2) {
+        HStack(alignment: .center, spacing: metrics.libraryRowContentSpacing) {
             SourceGlyph(kind: collection.sourceKind)
-                .frame(width: 22, height: 22)
+                .frame(width: metrics.librarySourceIconSize, height: metrics.librarySourceIconSize)
                 .foregroundStyle(MonoriPalette.secondaryInk)
-                .frame(width: 28)
+                .frame(width: metrics.librarySourceSlotWidth)
                 .accessibilityIdentifier("smoke.collectionSourceIcon")
-            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                 Text(collection.title)
-                    .font(MonoriTypography.ui(17, relativeTo: .headline, weight: .semibold))
+                    .font(MonoriTypography.ui(metrics.libraryTitleFontSize,
+                                               relativeTo: .headline, weight: .semibold))
                     .foregroundStyle(MonoriPalette.ink)
                 if let creator = collection.creatorName, !creator.isEmpty {
                     Text("作者：\(creator)")
-                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                   relativeTo: .subheadline))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                 }
                 HStack(spacing: 6) {
@@ -380,7 +395,8 @@ struct LibraryView: View {
                         Text("・更新於 \(updated.formatted(.relative(presentation: .named).locale(Locale(identifier: "zh-Hant"))))")
                     }
                 }
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                           relativeTo: .subheadline))
                 .foregroundStyle(MonoriPalette.secondaryInk)
             }
             Spacer()
@@ -400,37 +416,43 @@ struct LibraryView: View {
                     .accessibilityLabel("\(collection.unreadCount) 個新章節")
             }
         }
-        .padding(.vertical, MonoriSpacing.x2)
+        .padding(.vertical, metrics.rowVerticalPadding)
     }
 
     private var globalEmptyState: some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+        VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
             Text("尚無收藏")
-                .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .semibold))
+                .font(MonoriTypography.ui(metrics.libraryEmptyStateTitleFontSize,
+                                           relativeTo: .title2, weight: .semibold))
                 .foregroundStyle(MonoriPalette.ink)
             Text("在「瀏覽」分頁開啟 Patreon 文章的系列頁面，然後點選「匯入」。")
-                .font(MonoriTypography.ui(16, relativeTo: .body))
+                .font(MonoriTypography.ui(metrics.emptyStateDescriptionFontSize,
+                                           relativeTo: .body))
                 .foregroundStyle(MonoriPalette.secondaryInk)
                 .lineSpacing(6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(MonoriSpacing.x3)
+        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 
     private var scopedEmptyState: some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+        VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
             Text(scopedEmptyTitle)
-                .font(MonoriTypography.ui(18, relativeTo: .title3, weight: .semibold))
+                .font(MonoriTypography.ui(metrics.emptyStateTitleFontSize,
+                                           relativeTo: .title3, weight: .semibold))
                 .foregroundStyle(MonoriPalette.ink)
             if let hint = scopedEmptyHint {
                 Text(hint)
-                    .font(MonoriTypography.ui(16, relativeTo: .body))
+                    .font(MonoriTypography.ui(metrics.emptyStateDescriptionFontSize,
+                                               relativeTo: .body))
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .lineSpacing(6)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(MonoriSpacing.x3)
+        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 
     private var scopedEmptyTitle: String {
@@ -549,6 +571,7 @@ private struct LibrarySearchSheet: View {
     let statusFilter: CollectionReadingStatus
     let sourceFilter: SourceKind?
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.monoriUIMetrics) private var metrics
 
     private var results: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: .title,
@@ -568,13 +591,15 @@ private struct LibrarySearchSheet: View {
                         Button {
                             dismiss()
                         } label: {
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                                 Text(collection.title)
-                                    .font(MonoriTypography.ui(17, relativeTo: .headline,
+                                    .font(MonoriTypography.ui(metrics.libraryTitleFontSize,
+                                                              relativeTo: .headline,
                                                               weight: .semibold))
                                 if let creator = collection.creatorName, !creator.isEmpty {
                                     Text("作者：\(creator)")
-                                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                                   relativeTo: .subheadline))
                                         .foregroundStyle(MonoriPalette.secondaryInk)
                                 }
                             }

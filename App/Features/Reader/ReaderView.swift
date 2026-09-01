@@ -6,6 +6,7 @@ struct ReaderView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
     @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
+    @Environment(\.monoriUIMetrics) private var metrics
     @State private var current: LocalChapterModel
     /// Reader chrome (top/bottom bars) is hidden by default; tapping the
     /// center of the page toggles it.
@@ -42,7 +43,11 @@ struct ReaderView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            PatreonWebView(model: env.reader,
+            ZStack {
+                MonoriPalette.canvas
+                    .ignoresSafeArea()
+
+                PatreonWebView(model: env.reader,
                            onContentTap: handleContentTap(isCenter:),
                            backSwipeOverride: handleBackSwipe,
                            onOverscroll: { edge, progress in
@@ -61,8 +66,9 @@ struct ReaderView: View {
                                    if let next = neighbors.next { open(next) }
                                default: break
                                }
-                           })
-                .accessibilityIdentifier("smoke.readerWebView")
+                    })
+                    .accessibilityIdentifier("smoke.readerWebView")
+            }
                 .overlay(alignment: .top) { topChrome }
                 .overlay(alignment: .bottom) {
                     bottomChrome(bottomInset: proxy.safeAreaInsets.bottom)
@@ -325,6 +331,10 @@ struct ReaderView: View {
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
                     }
                 }
+                if metrics.isRegularWidth {
+                    _ = try? await webView.evaluateJavaScript(
+                        ReaderStyler.iPadReaderLayoutScript())
+                }
                 await applyCurrentPreferences(to: webView)
                 // Spawns own Task — does not block enforceScroll (title repair is independent of scroll)
                 repairCurrentTitleIfNeeded(webView)
@@ -417,7 +427,8 @@ struct ReaderView: View {
                 dismissSlidingRight()
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(MonoriTypography.ui(19, relativeTo: .body, weight: .semibold))
+                    .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                               relativeTo: .body, weight: .semibold))
                     .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -434,7 +445,8 @@ struct ReaderView: View {
                         "reader bookmark \(current.isBookmarked ? "set" : "cleared")")
                 } label: {
                     Image(systemName: current.isBookmarked ? "bookmark.fill" : "bookmark")
-                        .font(MonoriTypography.ui(19, relativeTo: .body, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                   relativeTo: .body, weight: .medium))
                         .foregroundStyle(current.isBookmarked ? MonoriPalette.bookmark : readerChromeIconColor)
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
@@ -450,7 +462,8 @@ struct ReaderView: View {
                 withAnimation(.easeOut(duration: 0.2)) { showPrefsPanel.toggle() }
             } label: {
                 Image(systemName: "textformat.size")
-                    .font(MonoriTypography.ui(21, relativeTo: .body, weight: .semibold))
+                    .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                               relativeTo: .body, weight: .semibold))
                     .foregroundStyle(readerChromeIconColor)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -464,7 +477,8 @@ struct ReaderView: View {
         // padding keeps it clear of the side buttons; it never intercepts taps.
         .overlay {
             Text(currentTitle)
-                .font(MonoriTypography.ui(16, relativeTo: .headline, weight: .medium))
+                .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                           relativeTo: .headline, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(readerChromeTitleColor)
                 .lineLimit(1)
@@ -488,9 +502,11 @@ struct ReaderView: View {
                 Button { open(previous) } label: {
                     HStack(spacing: MonoriSpacing.x1) {
                         Image(systemName: "chevron.left")
-                            .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                            .font(MonoriTypography.ui(metrics.actionIconSize,
+                                                       relativeTo: .body, weight: .semibold))
                         Text("上一章")
-                            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                            .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                       relativeTo: .subheadline, weight: .medium))
                             .tracking(MonoriTypography.uiTracking)
                     }
                     .foregroundStyle(MonoriPalette.ink)
@@ -505,10 +521,12 @@ struct ReaderView: View {
                 Button { open(next) } label: {
                     HStack(spacing: MonoriSpacing.x1) {
                         Text("下一章")
-                            .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                            .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                       relativeTo: .subheadline, weight: .medium))
                             .tracking(MonoriTypography.uiTracking)
                         Image(systemName: "chevron.right")
-                            .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                            .font(MonoriTypography.ui(metrics.actionIconSize,
+                                                       relativeTo: .body, weight: .semibold))
                     }
                     .foregroundStyle(MonoriPalette.ink)
                     .frame(minHeight: 44)

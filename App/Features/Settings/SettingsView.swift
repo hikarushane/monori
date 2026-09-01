@@ -3,6 +3,7 @@ import MonoriCore
 
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.monoriUIMetrics) private var metrics
 @State private var confirmClearLibrary = false
     @State private var confirmLogout = false
 
@@ -25,7 +26,7 @@ struct SettingsView: View {
 
         NavigationStack {
         ScrollView {
-            VStack(alignment: .leading, spacing: MonoriSpacing.x5) {
+            VStack(alignment: .leading, spacing: metrics.spacing.x5) {
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                     Text("設定")
@@ -33,20 +34,23 @@ struct SettingsView: View {
                         .tracking(-0.6)
                         .foregroundStyle(MonoriPalette.ink)
                     Text("個人化您的閱讀體驗與應用程式偏好")
-                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                   relativeTo: .subheadline))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
                     sectionHeading("閱讀設定")
                     settingsGroup {
-                        HStack(spacing: MonoriSpacing.x2) {
-                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                        HStack(spacing: metrics.spacing.x2) {
+                            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                                 Text("自動檢查新章節")
-                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                               relativeTo: .body, weight: .semibold))
                                     .foregroundStyle(MonoriPalette.ink)
                                 Text("有更新時會發出通知")
-                                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                               relativeTo: .subheadline))
                                     .foregroundStyle(MonoriPalette.secondaryInk)
                             }
                             Spacer()
@@ -67,18 +71,20 @@ struct SettingsView: View {
                             .accessibilityValue(env.appPrefs.autoCheckEnabled ? "開啟" : "關閉")
                             .accessibilityIdentifier("smoke.autoCheckToggle")
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
 
                         groupDivider()
 
-                        HStack(spacing: MonoriSpacing.x2) {
-                            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                        HStack(spacing: metrics.spacing.x2) {
+                            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                                 Text("字體大小")
-                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                               relativeTo: .body, weight: .semibold))
                                     .foregroundStyle(MonoriPalette.ink)
                                 Text("\(prefs.fontSize) pt")
-                                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                               relativeTo: .subheadline))
                                     .foregroundStyle(MonoriPalette.secondaryInk)
                             }
                             Spacer()
@@ -95,18 +101,18 @@ struct SettingsView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
                     }
                     sectionFootnote("開啟書庫時自動為「追更中」的收藏檢查新章節。僅在 app 使用中執行，不會在背景連線。")
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
                     sectionHeading("外觀")
                     settingsGroup {
                         HStack(spacing: MonoriSpacing.x2) {
                             Text("主題")
-                                .font(MonoriTypography.ui(16, relativeTo: .body,
+                                .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body,
                                                           weight: .semibold))
                                 .tracking(MonoriTypography.uiTracking)
                                 .foregroundStyle(MonoriPalette.ink)
@@ -114,8 +120,8 @@ struct SettingsView: View {
                             ThemeToggle()
                         }
                         .frame(minHeight: 56)
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
 
                         groupDivider()
 
@@ -124,9 +130,10 @@ struct SettingsView: View {
                                 .environment(env)
                         } label: {
                             HStack {
-                                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                                VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                                     Text("閱讀字體")
-                                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                        .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                                   relativeTo: .body, weight: .semibold))
                                         .foregroundStyle(MonoriPalette.ink)
                                     Text(currentFontDisplayName)
                                         .font(MonoriTypography.reader(14, relativeTo: .subheadline))
@@ -135,11 +142,12 @@ struct SettingsView: View {
                                 }
                                 Spacer()
                                 Image(systemName: "chevron.right")
-                                    .font(MonoriTypography.ui(14, relativeTo: .body, weight: .semibold))
+                                    .font(MonoriTypography.ui(metrics.accessoryIconSize,
+                                                               relativeTo: .body, weight: .semibold))
                                     .foregroundStyle(MonoriPalette.secondaryInk)
                             }
-                            .padding(.horizontal, MonoriSpacing.x3)
-                            .padding(.vertical, MonoriSpacing.x2)
+                            .padding(.horizontal, metrics.spacing.x3)
+                            .padding(.vertical, metrics.spacing.x2)
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
@@ -235,9 +243,11 @@ struct SettingsView: View {
                     }
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.top, MonoriSpacing.x3)
-            .padding(.bottom, MonoriSpacing.x8)
+            .frame(maxWidth: 760, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, metrics.contentHorizontalPadding)
+            .padding(.top, metrics.spacing.x3)
+            .padding(.bottom, metrics.spacing.x8)
         }
         .background(MonoriPalette.canvas)
         .tint(MonoriPalette.ink)
@@ -312,46 +322,53 @@ struct SettingsView: View {
     private func backupSectionContent() -> some View {
         let bs = env.backupService
         if bs.state == .checking {
-            HStack(spacing: MonoriSpacing.x2) {
+            HStack(spacing: metrics.spacing.x2) {
                 ProgressView()
                     .controlSize(.small)
                 Text("檢查 iCloud 狀態…")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline))
                     .foregroundStyle(MonoriPalette.secondaryInk)
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
         } else if bs.state == .noAccount || bs.state == .restricted || bs.state == .unavailable {
-            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                 Text("iCloud 無法使用")
-                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                    .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                               relativeTo: .body, weight: .semibold))
                     .foregroundStyle(MonoriPalette.ink)
                 Text(bs.state == .noAccount
                      ? "請在系統設定中登入 iCloud"
                      : "iCloud 目前無法使用，請稍後再試")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline))
                     .foregroundStyle(MonoriPalette.secondaryInk)
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
         } else {
             if let meta = bs.lastBackupMetadata {
-                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                     Text("上次備份")
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                   relativeTo: .body, weight: .semibold))
                         .foregroundStyle(MonoriPalette.ink)
                     Text(Self.backupDateFormatter.string(from: meta.createdAt))
-                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                   relativeTo: .subheadline))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                     Text("\(meta.collectionCount) 收藏 · \(meta.chapterCount) 章節 · \(meta.historyCount) 閱歷")
-                        .font(MonoriTypography.ui(13, relativeTo: .footnote))
+                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                   relativeTo: .footnote))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                 }
-                .padding(.horizontal, MonoriSpacing.x3)
-                .padding(.vertical, MonoriSpacing.x2)
+                .padding(.horizontal, metrics.spacing.x3)
+                .padding(.vertical, metrics.spacing.x2)
             } else {
                 Text("尚無 iCloud 備份")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline))
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .padding(.horizontal, MonoriSpacing.x3)
                     .padding(.vertical, MonoriSpacing.x2)
@@ -364,7 +381,8 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Text("立即備份")
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .body, weight: .semibold))
                         .foregroundStyle(MonoriPalette.ink)
                     Spacer()
                     if bs.state == .backingUp {
@@ -389,7 +407,8 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Text("從 iCloud 還原")
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .body, weight: .semibold))
                         .foregroundStyle(.red)
                     Spacer()
                     if bs.state == .restoring {
@@ -462,7 +481,8 @@ struct SettingsView: View {
                              disabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(symbol)
-                .font(MonoriTypography.ui(22, relativeTo: .title3, weight: .medium))
+                .font(MonoriTypography.ui(metrics.actionIconSize,
+                                           relativeTo: .title3, weight: .medium))
                 .foregroundStyle(MonoriPalette.ink)
                 .frame(width: 44, height: 44)
                 .background(MonoriPalette.canvas,
@@ -494,19 +514,20 @@ struct SettingsView: View {
         Rectangle()
             .fill(MonoriPalette.divider)
             .frame(height: 1)
-            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.horizontal, metrics.spacing.x3)
     }
 
     private func sectionHeading(_ title: String) -> some View {
         Text(title)
-            .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+            .font(MonoriTypography.ui(metrics.sectionTitleFontSize,
+                                       relativeTo: .footnote, weight: .semibold))
             .tracking(MonoriTypography.navigationTracking)
             .foregroundStyle(MonoriPalette.ink.opacity(0.8))
     }
 
     private func sectionFootnote(_ text: String) -> some View {
         Text(text)
-            .font(MonoriTypography.ui(13, relativeTo: .footnote))
+            .font(MonoriTypography.ui(metrics.secondaryFontSize, relativeTo: .footnote))
             .foregroundStyle(MonoriPalette.secondaryInk)
             .lineSpacing(5)
     }
@@ -515,7 +536,8 @@ struct SettingsView: View {
                                 action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                           relativeTo: .body, weight: .semibold))
                 .foregroundStyle(destructive ? Color.red : MonoriPalette.ink)
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 .contentShape(Rectangle())
@@ -580,4 +602,3 @@ private struct ExternalLinkIcon: Shape {
         return p
     }
 }
-

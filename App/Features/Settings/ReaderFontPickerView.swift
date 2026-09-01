@@ -4,20 +4,22 @@ import UniformTypeIdentifiers
 struct ReaderFontPickerView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.monoriUIMetrics) private var metrics
     @State private var showImporter = false
     @State private var importError: ImportAlertItem?
     @State private var confirmDeleteID: String?
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: MonoriSpacing.x5) {
+            VStack(alignment: .leading, spacing: metrics.spacing.x5) {
                 VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                     Text("閱讀字體")
                         .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
                         .tracking(-0.6)
                         .foregroundStyle(MonoriPalette.ink)
                     Text("選擇閱讀器正文使用的字型")
-                        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                   relativeTo: .subheadline))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                 }
 
@@ -38,7 +40,8 @@ struct ReaderFontPickerView: View {
                     sectionHeading("已匯入")
                     if env.readerFontStore.fonts.isEmpty {
                         Text("尚未匯入任何字型")
-                            .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                            .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                       relativeTo: .subheadline))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                     } else {
                         settingsGroup {
@@ -82,9 +85,11 @@ struct ReaderFontPickerView: View {
                     } label: {
                         HStack(spacing: MonoriSpacing.x1) {
                             Image(systemName: "plus")
-                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .font(MonoriTypography.ui(metrics.actionIconSize,
+                                                           relativeTo: .body, weight: .semibold))
                             Text("匯入字型")
-                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                           relativeTo: .body, weight: .semibold))
                         }
                         .foregroundStyle(MonoriPalette.ink)
                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -99,9 +104,11 @@ struct ReaderFontPickerView: View {
                     .accessibilityLabel("匯入字型檔案")
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.top, MonoriSpacing.x3)
-            .padding(.bottom, MonoriSpacing.x8)
+            .frame(maxWidth: 760, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, metrics.contentHorizontalPadding)
+            .padding(.top, metrics.spacing.x3)
+            .padding(.bottom, metrics.spacing.x8)
         }
         .background(MonoriPalette.canvas)
         .navigationBarBackButtonHidden(true)
@@ -153,18 +160,19 @@ struct ReaderFontPickerView: View {
             HStack {
                 Text(name)
                     .font(useReaderFont
-                           ? MonoriTypography.reader(16, relativeTo: .body, weight: .regular)
-                           : MonoriTypography.ui(16, relativeTo: .body, weight: .regular))
+                           ? MonoriTypography.reader(metrics.bodyFontSize, relativeTo: .body, weight: .regular)
+                           : MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .regular))
                     .foregroundStyle(MonoriPalette.ink)
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.actionIconSize,
+                                                   relativeTo: .body, weight: .semibold))
                         .foregroundStyle(MonoriPalette.ink)
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -213,12 +221,13 @@ struct ReaderFontPickerView: View {
         Rectangle()
             .fill(MonoriPalette.divider)
             .frame(height: 1)
-            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.horizontal, metrics.spacing.x3)
     }
 
     private func sectionHeading(_ title: String) -> some View {
         Text(title)
-            .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+            .font(MonoriTypography.ui(metrics.sectionTitleFontSize,
+                                       relativeTo: .footnote, weight: .semibold))
             .tracking(MonoriTypography.navigationTracking)
             .foregroundStyle(MonoriPalette.ink.opacity(0.8))
     }

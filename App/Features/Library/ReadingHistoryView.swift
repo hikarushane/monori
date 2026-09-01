@@ -5,6 +5,7 @@ import MonoriCore
 struct ReadingHistoryView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.monoriUIMetrics) private var metrics
     @Query(sort: \LocalReadingHistoryEntry.openedAt, order: .reverse)
     private var entries: [LocalReadingHistoryEntry]
     @State private var showsClearConfirmation = false
@@ -46,8 +47,9 @@ struct ReadingHistoryView: View {
             HStack(alignment: .firstTextBaseline) {
                 Button { dismiss() } label: {
                     Image(systemName: "chevron.left")
-                        .font(MonoriTypography.ui(20, relativeTo: .title3, weight: .medium))
-                        .frame(width: 32, height: 32)
+                        .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                   relativeTo: .title3, weight: .medium))
+                        .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("返回")
@@ -62,9 +64,10 @@ struct ReadingHistoryView: View {
                     Button {
                         showsClearConfirmation = true
                     } label: {
-                        Image(systemName: "trash")
-                            .font(MonoriTypography.ui(18, relativeTo: .body, weight: .medium))
-                            .frame(width: 32, height: 32)
+                    Image(systemName: "trash")
+                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                       relativeTo: .body, weight: .medium))
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("清除閱歷")
@@ -74,13 +77,16 @@ struct ReadingHistoryView: View {
             .foregroundStyle(MonoriPalette.ink)
 
             Text("共 \(entries.count) 筆紀錄")
-                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                           relativeTo: .subheadline, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(MonoriPalette.secondaryInk)
         }
-        .padding(.horizontal, MonoriSpacing.x3)
-        .padding(.top, MonoriSpacing.x3)
-        .padding(.bottom, MonoriSpacing.x2)
+        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, metrics.contentHorizontalPadding)
+        .padding(.top, metrics.spacing.x3)
+        .padding(.bottom, metrics.spacing.x2)
         .background(MonoriPalette.canvas)
         .overlay(alignment: .bottom) {
             Rectangle().fill(MonoriPalette.divider).frame(height: 1)
@@ -97,20 +103,23 @@ struct ReadingHistoryView: View {
                     }
                 } header: {
                     Text(sectionTitle(for: section.day))
-                        .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.sectionTitleFontSize,
+                                                   relativeTo: .subheadline, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.secondaryInk)
                         .textCase(nil)
                 }
                 .listRowBackground(MonoriPalette.canvas)
-                .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
-                                          bottom: 0, trailing: MonoriSpacing.x3))
+                .listRowInsets(EdgeInsets(top: 0, leading: metrics.contentHorizontalPadding,
+                                          bottom: 0, trailing: metrics.contentHorizontalPadding))
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(MonoriPalette.canvas)
         .listRowSeparatorTint(MonoriPalette.divider)
+        .frame(maxWidth: 760)
+        .frame(maxWidth: .infinity)
         .accessibilityIdentifier("smoke.readingHistoryList")
     }
 
@@ -122,16 +131,17 @@ struct ReadingHistoryView: View {
                 readerTarget = ReaderTarget(id: chapter.id)
             }
         } label: {
-            HStack(alignment: .top, spacing: MonoriSpacing.x2) {
+            HStack(alignment: .top, spacing: metrics.rowInformationSpacing) {
                 SourceGlyph(kind: SourceKind(rawValue: entry.sourceKindRaw) ?? .patreon)
-                    .frame(width: 18, height: 18)
+                    .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
                     .foregroundStyle(MonoriPalette.secondaryInk)
-                    .frame(width: 24)
+                    .frame(width: metrics.actionIconSize)
                     .padding(.top, 2)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                     Text(entry.chapterTitle)
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                   relativeTo: .body, weight: .medium))
                         .foregroundStyle(isAvailable ? MonoriPalette.ink : MonoriPalette.secondaryInk)
 
                     HStack(spacing: 6) {
@@ -139,7 +149,8 @@ struct ReadingHistoryView: View {
                         Text("·")
                         Text(timeString(entry.openedAt))
                     }
-                    .font(MonoriTypography.ui(13, relativeTo: .footnote))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .footnote))
                     .foregroundStyle(MonoriPalette.secondaryInk)
 
                     if !isAvailable {
@@ -151,7 +162,7 @@ struct ReadingHistoryView: View {
 
                 Spacer()
             }
-            .padding(.vertical, MonoriSpacing.x1)
+            .padding(.vertical, metrics.rowVerticalPadding)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -185,17 +196,20 @@ struct ReadingHistoryView: View {
     }
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+        VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
             Text("還沒有閱歷")
-                .font(MonoriTypography.ui(18, relativeTo: .title3, weight: .semibold))
+                .font(MonoriTypography.ui(metrics.emptyStateTitleFontSize,
+                                           relativeTo: .title3, weight: .semibold))
                 .foregroundStyle(MonoriPalette.ink)
             Text("開啟書庫中的章節後，閱讀紀錄會出現在這裡。")
-                .font(MonoriTypography.ui(16, relativeTo: .body))
+                .font(MonoriTypography.ui(metrics.emptyStateDescriptionFontSize,
+                                           relativeTo: .body))
                 .foregroundStyle(MonoriPalette.secondaryInk)
                 .lineSpacing(6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(MonoriSpacing.x3)
+        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 }
 
