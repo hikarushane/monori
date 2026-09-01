@@ -3,6 +3,7 @@ import Foundation
 public enum ReaderStyler {
     public static let styleElementID = "monori-reader-style"
     public static let userFontStyleID = "monori-user-font-style"
+    public static let iPadLayoutStyleID = "monori-ipad-reader-layout"
     static let defaultFontStack = #""Source Serif 4", "Noto Serif TC", serif"#
 
     public static func ruleset() -> String {
@@ -63,6 +64,130 @@ public enum ReaderStyler {
           document.documentElement.appendChild(style);
         \(fontCheckSnippet)
         \(clearAncestorBgSnippet)
+        })();
+        """
+    }
+
+    /// Expands the reading surface on regular-width iPad layouts without
+    /// changing the phone rulesets. Live Patreon/AO3 pages are reduced to their
+    /// prose plus comments; imported HTML and the other source-specific readers
+    /// retain their existing cleanup and only receive the width override.
+    public static func iPadReaderLayoutScript() -> String {
+        """
+        (function () {
+          function applyIPadReaderLayout() {
+            var old = document.getElementById("(iPadLayoutStyleID)");
+            if (old) old.remove();
+            var style = document.createElement('style');
+            style.id = "(iPadLayoutStyleID)";
+            style.textContent = `
+              html, body {
+                width: 100% !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+              }
+              [data-tag="post-content"], .patreon-post-content,
+              .userstuff[role="article"], #chapters .userstuff,
+              .editor-content-block, .lexical-web-theme,
+              #bodyText, #comments {
+                width: 100% !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+              }
+              [data-tag="post-content"], [data-tag="post-content"] *,
+              .patreon-post-content, .patreon-post-content *,
+              .userstuff[role="article"], .userstuff[role="article"] *,
+              #chapters .userstuff, #chapters .userstuff *,
+              .editor-content-block, .editor-content-block *,
+              .lexical-web-theme, .lexical-web-theme *,
+              #bodyText, #bodyText * {
+                font-family: var(--monori-font-family) !important;
+              }
+              [data-tag="post-content"] :is(div, section, article, main, p, li, blockquote),
+              .patreon-post-content :is(div, section, article, main, p, li, blockquote),
+              .userstuff[role="article"] :is(div, section, article, main, p, li, blockquote),
+              #chapters .userstuff :is(div, section, article, main, p, li, blockquote),
+              .editor-content-block :is(div, section, article, main, p, li, blockquote),
+              .lexical-web-theme :is(div, section, article, main, p, li, blockquote),
+              #bodyText :is(div, section, article, main, p, li, blockquote) {
+                width: auto !important;
+                max-width: none !important;
+              }
+              [data-tag="content-card-comment-thread-container"],
+              #comments, #comments_placeholder, #feedback {
+                width: 100% !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+                padding-left: 32px !important;
+                padding-right: 32px !important;
+              }
+            `;
+            document.documentElement.appendChild(style);
+
+            var liveSelector = [
+              '[data-tag="post-content"]',
+              '.patreon-post-content',
+              '.userstuff[role="article"]',
+              '#chapters .userstuff'
+            ].join(',');
+            var content = document.querySelector(liveSelector) ||
+                          document.querySelector('.editor-content-block') ||
+                          document.querySelector('.lexical-web-theme') ||
+                          document.querySelector('#bodyText');
+            var readingSurface = content || document.body;
+
+            document.body.style.setProperty('width', '100%', 'important');
+            document.body.style.setProperty('max-width', 'none', 'important');
+            document.body.style.setProperty('box-sizing', 'border-box', 'important');
+            document.body.style.setProperty('padding-left', content ? '0' : '32px', 'important');
+            document.body.style.setProperty('padding-right', content ? '0' : '32px', 'important');
+            document.body.style.setProperty('margin-left', '0', 'important');
+            document.body.style.setProperty('margin-right', '0', 'important');
+
+            readingSurface.style.setProperty('width', '100%', 'important');
+            readingSurface.style.setProperty('max-width', 'none', 'important');
+            readingSurface.style.setProperty('box-sizing', 'border-box', 'important');
+            readingSurface.style.setProperty('padding-left', '32px', 'important');
+            readingSurface.style.setProperty('padding-right', '32px', 'important');
+            readingSurface.style.setProperty('margin-left', '0', 'important');
+            readingSurface.style.setProperty('margin-right', '0', 'important');
+
+            if (content) {
+              var shouldIsolate = content.matches(liveSelector);
+              var commentsSelector = [
+                  '[data-tag="content-card-comment-thread-container"]',
+                  '#comments', '#comments_placeholder', '#feedback'
+                ].join(',');
+              var cursor = content;
+              while (cursor && cursor.parentElement &&
+                     cursor.parentElement !== document.documentElement) {
+                var parent = cursor.parentElement;
+                parent.style.setProperty('width', '100%', 'important');
+                parent.style.setProperty('max-width', 'none', 'important');
+                parent.style.setProperty('box-sizing', 'border-box', 'important');
+                parent.style.setProperty('padding-left', '0', 'important');
+                parent.style.setProperty('padding-right', '0', 'important');
+                parent.style.setProperty('margin-left', '0', 'important');
+                parent.style.setProperty('margin-right', '0', 'important');
+                if (shouldIsolate) {
+                  for (var i = 0; i < parent.children.length; i++) {
+                    var sibling = parent.children[i];
+                    if (sibling === cursor ||
+                        sibling.tagName === 'STYLE' || sibling.tagName === 'SCRIPT' ||
+                        sibling.tagName === 'LINK' ||
+                        sibling.matches(commentsSelector) || sibling.querySelector(commentsSelector)) {
+                      continue;
+                    }
+                    sibling.style.setProperty('display', 'none', 'important');
+                  }
+                }
+                cursor = parent;
+              }
+            }
+          }
+          applyIPadReaderLayout();
+          setTimeout(applyIPadReaderLayout, 500);
+          setTimeout(applyIPadReaderLayout, 1500);
         })();
         """
     }

@@ -1,7 +1,122 @@
 import XCTest
 @testable import MonoriCore
+#if canImport(WebKit)
+import WebKit
+#endif
 
 final class ReaderStylerTests: XCTestCase {
+#if canImport(WebKit)
+    @MainActor
+    func testIPadReaderLayoutUsesFullWidthAndIsolatesPatreonContent() async throws {
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1032, height: 1376))
+        webView.loadHTMLString("""
+        <!doctype html><html><body>
+          <header id="site-header">Patreon navigation</header>
+          <main style="max-width: 760px; margin: 0 auto">
+            <article style="max-width: 680px; margin: 0 auto">
+              <section id="byline">Creator and date</section>
+              <div id="post-actions">Like, share, more</div>
+              <div id="chapter" class="patreon-post-content"><p id="paragraph">Chapter text</p></div>
+              <section id="comments" data-tag="content-card-comment-thread-container">Comments</section>
+            </article>
+            <aside id="collection-panel">Collection chapters</aside>
+          </main>
+        </body></html>
+        """, baseURL: URL(string: "https://www.patreon.com/posts/chapter-1"))
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        _ = try await webView.evaluateJavaScript(ReaderStyler.injectionScript())
+        _ = try await webView.evaluateJavaScript(ReaderStyler.iPadReaderLayoutScript())
+        let result = try await webView.evaluateJavaScript("""
+        (function () {
+          var chapterStyle = getComputedStyle(document.getElementById('chapter'));
+          return [
+            chapterStyle.maxWidth,
+            chapterStyle.paddingLeft,
+            getComputedStyle(document.getElementById('site-header')).display,
+            getComputedStyle(document.getElementById('byline')).display,
+            getComputedStyle(document.getElementById('post-actions')).display,
+            getComputedStyle(document.getElementById('collection-panel')).display,
+            getComputedStyle(document.getElementById('chapter')).display,
+            getComputedStyle(document.getElementById('comments')).display
+          ];
+        })();
+        """)
+        let values = try XCTUnwrap(result as? [String])
+
+        XCTAssertEqual(values[0], "none")
+        XCTAssertEqual(values[1], "32px")
+        XCTAssertEqual(Array(values[2...5]), Array(repeating: "none", count: 4))
+        XCTAssertNotEqual(values[6], "none", "chapter content must remain visible")
+        XCTAssertNotEqual(values[7], "none", "comments must remain visible")
+        let chapterWidth = try await webView.evaluateJavaScript(
+            "document.getElementById('chapter').getBoundingClientRect().width")
+        XCTAssertGreaterThan(try XCTUnwrap(chapterWidth as? NSNumber).doubleValue, 900,
+                             "Patreon ancestor containers must not keep the iPad reader narrow")
+        let paragraphFont = try await webView.evaluateJavaScript(
+            "getComputedStyle(document.getElementById('paragraph')).fontFamily")
+        XCTAssertTrue(try XCTUnwrap(paragraphFont as? String).contains("Source Serif 4"),
+                      "Patreon descendants must keep Monori's reader typography")
+        let commentsPadding = try await webView.evaluateJavaScript(
+            "getComputedStyle(document.getElementById('comments')).paddingLeft")
+        XCTAssertEqual(commentsPadding as? String, "32px")
+    }
+
+    @MainActor
+    func testIPadReaderLayoutExpandsStoredDocumentBody() async throws {
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1032, height: 1376))
+        let html = ReaderStyler.wrappedDocument(
+            inner: "<p>Stored chapter text</p>", fontSizePoints: 19, lineHeight: 1.9)
+        webView.loadHTMLString(html, baseURL: URL(string: "https://docs.google.com/document/d/example"))
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        _ = try await webView.evaluateJavaScript(ReaderStyler.iPadReaderLayoutScript())
+        let result = try await webView.evaluateJavaScript("""
+        (function () {
+          var style = getComputedStyle(document.body);
+          return [style.maxWidth, style.paddingLeft, style.boxSizing];
+        })();
+        """)
+        let values = try XCTUnwrap(result as? [String])
+
+        XCTAssertEqual(values, ["none", "32px", "border-box"])
+    }
+
+    @MainActor
+    func testIPadReaderLayoutExpandsAFFContentAncestors() async throws {
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1032, height: 1376))
+        webView.loadHTMLString("""
+        <!doctype html><html><body>
+          <main style="max-width: 680px; margin: 0 auto">
+            <section id="bodyText">
+              <div id="content-column" style="max-width: 680px; margin: 0 auto">
+                <p id="prose" style="max-width: 680px; margin: 0 auto">Chapter text</p>
+              </div>
+            </section>
+            <section id="comments">Comments</section>
+          </main>
+        </body></html>
+        """, baseURL: URL(string: "https://www.asianfanfics.com/story/view/1/1"))
+        for _ in 0..<100 {
+            if !webView.isLoading { break }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        _ = try await webView.evaluateJavaScript(ReaderStyler.iPadReaderLayoutScript())
+        let width = try await webView.evaluateJavaScript(
+            "document.getElementById('prose').getBoundingClientRect().width")
+
+        XCTAssertGreaterThan(try XCTUnwrap(width as? NSNumber).doubleValue, 900,
+                             "source-specific content ancestors must not retain phone widths")
+    }
+#endif
+
     func testInjectionScriptEmbedsRulesetAndStyleId() {
         let js = ReaderStyler.injectionScript()
         XCTAssertTrue(js.contains(ReaderStyler.styleElementID))
