@@ -43,6 +43,7 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Monori
+        NSCameraUsageDescription: "Allow camera access when you choose to take a photo on a website opened in Monori."
         # Pinned here because xcodegen regenerates App/Info.plist and would
         # otherwise reset these to its defaults (1.0 / 1). Bump CFBundleVersion
         # for every TestFlight upload — App Store Connect rejects a build number

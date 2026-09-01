@@ -19,9 +19,11 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>7</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow camera access when you choose to take a photo on a website opened in Monori.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Manrope[wght].ttf</string>
