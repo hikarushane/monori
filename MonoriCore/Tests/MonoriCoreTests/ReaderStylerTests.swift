@@ -60,6 +60,10 @@ final class ReaderStylerTests: XCTestCase {
             "getComputedStyle(document.getElementById('paragraph')).fontFamily")
         XCTAssertTrue(try XCTUnwrap(paragraphFont as? String).contains("Source Serif 4"),
                       "Patreon descendants must keep Monori's reader typography")
+        let ancestorBg = try await webView.evaluateJavaScript(
+            "getComputedStyle(document.getElementById('chapter').parentElement).backgroundColor")
+        XCTAssertEqual(ancestorBg as? String, "rgba(0, 0, 0, 0)",
+                       "Ancestor backgrounds must be transparent on iPad")
         let commentsPadding = try await webView.evaluateJavaScript(
             "getComputedStyle(document.getElementById('comments')).paddingLeft")
         XCTAssertEqual(commentsPadding as? String, "32px")
@@ -574,5 +578,24 @@ final class ReaderStylerTests: XCTestCase {
             XCTAssertFalse(css.contains("SF Pro"))
             XCTAssertFalse(css.contains("-apple-system"))
         }
+    }
+
+    // MARK: - iPad delayed prefs re-application
+
+    func testIPadDelayedPrefsScriptContainsCorrectValues() {
+        let script = ReaderStyler.iPadDelayedPrefsScript(fontSize: 28, lineSpacing: 2.0)
+        XCTAssertTrue(script.contains("'28px'"), "should embed clamped font-size")
+        XCTAssertTrue(script.contains("'2.00'"), "should embed formatted line-height")
+        XCTAssertTrue(script.contains("setTimeout"), "should schedule delayed re-application")
+    }
+
+    func testIPadDelayedPrefsScriptClampsBounds() {
+        let tooSmall = ReaderStyler.iPadDelayedPrefsScript(fontSize: 8, lineSpacing: 0.5)
+        XCTAssertTrue(tooSmall.contains("'14px'"), "should clamp min font-size to 14")
+        XCTAssertTrue(tooSmall.contains("'1.20'"), "should clamp min line-height to 1.2")
+
+        let tooBig = ReaderStyler.iPadDelayedPrefsScript(fontSize: 50, lineSpacing: 5.0)
+        XCTAssertTrue(tooBig.contains("'48px'"), "should clamp max font-size to 48")
+        XCTAssertTrue(tooBig.contains("'2.40'"), "should clamp max line-height to 2.4")
     }
 }

@@ -82,6 +82,11 @@ struct MonoriUIMetrics: Equatable {
     let actionIconSize: CGFloat
     let primaryActionIconSize: CGFloat
     let emptyStateIconSize: CGFloat
+    let largeTitleFontSize: CGFloat
+    let captionFontSize: CGFloat
+    let footnoteFontSize: CGFloat
+    let readerTopBarHeight: CGFloat
+    let chapterProgressFontSize: CGFloat
 
     init(horizontalSizeClass: UserInterfaceSizeClass?) {
         isRegularWidth = horizontalSizeClass == .regular
@@ -92,22 +97,27 @@ struct MonoriUIMetrics: Equatable {
             rowVerticalPadding = 16
             rowInformationSpacing = 8
             libraryRowContentSpacing = 8
-            librarySourceIconSize = 20
-            librarySourceSlotWidth = 24
+            librarySourceIconSize = 33
+            librarySourceSlotWidth = 42
             sectionSpacing = 24
-            libraryTitleFontSize = 22
-            bodyFontSize = 18
-            secondaryFontSize = 17
-            sectionTitleFontSize = 17
-            buttonLabelFontSize = 18
-            emptyStateTitleFontSize = 22
-            emptyStateDescriptionFontSize = 17
-            libraryEmptyStateTitleFontSize = 22
-            filterLabelFontSize = 18
-            accessoryIconSize = 20
-            actionIconSize = 24
-            primaryActionIconSize = 26
-            emptyStateIconSize = 40
+            libraryTitleFontSize = 26
+            bodyFontSize = 24
+            secondaryFontSize = 21
+            sectionTitleFontSize = 20
+            buttonLabelFontSize = 24
+            emptyStateTitleFontSize = 27
+            emptyStateDescriptionFontSize = 24
+            libraryEmptyStateTitleFontSize = 36
+            filterLabelFontSize = 21
+            accessoryIconSize = 24
+            actionIconSize = 30
+            primaryActionIconSize = 30
+            emptyStateIconSize = 48
+            largeTitleFontSize = 48
+            captionFontSize = 17
+            footnoteFontSize = 20
+            readerTopBarHeight = 96
+            chapterProgressFontSize = 18
         } else {
             spacing = Spacing(x1: MonoriSpacing.x1, x2: MonoriSpacing.x2,
                               x3: MonoriSpacing.x3, x4: MonoriSpacing.x4,
@@ -133,6 +143,11 @@ struct MonoriUIMetrics: Equatable {
             actionIconSize = 20
             primaryActionIconSize = 20
             emptyStateIconSize = 32
+            largeTitleFontSize = 32
+            captionFontSize = 11
+            footnoteFontSize = 13
+            readerTopBarHeight = 64
+            chapterProgressFontSize = 12
         }
     }
 

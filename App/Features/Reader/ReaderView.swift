@@ -318,10 +318,9 @@ struct ReaderView: View {
         let webView = env.reader.webView
         Task { @MainActor in
             if foreignPageTitle == nil {
+                await applyCurrentPreferences(to: webView)
                 if !renderingStoredHTML {
                     let sourceKind = current.collection?.sourceKind ?? .patreon
-                    DiagnosticLog.shared.log(category: "reader",
-                        "applying reader CSS, source=\(sourceKind)")
                     switch sourceKind {
                     case .vocus:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript())
@@ -336,6 +335,12 @@ struct ReaderView: View {
                         ReaderStyler.iPadReaderLayoutScript())
                 }
                 await applyCurrentPreferences(to: webView)
+                if metrics.isRegularWidth && !renderingStoredHTML {
+                    _ = try? await webView.evaluateJavaScript(
+                        ReaderStyler.iPadDelayedPrefsScript(
+                            fontSize: prefs.fontSize,
+                            lineSpacing: prefs.lineSpacing))
+                }
                 // Spawns own Task — does not block enforceScroll (title repair is independent of scroll)
                 repairCurrentTitleIfNeeded(webView)
             } else {
@@ -487,7 +492,7 @@ struct ReaderView: View {
                 .accessibilityIdentifier("smoke.readerTitle")
         }
         .padding(.horizontal, MonoriSpacing.x2)
-        .frame(height: 64)
+        .frame(height: metrics.readerTopBarHeight)
         .background(MonoriPalette.canvas)
         .overlay(alignment: .bottom) {
             Rectangle()
@@ -539,7 +544,7 @@ struct ReaderView: View {
         .overlay {
             if let chapterProgress {
                 Text(chapterProgress)
-                    .font(MonoriTypography.ui(12, relativeTo: .footnote, weight: .regular))
+                    .font(MonoriTypography.ui(metrics.chapterProgressFontSize, relativeTo: .footnote, weight: .regular))
                     .tracking(MonoriTypography.uiTracking)
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .monospacedDigit()

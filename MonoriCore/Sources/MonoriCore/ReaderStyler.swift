@@ -76,10 +76,10 @@ public enum ReaderStyler {
         """
         (function () {
           function applyIPadReaderLayout() {
-            var old = document.getElementById("(iPadLayoutStyleID)");
+            var old = document.getElementById("\(iPadLayoutStyleID)");
             if (old) old.remove();
             var style = document.createElement('style');
-            style.id = "(iPadLayoutStyleID)";
+            style.id = "\(iPadLayoutStyleID)";
             style.textContent = `
               html, body {
                 width: 100% !important;
@@ -169,6 +169,13 @@ public enum ReaderStyler {
                 parent.style.setProperty('padding-right', '0', 'important');
                 parent.style.setProperty('margin-left', '0', 'important');
                 parent.style.setProperty('margin-right', '0', 'important');
+                parent.style.setProperty('background-color', 'transparent', 'important');
+                var pd = window.getComputedStyle(parent).display;
+                if (pd === 'grid' || pd === 'inline-grid') {
+                  parent.style.setProperty('grid-template-columns', '1fr', 'important');
+                } else if (pd === 'flex' || pd === 'inline-flex') {
+                  parent.style.setProperty('flex-direction', 'column', 'important');
+                }
                 if (shouldIsolate) {
                   for (var i = 0; i < parent.children.length; i++) {
                     var sibling = parent.children[i];
@@ -378,6 +385,26 @@ public enum ReaderStyler {
         let clamped = min(2.4, max(1.2, value))
         let formatted = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), clamped)
         return "document.documentElement.style.setProperty('--monori-line-height', '\(formatted)');"
+    }
+
+    /// Re-applies font-size and line-height CSS variables after delays,
+    /// working around a timing race on iPad where Patreon SPA rendering
+    /// resets the inline custom-property values set by applyCurrentPreferences.
+    public static func iPadDelayedPrefsScript(fontSize: Int, lineSpacing: Double) -> String {
+        let clampedSize = min(48, max(14, fontSize))
+        let clampedSpacing = min(2.4, max(1.2, lineSpacing))
+        let formatted = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), clampedSpacing)
+        return """
+        (function(){
+          var s='\(clampedSize)px',h='\(formatted)';
+          function r(){
+            document.documentElement.style.setProperty('--monori-font-size',s);
+            document.documentElement.style.setProperty('--monori-line-height',h);
+          }
+          setTimeout(r,600);
+          setTimeout(r,1600);
+        })();
+        """
     }
 
     public static func fontFamilyScript(font: ReaderFontCSS) -> String {

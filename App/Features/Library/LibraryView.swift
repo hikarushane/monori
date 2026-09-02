@@ -25,7 +25,7 @@ struct LibraryView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let contentMargin = metrics.contentMargin(in: proxy.size.width, maxContentWidth: 760)
+            let contentMargin = metrics.contentMargin(in: proxy.size.width, maxContentWidth: metrics.isRegularWidth ? .infinity : 760)
             NavigationStack {
                 Group {
                     if allCollections.isEmpty {
@@ -91,7 +91,7 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: metrics.spacing.x1) {
             HStack(alignment: .firstTextBaseline) {
                 Text("書庫")
-                    .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.largeTitleFontSize, relativeTo: .largeTitle, weight: .bold))
                     .tracking(-0.6)
 
                 Spacer()
@@ -153,7 +153,7 @@ struct LibraryView: View {
 
             sourceFilterPicker
         }
-        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, contentMargin)
         .padding(.top, metrics.spacing.x3)
@@ -350,7 +350,7 @@ struct LibraryView: View {
         if env.autoCheck.isRunning {
             VStack(alignment: .leading, spacing: metrics.spacing.x1) {
                 Text("檢查新章節中 \(env.autoCheck.checkedCount)/\(env.autoCheck.totalCount)")
-                    .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.footnoteFontSize, relativeTo: .footnote, weight: .medium))
                     .tracking(MonoriTypography.uiTracking)
                     .foregroundStyle(MonoriPalette.ink)
                 ProgressView()
@@ -407,7 +407,7 @@ struct LibraryView: View {
             }
             if collection.unreadCount > 0 {
                 Text("\(collection.unreadCount)")
-                    .font(MonoriTypography.ui(11, relativeTo: .caption2, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption2, weight: .bold))
                     .foregroundStyle(MonoriPalette.ink)
                     .frame(minWidth: 28, minHeight: 28)
                     .background(MonoriPalette.highlight,
@@ -432,7 +432,7 @@ struct LibraryView: View {
                 .lineSpacing(6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, maxHeight: .infinity, alignment: .topLeading)
         .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 
@@ -451,7 +451,7 @@ struct LibraryView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, maxHeight: .infinity, alignment: .topLeading)
         .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 

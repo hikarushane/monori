@@ -30,6 +30,7 @@ struct ReadingHistoryView: View {
             if let chapter = env.store.chapter(id: target.id) {
                 ReaderView(chapter: chapter)
                     .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+                    .environment(\.monoriUIMetrics, metrics)
             }
         }
         .confirmationDialog("清除所有閱歷？", isPresented: $showsClearConfirmation,

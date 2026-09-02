@@ -30,7 +30,7 @@ struct SettingsView: View {
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                     Text("設定")
-                        .font(MonoriTypography.ui(32, relativeTo: .largeTitle, weight: .bold))
+                        .font(MonoriTypography.ui(metrics.largeTitleFontSize, relativeTo: .largeTitle, weight: .bold))
                         .tracking(-0.6)
                         .foregroundStyle(MonoriPalette.ink)
                     Text("個人化您的閱讀體驗與應用程式偏好")
@@ -199,11 +199,11 @@ struct SettingsView: View {
                     settingsGroup {
                         HStack {
                             Text("版本")
-                                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .semibold))
                                 .foregroundStyle(MonoriPalette.ink)
                             Spacer()
                             Text(MonoriCore.version)
-                                .font(.system(size: 13, design: .monospaced).weight(.medium))
+                                .font(.system(size: metrics.footnoteFontSize, design: .monospaced).weight(.medium))
                                 .foregroundStyle(MonoriPalette.secondaryInk)
                                 .padding(.horizontal, MonoriSpacing.x1)
                                 .padding(.vertical, 4)
@@ -218,7 +218,7 @@ struct SettingsView: View {
                         Link(destination: URL(string: "https://github.com/hikarushane/monori/blob/main/COMPLIANCE.md")!) {
                             HStack {
                                 Text("隱私權政策與法律合規")
-                                    .font(MonoriTypography.ui(16, relativeTo: .body, weight: .semibold))
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .semibold))
                                     .foregroundStyle(MonoriPalette.ink)
                                 Spacer()
                                 ExternalLinkIcon()
@@ -235,7 +235,7 @@ struct SettingsView: View {
                         groupDivider()
 
                         Text("把散落在 Patreon、Google Docs、AO3、方格子、AsianFanfics 的同人作品收進同一個書庫。匯入章節、離線書籤、沉浸閱讀，不用在五個網站之間切換。\n\n僅在裝置上儲存章節標題、連結、書籤與閱歷，不儲存文章內容。備份至 iCloud 時同樣不含文章內容。所有文章存取由各平台控制。")
-                            .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                            .font(MonoriTypography.ui(metrics.secondaryFontSize, relativeTo: .subheadline))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                             .lineSpacing(6)
                             .padding(.horizontal, MonoriSpacing.x3)
@@ -243,7 +243,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .frame(maxWidth: 760, alignment: .leading)
+            .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, metrics.contentHorizontalPadding)
             .padding(.top, metrics.spacing.x3)

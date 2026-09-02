@@ -2,7 +2,7 @@ import SwiftUI
 
 enum AppChromeMetrics {
     static func bottomNavigationHeight(for viewHeight: CGFloat, isRegularWidth: Bool) -> CGFloat {
-        isRegularWidth ? 82 : min(max(viewHeight * 0.09, 70), 90)
+        isRegularWidth ? 123 : min(max(viewHeight * 0.09, 70), 90)
     }
 }
 
@@ -71,6 +71,7 @@ struct AppRootView: View {
                 set: { env.autopilotReaderTarget = $0 })) { target in
                 ReaderView(chapter: target.chapter)
                     .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+                    .environment(\.monoriUIMetrics, metrics)
                     .environment(env)
                     .modelContainer(env.store.container)
             }
@@ -94,7 +95,7 @@ struct AppRootView: View {
                         metrics: MonoriUIMetrics) -> some View {
         GeometryReader { proxy in
             let iconSize = metrics.isRegularWidth
-                ? metrics.primaryActionIconSize
+                ? CGFloat(39)
                 : min(max(proxy.size.height * 0.28, 24), 30)
 
             HStack(spacing: 0) {
@@ -131,7 +132,7 @@ struct AppRootView: View {
                     .foregroundStyle(isSelected ? MonoriPalette.navigationAccent : MonoriPalette.secondaryInk)
                 Text(title)
                     .font(MonoriTypography.ui(
-                        horizontalSizeClass == .regular ? 13 : 11,
+                        horizontalSizeClass == .regular ? 20 : 11,
                         relativeTo: .caption2,
                                                weight: isSelected ? .semibold : .medium))
                     .tracking(MonoriTypography.navigationTracking)

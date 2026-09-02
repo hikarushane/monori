@@ -187,7 +187,7 @@ struct CollectionTOCView: View {
             .scrollContentBackground(.hidden)
             .listRowSeparatorTint(MonoriPalette.divider)
         }
-        .frame(maxWidth: 760)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760)
         .frame(maxWidth: .infinity)
         .background(MonoriPalette.canvas)
         .simultaneousGesture(tocBackSwipe)
@@ -201,7 +201,7 @@ struct CollectionTOCView: View {
 
                 if refreshing {
                     Text("更新中")
-                        .font(MonoriTypography.ui(11, relativeTo: .caption, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.secondaryInk)
                         .frame(width: 44, height: 44)
@@ -256,6 +256,7 @@ struct CollectionTOCView: View {
             if let chapter = chapters.first(where: { $0.id == target.id }) {
                 ReaderView(chapter: chapter)
                     .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+                    .environment(\.monoriUIMetrics, metrics)
             }
         }
         .alert("重新命名章節", isPresented: Binding(
@@ -277,7 +278,7 @@ struct CollectionTOCView: View {
             if refreshing {
                 VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                     Text("正在檢查新章節⋯大型收藏可能需要幾分鐘。")
-                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.footnoteFontSize, relativeTo: .footnote, weight: .medium))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.ink)
                     ProgressView()
@@ -376,7 +377,7 @@ struct CollectionTOCView: View {
             Spacer(minLength: 12)
             if chapter.isNew {
                 Text("新")
-                    .font(MonoriTypography.ui(11, relativeTo: .caption2, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption2, weight: .bold))
                     .foregroundStyle(MonoriPalette.highlight)
                     .accessibilityLabel("新章節")
             }
