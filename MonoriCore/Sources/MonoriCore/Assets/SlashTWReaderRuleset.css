@@ -1,0 +1,134 @@
+/* MonoriCore/Sources/MonoriCore/Assets/SlashTWReaderRuleset.css
+   slashtw (在水裡寫字 / Written in Waters) reader ruleset — Uguisu Zen. DOM
+   selectors are generic placeholders: the site is mid-migration from Discuz
+   (slashtw.space/forum.php?mod=viewthread) to a self-built "Waterfall"
+   platform (waterfall.slashtw.space/thread/{id}, likely Vue or React) — see
+   ADR-0012 — and neither platform's real markup has been inspected with
+   DevTools yet (requires a logged-in session). Refine once confirmed —
+   if a selector stops matching, the page simply renders as plain slashtw
+   (graceful degradation, same philosophy as ReaderRuleset.css /
+   CXCReaderRuleset.css).
+
+   Unlike CXC (a single prose chapter), a slashtw thread page is the
+   original post plus its replies. No rule below hides anything that could
+   be a reply — the whole post list is the content, not chrome around it —
+   and thread metadata (author name, avatar, post time, floor number/樓層)
+   is deliberately left alone for now: nothing in this file hides elements
+   by matching on an author, username, post-time, or floor-number class
+   name. TODO: verify with DevTools whether Monori should trim any of that
+   once the real markup — Discuz or Waterfall, whichever is live at the
+   time — is known.
+
+   Nothing suggests slashtw ships a dark-by-default theme the way CXC does,
+   so dark-mode handling follows the normal Vocus/AFF pattern (washi-white
+   background forced always, dark ink forced only inside the
+   prefers-color-scheme: dark query) rather than CXC's light-mode
+   dark-ink override. */
+
+:root {
+  color-scheme: light dark;
+  --monori-font-family: "Source Serif 4", "Noto Serif TC", serif;
+  --monori-font-size: 19px;
+  --monori-line-height: 1.9;
+}
+
+/* --- font declarations --- */
+@font-face {
+  font-family: "Source Serif 4";
+  src: local("SourceSerif4Variable-Roman"), local("Source Serif 4");
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif TC";
+  src: local("NotoSerifTC-Regular"), local("Noto Serif TC");
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+/* --- hide forum chrome --- */
+/* TODO: verify with DevTools once Discuz or Waterfall markup is confirmed.
+   Intentionally generic, and does not touch anything named "post" /
+   "thread" / "reply" — on a forum those words describe the content
+   itself, not chrome around it. */
+nav,
+header,
+footer,
+aside,
+[class*="sidebar"],
+[class*="breadcrumb"],
+[class*="site-header"],
+[class*="site-footer"],
+[class*="forum-nav"],
+[class*="board-nav"],
+[class*="online-list"],
+[class*="promo"],
+[class*="ad-"] {
+  display: none !important;
+}
+
+/* --- reading column (original post + replies) --- */
+/* TODO: verify with DevTools — generic guesses for the thread/post-list
+   container across both the outgoing Discuz markup and the incoming
+   Waterfall platform. */
+main,
+article,
+[class*="thread-content"],
+[class*="post-list"],
+[class*="postlist"] {
+  max-width: 34em !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: clamp(24px, 6vw, 48px) !important;
+  padding-right: clamp(24px, 6vw, 48px) !important;
+  font-family: var(--monori-font-family) !important;
+}
+
+/* Size/spacing must hit the text nodes themselves — a value only on the
+   container may never reach the prose if the site sets per-post styles
+   (same Bug 1 reasoning as ReaderRuleset.css / CXCReaderRuleset.css). */
+main, main p, main li, main blockquote, main span,
+article, article p, article li, article blockquote, article span,
+[class*="thread-content"], [class*="thread-content"] p, [class*="thread-content"] span,
+[class*="post-list"], [class*="post-list"] p, [class*="post-list"] span,
+[class*="postlist"], [class*="postlist"] p, [class*="postlist"] span {
+  font-size: var(--monori-font-size, 19px) !important;
+  line-height: var(--monori-line-height, 1.9) !important;
+}
+
+/* Paragraph spacing */
+main p,
+article p,
+[class*="thread-content"] p,
+[class*="post-list"] p,
+[class*="postlist"] p {
+  margin-bottom: 0.85em !important;
+}
+
+/* --- background / dark mode --- */
+body {
+  margin: 0 !important;
+  background-color: #FBF9F8 !important;
+}
+
+body > *,
+body > * > *,
+body > * > * > *,
+body > * > * > * > *,
+body > * > * > * > * > *,
+body > * > * > * > * > * > * {
+  background-color: inherit !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1C1B19 !important;
+  }
+  main, main p, main li, main blockquote, main span,
+  article, article p, article li, article blockquote, article span,
+  [class*="thread-content"], [class*="thread-content"] p, [class*="thread-content"] span,
+  [class*="post-list"], [class*="post-list"] p, [class*="post-list"] span,
+  [class*="postlist"], [class*="postlist"] p, [class*="postlist"] span {
+    color: #F2F0ED !important;
+  }
+}

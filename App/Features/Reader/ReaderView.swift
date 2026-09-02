@@ -328,6 +328,8 @@ struct ReaderView: View {
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.affInjectionScript())
                     case .cxc:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.cxcInjectionScript())
+                    case .slashtw:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.slashtwInjectionScript())
                     default:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
                     }

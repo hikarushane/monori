@@ -408,6 +408,69 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertTrue(js.contains("document.fonts.check"))
     }
 
+    // MARK: - slashtw ruleset
+
+    func testSlashTWRulesetExists() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertFalse(css.isEmpty)
+    }
+
+    func testSlashTWRulesetUsesSourceSerif4() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("Source Serif 4"))
+        XCTAssertTrue(css.contains("Noto Serif TC"))
+        XCTAssertFalse(css.contains("Georgia"))
+    }
+
+    func testSlashTWRulesetDeclaresLocalFontFace() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains(#"local("SourceSerif4Variable-Roman")"#))
+    }
+
+    func testSlashTWRulesetUsesWashiWhite() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("#FBF9F8"))
+        XCTAssertFalse(css.contains("#faf8f5"))
+    }
+
+    func testSlashTWRulesetDarkTextColor() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("#F2F0ED"))
+        XCTAssertFalse(css.contains("#e8e6e3"))
+    }
+
+    func testSlashTWRulesetDefaultLineHeight19() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("--monori-line-height, 1.9"))
+    }
+
+    func testSlashTWRulesetParagraphSpacing() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("0.85em"))
+    }
+
+    func testSlashTWRulesetMaxWidth34em() {
+        let css = ReaderStyler.slashtwRuleset()
+        XCTAssertTrue(css.contains("34em"))
+        XCTAssertFalse(css.contains("42em"))
+    }
+
+    func testSlashTWRulesetPreservesThreadMetadataForNow() {
+        let css = ReaderStyler.slashtwRuleset()
+        // Ruling for this task: author/timestamp/floor-number metadata is
+        // kept, not hidden, until real (Discuz or Waterfall) markup is
+        // confirmed — no hide rule may target it.
+        XCTAssertFalse(css.contains(#"[class*="author"]"#))
+        XCTAssertFalse(css.contains(#"[class*="username"]"#))
+        XCTAssertFalse(css.contains(#"[class*="post-time"]"#))
+        XCTAssertFalse(css.contains(#"[class*="floor"]"#))
+    }
+
+    func testSlashTWInjectionScriptContainsFontCheck() {
+        let js = ReaderStyler.slashtwInjectionScript()
+        XCTAssertTrue(js.contains("document.fonts.check"))
+    }
+
     // MARK: - wrappedDocument (Google Docs)
 
     func testWrappedDocumentEmbedsPrefsVariables() {
@@ -508,7 +571,7 @@ final class ReaderStylerTests: XCTestCase {
 
     func testAllRulesetsUseFontFamilyVariable() {
         for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
-                    ReaderStyler.cxcRuleset()] {
+                    ReaderStyler.cxcRuleset(), ReaderStyler.slashtwRuleset()] {
             XCTAssertTrue(css.contains("--monori-font-family"),
                           "Ruleset must declare --monori-font-family")
             XCTAssertTrue(css.contains("var(--monori-font-family)"),
@@ -518,7 +581,7 @@ final class ReaderStylerTests: XCTestCase {
 
     func testAllRulesetsDeclareFontFamilyDefault() {
         for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
-                    ReaderStyler.cxcRuleset()] {
+                    ReaderStyler.cxcRuleset(), ReaderStyler.slashtwRuleset()] {
             XCTAssertTrue(css.contains(#"--monori-font-family: "Source Serif 4", "Noto Serif TC", serif"#),
                           "Ruleset must set default --monori-font-family value")
         }
@@ -635,11 +698,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertFalse(ReaderStyler.vocusRuleset().contains("Georgia"))
         XCTAssertFalse(ReaderStyler.affRuleset().contains("Georgia"))
         XCTAssertFalse(ReaderStyler.cxcRuleset().contains("Georgia"))
+        XCTAssertFalse(ReaderStyler.slashtwRuleset().contains("Georgia"))
     }
 
     func testNoSFProAcrossAllRulesets() {
         for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
-                    ReaderStyler.cxcRuleset()] {
+                    ReaderStyler.cxcRuleset(), ReaderStyler.slashtwRuleset()] {
             XCTAssertFalse(css.contains("SF Pro"))
             XCTAssertFalse(css.contains("-apple-system"))
         }
