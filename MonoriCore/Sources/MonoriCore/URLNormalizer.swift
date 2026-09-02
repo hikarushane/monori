@@ -255,4 +255,55 @@ public enum URLNormalizer {
         else { return nil }
         return "https://www.asianfanfics.com/story/view/\(parts[2])/\(parts[3])"
     }
+
+    // MARK: - CXC
+
+    /// True for `cxc.today` and any of its subdomains (e.g. `bl.cxc.today`, `bg.cxc.today`, `gl.cxc.today`).
+    public static func isCXCHost(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host == "cxc.today" || host.hasSuffix(".cxc.today")
+    }
+
+    /// Extracts the creator username (without the leading `@`) from a CXC creator-store
+    /// or work URL, e.g. `/zh/@nanami777/work/38982` -> `"nanami777"`.
+    public static func cxcUsername(_ url: URL) -> String? {
+        guard isCXCHost(url) else { return nil }
+        let segments = cxcPathSegments(url)
+        guard let atSegment = segments.first(where: { $0.hasPrefix("@") }) else { return nil }
+        return String(atSegment.dropFirst())
+    }
+
+    /// Extracts the numeric work id from a CXC work or chapter URL, e.g.
+    /// `/zh/@foo/work/123` or `/zh/@foo/work/123/chapter/1` -> `"123"`.
+    public static func cxcWorkID(_ url: URL) -> String? {
+        guard isCXCHost(url) else { return nil }
+        let segments = cxcPathSegments(url)
+        guard let workIdx = segments.firstIndex(of: "work"),
+              workIdx + 1 < segments.count else { return nil }
+        let id = segments[workIdx + 1]
+        return id.allSatisfy(\.isNumber) ? id : nil
+    }
+
+    /// True when the URL points at a CXC work (or one of its chapters).
+    public static func isCXCWorkURL(_ url: URL) -> Bool {
+        cxcWorkID(url) != nil
+    }
+
+    /// Canonical form of a CXC work URL: always `https://cxc.today/zh/@{username}/work/{workID}`,
+    /// regardless of the source subdomain, language prefix, or chapter suffix.
+    public static func canonicalCXCWorkURL(_ url: URL) -> URL? {
+        guard let username = cxcUsername(url),
+              let workID = cxcWorkID(url) else { return nil }
+        return URL(string: "https://cxc.today/zh/@\(username)/work/\(workID)")
+    }
+
+    /// Path components of a CXC URL with the leading `/` and language prefix
+    /// (`zh`/`en`/`jp`/`ko`) removed.
+    private static func cxcPathSegments(_ url: URL) -> [String] {
+        let segments = url.pathComponents.filter { $0 != "/" }
+        if let first = segments.first, ["zh", "en", "jp", "ko"].contains(first) {
+            return Array(segments.dropFirst())
+        }
+        return segments
+    }
 }
