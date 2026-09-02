@@ -61,6 +61,17 @@ struct WebCollectionBanner: View {
                         showImportConfirmation = true
                     }
             }
+        } else if model.isOnCXCWorkPage {
+            importBanner(kind: .cxc,
+                         title: model.detectedCollection?.collectionName ?? "CXC 作品") {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importCXCWork(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+            }
         } else if model.isOnGoogleDocPage {
             importBanner(kind: .googleDocs, title: "Google 文件") {
                     importing = true

@@ -51,6 +51,11 @@ final class AppEnvironment {
         if _affBrowse == nil { let m = WebViewModel(); wire(m); _affBrowse = m }
         return _affBrowse!
     }
+    @ObservationIgnored private var _cxcBrowse: WebViewModel?
+    var cxcBrowse: WebViewModel {
+        if _cxcBrowse == nil { let m = WebViewModel(); wire(m); _cxcBrowse = m }
+        return _cxcBrowse!
+    }
     @ObservationIgnored private var _refresher: WebViewModel?
     /// Offscreen collection re-crawler, built on first refresh.
     var refresher: WebViewModel {
@@ -227,7 +232,7 @@ final class AppEnvironment {
         model.router.onCollectionLink = { [weak model] payload in
             // Detect runs against whatever DOM the SPA still shows; by the time the
             // message arrives the user may have left the post (e.g. back to home).
-            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage else { return }
+            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage || model.isOnCXCWorkPage else { return }
             model.detectedCollection = payload
             DiagnosticLog.shared.log(category: "import",
                 "collection detected: \(payload.collectionName)")
@@ -444,6 +449,49 @@ final class AppEnvironment {
         importedCountThisSession = imported.chapters.count
         DiagnosticLog.shared.log(category: "import",
             "aff: imported \(imported.chapters.count) chapters")
+        return imported.chapters.count
+    }
+
+    /// Imports the CXC work currently shown in `model` into the library.
+    /// Calls CXCWorkImport.js via callAsyncJavaScript and persists results
+    /// through applyDocImport with sourceKind .cxc.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importCXCWork(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL,
+              URLNormalizer.isCXCWorkURL(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "cxc: current URL is not a work")
+            return 0
+        }
+
+        let workTitle = model.detectedCollection?.collectionName ?? "CXC 作品"
+        let creatorName = model.detectedCollection?.creatorName
+
+        let result = try? await model.webView.callAsyncJavaScript(
+            JSAssets.cxcWorkImport, contentWorld: .page)
+        guard let chapters = result as? [[String: Any]], !chapters.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "cxc: import script returned no chapters")
+            return 0
+        }
+
+        let canonicalURL = URLNormalizer.canonicalCXCWorkURL(url)?.absoluteString ?? url.absoluteString
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL,
+            title: workTitle,
+            creatorName: creatorName,
+            sourceKind: .cxc,
+            chapters: chapters.enumerated().map { index, dict -> ImportedChapter in
+                ImportedChapter(
+                    title: (dict["title"] as? String) ?? "Chapter",
+                    urlString: (dict["url"] as? String) ?? "",
+                    orderIndex: (dict["domOrder"] as? Int) ?? index)
+            })
+        try? store.applyDocImport(imported)
+        importedCountThisSession = imported.chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "cxc: imported \(imported.chapters.count) chapters")
         return imported.chapters.count
     }
 
