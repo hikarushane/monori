@@ -2,7 +2,7 @@
 
 ## Monori 是什麼
 
-Monori 是 local-first 的 iOS 閱讀 App，讀的是使用者原本就能透過所支援網站存取的內容，目前支援 Patreon、Google Docs、AO3（Archive of Our Own）、方格子（Vocus）、AsianFanfics 五個來源。
+Monori 是 local-first 的 iOS 閱讀 App，讀的是使用者原本就能透過所支援網站存取的內容，目前支援 Patreon、Google Docs、AO3（Archive of Our Own）、方格子（Vocus）、AsianFanfics、CXC 六個來源。
 
 App 沒有 Monori 自己的後端、帳號系統、分析服務、廣告服務，也沒有跨使用者的內容服務。網站內容一律透過 `WKWebView` 存取；部分支援匯入的來源，會用 WebView 裡已經登入的 session 直接發 request 取得內容。
 
@@ -51,6 +51,14 @@ Monori 不提供另外的內容託管服務，也不會把各平台的流量轉�
 - App 對 AsianFanfics 頁面上支援的廣告與追蹤資源套用本機的封鎖規則。這些規則在 WebKit 本機執行，不會把流量繞經 Monori 的伺服器。
 - 在有對應匯入器提供 HTML 內容時，匯入內容可能會存在本機 library 裡。
 - 不會把 AsianFanfics 的內容送到 Monori 的伺服器。
+
+### CXC
+
+- 使用者透過 WebView 存取 CXC。
+- Monori 從 WebView 目前載入的頁面判斷是否為支援的作品頁，導覽時用網站自己的網址。
+- 匯入器讀取的是章節標題與網址等 metadata，存在本機 library 裡；不擷取、不儲存章節內文 HTML，也不提供 CXC 作品內容的離線副本。
+- Monori 不做後端 proxy，不會把 CXC 的內容送到 Monori 的伺服器。
+- Monori 不使用 CXC 的官方或內部 API。
 
 ## 認證與網站資料
 
@@ -139,7 +147,7 @@ Apple 的審查規則要求「主要提供網頁內容」的 App 要有足夠的
 
 Monori 的技術行為本身，不代表每個支援的平台都認可這些使用方式。各平台的服務條款、使用規範、著作權政策、認證規則，以及網站行為的變動，都可能帶來額外限制。
 
-目前這個專案把這件事當成政策／合規風險處理，不主張各平台明確認可 Monori。專案不主張跟 Patreon、Google、AO3、方格子、AsianFanfics 有任何關係。
+目前這個專案把這件事當成政策／合規風險處理，不主張各平台明確認可 Monori。專案不主張跟 Patreon、Google、AO3、方格子、AsianFanfics、CXC 有任何關係。
 
 支援的平台隨時可能改版面、認證流程、防爬蟲機制、API 或條款。這類變動可能讓某個匯入器失效，或讓某個功能暫時用不了，但不會改變 App 本機為主的網路架構。
 
