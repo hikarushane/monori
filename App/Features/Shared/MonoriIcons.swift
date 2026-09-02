@@ -164,9 +164,62 @@ struct AFFMark: Shape {
     }
 }
 
+/// CXC mark: a crescent moon, echoing the white "C" crescent in CXC's own
+/// logo. Built as a single closed boundary — an outer disk's major arc (the
+/// moon's outer edge) plus a smaller, offset disk's minor arc (the inner
+/// edge of the "bite") — meeting at two tapered tips, the same way outlined
+/// crescent-moon glyphs are constructed in other icon sets.
+struct CXCMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let outerCenter = point(12, 12, in: rect)
+        let outerRadius = scaledValue(8, in: rect)
+        let innerCenter = point(18, 10, in: rect)
+        let innerRadius = scaledValue(7.5, in: rect)
+
+        let dx = innerCenter.x - outerCenter.x
+        let dy = innerCenter.y - outerCenter.y
+        let d = sqrt(dx * dx + dy * dy)
+
+        // Standard circle-circle intersection: `a` is the distance from
+        // outerCenter to the midpoint of the chord joining the two tips;
+        // `h` is half the chord length.
+        let a = (outerRadius * outerRadius - innerRadius * innerRadius + d * d) / (2 * d)
+        let h = sqrt(max(outerRadius * outerRadius - a * a, 0))
+        let midX = outerCenter.x + a * dx / d
+        let midY = outerCenter.y + a * dy / d
+        let offsetX = -dy / d * h
+        let offsetY = dx / d * h
+
+        let tip1 = CGPoint(x: midX + offsetX, y: midY + offsetY)
+        let tip2 = CGPoint(x: midX - offsetX, y: midY - offsetY)
+
+        var p = Path()
+        p.move(to: tip1)
+        // Outer disk's major arc: the moon's outer edge, away from the bite.
+        p.addArc(
+            center: outerCenter,
+            radius: outerRadius,
+            startAngle: .radians(atan2(tip1.y - outerCenter.y, tip1.x - outerCenter.x)),
+            endAngle: .radians(atan2(tip2.y - outerCenter.y, tip2.x - outerCenter.x)),
+            clockwise: false
+        )
+        // Inner disk's minor arc: closes back to the first tip.
+        p.addArc(
+            center: innerCenter,
+            radius: innerRadius,
+            startAngle: .radians(atan2(tip2.y - innerCenter.y, tip2.x - innerCenter.x)),
+            endAngle: .radians(atan2(tip1.y - innerCenter.y, tip1.x - innerCenter.x)),
+            clockwise: true
+        )
+        p.closeSubpath()
+
+        return p
+    }
+}
+
 /// Placeholder mark for a source that has not received its real hand-drawn
-/// icon yet (a plain outlined circle). Used for `.cxc` and `.slashtw` until
-/// their marks are drawn; deliberately generic so it reads as unfinished.
+/// icon yet (a plain outlined circle). Used for `.slashtw` until its mark is
+/// drawn; deliberately generic so it reads as unfinished.
 struct PlaceholderSourceMark: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
@@ -192,7 +245,9 @@ struct SourceGlyph: View {
             VocusMark().stroke(.foreground, style: monoriSourceStroke)
         case .asianFanfics:
             AFFMark().stroke(.foreground, style: monoriSourceStroke)
-        case .cxc, .slashtw:
+        case .cxc:
+            CXCMark().stroke(.foreground, style: monoriSourceStroke)
+        case .slashtw:
             PlaceholderSourceMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
