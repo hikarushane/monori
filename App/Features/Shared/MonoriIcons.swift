@@ -180,6 +180,10 @@ struct CXCMark: Shape {
         let dy = innerCenter.y - outerCenter.y
         let d = sqrt(dx * dx + dy * dy)
 
+        // Guard a degenerate (zero-size) rect: the two centers would
+        // coincide, making the intersection below divide by zero.
+        guard d > 0 else { return Path() }
+
         // Standard circle-circle intersection: `a` is the distance from
         // outerCenter to the midpoint of the chord joining the two tips;
         // `h` is half the chord length.
