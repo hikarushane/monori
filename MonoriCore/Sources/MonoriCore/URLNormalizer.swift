@@ -306,4 +306,51 @@ public enum URLNormalizer {
         }
         return segments
     }
+
+    // MARK: - slashtw (在水裡寫字 / Written in Waters)
+
+    /// True for `slashtw.space` and any of its subdomains (e.g. `waterfall.slashtw.space`).
+    public static func isSlashTWHost(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host == "slashtw.space" || host.hasSuffix(".slashtw.space")
+    }
+
+    /// Extracts the numeric thread id from a slashtw thread URL, recognizing both the
+    /// legacy Discuz form (`slashtw.space/forum.php?mod=viewthread&tid={id}`) and the
+    /// new Waterfall form (`waterfall.slashtw.space/thread/{id}`), since the old host
+    /// currently redirects to the new one and both forms may be encountered.
+    public static func slashtwThreadID(_ url: URL) -> String? {
+        guard isSlashTWHost(url) else { return nil }
+        let segments = url.pathComponents.filter { $0 != "/" }
+
+        // New Waterfall form: /thread/{id}
+        if let threadIdx = segments.firstIndex(of: "thread"), threadIdx + 1 < segments.count {
+            let id = segments[threadIdx + 1]
+            return !id.isEmpty && id.allSatisfy(\.isNumber) ? id : nil
+        }
+
+        // Legacy Discuz form: /forum.php?mod=viewthread&tid={id}
+        guard segments == ["forum.php"],
+              let comps = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let items = comps.queryItems,
+              items.first(where: { $0.name == "mod" })?.value == "viewthread",
+              let tid = items.first(where: { $0.name == "tid" })?.value,
+              !tid.isEmpty, tid.allSatisfy(\.isNumber)
+        else { return nil }
+        return tid
+    }
+
+    /// True when the URL points at a slashtw thread, in either the legacy Discuz
+    /// or new Waterfall URL form.
+    public static func isSlashTWThreadURL(_ url: URL) -> Bool {
+        slashtwThreadID(url) != nil
+    }
+
+    /// Canonical form of a slashtw thread URL: always the new Waterfall form,
+    /// `https://waterfall.slashtw.space/thread/{id}`, regardless of the source host
+    /// or URL format.
+    public static func canonicalSlashTWThreadURL(_ url: URL) -> URL? {
+        guard let id = slashtwThreadID(url) else { return nil }
+        return URL(string: "https://waterfall.slashtw.space/thread/\(id)")
+    }
 }
