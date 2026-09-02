@@ -31,6 +31,9 @@ public enum NavigationPolicy {
         if URLNormalizer.isCXCHost(url) {
             return .allowInWebView
         }
+        if URLNormalizer.isSlashTWHost(url) {
+            return .allowInWebView
+        }
         if host == "appleid.apple.com" {
             return .allowInWebView
         }
