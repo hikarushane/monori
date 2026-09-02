@@ -411,7 +411,7 @@ final class ReaderStylerTests: XCTestCase {
 
     func testWrappedDocumentClampsAndFormats() {
         let big = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 99, lineHeight: 9.0)
-        XCTAssertTrue(big.contains("--monori-font-size: 32px"))
+        XCTAssertTrue(big.contains("--monori-font-size: 48px"))
         XCTAssertTrue(big.contains("--monori-line-height: 2.40"))
         let small = ReaderStyler.wrappedDocument(inner: "", fontSizePoints: 1, lineHeight: 0.1)
         XCTAssertTrue(small.contains("--monori-font-size: 14px"))

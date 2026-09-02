@@ -91,12 +91,12 @@ struct SettingsView: View {
                             HStack(spacing: MonoriSpacing.x1) {
                                 valueButton(symbol: "−", accessibilityLabel: "字體大小減少",
                                             identifier: "Decrement",
-                                            disabled: prefs.fontSize <= 14) {
+                                            disabled: prefs.fontSize <= ReaderPreferences.fontSizeRange.lowerBound) {
                                     prefs.fontSize -= 1
                                 }
                                 valueButton(symbol: "+", accessibilityLabel: "字體大小增加",
                                             identifier: "Increment",
-                                            disabled: prefs.fontSize >= 32) {
+                                            disabled: prefs.fontSize >= ReaderPreferences.fontSizeRange.upperBound) {
                                     prefs.fontSize += 1
                                 }
                             }

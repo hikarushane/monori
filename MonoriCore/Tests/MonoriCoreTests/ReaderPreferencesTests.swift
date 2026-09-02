@@ -45,7 +45,7 @@ final class ReaderPreferencesTests: XCTestCase {
         firstOwner.lineSpacing = 0.2
 
         let nextOwner = ReaderPreferences(defaults: defaults)
-        XCTAssertEqual(nextOwner.fontSize, 32)
+        XCTAssertEqual(nextOwner.fontSize, 48)
         XCTAssertEqual(nextOwner.lineSpacing, 1.2, accuracy: 0.001)
     }
 }

@@ -377,7 +377,7 @@ public enum ReaderStyler {
     }
 
     public static func fontSizeScript(points: Int) -> String {
-        let clamped = min(32, max(14, points))
+        let clamped = min(48, max(14, points))
         return "document.documentElement.style.setProperty('--monori-font-size', '\(clamped)px');"
     }
 
@@ -453,7 +453,7 @@ public enum ReaderStyler {
     /// over Google's inline styles. Headings keep their own size for hierarchy.
     public static func wrappedDocument(inner: String, fontSizePoints: Int, lineHeight: Double,
                                        font: ReaderFontCSS = .builtIn) -> String {
-        let size = min(32, max(14, fontSizePoints))
+        let size = min(48, max(14, fontSizePoints))
         let lh = String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"),
                         min(2.4, max(1.2, lineHeight)))
         let userFontFace: String
