@@ -2,6 +2,63 @@ import XCTest
 @testable import MonoriCore
 
 final class AO3ChapterSplitterTests: XCTestCase {
+    func testChapterFetchesRemainPacedAfterAnEarlierFetchFails() async {
+        let entries = [
+            AO3ChapterSplitter.NavigateEntry(
+                title: "One", chapterPath: "/works/1/chapters/11", dateText: nil),
+            AO3ChapterSplitter.NavigateEntry(
+                title: "Two", chapterPath: "/works/1/chapters/12", dateText: nil),
+            AO3ChapterSplitter.NavigateEntry(
+                title: "Three", chapterPath: "/works/1/chapters/13", dateText: nil),
+        ]
+        let chapterPage = """
+        <html><body><div class="userstuff module"><p>Chapter text</p></div></body></html>
+        """
+        var firstRequest = true
+        var serverReady = false
+        var waitCount = 0
+
+        let fetched = await AO3ChapterSplitter.fetchChapterContents(
+            entries: entries,
+            waitBetweenRequests: {
+                waitCount += 1
+                serverReady = true
+            },
+            fetchPage: { _ in
+                if firstRequest {
+                    firstRequest = false
+                    return nil
+                }
+                guard serverReady else { return nil }
+                serverReady = false
+                return chapterPage
+            })
+
+        XCTAssertEqual(fetched.map(\.entry.title), ["Two", "Three"])
+        XCTAssertEqual(waitCount, 2, "every request after the first must be paced")
+    }
+
+    func testChapterFetchReportsEachRequestForImportProgress() async {
+        let entries = [
+            AO3ChapterSplitter.NavigateEntry(
+                title: "One", chapterPath: "/works/1/chapters/11", dateText: nil),
+            AO3ChapterSplitter.NavigateEntry(
+                title: "Two", chapterPath: "/works/1/chapters/12", dateText: nil),
+        ]
+        let chapterPage = """
+        <html><body><div class="userstuff module"><p>Chapter text</p></div></body></html>
+        """
+        var reportedRequests: [Int] = []
+
+        _ = await AO3ChapterSplitter.fetchChapterContents(
+            entries: entries,
+            waitBetweenRequests: {},
+            fetchPage: { _ in chapterPage },
+            didStartRequest: { reportedRequests.append($0) })
+
+        XCTAssertEqual(reportedRequests, [1, 2])
+    }
+
     private func fixture(_ name: String) throws -> String {
         let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)

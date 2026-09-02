@@ -29,5 +29,6 @@ struct MonoriSwitchControl<ThumbContent: View>: View {
                 .padding(3)
         }
         .frame(width: 48, height: 32)
+        .frame(minWidth: 44, minHeight: 44)
     }
 }

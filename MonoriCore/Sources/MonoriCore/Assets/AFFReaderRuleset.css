@@ -1,6 +1,8 @@
 :root {
   color-scheme: light dark;
   --monori-font-family: "Source Serif 4", "Noto Serif TC", serif;
+  --monori-font-size: 19px;
+  --monori-line-height: 1.9;
 }
 
 /* --- font declarations --- */

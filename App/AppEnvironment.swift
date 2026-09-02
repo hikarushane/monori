@@ -321,26 +321,22 @@ final class AppEnvironment {
 
         ao3ImportTotal = entries.count
         ao3ImportCurrent = 0
-        var chapters: [ImportedChapter] = []
-
-        for (index, entry) in entries.enumerated() {
-            ao3ImportCurrent = index + 1
-            guard let chapterHTML = await model.fetchAO3ChapterPage(path: entry.chapterPath)
-            else { continue }
-            guard let content = AO3ChapterSplitter.extractChapterContent(html: chapterHTML)
-            else { continue }
-
+        let fetched = await AO3ChapterSplitter.fetchChapterContents(
+            entries: entries,
+            waitBetweenRequests: { try? await Task.sleep(for: .seconds(1)) },
+            fetchPage: { entryPath in
+                await model.fetchAO3ChapterPage(path: entryPath)
+            },
+            didStartRequest: { requestNumber in
+                ao3ImportCurrent = requestNumber
+            })
+        let chapters = fetched.map { chapter in
             let chapterURL = URLNormalizer.canonicalAO3ChapterURL(
-                "https://archiveofourown.org\(entry.chapterPath)")
-                ?? "https://archiveofourown.org\(entry.chapterPath)"
-
-            chapters.append(ImportedChapter(
-                title: entry.title, urlString: chapterURL,
-                orderIndex: index, contentHTML: content))
-
-            if index < entries.count - 1 {
-                try? await Task.sleep(for: .seconds(1))
-            }
+                "https://archiveofourown.org\(chapter.entry.chapterPath)")
+                ?? "https://archiveofourown.org\(chapter.entry.chapterPath)"
+            return ImportedChapter(
+                title: chapter.entry.title, urlString: chapterURL,
+                orderIndex: chapter.orderIndex, contentHTML: chapter.contentHTML)
         }
 
         ao3ImportTotal = 0

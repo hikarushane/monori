@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 public final class ReaderPreferences {
-    public static let fontSizeRange = 14...32
+    public static let fontSizeRange = 14...48
     public static let lineSpacingRange = 1.2...2.4
     public static let lineSpacingStep = 0.1
     public static let defaultFontID = "built-in.source-serif-4"

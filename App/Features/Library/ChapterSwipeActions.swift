@@ -32,6 +32,7 @@ struct SwipeTrashIcon: Shape {
 // MARK: - Swipe Modifier
 
 struct ChapterSwipeModifier<ID: Equatable>: ViewModifier {
+    @Environment(\.monoriUIMetrics) private var metrics
     let onDelete: () -> Void
     let onRename: (() -> Void)?
     @Binding var revealedID: ID?
@@ -39,7 +40,7 @@ struct ChapterSwipeModifier<ID: Equatable>: ViewModifier {
 
     @State private var offset: CGFloat = 0
 
-    private let buttonWidth: CGFloat = 72
+    private var buttonWidth: CGFloat { metrics.isRegularWidth ? 88 : 72 }
     private var totalReveal: CGFloat { onRename != nil ? buttonWidth * 2 : buttonWidth }
 
     /// Fixed light foreground for action labels.
@@ -93,7 +94,7 @@ struct ChapterSwipeModifier<ID: Equatable>: ViewModifier {
                     DispatchQueue.main.async { onRename() }
                 } label: {
                     Text("重新命名")
-                        .font(MonoriTypography.ui(12, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize, weight: .medium))
                         .foregroundStyle(Self.buttonLabel)
                         .frame(width: buttonWidth)
                         .frame(maxHeight: .infinity)
@@ -110,9 +111,9 @@ struct ChapterSwipeModifier<ID: Equatable>: ViewModifier {
                     SwipeTrashIcon()
                         .stroke(Self.buttonLabel,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                        .frame(width: 20, height: 20)
+                        .frame(width: metrics.actionIconSize, height: metrics.actionIconSize)
                     Text("刪除")
-                        .font(MonoriTypography.ui(12, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize, weight: .medium))
                 }
                 .foregroundStyle(Self.buttonLabel)
                 .frame(width: buttonWidth)

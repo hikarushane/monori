@@ -7,6 +7,37 @@ public enum AO3ChapterSplitter {
         public let dateText: String?
     }
 
+    public struct FetchedChapterContent: Equatable, Sendable {
+        public let entry: NavigateEntry
+        public let orderIndex: Int
+        public let contentHTML: String
+    }
+
+    /// Fetches chapter pages sequentially. Every request after the first is
+    /// paced even when an earlier request failed, so a transient failure does
+    /// not turn the remainder of an import into an unthrottled request burst.
+    public static func fetchChapterContents(
+        entries: [NavigateEntry],
+        waitBetweenRequests: () async -> Void,
+        fetchPage: (String) async -> String?,
+        didStartRequest: (Int) -> Void = { _ in }
+    ) async -> [FetchedChapterContent] {
+        var fetched: [FetchedChapterContent] = []
+
+        for (index, entry) in entries.enumerated() {
+            if index > 0 {
+                await waitBetweenRequests()
+            }
+            didStartRequest(index + 1)
+            guard let page = await fetchPage(entry.chapterPath),
+                  let content = extractChapterContent(html: page) else { continue }
+            fetched.append(FetchedChapterContent(
+                entry: entry, orderIndex: index, contentHTML: content))
+        }
+
+        return fetched
+    }
+
     // MARK: - Navigate page parsing
 
     /// Parses an AO3 `/works/:id/navigate` page and returns one entry per chapter.

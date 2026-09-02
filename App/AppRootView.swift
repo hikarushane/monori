@@ -1,8 +1,8 @@
 import SwiftUI
 
 enum AppChromeMetrics {
-    static func bottomNavigationHeight(for viewHeight: CGFloat) -> CGFloat {
-        min(max(viewHeight * 0.09, 70), 90)
+    static func bottomNavigationHeight(for viewHeight: CGFloat, isRegularWidth: Bool) -> CGFloat {
+        isRegularWidth ? 123 : min(max(viewHeight * 0.09, 70), 90)
     }
 }
 
@@ -18,6 +18,7 @@ extension EnvironmentValues {
 }
 
 struct AppRootView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private enum AppTab: Hashable { case browse, library, settings }
 
     @State private var env: AppEnvironment
@@ -31,7 +32,11 @@ struct AppRootView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let tabBarHeight = AppChromeMetrics.bottomNavigationHeight(for: proxy.size.height)
+            let metrics = MonoriUIMetrics(horizontalSizeClass: horizontalSizeClass)
+            let tabBarHeight = AppChromeMetrics.bottomNavigationHeight(
+                for: proxy.size.height,
+                isRegularWidth: metrics.isRegularWidth
+            )
 
             TabView(selection: tabSelection) {
                 BrowseView()
@@ -50,11 +55,13 @@ struct AppRootView: View {
             .toolbar(.hidden, for: .tabBar)
             .background(MonoriPalette.canvas)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom)
+                tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom,
+                       metrics: metrics)
             }
             .preferredColorScheme(env.appPrefs.appearance.colorScheme)
             .tint(MonoriPalette.ink)
             .environment(\.bottomNavigationHeight, tabBarHeight)
+            .environment(\.monoriUIMetrics, metrics)
             .environment(env)
             .modelContainer(env.store.container)
             .task { env.startSmokeToolsIfNeeded() }
@@ -64,6 +71,7 @@ struct AppRootView: View {
                 set: { env.autopilotReaderTarget = $0 })) { target in
                 ReaderView(chapter: target.chapter)
                     .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+                    .environment(\.monoriUIMetrics, metrics)
                     .environment(env)
                     .modelContainer(env.store.container)
             }
@@ -83,9 +91,12 @@ struct AppRootView: View {
             })
     }
 
-    private func tabBar(height: CGFloat, bottomInset: CGFloat) -> some View {
+    private func tabBar(height: CGFloat, bottomInset: CGFloat,
+                        metrics: MonoriUIMetrics) -> some View {
         GeometryReader { proxy in
-            let iconSize = min(max(proxy.size.height * 0.28, 24), 30)
+            let iconSize = metrics.isRegularWidth
+                ? CGFloat(39)
+                : min(max(proxy.size.height * 0.28, 24), 30)
 
             HStack(spacing: 0) {
                 tabButton(.browse, title: "瀏覽", icon: MonoriTabIcon.browse,
@@ -95,7 +106,7 @@ struct AppRootView: View {
                 tabButton(.settings, title: "設定", icon: MonoriTabIcon.settings,
                           identifier: "smoke.settingsTab", iconSize: iconSize)
             }
-            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.horizontal, metrics.contentHorizontalPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(height: height + bottomInset)
@@ -120,7 +131,9 @@ struct AppRootView: View {
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(isSelected ? MonoriPalette.navigationAccent : MonoriPalette.secondaryInk)
                 Text(title)
-                    .font(MonoriTypography.ui(11, relativeTo: .caption2,
+                    .font(MonoriTypography.ui(
+                        horizontalSizeClass == .regular ? 20 : 11,
+                        relativeTo: .caption2,
                                                weight: isSelected ? .semibold : .medium))
                     .tracking(MonoriTypography.navigationTracking)
                     .foregroundStyle(isSelected ? MonoriPalette.ink : MonoriPalette.secondaryInk)

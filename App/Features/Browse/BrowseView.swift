@@ -3,6 +3,7 @@ import MonoriCore
 
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.monoriUIMetrics) private var metrics
     @State private var activeKind: SourceKind = .patreon
     @State private var isPickerExpanded = false
     @State private var showImportConfirmation = false
@@ -85,22 +86,23 @@ struct BrowseView: View {
                     isPickerExpanded.toggle()
                 }
             } label: {
-                HStack(spacing: MonoriSpacing.x2) {
+                HStack(spacing: metrics.spacing.x2) {
                     SourceGlyph(kind: activeKind)
-                        .frame(width: 20, height: 20)
+                        .frame(width: metrics.actionIconSize, height: metrics.actionIconSize)
                     Text(SourceRegistry.provider(for: activeKind).displayName)
-                        .font(MonoriTypography.ui(15, relativeTo: .subheadline, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .subheadline, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                     Spacer()
                     DropdownChevron()
                         .stroke(MonoriPalette.secondaryInk,
                                 style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
-                        .frame(width: 12, height: 12)
+                        .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
                         .rotationEffect(.degrees(isPickerExpanded ? 180 : 0))
                 }
                 .foregroundStyle(MonoriPalette.ink)
-                .padding(.horizontal, MonoriSpacing.x3)
-                .padding(.vertical, MonoriSpacing.x2)
+                .padding(.horizontal, metrics.contentHorizontalPadding)
+                .padding(.vertical, metrics.spacing.x2)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -119,17 +121,19 @@ struct BrowseView: View {
                             isPickerExpanded = false
                         }
                     } label: {
-                        HStack(spacing: MonoriSpacing.x2) {
+                        HStack(spacing: metrics.spacing.x2) {
                             SourceGlyph(kind: provider.kind)
-                                .frame(width: 18, height: 18)
+                                .frame(width: metrics.accessoryIconSize,
+                                       height: metrics.accessoryIconSize)
                             Text(provider.displayName)
-                                .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                                .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                           relativeTo: .subheadline, weight: .medium))
                                 .tracking(MonoriTypography.uiTracking)
                             Spacer()
                         }
                         .foregroundStyle(MonoriPalette.secondaryInk)
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.contentHorizontalPadding)
+                        .padding(.vertical, metrics.spacing.x2)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)

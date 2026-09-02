@@ -16,6 +16,7 @@ private let bannerLog = Logger(subsystem: "dev.monori", category: "smoke-diagnos
 /// collection page), not the whole screen. This view only owns the trigger.
 struct WebCollectionBanner: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.monoriUIMetrics) private var metrics
     let model: WebViewModel
     @Binding var showImportConfirmation: Bool
     @State private var importing = false
@@ -110,21 +111,23 @@ struct WebCollectionBanner: View {
                               progressLabel: String = "匯入中",
                               action: @escaping () -> Void) -> some View {
         bannerContainer {
-            HStack(spacing: MonoriSpacing.x2) {
+            HStack(spacing: metrics.spacing.x2) {
                 SourceGlyph(kind: kind)
-                    .frame(width: 16, height: 16)
+                    .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
                 Text(title)
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline, weight: .medium))
                     .tracking(MonoriTypography.uiTracking)
                     .lineLimit(1)
                     .foregroundStyle(MonoriPalette.ink)
-                Spacer(minLength: MonoriSpacing.x2)
+                Spacer(minLength: metrics.spacing.x2)
                 Button(action: action) {
                     Text(importing ? progressLabel : "匯入")
-                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .footnote, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.ink)
-                        .padding(.horizontal, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x2)
                         .frame(minHeight: 40)
                         .background(MonoriPalette.canvas,
                                     in: RoundedRectangle(cornerRadius: MonoriRadius.control))
@@ -149,19 +152,21 @@ struct WebCollectionBanner: View {
 
     private func collectionBanner(title: String, action: @escaping () -> Void) -> some View {
         bannerContainer {
-            HStack(spacing: MonoriSpacing.x2) {
+            HStack(spacing: metrics.spacing.x2) {
                 Text("系列：\(title)")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline, weight: .medium))
                     .tracking(MonoriTypography.uiTracking)
                     .lineLimit(1)
                     .foregroundStyle(MonoriPalette.ink)
-                Spacer(minLength: MonoriSpacing.x2)
+                Spacer(minLength: metrics.spacing.x2)
                 Button(action: action) {
                     Text("開啟收藏")
-                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .footnote, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.ink)
-                        .padding(.horizontal, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x2)
                         .frame(minHeight: 40)
                         .background(MonoriPalette.canvas,
                                     in: RoundedRectangle(cornerRadius: MonoriRadius.control))
@@ -178,9 +183,9 @@ struct WebCollectionBanner: View {
     }
 
     private func bannerContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x1, content: content)
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+        VStack(alignment: .leading, spacing: metrics.spacing.x1, content: content)
+            .padding(.horizontal, metrics.contentHorizontalPadding)
+            .padding(.vertical, metrics.spacing.x2)
             .background(MonoriPalette.surface)
             .overlay(alignment: .bottom) {
                 Rectangle()
@@ -199,6 +204,7 @@ struct WebCollectionBanner: View {
 struct ImportConfirmationOverlay: View {
     let importedCount: Int
     let onConfirm: () -> Void
+    @Environment(\.monoriUIMetrics) private var metrics
 
     private var title: String {
         importedCount == 0 ? "未找到章節" : "已匯入章節"
@@ -227,18 +233,21 @@ struct ImportConfirmationOverlay: View {
                 Image("LaunchMark")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 48, height: 48)
+                    .frame(width: metrics.emptyStateIconSize,
+                           height: metrics.emptyStateIconSize)
                     .accessibilityHidden(true)
                     .padding(.bottom, MonoriSpacing.x2)
 
                 Text(title)
-                    .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.emptyStateTitleFontSize,
+                                               relativeTo: .title2, weight: .medium))
                     .foregroundStyle(MonoriPalette.ink)
                     .multilineTextAlignment(.center)
                     .padding(.bottom, MonoriSpacing.x1)
 
                 Text(message)
-                    .font(MonoriTypography.ui(16, relativeTo: .body))
+                    .font(MonoriTypography.ui(metrics.emptyStateDescriptionFontSize,
+                                               relativeTo: .body))
                     .tracking(MonoriTypography.uiTracking)
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .multilineTextAlignment(.center)
@@ -246,7 +255,8 @@ struct ImportConfirmationOverlay: View {
 
                 Button(action: onConfirm) {
                     Text("確定")
-                        .font(MonoriTypography.ui(16, relativeTo: .body, weight: .bold))
+                        .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                                   relativeTo: .body, weight: .bold))
                         .foregroundStyle(MonoriPalette.canvas)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -256,8 +266,8 @@ struct ImportConfirmationOverlay: View {
                 .buttonStyle(ImportConfirmButtonStyle())
                 .accessibilityLabel("確定")
             }
-            .padding(MonoriSpacing.x3)
-            .frame(maxWidth: 320)
+            .padding(metrics.spacing.x3)
+            .frame(maxWidth: metrics.isRegularWidth ? 420 : 320)
             .background(MonoriPalette.canvas)
             .overlay {
                 RoundedRectangle(cornerRadius: MonoriRadius.container)

@@ -8,6 +8,7 @@ struct ReaderTarget: Identifiable {
 struct CollectionTOCView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.monoriUIMetrics) private var metrics
     let collection: LocalCollectionModel
     @State private var readerTarget: ReaderTarget?
     @State private var refreshing = false
@@ -104,18 +105,18 @@ struct CollectionTOCView: View {
         } label: {
             HStack {
                 Text(title)
-                    .font(MonoriTypography.ui(16, relativeTo: .body,
+                    .font(MonoriTypography.ui(metrics.buttonLabelFontSize, relativeTo: .body,
                                               weight: selected ? .semibold : .regular))
                     .foregroundStyle(MonoriPalette.ink)
                 Spacer()
                 if selected {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: metrics.accessoryIconSize, weight: .semibold))
                         .foregroundStyle(MonoriPalette.ink)
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -128,11 +129,12 @@ struct CollectionTOCView: View {
             withAnimation(.easeOut(duration: 0.15)) { showsOptionsMenu = false }
         } label: {
             Text(title)
-                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .regular))
+                .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
+                                           relativeTo: .body, weight: .regular))
                 .foregroundStyle(MonoriPalette.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, MonoriSpacing.x3)
-                .padding(.vertical, MonoriSpacing.x2)
+                .padding(.horizontal, metrics.spacing.x3)
+                .padding(.vertical, metrics.spacing.x2)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -144,15 +146,15 @@ struct CollectionTOCView: View {
         Rectangle()
             .fill(MonoriPalette.divider)
             .frame(height: 1)
-            .padding(.horizontal, MonoriSpacing.x3)
+            .padding(.horizontal, metrics.spacing.x3)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             collectionHeader
-                .padding(.horizontal, MonoriSpacing.x3)
-                .padding(.top, MonoriSpacing.x3)
-                .padding(.bottom, MonoriSpacing.x3)
+                .padding(.horizontal, metrics.contentHorizontalPadding)
+                .padding(.top, metrics.spacing.x3)
+                .padding(.bottom, metrics.spacing.x3)
 
             List {
                 ForEach(chapters) { chapter in
@@ -176,8 +178,8 @@ struct CollectionTOCView: View {
                                 renameText = chapter.title
                             }
                         )
-                        .listRowInsets(EdgeInsets(top: 0, leading: MonoriSpacing.x3,
-                                                   bottom: 0, trailing: MonoriSpacing.x3))
+                        .listRowInsets(EdgeInsets(top: 0, leading: metrics.contentHorizontalPadding,
+                                                   bottom: 0, trailing: metrics.contentHorizontalPadding))
                         .listRowBackground(MonoriPalette.canvas)
                 }
             }
@@ -185,6 +187,8 @@ struct CollectionTOCView: View {
             .scrollContentBackground(.hidden)
             .listRowSeparatorTint(MonoriPalette.divider)
         }
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760)
+        .frame(maxWidth: .infinity)
         .background(MonoriPalette.canvas)
         .simultaneousGesture(tocBackSwipe)
         .navigationBarBackButtonHidden(true)
@@ -197,7 +201,7 @@ struct CollectionTOCView: View {
 
                 if refreshing {
                     Text("更新中")
-                        .font(MonoriTypography.ui(11, relativeTo: .caption, weight: .semibold))
+                        .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption, weight: .semibold))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.secondaryInk)
                         .frame(width: 44, height: 44)
@@ -209,7 +213,8 @@ struct CollectionTOCView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .font(MonoriTypography.ui(18, relativeTo: .title3, weight: .semibold))
+                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
+                                                       relativeTo: .title3, weight: .semibold))
                             .foregroundStyle(MonoriPalette.ink)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
@@ -251,6 +256,7 @@ struct CollectionTOCView: View {
             if let chapter = chapters.first(where: { $0.id == target.id }) {
                 ReaderView(chapter: chapter)
                     .preferredColorScheme(env.appPrefs.appearance.colorScheme)
+                    .environment(\.monoriUIMetrics, metrics)
             }
         }
         .alert("重新命名章節", isPresented: Binding(
@@ -272,7 +278,7 @@ struct CollectionTOCView: View {
             if refreshing {
                 VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
                     Text("正在檢查新章節⋯大型收藏可能需要幾分鐘。")
-                        .font(MonoriTypography.ui(13, relativeTo: .footnote, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.footnoteFontSize, relativeTo: .footnote, weight: .medium))
                         .tracking(MonoriTypography.uiTracking)
                         .foregroundStyle(MonoriPalette.ink)
                     ProgressView()
@@ -310,23 +316,25 @@ struct CollectionTOCView: View {
     private var collectionHeader: some View {
         let sourceName = SourceRegistry.provider(for: collection.sourceKind).displayName
         let author = collection.creatorName?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+        return VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
             sourceChip(sourceName)
 
             Text(collection.title)
-                .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .semibold))
+                .font(MonoriTypography.ui(metrics.emptyStateTitleFontSize,
+                                           relativeTo: .title2, weight: .semibold))
                 .foregroundStyle(MonoriPalette.ink)
                 .lineLimit(3)
                 .layoutPriority(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
 
-            VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+            VStack(alignment: .leading, spacing: metrics.rowInformationSpacing) {
                 if let author, !author.isEmpty {
                     metadataLine(label: "作者", value: author)
                 }
                 Text("共 \(chapters.count) 章")
-                    .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                               relativeTo: .subheadline))
                     .foregroundStyle(MonoriPalette.secondaryInk)
             }
         }
@@ -335,40 +343,41 @@ struct CollectionTOCView: View {
     }
 
     private func sourceChip(_ sourceName: String) -> some View {
-        HStack(spacing: MonoriSpacing.x1) {
+        HStack(spacing: metrics.rowInformationSpacing) {
             SourceGlyph(kind: collection.sourceKind)
-                .frame(width: 14, height: 14)
+                .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
             Text(sourceName)
-                .font(MonoriTypography.ui(12, relativeTo: .caption, weight: .medium))
+                .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                           relativeTo: .caption, weight: .medium))
                 .tracking(MonoriTypography.uiTracking)
         }
         .foregroundStyle(MonoriPalette.secondaryInk)
     }
 
     private func metadataLine(label: String, value: String) -> some View {
-        HStack(spacing: MonoriSpacing.x1) {
+        HStack(spacing: metrics.rowInformationSpacing) {
             Text(label)
                 .foregroundStyle(MonoriPalette.secondaryInk)
             Text(value)
                 .foregroundStyle(MonoriPalette.ink)
         }
-        .font(MonoriTypography.ui(14, relativeTo: .subheadline))
+        .font(MonoriTypography.ui(metrics.secondaryFontSize, relativeTo: .subheadline))
     }
 
     private func chapterRow(_ chapter: LocalChapterModel) -> some View {
         let text = ChapterTextFormatter.presentation(storedTitle: chapter.title,
                                                      urlString: chapter.urlString)
 
-        return HStack(alignment: .center, spacing: MonoriSpacing.x1) {
+        return HStack(alignment: .center, spacing: metrics.rowInformationSpacing) {
             Text(text.title)
-                .font(MonoriTypography.ui(16, relativeTo: .body, weight: .medium))
+                .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .medium))
                 .foregroundStyle(MonoriPalette.ink)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 12)
             if chapter.isNew {
                 Text("新")
-                    .font(MonoriTypography.ui(11, relativeTo: .caption2, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption2, weight: .bold))
                     .foregroundStyle(MonoriPalette.highlight)
                     .accessibilityLabel("新章節")
             }
@@ -378,16 +387,17 @@ struct CollectionTOCView: View {
                     "TOC bookmark \(chapter.isBookmarked ? "set" : "cleared")")
             } label: {
                 Image(systemName: chapter.isBookmarked ? "bookmark.fill" : "bookmark")
-                    .font(MonoriTypography.ui(17, relativeTo: .body, weight: .regular))
+                    .font(MonoriTypography.ui(metrics.actionIconSize,
+                                               relativeTo: .body, weight: .regular))
                     .foregroundStyle(chapter.isBookmarked ? MonoriPalette.bookmark : MonoriPalette.secondaryInk)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
             .accessibilityLabel(chapter.isBookmarked ? "移除書籤" : "加入書籤")
             .accessibilityIdentifier("smoke.chapterBookmarkButton")
         }
-        .padding(.vertical, MonoriSpacing.x2)
+        .padding(.vertical, metrics.rowVerticalPadding)
     }
 }
 
