@@ -56,6 +56,11 @@ final class AppEnvironment {
         if _cxcBrowse == nil { let m = WebViewModel(); wire(m); _cxcBrowse = m }
         return _cxcBrowse!
     }
+    @ObservationIgnored private var _slashtwBrowse: WebViewModel?
+    var slashtwBrowse: WebViewModel {
+        if _slashtwBrowse == nil { let m = WebViewModel(); wire(m); _slashtwBrowse = m }
+        return _slashtwBrowse!
+    }
     @ObservationIgnored private var _refresher: WebViewModel?
     /// Offscreen collection re-crawler, built on first refresh.
     var refresher: WebViewModel {
@@ -232,7 +237,7 @@ final class AppEnvironment {
         model.router.onCollectionLink = { [weak model] payload in
             // Detect runs against whatever DOM the SPA still shows; by the time the
             // message arrives the user may have left the post (e.g. back to home).
-            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage || model.isOnCXCWorkPage else { return }
+            guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage || model.isOnCXCWorkPage || model.isOnSlashTWThreadPage else { return }
             model.detectedCollection = payload
             DiagnosticLog.shared.log(category: "import",
                 "collection detected: \(payload.collectionName)")
@@ -492,6 +497,49 @@ final class AppEnvironment {
         importedCountThisSession = imported.chapters.count
         DiagnosticLog.shared.log(category: "import",
             "cxc: imported \(imported.chapters.count) chapters")
+        return imported.chapters.count
+    }
+
+    /// Imports the slashtw thread currently shown in `model` into the library.
+    /// Calls SlashTWThreadImport.js via callAsyncJavaScript and persists results
+    /// through applyDocImport with sourceKind .slashtw.
+    /// Returns the number of chapters imported (0 on failure / empty).
+    @discardableResult
+    func importSlashTWThread(from model: WebViewModel) async -> Int {
+        guard let url = model.currentURL,
+              URLNormalizer.isSlashTWThreadURL(url) else {
+            DiagnosticLog.shared.error(category: "import",
+                "slashtw: current URL is not a thread")
+            return 0
+        }
+
+        let threadTitle = model.detectedCollection?.collectionName ?? "在水裡寫字討論串"
+        let creatorName = model.detectedCollection?.creatorName
+
+        let result = try? await model.webView.callAsyncJavaScript(
+            JSAssets.slashtwThreadImport, contentWorld: .page)
+        guard let chapters = result as? [[String: Any]], !chapters.isEmpty else {
+            DiagnosticLog.shared.error(category: "import",
+                "slashtw: import script returned no chapters")
+            return 0
+        }
+
+        let canonicalURL = URLNormalizer.canonicalSlashTWThreadURL(url)?.absoluteString ?? url.absoluteString
+        let imported = ImportedCollection(
+            sourceURLString: canonicalURL,
+            title: threadTitle,
+            creatorName: creatorName,
+            sourceKind: .slashtw,
+            chapters: chapters.enumerated().map { index, dict -> ImportedChapter in
+                ImportedChapter(
+                    title: (dict["title"] as? String) ?? "Chapter",
+                    urlString: (dict["url"] as? String) ?? "",
+                    orderIndex: (dict["domOrder"] as? Int) ?? index)
+            })
+        try? store.applyDocImport(imported)
+        importedCountThisSession = imported.chapters.count
+        DiagnosticLog.shared.log(category: "import",
+            "slashtw: imported \(imported.chapters.count) chapters")
         return imported.chapters.count
     }
 
