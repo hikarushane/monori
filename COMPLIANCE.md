@@ -84,7 +84,7 @@ Monori 沒有後端 proxy。WebView 發出的請求會直接打到平台本身�
 
 部分匯入器會用頁面 context 發出已認證的請求來取得內容給本機 Reader 用，這些請求用的是既有的 WebView session，不會經過 Monori 後端。
 
-使用者把 collection 標成「追更中」後，App 會在前景對該 collection 做週期性的檢查請求，走的一樣是既有的 WebView session，不經過 Monori 伺服器。目前只有 Patreon 支援自動檢查，其他來源仍然是手動按「檢查新章節」。
+使用者把 collection 標成「追更中」後，App 會在前景對該 collection 做週期性的檢查請求，走的一樣是既有的 WebView session，不經過 Monori 伺服器。目前 Patreon、方格子（Vocus）、AsianFanfics、AO3 支援自動檢查；Google Docs、CXC、在水裡寫字（slashtw）仍然是手動按「檢查新章節」。
 
 Monori 不攔截 WebView 任意的網路回應。
 
