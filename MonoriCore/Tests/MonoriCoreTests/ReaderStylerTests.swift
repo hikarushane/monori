@@ -347,6 +347,67 @@ final class ReaderStylerTests: XCTestCase {
                       "Comment section is styled, not hidden")
     }
 
+    // MARK: - CXC ruleset
+
+    func testCXCRulesetExists() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertFalse(css.isEmpty)
+    }
+
+    func testCXCRulesetUsesSourceSerif4() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("Source Serif 4"))
+        XCTAssertTrue(css.contains("Noto Serif TC"))
+        XCTAssertFalse(css.contains("Georgia"))
+    }
+
+    func testCXCRulesetDeclaresLocalFontFace() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains(#"local("SourceSerif4Variable-Roman")"#))
+    }
+
+    func testCXCRulesetUsesWashiWhite() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("#FBF9F8"))
+        XCTAssertFalse(css.contains("#faf8f5"))
+    }
+
+    func testCXCRulesetDarkTextColor() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("#F2F0ED"))
+        XCTAssertFalse(css.contains("#e8e6e3"))
+    }
+
+    func testCXCRulesetOverridesNativeDarkTextColorInLightMode() {
+        let css = ReaderStyler.cxcRuleset()
+        // CXC's own reading page defaults to a dark theme with light text;
+        // forcing the washi-white background without also forcing dark ink
+        // would make that native text unreadable. Unlike the other rulesets,
+        // this override must not be confined to the dark-mode media query.
+        XCTAssertTrue(css.contains("color: #1C1B19 !important"))
+    }
+
+    func testCXCRulesetDefaultLineHeight19() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("--monori-line-height, 1.9"))
+    }
+
+    func testCXCRulesetParagraphSpacing() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("0.85em"))
+    }
+
+    func testCXCRulesetMaxWidth34em() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains("34em"))
+        XCTAssertFalse(css.contains("42em"))
+    }
+
+    func testCXCInjectionScriptContainsFontCheck() {
+        let js = ReaderStyler.cxcInjectionScript()
+        XCTAssertTrue(js.contains("document.fonts.check"))
+    }
+
     // MARK: - wrappedDocument (Google Docs)
 
     func testWrappedDocumentEmbedsPrefsVariables() {
@@ -446,7 +507,8 @@ final class ReaderStylerTests: XCTestCase {
     // MARK: - CSS variable --monori-font-family
 
     func testAllRulesetsUseFontFamilyVariable() {
-        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
+                    ReaderStyler.cxcRuleset()] {
             XCTAssertTrue(css.contains("--monori-font-family"),
                           "Ruleset must declare --monori-font-family")
             XCTAssertTrue(css.contains("var(--monori-font-family)"),
@@ -455,7 +517,8 @@ final class ReaderStylerTests: XCTestCase {
     }
 
     func testAllRulesetsDeclareFontFamilyDefault() {
-        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
+                    ReaderStyler.cxcRuleset()] {
             XCTAssertTrue(css.contains(#"--monori-font-family: "Source Serif 4", "Noto Serif TC", serif"#),
                           "Ruleset must set default --monori-font-family value")
         }
@@ -571,10 +634,12 @@ final class ReaderStylerTests: XCTestCase {
         XCTAssertFalse(ReaderStyler.ruleset().contains("Georgia"))
         XCTAssertFalse(ReaderStyler.vocusRuleset().contains("Georgia"))
         XCTAssertFalse(ReaderStyler.affRuleset().contains("Georgia"))
+        XCTAssertFalse(ReaderStyler.cxcRuleset().contains("Georgia"))
     }
 
     func testNoSFProAcrossAllRulesets() {
-        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset()] {
+        for css in [ReaderStyler.ruleset(), ReaderStyler.vocusRuleset(), ReaderStyler.affRuleset(),
+                    ReaderStyler.cxcRuleset()] {
             XCTAssertFalse(css.contains("SF Pro"))
             XCTAssertFalse(css.contains("-apple-system"))
         }
