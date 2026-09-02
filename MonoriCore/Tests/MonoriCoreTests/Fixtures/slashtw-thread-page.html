@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>異世界水管工的日常連載串 - 在水裡寫字</title>
+</head>
+<body>
+  <header class="site-header">在水裡寫字</header>
+
+  <div class="thread-container">
+    <section class="thread-header">
+      <h1 class="thread-subject">異世界水管工的日常連載串</h1>
+      <div class="thread-poster">阿水</div>
+    </section>
+
+    <!--
+      This heading deliberately carries the "reply" substring (matching the
+      broad [class*="reply"] floor selector) but has no <a href>, so it must
+      be skipped by the "requires a link" filter -- same trap as
+      CXCWorkImport.js's fixture "chapter-list-heading" row.
+    -->
+    <div class="reply-list-heading">回覆列表（共 5 樓）</div>
+
+    <!--
+      "thread-poster" above also matches [class*="post"] (the word "poster"
+      starts with "post"), so it is picked up by the SAME floor query too --
+      another deliberate collision test. It has no link, so it is skipped the
+      same way as the heading.
+    -->
+
+    <div class="thread-post" id="pid1">
+      <a class="index-badge" href="#pid1">1樓</a>
+      <div class="body-text">FAKE_BODY_TEXT_MUST_NEVER_LEAK 序章：初來乍到</div>
+    </div>
+    <div class="thread-post" id="pid2">
+      <a class="index-badge" href="#pid2">2樓</a>
+      <div class="body-text">第一章：水管工上工</div>
+    </div>
+    <div class="thread-reply" id="pid3">
+      <a class="index-badge" href="#pid3">3樓</a>
+      <div class="body-text">第二章：異世界的第一天</div>
+    </div>
+
+    <!--
+      Moderator note between floors, also carries a matching substring
+      ([class*="floor"]) but no link -- must be skipped, same trap pattern.
+    -->
+    <div class="floor-notice">— 以上樓層由版主整理置頂 —</div>
+
+    <div class="thread-post" id="pid4">
+      <a class="index-badge" href="#pid4">4樓</a>
+      <div class="body-text">第三章：管線裡的秘密</div>
+    </div>
+    <div class="thread-post" id="pid5">
+      <a class="index-badge" href="#pid5">5樓</a>
+      <div class="body-text">尾聲：回家的水管</div>
+    </div>
+  </div>
+</body>
+</html>

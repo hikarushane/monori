@@ -24,4 +24,6 @@ public enum JSAssets {
     public static var affStoryImport: String { script(named: "AFFStoryImport") }
     public static var cxcWorkDetect: String { script(named: "CXCWorkDetect") }
     public static var cxcWorkImport: String { script(named: "CXCWorkImport") }
+    public static var slashtwThreadDetect: String { script(named: "SlashTWThreadDetect") }
+    public static var slashtwThreadImport: String { script(named: "SlashTWThreadImport") }
 }
