@@ -221,13 +221,44 @@ struct CXCMark: Shape {
     }
 }
 
-/// Placeholder mark for a source that has not received its real hand-drawn
-/// icon yet (a plain outlined circle). Used for `.slashtw` until its mark is
-/// drawn; deliberately generic so it reads as unfinished.
-struct PlaceholderSourceMark: Shape {
+/// Slashtw mark ("在水裡寫字" / "Writing in Water"): a water drop shaped like
+/// a fountain-pen nib. The teardrop silhouette carries the "water" half of
+/// the name; the center slit and breather hole running down through it —
+/// the same construction as a real pen nib — carry the "writing" half.
+struct SlashTWMark: Shape {
     func path(in rect: CGRect) -> Path {
+        // Guard a degenerate (zero-size) rect, same as CXCMark.
+        guard rect.width > 0, rect.height > 0 else { return Path() }
+
+        let tip = point(12, 3, in: rect)
+        let bulbCenter = point(12, 14.5, in: rect)
+        let bulbRadius = scaledValue(7, in: rect)
+        let rightPoint = point(19, 14.5, in: rect)
+
         var p = Path()
-        p.addEllipse(in: scaledRect(4, 4, 16, 16, in: rect))
+
+        // Outer teardrop: two symmetric curves taper from the tip down to
+        // the bulb's widest point, closed by the bulb's lower arc.
+        p.move(to: tip)
+        // control2's x matches rightPoint's (both sit on the bulb circle's
+        // vertical tangent line there), so the curve meets the arc smoothly
+        // instead of kinking.
+        p.addCurve(to: rightPoint, control1: point(17, 5, in: rect), control2: point(19, 11, in: rect))
+        p.addArc(
+            center: bulbCenter,
+            radius: bulbRadius,
+            startAngle: .degrees(0),
+            endAngle: .degrees(180),
+            clockwise: false
+        )
+        p.addCurve(to: tip, control1: point(5, 11, in: rect), control2: point(7, 5, in: rect))
+        p.closeSubpath()
+
+        // Nib slit and breather hole, echoing a fountain pen's tip.
+        p.move(to: point(12, 7, in: rect))
+        p.addLine(to: point(12, 18, in: rect))
+        p.addEllipse(in: scaledRect(11, 18, 2, 2, in: rect))
+
         return p
     }
 }
@@ -252,7 +283,7 @@ struct SourceGlyph: View {
         case .cxc:
             CXCMark().stroke(.foreground, style: monoriSourceStroke)
         case .slashtw:
-            PlaceholderSourceMark().stroke(.foreground, style: monoriSourceStroke)
+            SlashTWMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
 }
