@@ -22,4 +22,6 @@ public enum JSAssets {
     public static var vocusRoomImport: String { script(named: "VocusRoomImport") }
     public static var affStoryDetect: String { script(named: "AFFStoryDetect") }
     public static var affStoryImport: String { script(named: "AFFStoryImport") }
+    public static var cxcWorkDetect: String { script(named: "CXCWorkDetect") }
+    public static var cxcWorkImport: String { script(named: "CXCWorkImport") }
 }
