@@ -164,6 +164,17 @@ struct AFFMark: Shape {
     }
 }
 
+/// Placeholder mark for a source that has not received its real hand-drawn
+/// icon yet (a plain outlined circle). Used for `.cxc` and `.slashtw` until
+/// their marks are drawn; deliberately generic so it reads as unfinished.
+struct PlaceholderSourceMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.addEllipse(in: scaledRect(4, 4, 16, 16, in: rect))
+        return p
+    }
+}
+
 /// The shared source icon. One source of truth for the Browse source picker and
 /// the Library collection list.
 struct SourceGlyph: View {
@@ -181,6 +192,8 @@ struct SourceGlyph: View {
             VocusMark().stroke(.foreground, style: monoriSourceStroke)
         case .asianFanfics:
             AFFMark().stroke(.foreground, style: monoriSourceStroke)
+        case .cxc, .slashtw:
+            PlaceholderSourceMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
 }

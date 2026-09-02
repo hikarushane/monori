@@ -4,7 +4,7 @@ import XCTest
 final class SourceKindTests: XCTestCase {
     func testRegistryHasAllSources() {
         let kinds = SourceRegistry.all.map(\.kind)
-        XCTAssertEqual(kinds, [.patreon, .googleDocs, .ao3, .vocus, .asianFanfics])
+        XCTAssertEqual(kinds, [.patreon, .googleDocs, .ao3, .vocus, .asianFanfics, .cxc, .slashtw])
     }
 
     func testVocusProviderLookup() {
@@ -63,5 +63,24 @@ final class SourceKindTests: XCTestCase {
         XCTAssertEqual(provider.kind, .asianFanfics)
         XCTAssertEqual(provider.displayName, "AsianFanfics")
         XCTAssertEqual(provider.startURL.host, "www.asianfanfics.com")
+    }
+
+    func testCXCProviderExists() {
+        let provider = SourceRegistry.provider(for: .cxc)
+        XCTAssertEqual(provider.kind, .cxc)
+        XCTAssertEqual(provider.displayName, "CXC")
+        XCTAssertEqual(provider.startURL.host, "cxc.today")
+    }
+
+    func testSlashTWProviderExists() {
+        let provider = SourceRegistry.provider(for: .slashtw)
+        XCTAssertEqual(provider.kind, .slashtw)
+        XCTAssertEqual(provider.displayName, "在水裡寫字")
+        XCTAssertEqual(provider.startURL.host, "slashtw.space")
+    }
+
+    func testNewSourcesAutoCheckDisabled() {
+        XCTAssertFalse(SourceKind.cxc.supportsAutoCheck)
+        XCTAssertFalse(SourceKind.slashtw.supportsAutoCheck)
     }
 }
