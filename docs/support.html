@@ -10,7 +10,6 @@
     --border: #E0DFDB;
     --surface: #F0EFEB;
   }
-
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1A1A1E;
@@ -21,7 +20,6 @@
       --surface: #232327;
     }
   }
-
   :root[data-theme="dark"] {
     --bg: #1A1A1E;
     --text: #E4E4E2;
@@ -30,7 +28,6 @@
     --border: #2E2E32;
     --surface: #232327;
   }
-
   :root[data-theme="light"] {
     --bg: #FAFAF8;
     --text: #2C2C2E;
@@ -39,9 +36,7 @@
     --border: #E0DFDB;
     --surface: #F0EFEB;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: system-ui, -apple-system, sans-serif;
     background: var(--bg);
@@ -49,12 +44,7 @@
     line-height: 1.7;
     padding: 3rem 1.5rem 4rem;
   }
-
-  main {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
+  main { max-width: 600px; margin: 0 auto; }
   h1 {
     font-family: Georgia, serif;
     font-size: 1.75rem;
@@ -63,13 +53,11 @@
     margin-bottom: 0.25rem;
     text-wrap: balance;
   }
-
   .subtitle {
     font-size: 0.95rem;
     color: var(--text-secondary);
     margin-bottom: 2.5rem;
   }
-
   h2 {
     font-size: 1rem;
     font-weight: 600;
@@ -78,16 +66,9 @@
     margin-top: 2rem;
     margin-bottom: 0.5rem;
   }
-
   p { margin-bottom: 1rem; }
-
-  ul {
-    padding-left: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
+  ul { padding-left: 1.25rem; margin-bottom: 1rem; }
   li { margin-bottom: 0.35rem; }
-
   .contact-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -96,25 +77,10 @@
     margin-top: 0.5rem;
     font-size: 0.9rem;
   }
-
-  .contact-box a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .contact-box a:hover {
-    text-decoration: underline;
-  }
-
-  .faq-item {
-    margin-bottom: 1.5rem;
-  }
-
-  .faq-item strong {
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-
+  .contact-box a { color: var(--accent); text-decoration: none; }
+  .contact-box a:hover { text-decoration: underline; }
+  .faq-item { margin-bottom: 1.5rem; }
+  .faq-item strong { display: block; margin-bottom: 0.25rem; }
   footer {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -126,44 +92,59 @@
 
 <main>
   <h1>Monori 支援</h1>
-  <p class="subtitle">跨平台同人文閱讀器</p>
+  <p class="subtitle">local-first 個人閱讀 App</p>
 
   <h2>常見問題</h2>
 
   <div class="faq-item">
     <strong>Monori 是什麼？</strong>
-    <p>Monori 是一個跨平台的同人文閱讀 app，支援 Patreon、AO3、Google Docs、Vocus 和 AsianFanfics。它把五個平台的作品收進同一個書架，給你乾淨排版的閱讀體驗。</p>
+    <p>Monori 是一個 local-first 的 iOS 閱讀 App，讓你整理並閱讀自己原本就有權限存取的內容。目前支援 Patreon、Google Docs、AO3（Archive of Our Own）、方格子（Vocus）與 AsianFanfics。</p>
   </div>
 
   <div class="faq-item">
-    <strong>支援哪些平台？</strong>
-    <p>Patreon（連載匯入、自動追更）、AO3（作品匯入、離線閱讀）、Google Docs（分章匯入、離線閱讀）、Vocus（專題匯入、廣告隱藏）、AsianFanfics（故事匯入、廣告過濾）。</p>
+    <strong>Monori 有自己的帳號系統嗎？</strong>
+    <p>沒有。Monori 不提供註冊、登入或 Monori 帳號。Patreon、Google Docs 等來源的登入畫面都由各平台自己的網站提供，帳號的建立、管理與刪除也由各平台負責。</p>
   </div>
 
   <div class="faq-item">
-    <strong>為什麼需要在 app 裡登入平台？</strong>
-    <p>Monori 使用內建瀏覽器載入各平台網頁。你需要登入才能看到有權限閱讀的內容，和在 Safari 登入一樣。Monori 不存取你的密碼或登入資訊。</p>
+    <strong>為什麼需要在 App 裡登入平台？</strong>
+    <p>Monori 使用 WKWebView 直接載入支援平台的網頁。需要登入的內容會使用你在該平台既有的網站 session 存取。Monori 不會列舉、複製或匯出你的認證 cookie、session、token 或帳號憑證給 Monori 的服務使用。</p>
   </div>
 
   <div class="faq-item">
-    <strong>匯入的章節存在哪裡？</strong>
-    <p>章節標題和連結存在你的手機裡，不會上傳到任何伺服器。AO3 和 Google Docs 的文章內容也儲存在本機供離線閱讀。Patreon、Vocus 和 AsianFanfics 不儲存文章內容。</p>
+    <strong>Monori 會把內容或登入資料送到自己的伺服器嗎？</strong>
+    <p>不會。Monori 沒有自己的後端或 proxy server。WebView 的請求直接送往各平台或其頁面引用的資源；匯入內容也不會上傳到 Monori 的伺服器。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>匯入後哪些資料會存在本機？</strong>
+    <p>依來源與匯入方式不同，本機書庫可能保存 collection 與章節標題、來源網址、閱讀狀態、排序、閱讀進度、書籤、閱歷，以及部分來源匯入的章節或文件 HTML。</p>
   </div>
 
   <div class="faq-item">
     <strong>可以離線閱讀嗎？</strong>
-    <p>AO3 和 Google Docs 匯入的內容支援離線閱讀。Patreon、Vocus 和 AsianFanfics 的內容每次開啟時從原始來源載入。</p>
+    <p>是否能離線閱讀取決於來源與匯入方式。部分來源的匯入內容會保存在本機，因此可在不重新載入原始網頁的情況下閱讀；其他來源仍需要從原始網站載入內容。</p>
   </div>
 
   <div class="faq-item">
-    <strong>如何清除所有資料？</strong>
-    <p>在「設定」分頁使用「清除書庫資料」可刪除所有匯入的合集和章節。平台登入狀態獨立於書庫資料，不會被一起清除。</p>
+    <strong>有 iCloud 備份嗎？</strong>
+    <p>有。Monori 提供手動 iCloud 備份與還原。備份使用你自己的 iCloud 帳號與 CloudKit private database，包含書庫 metadata、書籤、閱讀進度與閱歷，不包含匯入的文章 HTML、認證 cookie、session、token、帳號憑證或閱讀偏好。Monori 不提供自動同步，也不會把備份資料送到 Monori 的伺服器。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>如何清除資料？</strong>
+    <p>在「設定」分頁使用「清除書庫資料」可刪除本機書庫的 metadata、閱歷與 App 儲存的匯入內容。網站登入狀態由 WebView 管理，可在登出時清除對應網站資料。已建立的 iCloud 備份不會因清除本機書庫而自動刪除。</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>Monori 和這些平台有合作關係嗎？</strong>
+    <p>沒有。Monori 是獨立 App，不隸屬於 Patreon、Google、AO3、方格子或 AsianFanfics，也不代表這些平台。</p>
   </div>
 
   <h2>需要其他協助？</h2>
 
   <div class="contact-box">
-    請寄信至 <a href="mailto:shane.shanyeh@gmail.com">shane.shanyeh@gmail.com</a>，我們會盡快回覆。
+    請寄信至 <a href="mailto:hikarushane.dev@gmail.com">hikarushane.dev@gmail.com</a>，我們會盡快回覆。
   </div>
 
   <footer>
