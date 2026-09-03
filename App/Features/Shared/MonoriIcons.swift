@@ -164,101 +164,65 @@ struct AFFMark: Shape {
     }
 }
 
-/// CXC mark: a crescent moon, echoing the white "C" crescent in CXC's own
-/// logo. Built as a single closed boundary — an outer disk's major arc (the
-/// moon's outer edge) plus a smaller, offset disk's minor arc (the inner
-/// edge of the "bite") — meeting at two tapered tips, the same way outlined
-/// crescent-moon glyphs are constructed in other icon sets.
+/// CXC mark: left-opening semicircle with a vertical bar on the right,
+/// tracing the CXC logo's actual outline.
 struct CXCMark: Shape {
     func path(in rect: CGRect) -> Path {
-        let outerCenter = point(12, 12, in: rect)
-        let outerRadius = scaledValue(8, in: rect)
-        let innerCenter = point(18, 10, in: rect)
-        let innerRadius = scaledValue(7.5, in: rect)
-
-        let dx = innerCenter.x - outerCenter.x
-        let dy = innerCenter.y - outerCenter.y
-        let d = sqrt(dx * dx + dy * dy)
-
-        // Guard a degenerate (zero-size) rect: the two centers would
-        // coincide, making the intersection below divide by zero.
-        guard d > 0 else { return Path() }
-
-        // Standard circle-circle intersection: `a` is the distance from
-        // outerCenter to the midpoint of the chord joining the two tips;
-        // `h` is half the chord length.
-        let a = (outerRadius * outerRadius - innerRadius * innerRadius + d * d) / (2 * d)
-        let h = sqrt(max(outerRadius * outerRadius - a * a, 0))
-        let midX = outerCenter.x + a * dx / d
-        let midY = outerCenter.y + a * dy / d
-        let offsetX = -dy / d * h
-        let offsetY = dx / d * h
-
-        let tip1 = CGPoint(x: midX + offsetX, y: midY + offsetY)
-        let tip2 = CGPoint(x: midX - offsetX, y: midY - offsetY)
-
+        guard rect.width > 0, rect.height > 0 else { return Path() }
         var p = Path()
-        p.move(to: tip1)
-        // Outer disk's major arc: the moon's outer edge, away from the bite.
+        p.move(to: point(14.5, 4, in: rect))
+        p.addLine(to: point(11, 4, in: rect))
         p.addArc(
-            center: outerCenter,
-            radius: outerRadius,
-            startAngle: .radians(atan2(tip1.y - outerCenter.y, tip1.x - outerCenter.x)),
-            endAngle: .radians(atan2(tip2.y - outerCenter.y, tip2.x - outerCenter.x)),
-            clockwise: false
-        )
-        // Inner disk's minor arc: closes back to the first tip.
-        p.addArc(
-            center: innerCenter,
-            radius: innerRadius,
-            startAngle: .radians(atan2(tip2.y - innerCenter.y, tip2.x - innerCenter.x)),
-            endAngle: .radians(atan2(tip1.y - innerCenter.y, tip1.x - innerCenter.x)),
+            center: point(11, 12, in: rect),
+            radius: scaledValue(8, in: rect),
+            startAngle: .degrees(-90),
+            endAngle: .degrees(90),
             clockwise: true
         )
-        p.closeSubpath()
-
+        p.addLine(to: point(14.5, 20, in: rect))
+        p.move(to: point(14.5, 9, in: rect))
+        p.addLine(to: point(14.5, 15, in: rect))
         return p
     }
 }
 
-/// Slashtw mark ("在水裡寫字" / "Writing in Water"): a water drop shaped like
-/// a fountain-pen nib. The teardrop silhouette carries the "water" half of
-/// the name; the center slit and breather hole running down through it —
-/// the same construction as a real pen nib — carry the "writing" half.
+/// Slashtw mark ("在水裡寫字"): a geometric water drop — pointed tip at the
+/// top, straight tangent edges, round bottom.
 struct SlashTWMark: Shape {
     func path(in rect: CGRect) -> Path {
-        // Guard a degenerate (zero-size) rect, same as CXCMark.
         guard rect.width > 0, rect.height > 0 else { return Path() }
-
-        let tip = point(12, 3, in: rect)
-        let bulbCenter = point(12, 14.5, in: rect)
-        let bulbRadius = scaledValue(7, in: rect)
-        let rightPoint = point(19, 14.5, in: rect)
-
         var p = Path()
-
-        // Outer teardrop: two symmetric curves taper from the tip down to
-        // the bulb's widest point, closed by the bulb's lower arc.
-        p.move(to: tip)
-        // control2's x matches rightPoint's (both sit on the bulb circle's
-        // vertical tangent line there), so the curve meets the arc smoothly
-        // instead of kinking.
-        p.addCurve(to: rightPoint, control1: point(17, 5, in: rect), control2: point(19, 11, in: rect))
+        p.move(to: point(12, 2.69, in: rect))
+        p.addLine(to: point(17.66, 8.35, in: rect))
         p.addArc(
-            center: bulbCenter,
-            radius: bulbRadius,
-            startAngle: .degrees(0),
-            endAngle: .degrees(180),
+            center: point(12, 14, in: rect),
+            radius: scaledValue(8, in: rect),
+            startAngle: .degrees(-45),
+            endAngle: .degrees(225),
             clockwise: false
         )
-        p.addCurve(to: tip, control1: point(5, 11, in: rect), control2: point(7, 5, in: rect))
         p.closeSubpath()
+        return p
+    }
+}
 
-        // Nib slit and breather hole, echoing a fountain pen's tip.
-        p.move(to: point(12, 7, in: rect))
-        p.addLine(to: point(12, 18, in: rect))
-        p.addEllipse(in: scaledRect(11, 18, 2, 2, in: rect))
-
+/// Source layers icon: three stacked diamond layers representing multiple
+/// reading sources converging.
+struct SourceLayersIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        guard rect.width > 0, rect.height > 0 else { return Path() }
+        var p = Path()
+        p.move(to: point(12, 4.5, in: rect))
+        p.addLine(to: point(20, 8.5, in: rect))
+        p.addLine(to: point(12, 12.5, in: rect))
+        p.addLine(to: point(4, 8.5, in: rect))
+        p.closeSubpath()
+        p.move(to: point(4, 12.5, in: rect))
+        p.addLine(to: point(12, 16.5, in: rect))
+        p.addLine(to: point(20, 12.5, in: rect))
+        p.move(to: point(4, 16.5, in: rect))
+        p.addLine(to: point(12, 20.5, in: rect))
+        p.addLine(to: point(20, 16.5, in: rect))
         return p
     }
 }
@@ -285,6 +249,158 @@ struct SourceGlyph: View {
         case .slashtw:
             SlashTWMark().stroke(.foreground, style: monoriSourceStroke)
         }
+    }
+}
+
+// MARK: Library header action marks
+
+/// Clock icon for reading history.
+struct LibraryClockIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = scaledValue(9, in: rect)
+        let c = point(12, 12, in: rect)
+        p.addEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+        p.move(to: point(12, 7, in: rect))
+        p.addLine(to: point(12, 12, in: rect))
+        p.addLine(to: point(15, 15, in: rect))
+        return p
+    }
+}
+
+/// Magnifying glass for search.
+struct LibrarySearchIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = scaledValue(8, in: rect)
+        let c = point(11, 11, in: rect)
+        p.addEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+        p.move(to: point(16.65, 16.65, in: rect))
+        p.addLine(to: point(21, 21, in: rect))
+        return p
+    }
+}
+
+/// Up/down arrows for sort.
+struct LibrarySortIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(7, 20, in: rect))
+        p.addLine(to: point(7, 4, in: rect))
+        p.move(to: point(3, 8, in: rect))
+        p.addLine(to: point(7, 4, in: rect))
+        p.addLine(to: point(11, 8, in: rect))
+        p.move(to: point(17, 4, in: rect))
+        p.addLine(to: point(17, 20, in: rect))
+        p.move(to: point(21, 16, in: rect))
+        p.addLine(to: point(17, 20, in: rect))
+        p.addLine(to: point(13, 16, in: rect))
+        return p
+    }
+}
+
+/// Pill chevron-down indicator (open V, for stroked rendering).
+struct PillChevronDown: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(6, 9, in: rect))
+        p.addLine(to: point(12, 15, in: rect))
+        p.addLine(to: point(18, 9, in: rect))
+        return p
+    }
+}
+
+// MARK: Menu dropdown icons
+
+struct MenuCheckmark: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(20, 6, in: rect))
+        p.addLine(to: point(9, 17, in: rect))
+        p.addLine(to: point(4, 12, in: rect))
+        return p
+    }
+}
+
+struct MenuBookmarkIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(19, 21, in: rect))
+        p.addLine(to: point(12, 16, in: rect))
+        p.addLine(to: point(5, 21, in: rect))
+        p.addLine(to: point(5, 3, in: rect))
+        p.addLine(to: point(19, 3, in: rect))
+        p.closeSubpath()
+        return p
+    }
+}
+
+struct MenuCircleCheckIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = scaledValue(9, in: rect)
+        let c = point(12, 12, in: rect)
+        p.addEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+        p.move(to: point(9, 12, in: rect))
+        p.addLine(to: point(11, 14, in: rect))
+        p.addLine(to: point(15, 10, in: rect))
+        return p
+    }
+}
+
+struct MenuCircleMinusIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = scaledValue(9, in: rect)
+        let c = point(12, 12, in: rect)
+        p.addEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+        p.move(to: point(8, 12, in: rect))
+        p.addLine(to: point(16, 12, in: rect))
+        return p
+    }
+}
+
+struct MenuBoltIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(13, 2, in: rect))
+        p.addLine(to: point(6, 14, in: rect))
+        p.addLine(to: point(12, 14, in: rect))
+        p.addLine(to: point(11, 22, in: rect))
+        p.addLine(to: point(18, 10, in: rect))
+        p.addLine(to: point(12, 10, in: rect))
+        p.closeSubpath()
+        return p
+    }
+}
+
+struct MenuFolderIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: point(4, 20, in: rect))
+        p.addLine(to: point(4, 5, in: rect))
+        p.addLine(to: point(10, 5, in: rect))
+        p.addLine(to: point(12, 8, in: rect))
+        p.addLine(to: point(20, 8, in: rect))
+        p.addLine(to: point(20, 20, in: rect))
+        p.closeSubpath()
+        return p
+    }
+}
+
+struct MenuPersonIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = scaledValue(4, in: rect)
+        let c = point(12, 8, in: rect)
+        p.addEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+        p.move(to: point(5, 20, in: rect))
+        p.addCurve(
+            to: point(19, 20, in: rect),
+            control1: point(5, 14, in: rect),
+            control2: point(19, 14, in: rect)
+        )
+        return p
     }
 }
 
