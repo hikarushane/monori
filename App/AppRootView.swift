@@ -22,7 +22,7 @@ struct AppRootView: View {
     private enum AppTab: Hashable { case browse, library, settings }
 
     @State private var env: AppEnvironment
-    @State private var selectedTab = AppTab.browse
+    @State private var selectedTab = AppTab.library
 
     init() { _env = State(initialValue: AppEnvironment()) }
 
