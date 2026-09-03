@@ -1,33 +1,17 @@
 "use strict";
-// Collects the per-floor "chapter" list from a slashtw (在水裡寫字) thread page
-// and returns it as a plain array via callAsyncJavaScript's top-level
-// `return`, matching CXCWorkImport.js / VocusRoomImport.js / AFFStoryImport.js
-// rather than the JSON.stringify(...) wrapper style -- nothing in this
-// codebase evaluates a JS asset and parses a stringified result out of it.
+// Collects the per-floor "chapter" list from a slashtw (在水裡寫字 / Waterfall)
+// thread page. Each .card-post.thread element is one floor (chapter).
 //
-// Chapter-splitting model (task-12 brief, selectors TBD pending DevTools):
-// slashtw threads are Discuz-style forum threads migrating to the Waterfall
-// platform. The assumed model -- unverified against the live site, which
-// requires a logged-in session to view at all -- is that EVERY floor (post)
-// in the thread, including the opening post, is one chapter, in DOM order.
-// This does not yet distinguish the thread author's own update posts from
-// other users' replies/quotes landing in the same thread; refine once real
-// markup and the forum's actual chaptering convention are confirmed (see the
-// brief's open question: one long post split by dividers, vs. one post per
-// chapter with the first post as the opening chapter).
+// Waterfall renders floors via infinite scroll — only the first ~5 are in the
+// DOM initially. Before collecting, scroll to the bottom repeatedly to trigger
+// lazy loading of all floors.
 //
-// DOM selectors are generic `[class*="..."]` placeholders. Of the task's
-// four suggested keywords (post/thread/reply/floor), a bare [class*="thread"]
-// is deliberately left OUT of the per-floor selector below: it is far more
-// likely to match the page-level thread container (e.g. a "thread-wrapper"
-// div around every floor) than an individual floor, which would add one
-// giant bogus extra "chapter" spanning the whole page. "thread" is only used
-// for URL parsing (see currentThread() below), matching
-// URLNormalizer.slashtwThreadID's own path-segment check.
-//
-// No SPA scroll/pagination handling yet -- like CXCWorkImport.js, this stays
-// a single synchronous scan of whatever floors are already in the DOM until
-// the real multi-page-thread behavior is known.
+// Every floor also carries its body as `contentHTML`. All floors share the
+// thread URL (only the #post fragment differs), so the reader cannot load a
+// single chapter by URL — it renders the stored body instead (ADR-0012, 2026-09
+// revision). The body is the div.content block(s) inside .card-content; the
+// thread-title block (.title), heading row (.subtitle) and the .comments
+// interaction block are left out. See floorBodyHTML for the fallback.
 
 function compactText(value) {
   return (value || '').replace(/\s+/g, ' ').trim();
@@ -49,44 +33,105 @@ function currentThread() {
   return null;
 }
 
+// Body HTML of one floor, or null when the floor has no readable body.
+//
+// Waterfall's .card-content (verified 2026-09-03 from markup captured in the
+// app's own WebView) holds, in order: .title (thread title, 1F only),
+// .subtitle (chapter heading + floor link), one or more div.content (the post
+// body — the second one is usually empty), and div.comments (comment thread,
+// login prompt, reaction/feed widgets). The body is the .content blocks,
+// unwrapped. When no .content child exists (markup change), fall back to
+// everything except the known chrome blocks. Direct children only — a post
+// body may legitimately contain elements with these class names deeper down.
+function floorBodyHTML(floor) {
+  var content = floor.querySelector('.card-content');
+  if (!content) return null;
+  var children = Array.prototype.slice.call(content.children);
+  var bodies = children.filter(function (c) { return c.classList.contains('content'); });
+  var root = document.createElement('div');
+  if (bodies.length) {
+    bodies.forEach(function (b) {
+      Array.prototype.slice.call(b.cloneNode(true).childNodes).forEach(function (n) {
+        root.appendChild(n);
+      });
+    });
+  } else {
+    children.forEach(function (c) {
+      if (c.classList.contains('title') || c.classList.contains('subtitle')
+          || c.classList.contains('comments')) return;
+      root.appendChild(c.cloneNode(true));
+    });
+  }
+  // script/style/iframe are dropped here as defense in depth (HTMLSanitizer
+  // runs again on the Swift side). i.pstatus is Discuz's "last edited by"
+  // stamp — platform metadata, not prose.
+  root.querySelectorAll('script, style, iframe, object, embed, i.pstatus').forEach(function (el) {
+    el.remove();
+  });
+  var html = root.innerHTML.trim();
+  if (!html) return null;
+  if (!root.textContent.trim() && !root.querySelector('img')) return null;
+  return html;
+}
+
 var threadId = currentThread();
 
-var titleEl = document.querySelector('h1, [class*="title"], [class*="subject"]');
-var authorEl = document.querySelector('[class*="author"], [class*="username"], [class*="poster"]');
+// Thread title: h1 > a.title-link, fallback to document.title minus suffix.
+var h1 = document.querySelector('h1');
+var threadTitle = h1 ? compactText(h1.textContent) : null;
+if (!threadTitle) {
+  threadTitle = document.title.replace(/\s*-\s*在水裡寫字\s*$/, '').trim();
+}
 
-var threadTitle = compactText(titleEl ? titleEl.textContent : document.title);
-var authorName = authorEl ? compactText(authorEl.textContent) : null;
+// Thread-level author from the first floor's author-info.
+var firstAuthorLink = document.querySelector('.card-post.thread .author-info a[href*="/user/"]');
+var threadAuthor = firstAuthorLink ? compactText(firstAuthorLink.textContent) : null;
+
 var threadURL = threadId
   ? ('https://waterfall.slashtw.space/thread/' + threadId)
   : location.href;
 
-// TODO: verify with DevTools -- floor/post selector and per-floor permalink
-// shape are both placeholders pending real Waterfall markup.
-var items = document.querySelectorAll('[class*="post"], [class*="reply"], [class*="floor"]');
-var chapters = [];
-items.forEach(function (item, index) {
-  var link = item.querySelector('a[href]') || item.closest('a[href]');
-  if (!link) return;
+// Scroll to the bottom repeatedly to load all lazy-loaded floors.
+var _prevFloorCount = 0;
+var _prevHeight = 0;
+for (var _i = 0; _i < 30; _i++) {
+  window.scrollTo(0, document.body.scrollHeight);
+  await new Promise(function (r) { setTimeout(r, 400); });
+  var _curFloors = document.querySelectorAll('.card-post.thread').length;
+  var _curHeight = document.body.scrollHeight;
+  if (_curFloors === _prevFloorCount && _curHeight === _prevHeight) break;
+  _prevFloorCount = _curFloors;
+  _prevHeight = _curHeight;
+}
+window.scrollTo(0, 0);
+await new Promise(function (r) { setTimeout(r, 200); });
 
-  // The floor-number badge is a separate, narrower selector than the row
-  // selector above on purpose: it must NOT itself contain "post"/"reply"/
-  // "floor" (e.g. a class like "floor-num") or it would also match the row
-  // query above and be double-counted as its own bogus extra chapter.
-  var floorLabelEl = item.querySelector('[class*="index"]');
-  var floorLabel = floorLabelEl
-    ? compactText(floorLabelEl.textContent)
-    : ('第 ' + (chapters.length + 1) + ' 樓');
+// Each .card-post.thread is one floor (chapter). The bare .card-post without
+// .thread is either the login overlay or a footer element — skip those.
+var floors = document.querySelectorAll('.card-post.thread');
+var chapters = [];
+floors.forEach(function (floor) {
+  // Chapter title from h2 > a.title-link inside .subtitle
+  var titleLink = floor.querySelector('.subtitle h2 a.title-link');
+  if (!titleLink) return;
+
+  var chapterTitle = compactText(titleLink.textContent);
+  var chapterURL = titleLink.href;
+
+  // Floor number from a.floor-link (text "1F", "2F", etc.)
+  var floorLink = floor.querySelector('a.floor-link');
+  var floorLabel = floorLink ? compactText(floorLink.textContent) : null;
+
+  // Per-floor author (usually same as thread author for serials)
+  var authorLink = floor.querySelector('.author-info a[href*="/user/"]');
+  var floorAuthor = authorLink ? compactText(authorLink.textContent) : threadAuthor;
 
   chapters.push({
-    title: floorLabel,
-    url: link.href,
-    // Recomputed from the accepted count, not the raw NodeList index, so a
-    // skipped no-link item (a list heading, a moderator note, or the OP-name
-    // badge -- "poster" itself contains the substring "post") never leaves a
-    // gap in the ordering -- same fix as CXCWorkImport.js's
-    // `domOrder: chapters.length`.
+    title: chapterTitle || floorLabel || ('第 ' + (chapters.length + 1) + ' 樓'),
+    url: chapterURL,
+    contentHTML: floorBodyHTML(floor),
     domOrder: chapters.length,
-    creatorName: authorName,
+    creatorName: floorAuthor,
     collectionName: threadTitle,
     collectionURL: threadURL
   });

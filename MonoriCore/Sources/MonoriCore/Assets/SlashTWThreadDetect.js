@@ -1,18 +1,14 @@
 (function () {
-  // Detects a slashtw (在水裡寫字) thread page and posts its metadata to the
-  // monoriCollectionLink handler, matching the CXC/Vocus/AFF/AO3 detect
-  // scripts' contract so the app can show the "Import chapters" banner (see
-  // CXCWorkDetect.js). URL shape mirrors URLNormalizer's slashtw parsing
-  // (isSlashTWHost / slashtwThreadID): either the new Waterfall form
-  // waterfall.slashtw.space/thread/{id}, or the legacy Discuz form
-  // slashtw.space/forum.php?mod=viewthread&tid={id} -- the old host currently
-  // redirects to the new one and both forms may still be encountered.
+  // Detects a slashtw (在水裡寫字 / Waterfall) thread page and posts its
+  // metadata to the monoriCollectionLink handler so the app shows the
+  // "Import chapters" banner.
   //
-  // Waterfall requires a logged-in session to see thread content at all, so
-  // in practice this only ever fires after the user has manually signed in
-  // (real Patreon/forum login is always a manual step -- see
-  // SIMULATOR_PLAYBOOK.md / CLAUDE.md Patreon Login Rules; the same policy
-  // extends to any third-party auth gate this app injects scripts into).
+  // URL shapes (both handled by URLNormalizer.slashtwThreadID):
+  //   waterfall.slashtw.space/thread/{id}          — new Waterfall form
+  //   slashtw.space/forum.php?mod=viewthread&tid=N  — legacy Discuz form
+  //
+  // Waterfall requires a logged-in session to view thread content.
+  // This script only fires after the user has manually signed in.
   var host = location.hostname.toLowerCase();
   if (host !== 'slashtw.space' && !host.endsWith('.slashtw.space')) return;
 
@@ -34,19 +30,17 @@
     && window.webkit.messageHandlers.monoriCollectionLink;
   if (!handler) return;
 
-  // DOM selectors are generic placeholders pending real DevTools inspection
-  // of waterfall.slashtw.space (the page requires a logged-in session to
-  // reach at all); refine once the real markup is confirmed.
-  // TODO: verify with DevTools
-  var titleEl = document.querySelector('h1, [class*="title"], [class*="subject"]');
-  var authorEl = document.querySelector('[class*="author"], [class*="username"], [class*="poster"]');
+  // Thread title: h1 > a.title-link inside the first card-post.thread,
+  // fallback to document.title minus the " - 在水裡寫字" suffix.
+  var h1 = document.querySelector('h1');
+  var title = h1 ? h1.textContent.trim() : null;
+  if (!title) {
+    title = document.title.replace(/\s*-\s*在水裡寫字\s*$/, '').trim();
+  }
 
-  var title = titleEl ? titleEl.textContent.trim() : document.title;
-  // Unlike CXC's /@username/work/N URLs, a slashtw thread URL carries no
-  // author identifier to fall back to, so an unmatched author element means
-  // an unknown creator -- null, same as AFFStoryDetect.js's fallback when its
-  // author link is missing.
-  var author = authorEl ? authorEl.textContent.trim() : null;
+  // Author: first .author-info link pointing to /user/{username}.
+  var authorLink = document.querySelector('.author-info a[href*="/user/"]');
+  var author = authorLink ? authorLink.textContent.trim() : null;
 
   handler.postMessage({
     collectionName: title,

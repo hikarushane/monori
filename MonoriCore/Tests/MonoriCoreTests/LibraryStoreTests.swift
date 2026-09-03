@@ -571,6 +571,32 @@ final class LibraryStoreTests: XCTestCase {
                        "nil contentHTML must not overwrite stored content")
     }
 
+    func testApplyDocImportReplacesContentHTMLWhenIncomingIsPresent() throws {
+        // A slashtw re-import after a fixed extractor must fill in bodies that an
+        // earlier import stored as nil — same chapter URL, merged, not duplicated.
+        let threadURL = "https://waterfall.slashtw.space/thread/4118"
+        let floorURL = threadURL + "#post1001"
+        let initial = ImportedCollection(
+            sourceURLString: threadURL, title: "連載串", creatorName: "阿水",
+            sourceKind: .slashtw,
+            chapters: [ImportedChapter(title: "序章", urlString: floorURL,
+                                        orderIndex: 0, contentHTML: nil)])
+        try store.applyDocImport(initial)
+        XCTAssertNil(try store.collections()[0].chapters[0].contentHTML)
+
+        let reimport = ImportedCollection(
+            sourceURLString: threadURL, title: "連載串", creatorName: "阿水",
+            sourceKind: .slashtw,
+            chapters: [ImportedChapter(title: "序章", urlString: floorURL,
+                                        orderIndex: 0, contentHTML: "<p>序章內容</p>")])
+        try store.applyDocImport(reimport)
+
+        let collections = try store.collections()
+        XCTAssertEqual(collections.count, 1)
+        XCTAssertEqual(collections[0].chapters.count, 1, "same URL must merge, not duplicate")
+        XCTAssertEqual(collections[0].chapters[0].contentHTML, "<p>序章內容</p>")
+    }
+
     // MARK: - Reading history
 
     func testRecordChapterOpenedCreatesHistoryEntry() throws {

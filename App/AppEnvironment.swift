@@ -540,15 +540,22 @@ final class AppEnvironment {
             creatorName: creatorName,
             sourceKind: .slashtw,
             chapters: chapters.enumerated().map { index, dict -> ImportedChapter in
-                ImportedChapter(
+                // Floor bodies come straight off a forum page; strip active
+                // content before they are stored and rendered via loadHTMLString.
+                let rawBody = (dict["contentHTML"] as? String)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                let body = rawBody.flatMap { $0.isEmpty ? nil : HTMLSanitizer.sanitize($0) }
+                return ImportedChapter(
                     title: (dict["title"] as? String) ?? "Chapter",
                     urlString: (dict["url"] as? String) ?? "",
-                    orderIndex: (dict["domOrder"] as? Int) ?? index)
+                    orderIndex: (dict["domOrder"] as? Int) ?? index,
+                    contentHTML: body)
             })
         try? store.applyDocImport(imported)
         importedCountThisSession = imported.chapters.count
+        let storedBodies = imported.chapters.filter { $0.contentHTML != nil }.count
         DiagnosticLog.shared.log(category: "import",
-            "slashtw: imported \(imported.chapters.count) chapters")
+            "slashtw: imported \(imported.chapters.count) chapters, \(storedBodies) with stored body")
         return imported.chapters.count
     }
 
