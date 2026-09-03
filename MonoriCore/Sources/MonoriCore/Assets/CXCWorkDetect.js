@@ -1,14 +1,11 @@
 (function () {
-  // Detects a CXC work page and posts its metadata to the monoriCollectionLink
-  // handler, matching the Vocus/AFF/AO3 detect scripts' contract so the app
-  // can show the "Import chapters" banner (see VocusRoomDetect.js,
-  // AFFStoryDetect.js, AO3WorkDetect.js). URL shape confirmed by
-  // URLNormalizer's CXC parsing: /{lang}/@{username}/work/{workId}, where
-  // {lang} is one of zh/en/jp/ko and may be absent.
+  // Detects a CXC work/book page and posts its metadata to the
+  // monoriCollectionLink handler. CXC is a SPA — document.title may be
+  // empty at injection time, so we poll until it appears (up to 5 s).
   if (location.hostname !== 'cxc.today' && !location.hostname.endsWith('.cxc.today')) return;
 
   var path = location.pathname.replace(/^\/(zh|en|jp|ko)\//, '/');
-  var match = path.match(/^\/@([^/]+)\/work\/(\d+)/);
+  var match = path.match(/^\/@([^/]+)\/(work|book)\/(\d+)/);
   if (!match) return;
 
   var handler = window.webkit && window.webkit.messageHandlers
@@ -16,19 +13,36 @@
   if (!handler) return;
 
   var username = match[1];
-  var workId = match[2];
+  var contentType = match[2];
+  var workId = match[3];
 
-  // DOM selectors are generic placeholders pending real DevTools inspection
-  // of cxc.today; refine them once the real markup is confirmed.
-  var titleEl = document.querySelector('h1, [class*="title"]');
-  var authorEl = document.querySelector('[class*="author"], [class*="creator"]');
+  function post() {
+    var parts = document.title.split(' | ');
+    var title = (parts[0] || '').trim();
+    if (!title) title = document.title.trim();
 
-  var title = titleEl ? titleEl.textContent.trim() : document.title;
-  var author = authorEl ? authorEl.textContent.trim() : username;
+    var authorName = (parts[1] || '').trim();
+    if (!authorName) {
+      var storeEl = document.querySelector('a.store_name');
+      authorName = storeEl ? storeEl.textContent.trim() : '';
+    }
+    if (!authorName) authorName = username;
 
-  handler.postMessage({
-    collectionName: title,
-    collectionURL: 'https://cxc.today/zh/@' + username + '/work/' + workId,
-    creatorName: author
-  });
+    handler.postMessage({
+      collectionName: title || 'CXC 作品',
+      collectionURL: 'https://cxc.today/@' + username + '/' + contentType + '/' + workId,
+      creatorName: authorName
+    });
+  }
+
+  if (document.title.trim()) { post(); return; }
+
+  var attempts = 0;
+  var timer = setInterval(function () {
+    attempts++;
+    if (document.title.trim() || attempts >= 50) {
+      clearInterval(timer);
+      post();
+    }
+  }, 100);
 })();

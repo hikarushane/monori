@@ -1,18 +1,7 @@
 "use strict";
-// Collects the chapter list from a CXC work page's "章節列表" tab and returns
-// it as a plain array via callAsyncJavaScript's top-level `return`, matching
-// VocusRoomImport.js / AFFStoryImport.js rather than the JSON.stringify(...)
-// wrapper style -- nothing in this codebase evaluates a JS asset and parses a
-// stringified result out of it.
-//
-// DOM selectors are generic placeholders pending real DevTools inspection of
-// cxc.today (see CXCWorkDetect.js); refine them once the real markup is
-// confirmed. No SPA scroll/pagination handling yet -- the task brief's own
-// reference script is a single synchronous scan, so this keeps that scope
-// until the real tab/list behavior is known. Re-detecting after SPA
-// navigation (MutationObserver / URL-change hook) is a WebViewModel-side
-// concern per the Vocus precedent (commit 931ac57), not something this
-// injected script needs to own.
+// Collects the chapter list from a CXC work/book page and returns it as a
+// plain array via callAsyncJavaScript. CXC uses /work/ for novels and /book/
+// for comics. Chapter links use /@{user}/{work|book}/{id}/reader/{readerId}.
 
 function compactText(value) {
   return (value || '').replace(/\s+/g, ' ').trim();
@@ -20,36 +9,45 @@ function compactText(value) {
 
 function currentWork() {
   var path = location.pathname.replace(/^\/(zh|en|jp|ko)\//, '/');
-  var match = path.match(/^\/@([^/]+)\/work\/(\d+)/);
-  return match ? { username: match[1], workId: match[2] } : null;
+  var match = path.match(/^\/@([^/]+)\/(work|book)\/(\d+)/);
+  return match ? { username: match[1], contentType: match[2], workId: match[3] } : null;
 }
 
 var work = currentWork();
 
-var titleEl = document.querySelector('h1, [class*="title"]');
-var authorEl = document.querySelector('[class*="author"], [class*="creator"]');
+// document.title format: "作品名 | 作者顯示名"
+var parts = document.title.split(' | ');
+var workTitle = compactText(parts[0]) || compactText(document.title);
+if (!workTitle) {
+  var nameEl = document.querySelector('.book_header .name');
+  workTitle = nameEl ? compactText(nameEl.textContent) : '';
+}
 
-var workTitle = compactText(titleEl ? titleEl.textContent : document.title);
-var authorName = authorEl ? compactText(authorEl.textContent) : (work ? work.username : '');
+var authorName = compactText(parts[1]);
+if (!authorName) {
+  var storeEl = document.querySelector('a.store_name');
+  authorName = storeEl ? compactText(storeEl.textContent) : '';
+}
+if (!authorName && work) authorName = work.username;
+
 var workURL = work
-  ? ('https://cxc.today/zh/@' + work.username + '/work/' + work.workId)
+  ? ('https://cxc.today/@' + work.username + '/' + work.contentType + '/' + work.workId)
   : location.href;
 
-var items = document.querySelectorAll('[class*="chapter"], [class*="episode"]');
+// Chapter links live under .section-list__item__section and point to /reader/
+var items = document.querySelectorAll('.section-list__item__section a[href*="/reader/"]');
 var chapters = [];
-items.forEach(function (item, index) {
-  var link = item.querySelector('a') || item.closest('a');
-  if (!link) return;
-  var titleNode = item.querySelector('[class*="title"]');
+items.forEach(function (item) {
+  var titleNode = item.querySelector('.info__name');
+  var chapterTitle = titleNode ? compactText(titleNode.textContent) : ('Chapter ' + (chapters.length + 1));
+  // Canonicalize URL: strip language prefix to match what URLNormalizer produces
+  var href = item.getAttribute('href') || '';
+  var cleanHref = href.replace(/^\/(zh|en|jp|ko)\//, '/');
+  var fullURL = 'https://cxc.today' + cleanHref;
   chapters.push({
-    title: titleNode ? compactText(titleNode.textContent) : ('Chapter ' + (index + 1)),
-    url: link.href,
-    // Recomputed from the accepted count, not the raw NodeList index, so a
-    // skipped no-link item (e.g. a "章節列表" section heading matching the
-    // same broad class selector) never leaves a gap in the ordering -- same
-    // fix as VocusRoomImport.js's `domOrder: collected.length`.
+    title: chapterTitle,
+    url: fullURL,
     domOrder: chapters.length,
-    isFree: item.textContent.indexOf('免費') !== -1,
     creatorName: authorName || null,
     collectionName: workTitle,
     collectionURL: workURL

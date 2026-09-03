@@ -223,7 +223,22 @@ public final class LibraryStore {
             }
         }
 
-        // 4. AO3: canonicalize chapter URL then match
+        // 4. CXC: canonicalize reader URL (strip lang prefix) then match
+        if let canonical = URLNormalizer.canonicalCXCReaderURL(pageURL) {
+            var descriptor = FetchDescriptor<LocalChapterModel>(
+                predicate: #Predicate { $0.urlString == canonical })
+            descriptor.fetchLimit = 1
+            if let exact = try? context.fetch(descriptor).first {
+                return exact
+            }
+            if let chapters = try? context.fetch(FetchDescriptor<LocalChapterModel>()) {
+                return chapters.first {
+                    URLNormalizer.canonicalCXCReaderURL($0.urlString) == canonical
+                }
+            }
+        }
+
+        // 5. AO3: canonicalize chapter URL then match
         if let canonical = URLNormalizer.canonicalAO3ChapterURL(pageURL) {
             var descriptor = FetchDescriptor<LocalChapterModel>(
                 predicate: #Predicate { $0.urlString == canonical })

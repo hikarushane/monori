@@ -2,65 +2,42 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>薄荷貓耳少女的異世界奇幻冒險 - CXC</title>
+<title>薄荷貓耳少女的異世界奇幻冒險 | 夜雨微涼</title>
 </head>
 <body>
   <header class="site-header">CXC</header>
 
-  <section class="work-header">
-    <img class="cover-image" src="cover.jpg" alt="cover">
-    <h1 class="work-title">薄荷貓耳少女的異世界奇幻冒險</h1>
-    <div class="work-author">夜雨微涼</div>
-  </section>
+  <div class="book_header">
+    <a class="store_name single_line" href="/@yeyu">夜雨微涼</a>
+    <div class="name">薄荷貓耳少女的異世界奇幻冒險</div>
+  </div>
 
-  <nav class="tabs">
-    <button class="tab-item active">簡介</button>
-    <button class="tab-item">章節列表</button>
-  </nav>
-
-  <!--
-    Row descendants are deliberately NOT named with a "chapter"/"episode"
-    substring (e.g. "title"/"num"/"wordcount", not "chapter-title"): the
-    detect/import scripts' selector is the broad `[class*="chapter"]`, and a
-    BEM-style "chapter-title" descendant class would also match it, making
-    each row's own children re-match as bogus extra "chapters" resolved via
-    `.closest('a')` back to the same row. Only chapter-row itself (the real
-    target) carries that substring.
-  -->
-  <section class="toc-panel">
-    <div class="chapter-list-heading">章節列表（共 5 章）</div>
-
-    <a class="chapter-row" href="/zh/@yeyu/work/38982/chapter/1">
-      <span class="num">#1-1</span>
-      <span class="title">初次見面的貓耳少女</span>
-      <span class="wordcount">3,200 字</span>
-      <span class="badge-free">免費</span>
-    </a>
-    <a class="chapter-row" href="/zh/@yeyu/work/38982/chapter/2">
-      <span class="num">#1-2</span>
-      <span class="title">薄荷糖與月光</span>
-      <span class="wordcount">4,150 字</span>
-      <span class="badge-free">免費</span>
-    </a>
-    <a class="chapter-row" href="/zh/@yeyu/work/38982/chapter/3">
-      <span class="num">#1-3</span>
-      <span class="title">異世界的第一場雨</span>
-      <span class="wordcount">5,600 字</span>
-      <span class="badge-paid">付費</span>
-    </a>
-    <div class="chapter-list-note">— 以下為付費章節 —</div>
-    <a class="chapter-row" href="/zh/@yeyu/work/38982/chapter/4">
-      <span class="num">#1-4</span>
-      <span class="title">貓耳少女的祕密</span>
-      <span class="wordcount">6,020 字</span>
-      <span class="badge-paid">付費</span>
-    </a>
-    <a class="chapter-row" href="/zh/@yeyu/work/38982/chapter/5">
-      <span class="num">#1-5</span>
-      <span class="title">尾聲：回家的路</span>
-      <span class="wordcount">2,980 字</span>
-      <span class="badge-free">免費</span>
-    </a>
+  <section class="section-list">
+    <div class="section-list__item__section">
+      <a href="/zh/@yeyu/work/38982/reader/1001">
+        <div class="info__name">初次見面的貓耳少女</div>
+      </a>
+    </div>
+    <div class="section-list__item__section">
+      <a href="/zh/@yeyu/work/38982/reader/1002">
+        <div class="info__name">薄荷糖與月光</div>
+      </a>
+    </div>
+    <div class="section-list__item__section">
+      <a href="/zh/@yeyu/work/38982/reader/1003">
+        <div class="info__name">異世界的第一場雨</div>
+      </a>
+    </div>
+    <div class="section-list__item__section">
+      <a href="/zh/@yeyu/work/38982/reader/1004">
+        <div class="info__name">貓耳少女的祕密</div>
+      </a>
+    </div>
+    <div class="section-list__item__section">
+      <a href="/zh/@yeyu/work/38982/reader/1005">
+        <div class="info__name">尾聲：回家的路</div>
+      </a>
+    </div>
   </section>
 
   <section class="comments">

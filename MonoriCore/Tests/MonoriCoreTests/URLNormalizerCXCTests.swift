@@ -95,19 +95,56 @@ final class URLNormalizerCXCTests: XCTestCase {
     func testCanonicalCXCWorkURL() {
         let canonical = URLNormalizer.canonicalCXCWorkURL(
             URL(string: "https://bl.cxc.today/en/@nanami777/work/38982")!)
-        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/zh/@nanami777/work/38982")
+        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/@nanami777/work/38982")
     }
 
     func testCanonicalCXCWorkURLAlreadyCanonical() {
         let canonical = URLNormalizer.canonicalCXCWorkURL(
             URL(string: "https://cxc.today/zh/@nanami777/work/38982")!)
-        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/zh/@nanami777/work/38982")
+        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/@nanami777/work/38982")
     }
 
     func testCanonicalCXCWorkURLStripsChapterSuffix() {
         let canonical = URLNormalizer.canonicalCXCWorkURL(
             URL(string: "https://gl.cxc.today/ko/@foo/work/456/chapter/3")!)
-        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/zh/@foo/work/456")
+        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/@foo/work/456")
+    }
+
+    func testCanonicalCXCWorkURLForBookType() {
+        let canonical = URLNormalizer.canonicalCXCWorkURL(
+            URL(string: "https://bl.cxc.today/zh/@bubbledingding/book/55150")!)
+        XCTAssertEqual(canonical?.absoluteString, "https://cxc.today/@bubbledingding/book/55150")
+    }
+
+    func testCXCWorkIDForBookURL() {
+        let id = URLNormalizer.cxcWorkID(
+            URL(string: "https://cxc.today/zh/@foo/book/789")!)
+        XCTAssertEqual(id, "789")
+    }
+
+    func testIsCXCWorkURLForBookURL() {
+        XCTAssertTrue(URLNormalizer.isCXCWorkURL(
+            URL(string: "https://cxc.today/@user/book/123")!))
+    }
+
+    func testCanonicalCXCReaderURL() {
+        let canonical = URLNormalizer.canonicalCXCReaderURL(
+            "https://cxc.today/zh/@laterne/work/24551/reader/160694")
+        XCTAssertEqual(canonical, "https://cxc.today/@laterne/work/24551/reader/160694")
+    }
+
+    func testCanonicalCXCReaderURLForBookType() {
+        let canonical = URLNormalizer.canonicalCXCReaderURL(
+            "https://bl.cxc.today/en/@user/book/100/reader/200")
+        XCTAssertEqual(canonical, "https://cxc.today/@user/book/100/reader/200")
+    }
+
+    func testCanonicalCXCReaderURLStripsLangPrefix() {
+        let withLang = URLNormalizer.canonicalCXCReaderURL(
+            "https://cxc.today/zh/@foo/work/1/reader/2")
+        let withoutLang = URLNormalizer.canonicalCXCReaderURL(
+            "https://cxc.today/@foo/work/1/reader/2")
+        XCTAssertEqual(withLang, withoutLang)
     }
 
     func testCanonicalCXCWorkURLNilForCreatorStoreOnly() {

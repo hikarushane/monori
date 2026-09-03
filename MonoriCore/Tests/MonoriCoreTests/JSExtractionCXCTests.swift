@@ -2,15 +2,8 @@ import XCTest
 import WebKit
 @testable import MonoriCore
 
-/// Exercises CXCWorkDetect.js and CXCWorkImport.js against fixture HTML.
-///
-/// The DOM selectors in both scripts are generic `[class*="..."]` placeholders
-/// -- the real cxc.today markup hasn't been inspected with DevTools yet -- so
-/// these fixtures are hand-built to match the task brief's described
-/// structure (title, author below the cover, a chapter list with number/
-/// title/word-count/free-or-paid marker per row) rather than captured from
-/// the live site. They lock in the current, intentionally-generic behavior;
-/// expect fixtures and selectors to be revisited once real markup is known.
+/// Exercises CXCWorkDetect.js and CXCWorkImport.js against fixture HTML
+/// modeled after the real cxc.today DOM structure (inspected 2026-09).
 @MainActor
 final class JSExtractionCXCTests: XCTestCase {
 
@@ -50,7 +43,7 @@ final class JSExtractionCXCTests: XCTestCase {
         let link = try PayloadValidator.validateCollectionLink(try XCTUnwrap(bodies.first)).get()
         XCTAssertEqual(link.collectionName, "薄荷貓耳少女的異世界奇幻冒險")
         XCTAssertEqual(link.creatorName, "夜雨微涼")
-        XCTAssertEqual(link.collectionURL, "https://cxc.today/zh/@yeyu/work/38982")
+        XCTAssertEqual(link.collectionURL, "https://cxc.today/@yeyu/work/38982")
     }
 
     func testDetectFallsBackToDocumentTitleAndUsername() async throws {
@@ -59,22 +52,20 @@ final class JSExtractionCXCTests: XCTestCase {
             pageURL: "https://cxc.today/zh/@fallback_user/work/9001")
         XCTAssertEqual(bodies.count, 1)
         let link = try PayloadValidator.validateCollectionLink(try XCTUnwrap(bodies.first)).get()
-        XCTAssertEqual(link.collectionName, "沒有標題元素的作品 - CXC",
-                       "must fall back to document.title when no h1/[class*=title] element exists")
-        XCTAssertEqual(link.creatorName, "fallback_user",
-                       "must fall back to the URL username when no author/creator element exists")
+        XCTAssertEqual(link.collectionName, "沒有標題元素的作品",
+                       "title is the first segment of document.title split on ' | '")
+        XCTAssertEqual(link.creatorName, "無名作者",
+                       "creatorName prefers the display name from document.title split on ' | '")
     }
 
     func testDetectFiresOnChapterSubpageToo() async throws {
-        // The path regex has no end anchor, so it also matches chapter
-        // subpages (mirrors AO3WorkDetect.js firing on any /works/N page).
         let bodies = try await runDetect(
             fixture: "cxc-work-page",
-            pageURL: "https://cxc.today/zh/@yeyu/work/38982/chapter/3")
+            pageURL: "https://cxc.today/zh/@yeyu/work/38982/reader/1003")
         XCTAssertEqual(bodies.count, 1)
         let link = try PayloadValidator.validateCollectionLink(try XCTUnwrap(bodies.first)).get()
-        XCTAssertEqual(link.collectionURL, "https://cxc.today/zh/@yeyu/work/38982",
-                       "the posted collection URL is always the canonical work root, never the chapter suffix")
+        XCTAssertEqual(link.collectionURL, "https://cxc.today/@yeyu/work/38982",
+                       "the posted collection URL is always the canonical work root, never the reader suffix")
     }
 
     func testDetectAllowsCXCSubdomains() async throws {
@@ -83,7 +74,7 @@ final class JSExtractionCXCTests: XCTestCase {
             pageURL: "https://bl.cxc.today/zh/@yeyu/work/38982")
         XCTAssertEqual(bodies.count, 1)
         let link = try PayloadValidator.validateCollectionLink(try XCTUnwrap(bodies.first)).get()
-        XCTAssertEqual(link.collectionURL, "https://cxc.today/zh/@yeyu/work/38982",
+        XCTAssertEqual(link.collectionURL, "https://cxc.today/@yeyu/work/38982",
                        "collection URL is normalized to the main cxc.today host regardless of subdomain")
     }
 
@@ -147,9 +138,7 @@ final class JSExtractionCXCTests: XCTestCase {
 
     func testImportCollectsEveryChapterOnce() async throws {
         let chapters = try await importChapters()
-        XCTAssertEqual(chapters.count, 5,
-                       "the section heading and the paid-section note both match the broad " +
-                       "[class*=chapter] selector but carry no link, and must be skipped")
+        XCTAssertEqual(chapters.count, 5)
     }
 
     func testImportTitlesInOrder() async throws {
@@ -166,22 +155,13 @@ final class JSExtractionCXCTests: XCTestCase {
     func testImportURLsAreAbsoluteAndSequential() async throws {
         let chapters = try await importChapters()
         XCTAssertEqual(chapters.compactMap { $0["url"] as? String }, [
-            "https://cxc.today/zh/@yeyu/work/38982/chapter/1",
-            "https://cxc.today/zh/@yeyu/work/38982/chapter/2",
-            "https://cxc.today/zh/@yeyu/work/38982/chapter/3",
-            "https://cxc.today/zh/@yeyu/work/38982/chapter/4",
-            "https://cxc.today/zh/@yeyu/work/38982/chapter/5",
+            "https://cxc.today/@yeyu/work/38982/reader/1001",
+            "https://cxc.today/@yeyu/work/38982/reader/1002",
+            "https://cxc.today/@yeyu/work/38982/reader/1003",
+            "https://cxc.today/@yeyu/work/38982/reader/1004",
+            "https://cxc.today/@yeyu/work/38982/reader/1005",
         ])
-        // domOrder is recomputed from the accepted count, not the raw
-        // NodeList index, so the two skipped no-link rows (at NodeList
-        // positions 0 and 4) never leave gaps like [1,2,3,5,6].
         XCTAssertEqual(chapters.compactMap { $0["domOrder"] as? Int }, [0, 1, 2, 3, 4])
-    }
-
-    func testImportMarksFreeAndPaidChaptersCorrectly() async throws {
-        let chapters = try await importChapters()
-        XCTAssertEqual(chapters.compactMap { $0["isFree"] as? Bool },
-                       [true, true, false, false, true])
     }
 
     func testImportCarriesWorkMetadataOnEveryChapter() async throws {
@@ -190,7 +170,7 @@ final class JSExtractionCXCTests: XCTestCase {
         XCTAssertTrue(chapters.allSatisfy { $0["collectionName"] as? String == "薄荷貓耳少女的異世界奇幻冒險" })
         XCTAssertTrue(chapters.allSatisfy { $0["creatorName"] as? String == "夜雨微涼" })
         XCTAssertTrue(chapters.allSatisfy {
-            ($0["collectionURL"] as? String) == "https://cxc.today/zh/@yeyu/work/38982"
+            ($0["collectionURL"] as? String) == "https://cxc.today/@yeyu/work/38982"
         })
     }
 

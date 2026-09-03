@@ -470,9 +470,6 @@ final class AppEnvironment {
             return 0
         }
 
-        let workTitle = model.detectedCollection?.collectionName ?? "CXC 作品"
-        let creatorName = model.detectedCollection?.creatorName
-
         let result = try? await model.webView.callAsyncJavaScript(
             JSAssets.cxcWorkImport, contentWorld: .page)
         guard let chapters = result as? [[String: Any]], !chapters.isEmpty else {
@@ -480,6 +477,18 @@ final class AppEnvironment {
                 "cxc: import script returned no chapters")
             return 0
         }
+
+        // Prefer import-time title (SPA title may not have been set when detect ran)
+        let importTitle = (chapters.first?["collectionName"] as? String)?
+            .trimmingCharacters(in: .whitespaces)
+        let workTitle: String
+        if let t = importTitle, !t.isEmpty {
+            workTitle = t
+        } else {
+            workTitle = model.detectedCollection?.collectionName ?? "CXC 作品"
+        }
+        let creatorName = (chapters.first?["creatorName"] as? String)
+            ?? model.detectedCollection?.creatorName
 
         let canonicalURL = URLNormalizer.canonicalCXCWorkURL(url)?.absoluteString ?? url.absoluteString
         let imported = ImportedCollection(
