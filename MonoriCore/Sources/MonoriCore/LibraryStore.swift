@@ -102,6 +102,12 @@ public final class LibraryStore {
         let collection: LocalCollectionModel
         if let existing = try findCollection(sourceURLString: imported.sourceURLString) {
             collection = existing
+            if !imported.title.isEmpty {
+                collection.title = imported.title
+            }
+            if let name = imported.creatorName, !name.isEmpty {
+                collection.creatorName = name
+            }
         } else {
             let c = LocalCollectionModel(title: imported.title,
                                          sourceURLString: imported.sourceURLString,
