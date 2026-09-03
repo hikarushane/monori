@@ -1,6 +1,6 @@
 # MEMORY
 > 這個 project 的長效記憶，每次 session 累積更新
-> 最後更新：2026-08-31（功能分支整合與 Patreon collection 排序修復）
+> 最後更新：2026-09-03（CXC／slashtw 來源合併；slashtw 改本地儲存每樓內文）
 
 ## 專案概覽
 Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小說，自動偵測章節集合、匯入章節列表、章節書籤、沉浸式閱讀（2026-06-12 起閱讀進度功能整個移除，固定開頂部）。核心技術：SwiftUI + SwiftData + WKWebView + JavaScript injection。目標：完整 MVP 可用。
@@ -37,6 +37,11 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 | AsianFanfics 選擇器策略 | 錨定 `data-toc-chapter` 屬性與「第一個含 `<h1>` 的 `<header>`」，不用 Tailwind utility class | → docs/decisions/0009-asianfanfics-2026-redesign-selectors.md | active | 2026-08-15 |
 | Reader dark mode 背景修復策略 | 依頁面型態分流：server-rendered（AFF）用 CSS 級聯；SPA（Patreon）改用 JS 祖先鏈精準清除 | → docs/decisions/0010-reader-dark-mode-background-strategy.md | active | 2026-08-20 |
 | Reader library chapter URL lookup | `LibraryStore.chapter(withPageURL:)` 依來源 canonicalize；AO3 與 AFF 對舊的非 canonical 儲存 URL再做雙邊 canonical fallback | Reader 的 currentURL 可能帶 query/fragment；lookup 失敗會進 foreign-page 分支並移除 Reader CSS | active | 2026-08-24 |
+
+| CXC Reader 模型 | Web-based（Patreon/Vocus 路徑），不存本地 HTML | → docs/decisions/0012-cxc-slashtw-reading-source-tos.md（條款禁止側錄擷取） | active | 2026-09-02 |
+| slashtw Reader 模型 | 本地儲存每樓內文 HTML（AO3 路徑）；匯入取 `.card-content > div.content`，`HTMLSanitizer` 後存 `contentHTML`，reader 用 `wrappedDocument` 渲染單章 | → docs/decisions/0012-cxc-slashtw-reading-source-tos.md 2026-09-03 修訂（原 Web-based 是未讀版規時的保守判斷；版規只禁轉載／轉出發表，未禁個人本機副本） | active | 2026-09-03 |
+| Stored-HTML sanitizer | `HTMLSanitizer.sanitize` 為 Google Docs 與 slashtw 共用；移除 script/style/iframe/object/embed/meta、inline handler、`javascript:`/`data:` 連結 | `loadHTMLString` 會執行 script；論壇 HTML 來自任意使用者 | active | 2026-09-03 |
+| slashtw 匯入完整度 | 匯入前反覆 `scrollTo(bottom)` 直到樓數與頁高都不再增長，再收集 `.card-post.thread` | Waterfall 無限捲動，初始只渲染約 5 樓 | active | 2026-09-03 |
 
 ## 規範
 ### Patreon DOM
@@ -106,6 +111,15 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **`Monori.xcodeproj` 是 gitignored 產生物**：改名只動 `project.yml` 的 `name:` 再 `xcodegen generate`；腳本內硬寫的才手改。
 - **bundle id 一變 → 本機資料重置**：無 App Group、無具名 UserDefaults suite、SwiftData 用預設容器 → 沒有遷移碼，但書庫 + `reader.fontSize`/`reader.lineSpacing` 會清空，需重 import + 重登 Patreon。
 - **品牌色**：AccentForest `#5C7150`（互動強調色，WCAG AA 過）；BrandSage `#A8B9A0`（大面積底色，白底對比不足只能當背景）；Ink `#333333`；icon 母檔須直角方形（無 rx），iOS 自套 squircle。
+
+### slashtw（在水裡寫字）內容模型與 DOM（2026-09-03）
+- 一個 thread（連載）= 一個 collection；每一樓（1F、2F…）= 一章；沒有獨立的 collection 路徑。
+- 所有樓層共用 `waterfall.slashtw.space/thread/{id}`，只差 `#post{id}` 錨點；WKWebView 回報的 URL 不含錨點，`chapter(withPageURL:)` 無法區分樓層，reader 必須用 stored HTML。
+- 樓層容器 `.card-post.thread`（bare `.card-post` 是登入卡或頁尾）；`.card-content` 直接子元素依序：`.title`（h1，僅 1F）、`.subtitle`（h2 章節標題＋`a.floor-link`）、`div.content`（正文）、空 `div.content`、`div.comments`（留言區／登入提示／投餵下拉）。
+- 正文取 `div.content` 內容並拆包裝；丟掉 `.comments` 與 Discuz `i.pstatus` 編輯戳；找不到 `.content` 時退回排除法（扣 `.title`／`.subtitle`／`.comments`）。
+- 目錄側欄 `.guider ul.showList li` 有全部章節標題與樓號但沒有連結，不能拿來建 URL。
+- 舊版 Discuz URL `slashtw.space/forum.php?mod=viewthread&tid=N` 會 server redirect 到 Waterfall；canonical 一律用 Waterfall 形式。
+- 遊客可讀主文（`needLogin` 只掛在目錄側欄）；R 級以上需積分 >20，匯入只擷取該 session 已渲染的內容。
 
 ## 踩過的坑
 - **AsianFanfics 2026 年前端全面 Tailwind 改版，舊選擇器全滅**（2026-08-15）：`#story-title`、`.widget--chapters`、`select[name="chapter-nav"]`、`main.primary`、`#user-submitted-body` 全部消失或回 0 nodes，任何故事匯入都跳「未找到章節」。2026-08-15 於正式站 1280px（桌機）/375px（手機）、登出狀態驗證為全站性（非單篇或單版型問題），並用另一篇不同作者的故事 `/story/view/1470000` 交叉確認。修法見 ADR-0009：章節清單改鎖 `data-toc-chapter`（TOC 桌機 `aside` + 手機 `dialog` 各渲染一份，依章節編號去重；`0` = Foreword 視為 metadata、非章節）、標題/作者改抓「第一個含 `<h1>` 的 `<header>`」、reader CSS 改鎖 `#bodyText`。**任何 AFF 選擇器改動，動手前都要先對正式站即時 DOM 重新驗證，不能只憑這份記錄裡的假設**——AFF 一改版視覺，Tailwind utility class 就會整批重生成，下次同類壞法幾乎必然重演。
@@ -212,14 +226,29 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - **Reader dark mode 黑色遮罩／原生深色背景（多來源，2026-08-20）**：AO3／Google Docs 文章在 dark mode 呈現黑色遮罩（文字不可見）；Patreon／AFF 背景是網站原生深色而非 Monori 色彩；只有 Vocus 正常。診斷 JS（`window.matchMedia('(prefers-color-scheme: dark)').matches` + computed style）證實：`prefers-color-scheme: dark` 在所有來源都正確 match，body 背景也都正確是 `#1C1B19`，問題出在兩層：(1) stored HTML（Google Docs）的 `wrappedDocument()` 用 `* { color: inherit !important }`，把 `<html>` 的 color 強制成 initial value（黑），dark mode 的 `body { color: #F2F0ED }` 沒有 `!important` 因而輸掉——AO3 走同一份 URL-loaded ruleset，其 dark mode 文字選擇器沒涵蓋 AO3 專屬 DOM，同樣顯示黑字；(2) 中間容器元素保留各網站原生深色背景，蓋掉 body 背景——只有 `VocusReaderRuleset.css` 有 6 層 `background-color: inherit !important` 級聯才正常。修法：`wrappedDocument()` 的 `* { color: inherit }` 縮小為 `body *`，dark mode `body { color }` 加 `!important`；`ReaderRuleset.css`／`AFFReaderRuleset.css` 補齊 dark mode text color `!important`。**背景級聯不要直接複製 Vocus 的 CSS `body > * { background-color: inherit !important }` 6 層寫法**——套到 `ReaderRuleset.css`（Patreon）會讓文章整個空白，因為 Patreon 是 React SPA，暴力覆寫所有中間容器背景連動破壞版面必要樣式；改用 JS `clearAncestorBg()`，只沿實際內容容器（`[data-tag="post-content"]`／`.patreon-post-content`／`article`）的祖先鏈精準清除背景，才沒有副作用。AFF 因為是傳統 server-rendered 頁面，CSS 級聯沒有這個副作用，維持原本寫法。
   📍 出現位置：`MonoriCore/Sources/MonoriCore/ReaderStyler.swift`（`wrappedDocument()` + `injectionScript()`）、`ReaderRuleset.css`、`AFFReaderRuleset.css`
 
+- **fixture 捏造 selector 讓測試綠、真站全空**（2026-09-03）：slashtw 匯入用 `.post-body` 取內文，測試 15/15 過，但真實 Waterfall 沒有這個 class，14 章 `contentHTML` 全 nil，reader 退回載入整串 thread → selector 必須來自真實擷取；程式碼不依賴未驗證的 class（改取 `div.content`，排除法當 fallback）。
+  📍 出現位置：`SlashTWThreadImport.js` 的 `floorBodyHTML()`；fixture `slashtw-thread-page.html`
+- **Waterfall SPA 在自動化瀏覽器不渲染樓層**（2026-09-03）：Claude Browser（桌面／手機 UA）與已登入的 Chrome CDP 開 `thread/{id}` 都停在 `.loading`，`.card-post.thread` 數為 0，DevTools 查不到 DOM → 從 Simulator 的 `default.store`（`ZLOCALCHAPTERMODEL.ZCONTENTHTML`）用 sqlite 唯讀取已存 HTML，只印 tag／class 結構不印內文。
+  📍 出現位置：`xcrun simctl get_app_container <udid> dev.monori.Monori data` → `Library/Application Support/default.store`
+- **slashtw 章節被判 foreign page、reader CSS 被移除**（2026-09-03）：`chapter(withPageURL:)` 沒有 slashtw case，`syncCurrentChapter` 走 foreign 分支 → `ReaderView` 加 thread ID 比對分支保留 `current`；stored HTML 路徑（`renderingStoredHTML`）直接跳過這個問題。
+  📍 出現位置：`ReaderView.syncCurrentChapter(to:)`
+- **`xcodegen generate` 改寫 `App/Info.plist` build number**（2026-09-03）：正本在 `project.yml`（`CFBundleVersion`），regenerate 後 Info.plist 會出現未 commit 的差異 → 一起 commit 成 `chore`，不要當成來路不明的改動。
+  📍 出現位置：`project.yml` `info:` 區塊註解
+
 ## 排除的方向
 - 自動化 Patreon 登入：CAPTCHA/2FA/session token，法律與安全風險
 - 用 `scrollApplied: Bool` guard 防止重複 scroll：Patreon 自帶 scroll 在 guard 後才執行，無效 → 改用 enforceScrollScript interval
+
+- slashtw Web-based 單樓隔離（載 thread URL＋JS/CSS 只留目標樓）：依賴 SPA 每次成功渲染並懶載入到目標樓，2026-09-03 三個自動化環境全部卡 loading，WKWebView 又丟 fragment；改存內文 HTML。
+- 用 `.guider` 目錄建 slashtw 章節 URL：目錄只有標題與樓號，沒有 post id，做不到。
 
 ## 環境 / 依賴
 - XcodeGen：`xcodegen generate` 後需 `xcodebuild -list -project Monori.xcodeproj` 驗證
 - 測試 fixture HTML 放 `MonoriCore/Tests/MonoriCoreTests/Fixtures/`
 - Smoke test artifacts 寫入 `build/smoke/`
+
+- Discuz 站的版規等純文字可用 archiver 讀：`https://slashtw.space/archiver/?tid-2.html`（翻頁參數無效，只回第 1 頁）。
+- slashtw 章節內文以 `contentHTML` 存本機，依既有規則不進 iCloud 備份（`LibraryBackupTests.testBackupExcludesContentHTML`）。
 
 ## 未解決的問題
 - [ ] **Google 登入的存活監控（2026-08-12 起）**：UA 標示為 Safari 是暫時有效的手段，不是永久解。內測若再回報「以 Google 繼續登入」變灰按不動，先跑 `curl -A "<app 的 UA>" -o /dev/null -w "%{http_code}" https://accounts.google.com/gsi/client` 確認是不是又被 403，再依 ADR-0008 的結論走引導路線。
@@ -239,3 +268,5 @@ Monori 是 iOS SwiftUI app，讓用戶在 Patreon WKWebView 中閱讀連載小�
 - ~~[ ] Bug regression：Library collection 點進文章自動卷到底部~~（已修 2026-06-11 session 3）
 - ~~[ ] Browse banner 殘留~~（已修 2026-06-11 session 3：detect 限 post 頁，非 reselect 清空問題）
 - ~~[ ] Browse menu 項目可拖動~~（已修 2026-06-11 session 3：WKWebView dragstart suppressor，非 `.onMove`）
+- [ ] slashtw／CXC 的 `supportsAutoCheck` 為 false；追更需另做 refresh 路徑（slashtw 可重用匯入腳本＋`applyDocImport` 合併）。
+- [ ] `SlashTWReaderRuleset.css` 仍是 placeholder，只影響無內文的 fallback；有需要再依真實 DOM 重寫。
