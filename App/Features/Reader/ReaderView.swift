@@ -268,6 +268,18 @@ struct ReaderView: View {
                 // so re-apply treatment here or the page keeps Patreon's auto-scroll.
                 applyReaderTreatment()
             }
+        } else if let threadID = URLNormalizer.slashtwThreadID(url),
+                  let currentURL = URL(string: current.urlString),
+                  URLNormalizer.slashtwThreadID(currentURL) == threadID {
+            // slashtw chapters share the same thread URL; the WebView drops the
+            // #post{id} fragment so chapter(withPageURL:) can't distinguish them.
+            // Keep current (set by open()) and ensure reader treatment fires.
+            foreignTitleTask?.cancel()
+            if foreignPageTitle != nil {
+                foreignPageTitle = nil
+                foreignPageKey = nil
+                applyReaderTreatment()
+            }
         } else {
             let key = URLNormalizer.patreonPostID(url.absoluteString)
                 ?? URLNormalizer.normalize(url.absoluteString)?.absoluteString
@@ -327,6 +339,10 @@ struct ReaderView: View {
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.vocusInjectionScript())
                     case .asianFanfics:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.affInjectionScript())
+                    case .cxc:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.cxcInjectionScript())
+                    case .slashtw:
+                        _ = try? await webView.evaluateJavaScript(ReaderStyler.slashtwInjectionScript())
                     default:
                         _ = try? await webView.evaluateJavaScript(ReaderStyler.injectionScript())
                     }

@@ -61,6 +61,28 @@ struct WebCollectionBanner: View {
                         showImportConfirmation = true
                     }
             }
+        } else if model.isOnCXCWorkPage {
+            importBanner(kind: .cxc,
+                         title: model.detectedCollection?.collectionName ?? "CXC 作品") {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importCXCWork(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+            }
+        } else if model.isOnSlashTWThreadPage {
+            importBanner(kind: .slashtw,
+                         title: model.detectedCollection?.collectionName ?? "在水裡寫字討論串") {
+                    importing = true
+                    env.importedCountThisSession = 0
+                    Task {
+                        _ = await env.importSlashTWThread(from: model)
+                        importing = false
+                        showImportConfirmation = true
+                    }
+            }
         } else if model.isOnGoogleDocPage {
             importBanner(kind: .googleDocs, title: "Google 文件") {
                     importing = true

@@ -164,6 +164,105 @@ struct AFFMark: Shape {
     }
 }
 
+/// CXC mark: a crescent moon, echoing the white "C" crescent in CXC's own
+/// logo. Built as a single closed boundary — an outer disk's major arc (the
+/// moon's outer edge) plus a smaller, offset disk's minor arc (the inner
+/// edge of the "bite") — meeting at two tapered tips, the same way outlined
+/// crescent-moon glyphs are constructed in other icon sets.
+struct CXCMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let outerCenter = point(12, 12, in: rect)
+        let outerRadius = scaledValue(8, in: rect)
+        let innerCenter = point(18, 10, in: rect)
+        let innerRadius = scaledValue(7.5, in: rect)
+
+        let dx = innerCenter.x - outerCenter.x
+        let dy = innerCenter.y - outerCenter.y
+        let d = sqrt(dx * dx + dy * dy)
+
+        // Guard a degenerate (zero-size) rect: the two centers would
+        // coincide, making the intersection below divide by zero.
+        guard d > 0 else { return Path() }
+
+        // Standard circle-circle intersection: `a` is the distance from
+        // outerCenter to the midpoint of the chord joining the two tips;
+        // `h` is half the chord length.
+        let a = (outerRadius * outerRadius - innerRadius * innerRadius + d * d) / (2 * d)
+        let h = sqrt(max(outerRadius * outerRadius - a * a, 0))
+        let midX = outerCenter.x + a * dx / d
+        let midY = outerCenter.y + a * dy / d
+        let offsetX = -dy / d * h
+        let offsetY = dx / d * h
+
+        let tip1 = CGPoint(x: midX + offsetX, y: midY + offsetY)
+        let tip2 = CGPoint(x: midX - offsetX, y: midY - offsetY)
+
+        var p = Path()
+        p.move(to: tip1)
+        // Outer disk's major arc: the moon's outer edge, away from the bite.
+        p.addArc(
+            center: outerCenter,
+            radius: outerRadius,
+            startAngle: .radians(atan2(tip1.y - outerCenter.y, tip1.x - outerCenter.x)),
+            endAngle: .radians(atan2(tip2.y - outerCenter.y, tip2.x - outerCenter.x)),
+            clockwise: false
+        )
+        // Inner disk's minor arc: closes back to the first tip.
+        p.addArc(
+            center: innerCenter,
+            radius: innerRadius,
+            startAngle: .radians(atan2(tip2.y - innerCenter.y, tip2.x - innerCenter.x)),
+            endAngle: .radians(atan2(tip1.y - innerCenter.y, tip1.x - innerCenter.x)),
+            clockwise: true
+        )
+        p.closeSubpath()
+
+        return p
+    }
+}
+
+/// Slashtw mark ("在水裡寫字" / "Writing in Water"): a water drop shaped like
+/// a fountain-pen nib. The teardrop silhouette carries the "water" half of
+/// the name; the center slit and breather hole running down through it —
+/// the same construction as a real pen nib — carry the "writing" half.
+struct SlashTWMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        // Guard a degenerate (zero-size) rect, same as CXCMark.
+        guard rect.width > 0, rect.height > 0 else { return Path() }
+
+        let tip = point(12, 3, in: rect)
+        let bulbCenter = point(12, 14.5, in: rect)
+        let bulbRadius = scaledValue(7, in: rect)
+        let rightPoint = point(19, 14.5, in: rect)
+
+        var p = Path()
+
+        // Outer teardrop: two symmetric curves taper from the tip down to
+        // the bulb's widest point, closed by the bulb's lower arc.
+        p.move(to: tip)
+        // control2's x matches rightPoint's (both sit on the bulb circle's
+        // vertical tangent line there), so the curve meets the arc smoothly
+        // instead of kinking.
+        p.addCurve(to: rightPoint, control1: point(17, 5, in: rect), control2: point(19, 11, in: rect))
+        p.addArc(
+            center: bulbCenter,
+            radius: bulbRadius,
+            startAngle: .degrees(0),
+            endAngle: .degrees(180),
+            clockwise: false
+        )
+        p.addCurve(to: tip, control1: point(5, 11, in: rect), control2: point(7, 5, in: rect))
+        p.closeSubpath()
+
+        // Nib slit and breather hole, echoing a fountain pen's tip.
+        p.move(to: point(12, 7, in: rect))
+        p.addLine(to: point(12, 18, in: rect))
+        p.addEllipse(in: scaledRect(11, 18, 2, 2, in: rect))
+
+        return p
+    }
+}
+
 /// The shared source icon. One source of truth for the Browse source picker and
 /// the Library collection list.
 struct SourceGlyph: View {
@@ -181,6 +280,10 @@ struct SourceGlyph: View {
             VocusMark().stroke(.foreground, style: monoriSourceStroke)
         case .asianFanfics:
             AFFMark().stroke(.foreground, style: monoriSourceStroke)
+        case .cxc:
+            CXCMark().stroke(.foreground, style: monoriSourceStroke)
+        case .slashtw:
+            SlashTWMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
 }

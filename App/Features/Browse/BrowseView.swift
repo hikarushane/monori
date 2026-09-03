@@ -25,6 +25,8 @@ struct BrowseView: View {
         case .ao3: return env.ao3Browse
         case .vocus: return env.vocusBrowse
         case .asianFanfics: return env.affBrowse
+        case .cxc: return env.cxcBrowse
+        case .slashtw: return env.slashtwBrowse
         default: return env.browse
         }
     }
@@ -80,6 +82,8 @@ struct BrowseView: View {
         case .ao3: model = env.ao3Browse
         case .vocus: model = env.vocusBrowse
         case .asianFanfics: model = env.affBrowse
+        case .cxc: model = env.cxcBrowse
+        case .slashtw: model = env.slashtwBrowse
         default: model = env.browse
         }
         if model.currentURL == nil {

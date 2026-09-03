@@ -364,6 +364,104 @@ public enum ReaderStyler {
         """
     }
 
+    public static func cxcRuleset() -> String {
+        guard let url = Bundle.module.url(forResource: "CXCReaderRuleset", withExtension: "css"),
+              let css = try? String(contentsOf: url, encoding: .utf8) else {
+            assertionFailure("Missing CXCReaderRuleset.css")
+            return ""
+        }
+        return css
+    }
+
+    public static func cxcInjectionScript() -> String {
+        let css = cxcRuleset()
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "${", with: "\\${")
+        return """
+        (function () {
+          var old = document.getElementById("\(styleElementID)");
+          if (old) { old.remove(); }
+          var style = document.createElement("style");
+          style.id = "\(styleElementID)";
+          style.textContent = `\(css)`;
+          document.documentElement.appendChild(style);
+        \(fontCheckSnippet)
+          function clearCxcAncestors() {
+            var c = document.querySelector('article') || document.querySelector('main');
+            if (c) {
+              c.style.setProperty('padding-left', 'clamp(24px, 6vw, 48px)', 'important');
+              c.style.setProperty('padding-right', 'clamp(24px, 6vw, 48px)', 'important');
+              c.style.setProperty('max-width', '34em', 'important');
+              c.style.setProperty('margin-left', 'auto', 'important');
+              c.style.setProperty('margin-right', 'auto', 'important');
+              var p = c.parentElement;
+              while (p && p !== document.documentElement) {
+                p.style.setProperty('background-color', 'transparent', 'important');
+                p.style.setProperty('padding-left', '0', 'important');
+                p.style.setProperty('padding-right', '0', 'important');
+                p.style.setProperty('margin-left', '0', 'important');
+                p.style.setProperty('margin-right', '0', 'important');
+                p = p.parentElement;
+              }
+            }
+          }
+          clearCxcAncestors();
+          setTimeout(clearCxcAncestors, 500);
+          setTimeout(clearCxcAncestors, 1500);
+        })();
+        """
+    }
+
+    public static func slashtwRuleset() -> String {
+        guard let url = Bundle.module.url(forResource: "SlashTWReaderRuleset", withExtension: "css"),
+              let css = try? String(contentsOf: url, encoding: .utf8) else {
+            assertionFailure("Missing SlashTWReaderRuleset.css")
+            return ""
+        }
+        return css
+    }
+
+    public static func slashtwInjectionScript() -> String {
+        let css = slashtwRuleset()
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "${", with: "\\${")
+        return """
+        (function () {
+          var old = document.getElementById("\(styleElementID)");
+          if (old) { old.remove(); }
+          var style = document.createElement("style");
+          style.id = "\(styleElementID)";
+          style.textContent = `\(css)`;
+          document.documentElement.appendChild(style);
+        \(fontCheckSnippet)
+          function clearSlashtwAncestors() {
+            var c = document.querySelector('article') || document.querySelector('main');
+            if (c) {
+              c.style.setProperty('padding-left', 'clamp(24px, 6vw, 48px)', 'important');
+              c.style.setProperty('padding-right', 'clamp(24px, 6vw, 48px)', 'important');
+              c.style.setProperty('max-width', '34em', 'important');
+              c.style.setProperty('margin-left', 'auto', 'important');
+              c.style.setProperty('margin-right', 'auto', 'important');
+              var p = c.parentElement;
+              while (p && p !== document.documentElement) {
+                p.style.setProperty('background-color', 'transparent', 'important');
+                p.style.setProperty('padding-left', '0', 'important');
+                p.style.setProperty('padding-right', '0', 'important');
+                p.style.setProperty('margin-left', '0', 'important');
+                p.style.setProperty('margin-right', '0', 'important');
+                p = p.parentElement;
+              }
+            }
+          }
+          clearSlashtwAncestors();
+          setTimeout(clearSlashtwAncestors, 500);
+          setTimeout(clearSlashtwAncestors, 1500);
+        })();
+        """
+    }
+
     public static func removalScript() -> String {
         """
         (function () {

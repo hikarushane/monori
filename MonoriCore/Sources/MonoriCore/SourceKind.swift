@@ -6,6 +6,8 @@ public enum SourceKind: String, Codable, CaseIterable, Sendable {
     case ao3
     case vocus
     case asianFanfics
+    case cxc
+    case slashtw
 }
 
 public struct SourceProvider: Identifiable, Sendable {
@@ -46,7 +48,15 @@ public enum SourceRegistry {
         iconSystemName: "book.pages",
         startURL: URL(string: "https://www.asianfanfics.com")!)
 
-    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus, asianFanfics]
+    public static let cxc = SourceProvider(
+        kind: .cxc, displayName: "CXC", iconSystemName: "c.circle",
+        startURL: URL(string: "https://cxc.today")!)
+
+    public static let slashtw = SourceProvider(
+        kind: .slashtw, displayName: "在水裡寫字", iconSystemName: "w.circle",
+        startURL: URL(string: "https://slashtw.space")!)
+
+    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus, asianFanfics, cxc, slashtw]
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
         switch kind {
@@ -55,6 +65,8 @@ public enum SourceRegistry {
         case .ao3: return ao3
         case .vocus: return vocus
         case .asianFanfics: return asianFanfics
+        case .cxc: return cxc
+        case .slashtw: return slashtw
         }
     }
 }
@@ -65,7 +77,7 @@ public extension SourceKind {
     var supportsAutoCheck: Bool {
         switch self {
         case .patreon, .vocus, .asianFanfics, .ao3: return true
-        case .googleDocs: return false
+        case .googleDocs, .cxc, .slashtw: return false
         }
     }
 }

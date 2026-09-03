@@ -255,4 +255,129 @@ public enum URLNormalizer {
         else { return nil }
         return "https://www.asianfanfics.com/story/view/\(parts[2])/\(parts[3])"
     }
+
+    // MARK: - CXC
+
+    /// True for `cxc.today` and any of its subdomains (e.g. `bl.cxc.today`, `bg.cxc.today`, `gl.cxc.today`).
+    public static func isCXCHost(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host == "cxc.today" || host.hasSuffix(".cxc.today")
+    }
+
+    /// Extracts the creator username (without the leading `@`) from a CXC creator-store
+    /// or work URL, e.g. `/zh/@nanami777/work/38982` -> `"nanami777"`.
+    public static func cxcUsername(_ url: URL) -> String? {
+        guard isCXCHost(url) else { return nil }
+        let segments = cxcPathSegments(url)
+        guard let atSegment = segments.first(where: { $0.hasPrefix("@") }) else { return nil }
+        return String(atSegment.dropFirst())
+    }
+
+    /// Extracts the numeric work/book id from a CXC work or chapter URL, e.g.
+    /// `/zh/@foo/work/123` or `/zh/@foo/book/456/reader/789` -> `"123"` / `"456"`.
+    /// CXC uses `/work/` for novels and `/book/` for comics.
+    public static func cxcWorkID(_ url: URL) -> String? {
+        guard isCXCHost(url) else { return nil }
+        let segments = cxcPathSegments(url)
+        guard let typeIdx = segments.firstIndex(where: { $0 == "work" || $0 == "book" }),
+              typeIdx + 1 < segments.count else { return nil }
+        let id = segments[typeIdx + 1]
+        return id.allSatisfy(\.isNumber) ? id : nil
+    }
+
+    /// The content type segment ("work" or "book") from a CXC URL, or nil.
+    private static func cxcContentType(_ url: URL) -> String? {
+        let segments = cxcPathSegments(url)
+        return segments.first(where: { $0 == "work" || $0 == "book" })
+    }
+
+    /// True when the URL points at a CXC work (or one of its chapters).
+    public static func isCXCWorkURL(_ url: URL) -> Bool {
+        cxcWorkID(url) != nil
+    }
+
+    /// Canonical form of a CXC work URL: always `https://cxc.today/@{username}/{work|book}/{workID}`,
+    /// regardless of the source subdomain or language prefix. Preserves the content type (work/book).
+    public static func canonicalCXCWorkURL(_ url: URL) -> URL? {
+        guard let username = cxcUsername(url),
+              let workID = cxcWorkID(url),
+              let contentType = cxcContentType(url) else { return nil }
+        return URL(string: "https://cxc.today/@\(username)/\(contentType)/\(workID)")
+    }
+
+    /// Canonical form of a CXC reader (chapter) URL, stripping the language prefix
+    /// and subdomain: `https://cxc.today/@{user}/{work|book}/{id}/reader/{readerId}`.
+    public static func canonicalCXCReaderURL(_ pageURL: String) -> String? {
+        guard let url = URL(string: pageURL), isCXCHost(url) else { return nil }
+        let segments = cxcPathSegments(url)
+        guard let typeIdx = segments.firstIndex(where: { $0 == "work" || $0 == "book" }),
+              typeIdx + 1 < segments.count else { return nil }
+        let contentType = segments[typeIdx]
+        let workID = segments[typeIdx + 1]
+        guard workID.allSatisfy(\.isNumber) else { return nil }
+        guard let atSegment = segments.first(where: { $0.hasPrefix("@") }) else { return nil }
+        let username = String(atSegment.dropFirst())
+        if typeIdx + 3 < segments.count, segments[typeIdx + 2] == "reader" {
+            let readerID = segments[typeIdx + 3]
+            return "https://cxc.today/@\(username)/\(contentType)/\(workID)/reader/\(readerID)"
+        }
+        return "https://cxc.today/@\(username)/\(contentType)/\(workID)"
+    }
+
+    /// Path components of a CXC URL with the leading `/` and language prefix
+    /// (`zh`/`en`/`jp`/`ko`) removed.
+    private static func cxcPathSegments(_ url: URL) -> [String] {
+        let segments = url.pathComponents.filter { $0 != "/" }
+        if let first = segments.first, ["zh", "en", "jp", "ko"].contains(first) {
+            return Array(segments.dropFirst())
+        }
+        return segments
+    }
+
+    // MARK: - slashtw (在水裡寫字 / Written in Waters)
+
+    /// True for `slashtw.space` and any of its subdomains (e.g. `waterfall.slashtw.space`).
+    public static func isSlashTWHost(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host == "slashtw.space" || host.hasSuffix(".slashtw.space")
+    }
+
+    /// Extracts the numeric thread id from a slashtw thread URL, recognizing both the
+    /// legacy Discuz form (`slashtw.space/forum.php?mod=viewthread&tid={id}`) and the
+    /// new Waterfall form (`waterfall.slashtw.space/thread/{id}`), since the old host
+    /// currently redirects to the new one and both forms may be encountered.
+    public static func slashtwThreadID(_ url: URL) -> String? {
+        guard isSlashTWHost(url) else { return nil }
+        let segments = url.pathComponents.filter { $0 != "/" }
+
+        // New Waterfall form: /thread/{id}
+        if let threadIdx = segments.firstIndex(of: "thread"), threadIdx + 1 < segments.count {
+            let id = segments[threadIdx + 1]
+            return !id.isEmpty && id.allSatisfy(\.isNumber) ? id : nil
+        }
+
+        // Legacy Discuz form: /forum.php?mod=viewthread&tid={id}
+        guard segments == ["forum.php"],
+              let comps = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let items = comps.queryItems,
+              items.first(where: { $0.name == "mod" })?.value == "viewthread",
+              let tid = items.first(where: { $0.name == "tid" })?.value,
+              !tid.isEmpty, tid.allSatisfy(\.isNumber)
+        else { return nil }
+        return tid
+    }
+
+    /// True when the URL points at a slashtw thread, in either the legacy Discuz
+    /// or new Waterfall URL form.
+    public static func isSlashTWThreadURL(_ url: URL) -> Bool {
+        slashtwThreadID(url) != nil
+    }
+
+    /// Canonical form of a slashtw thread URL: always the new Waterfall form,
+    /// `https://waterfall.slashtw.space/thread/{id}`, regardless of the source host
+    /// or URL format.
+    public static func canonicalSlashTWThreadURL(_ url: URL) -> URL? {
+        guard let id = slashtwThreadID(url) else { return nil }
+        return URL(string: "https://waterfall.slashtw.space/thread/\(id)")
+    }
 }

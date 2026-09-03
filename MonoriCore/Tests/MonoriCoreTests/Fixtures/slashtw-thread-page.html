@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>異世界水管工的日常連載串 - 在水裡寫字</title>
+</head>
+<body>
+  <!--
+    Fixture matching the real waterfall.slashtw.space DOM structure as of
+    2026-09. Selectors verified via DevTools on a live thread page.
+  -->
+
+  <!-- Guider sidebar (TOC) — always present, complete chapter list -->
+  <div class="guider w0 needLogin">
+    <div class="title">
+      <span>異世界水管工的日常連載串</span>
+      <span>（共5樓）</span>
+      <span class="floor">共5樓</span>
+    </div>
+    <ul class="showList" style="display: none;">
+      <li class="subject"><span>異世界水管工的日常連載串</span></li>
+      <li><span>序章：初來乍到</span><div>1F</div></li>
+      <li><span>第一章：水管工上工</span><div>2F</div></li>
+      <li><span>第二章：異世界的第一天</span><div>3F</div></li>
+      <li><span>第三章：管線裡的秘密</span><div>4F</div></li>
+      <li><span>尾聲：回家的水管</span><div>5F</div></li>
+    </ul>
+  </div>
+
+  <div class="main w0 fs0 lh0 pm0">
+    <!--
+      Login overlay — bare .card-post WITHOUT .thread class.
+      The import script selects .card-post.thread; this must be skipped.
+    -->
+    <div class="card-post">
+      <form>
+        <input type="text" placeholder="帳號／信箱">
+        <input type="password" placeholder="密碼">
+        <button type="submit">登入</button>
+      </form>
+    </div>
+
+    <!-- Floor 1 (1F) — has h1 thread title, only on first floor -->
+    <div class="card-post thread">
+      <div class="card-header">
+        <div id="post1001" class="anchor"></div>
+        <div class="header-info-wrapper">
+          <div class="header-top">
+            <div class="top-info-left">
+              <div class="author-info valign-wrapper">
+                <a href="/user/AShui"><span>阿水</span></a>
+                <span class="timestamp">7 天前</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content p1001">
+        <div class="title">
+          <h1><a href="/thread/4118" class="title-link">異世界水管工的日常連載串</a></h1>
+        </div>
+        <div class="subtitle">
+          <h2><a href="/thread/4118#post1001" class="title-link">序章：初來乍到</a></h2>
+          <a href="#post1001" class="floor-link">1F</a>
+        </div>
+        <!-- 1F: real Waterfall structure (captured 2026-09-03 from the app's WebView):
+             the body is div.content, followed by an empty div.content and the
+             div.comments interaction block. i.pstatus is Discuz's edit stamp. -->
+        <div class="content"><p>FAKE_BODY_TEXT_MUST_NEVER_LEAK 序章內容</p><p>第二段。<i class="pstatus">本文最後由 阿水 於 2026-9-2 20:19 編輯</i></p></div>
+        <div class="content"></div>
+        <div class="comments">
+          <div class="wrapper center">還沒有任何人留言，快來當第一個吧！</div>
+          <div class="comment-input-wrapper needLogin">請先<a href="/login">登入</a>以進行留言</div>
+          <div class="anchor" id="comment1001"></div>
+          <ul class="dropdown-content" id="dropdownFeed1001"><li>寫得太好了！</li><li>您真內行</li></ul>
+        </div>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+    <!-- Floor 2 (2F) -->
+    <div class="card-post thread">
+      <div class="card-header">
+        <div id="post1002" class="anchor"></div>
+        <div class="header-info-wrapper">
+          <div class="header-top">
+            <div class="top-info-left">
+              <div class="author-info valign-wrapper">
+                <a href="/user/AShui"><span>阿水</span></a>
+                <span class="timestamp">6 天前</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content p1002">
+        <div class="subtitle">
+          <h2><a href="/thread/4118#post1002" class="title-link">第一章：水管工上工</a></h2>
+          <a href="#post1002" class="floor-link">2F</a>
+        </div>
+        <!-- 2F: no wrapper at all — paragraphs sit directly under .card-content -->
+        <p>第一章內容</p>
+        <p>第一章第二段。</p>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+    <!-- Floor 3 (3F) -->
+    <div class="card-post thread">
+      <div class="card-header">
+        <div id="post1003" class="anchor"></div>
+        <div class="header-info-wrapper">
+          <div class="header-top">
+            <div class="top-info-left">
+              <div class="author-info valign-wrapper">
+                <a href="/user/AShui"><span>阿水</span></a>
+                <span class="timestamp">5 天前</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content p1003">
+        <div class="subtitle">
+          <h2><a href="/thread/4118#post1003" class="title-link">第二章：異世界的第一天</a></h2>
+          <a href="#post1003" class="floor-link">3F</a>
+        </div>
+        <!-- 3F: fallback path (no div.content): a different wrapper class, a nested
+             element whose class is "title" that must survive (only direct children
+             of .card-content are excluded), and a .comments block that must be dropped -->
+        <div class="message-text"><p>第二章內容</p><p class="title">小標：管線</p></div>
+        <div class="comments">FALLBACK_COMMENTS_TRAP</div>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+    <!-- Floor 4 (4F) -->
+    <div class="card-post thread">
+      <div class="card-header">
+        <div id="post1004" class="anchor"></div>
+        <div class="header-info-wrapper">
+          <div class="header-top">
+            <div class="top-info-left">
+              <div class="author-info valign-wrapper">
+                <a href="/user/AShui"><span>阿水</span></a>
+                <span class="timestamp">4 天前</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content p1004">
+        <div class="subtitle">
+          <h2><a href="/thread/4118#post1004" class="title-link">第三章：管線裡的秘密</a></h2>
+          <a href="#post1004" class="floor-link">4F</a>
+        </div>
+        <!-- 4F: script and inline handler traps — script is dropped in JS,
+             the onclick attribute is left for HTMLSanitizer on the Swift side -->
+        <div class="post-body"><p onclick="steal()">第三章內容</p><script>window.__pwned = true;</script></div>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+    <!-- Floor 5 (5F) -->
+    <div class="card-post thread">
+      <div class="card-header">
+        <div id="post1005" class="anchor"></div>
+        <div class="header-info-wrapper">
+          <div class="header-top">
+            <div class="top-info-left">
+              <div class="author-info valign-wrapper">
+                <a href="/user/AShui"><span>阿水</span></a>
+                <span class="timestamp">3 天前</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content p1005">
+        <div class="subtitle">
+          <h2><a href="/thread/4118#post1005" class="title-link">尾聲：回家的水管</a></h2>
+          <a href="#post1005" class="floor-link">5F</a>
+        </div>
+        <!-- 5F: image-only body must still count as content -->
+        <div class="post-body"><p><img src="/data/attachment/forum/ending.png" alt="尾聲內容"></p></div>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+    <!-- Footer card — bare .card-post without .thread, must be skipped -->
+    <div class="card-post">
+      <div>已經到最底下了！</div>
+    </div>
+  </div>
+</body>
+</html>
