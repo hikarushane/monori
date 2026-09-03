@@ -2,10 +2,6 @@ import SwiftUI
 import SwiftData
 import MonoriCore
 
-private let uguisuGreen = Color(red: 0xA8/255, green: 0xB9/255, blue: 0xA0/255)
-private let menuIconGrey = Color(red: 0x73/255, green: 0x72/255, blue: 0x6E/255)
-private let menuBorderColor = Color(red: 0xF0/255, green: 0xEC/255, blue: 0xE7/255)
-private let zeroBadgeColor = Color(red: 0xBD/255, green: 0xBB/255, blue: 0xB7/255)
 
 struct LibraryView: View {
     @Environment(AppEnvironment.self) private var env
@@ -328,70 +324,25 @@ struct LibraryView: View {
     }
 
     private func uguisuMenuRow<Icon: View>(
-        @ViewBuilder icon: () -> Icon,
+        @ViewBuilder icon: @escaping () -> Icon,
         label: String,
         count: Int? = nil,
         selected: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        Button {
+        UguisuMenuRow(icon: icon, label: label, count: count, selected: selected) {
             action()
             dismissAllMenus()
-        } label: {
-            HStack(spacing: 10) {
-                icon()
-                    .frame(width: 17, height: 17)
-                Text(label)
-                    .font(.system(size: 13.5, weight: selected ? .semibold : .medium))
-                    .foregroundStyle(MonoriPalette.ink)
-                Spacer()
-                if let count {
-                    Text("\(count)")
-                        .font(.system(size: 12.5, weight: .medium))
-                        .foregroundStyle(count > 0 ? menuIconGrey : zeroBadgeColor)
-                }
-                if selected {
-                    MenuCheckmark()
-                        .stroke(uguisuGreen,
-                                style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                        .frame(width: 14, height: 14)
-                }
-            }
-            .padding(.horizontal, 14)
-            .frame(height: 40)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
     }
 
-    private func uguisuMenuDivider() -> some View {
-        Rectangle()
-            .fill(menuBorderColor)
-            .frame(height: 1)
-            .padding(.horizontal, 14)
-    }
-
-    @ViewBuilder
-    private func uguisuMenuContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(spacing: 0) {
-            content()
-        }
-        .padding(.vertical, 6)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(menuBorderColor, lineWidth: 1)
-        }
-        .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 8)
-        .frame(width: 200)
-    }
 
     private var sortDropdown: some View {
-        uguisuMenuContainer {
+        UguisuMenuContainer {
             uguisuMenuRow(
                 icon: {
                     LibraryClockIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "最近閱讀",
@@ -401,7 +352,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuBoltIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "最近更新",
@@ -411,7 +362,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuFolderIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "作品名稱",
@@ -421,21 +372,21 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuPersonIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "作者名稱",
                 selected: sortOrder == .author
             ) { sortOrder = .author }
 
-            uguisuMenuDivider()
+            UguisuMenuDivider()
 
             Button {
                 sortReversed.toggle()
             } label: {
                 HStack(spacing: 10) {
                     PillChevronDown()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                         .frame(width: 17, height: 17)
                         .rotationEffect(.degrees(sortReversed ? 180 : 0))
@@ -453,7 +404,7 @@ struct LibraryView: View {
     }
 
     private var sourceMenuPopover: some View {
-        uguisuMenuContainer {
+        UguisuMenuContainer {
             uguisuMenuRow(
                 icon: {
                     SourceLayersIcon()
@@ -465,7 +416,7 @@ struct LibraryView: View {
                 selected: sourceFilter == nil
             ) { sourceFilter = nil }
 
-            uguisuMenuDivider()
+            UguisuMenuDivider()
 
             ForEach(SourceRegistry.all) { provider in
                 uguisuMenuRow(
@@ -482,11 +433,11 @@ struct LibraryView: View {
     }
 
     private var statusMenuPopover: some View {
-        uguisuMenuContainer {
+        UguisuMenuContainer {
             uguisuMenuRow(
                 icon: {
                     SourceLayersIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "全部狀態",
@@ -494,12 +445,12 @@ struct LibraryView: View {
                 selected: statusFilter == nil
             ) { statusFilter = nil }
 
-            uguisuMenuDivider()
+            UguisuMenuDivider()
 
             uguisuMenuRow(
                 icon: {
                     MenuBookmarkIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "追更中",
@@ -510,7 +461,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuCircleCheckIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "已讀完",
@@ -521,7 +472,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuCircleMinusIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: "棄坑",
@@ -533,11 +484,11 @@ struct LibraryView: View {
 
 
     private func readingStatusDropdown(for collection: LocalCollectionModel) -> some View {
-        uguisuMenuContainer {
+        UguisuMenuContainer {
             uguisuMenuRow(
                 icon: {
                     MenuBookmarkIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: CollectionReadingStatus.reading.label,
@@ -550,7 +501,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuCircleCheckIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: CollectionReadingStatus.finished.label,
@@ -563,7 +514,7 @@ struct LibraryView: View {
             uguisuMenuRow(
                 icon: {
                     MenuCircleMinusIcon()
-                        .stroke(menuIconGrey,
+                        .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                 },
                 label: CollectionReadingStatus.dropped.label,

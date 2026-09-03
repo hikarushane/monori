@@ -13,6 +13,7 @@ struct SettingsView: View {
     }
     @State private var logExport: LogExport?
     @State private var showNoLogsAlert = false
+    @State private var showsHomepageMenu = false
     @State private var showExportFailedAlert = false
     @State private var confirmRestore = false
     @State private var showForceBackupConfirm = false
@@ -25,6 +26,17 @@ struct SettingsView: View {
         @Bindable var prefs = env.prefs
 
         NavigationStack {
+        ZStack {
+        if showsHomepageMenu {
+            Color.black.opacity(0.001)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        showsHomepageMenu = false
+                    }
+                }
+                .zIndex(1)
+        }
         ScrollView {
             VStack(alignment: .leading, spacing: metrics.spacing.x5) {
 
@@ -157,42 +169,62 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
                     sectionHeading("瀏覽")
                     settingsGroup {
-                        HStack(spacing: MonoriSpacing.x2) {
-                            Text("預設首頁")
-                                .font(MonoriTypography.ui(metrics.bodyFontSize,
-                                                          relativeTo: .body, weight: .semibold))
-                                .tracking(MonoriTypography.uiTracking)
-                                .foregroundStyle(MonoriPalette.ink)
-                            Spacer()
-                            Menu {
-                                ForEach(SourceRegistry.all) { provider in
-                                    Button {
-                                        env.appPrefs.browseDefaultSource = provider.kind
-                                    } label: {
-                                        if env.appPrefs.browseDefaultSource == provider.kind {
-                                            Label(provider.displayName, systemImage: "checkmark")
-                                        } else {
-                                            Text(provider.displayName)
-                                        }
-                                    }
-                                }
-                            } label: {
+                        Button {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                showsHomepageMenu.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: MonoriSpacing.x2) {
+                                Text("預設首頁")
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                              relativeTo: .body, weight: .semibold))
+                                    .tracking(MonoriTypography.uiTracking)
+                                    .foregroundStyle(MonoriPalette.ink)
+                                Spacer()
                                 HStack(spacing: MonoriSpacing.x1) {
                                     Text(SourceRegistry.provider(for: env.appPrefs.browseDefaultSource).displayName)
                                         .font(MonoriTypography.ui(metrics.secondaryFontSize,
                                                                    relativeTo: .body))
                                         .foregroundStyle(MonoriPalette.secondaryInk)
-                                    Image(systemName: "chevron.up.chevron.down")
-                                        .font(.system(size: metrics.accessoryIconSize))
-                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                    PillChevronDown()
+                                        .stroke(Color(uiColor: .systemGray),
+                                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                                        .frame(width: 10, height: 10)
                                 }
                             }
+                            .frame(minHeight: 56)
+                            .padding(.horizontal, metrics.spacing.x3)
+                            .padding(.vertical, metrics.spacing.x2)
+                            .contentShape(Rectangle())
                         }
-                        .frame(minHeight: 56)
-                        .padding(.horizontal, metrics.spacing.x3)
-                        .padding(.vertical, metrics.spacing.x2)
+                        .buttonStyle(.plain)
+                    }
+                    .overlay(alignment: .topTrailing) {
+                        if showsHomepageMenu {
+                            UguisuMenuContainer {
+                                ForEach(SourceRegistry.all) { provider in
+                                    UguisuMenuRow(
+                                        icon: {
+                                            SourceGlyph(kind: provider.kind)
+                                                .foregroundStyle(uguisuGreen)
+                                        },
+                                        label: provider.displayName,
+                                        selected: env.appPrefs.browseDefaultSource == provider.kind
+                                    ) {
+                                        env.appPrefs.browseDefaultSource = provider.kind
+                                        withAnimation(.easeOut(duration: 0.15)) {
+                                            showsHomepageMenu = false
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.top, 60)
+                            .padding(.trailing, metrics.spacing.x3)
+                            .transition(.scale(scale: 0.95, anchor: .topTrailing).combined(with: .opacity))
+                        }
                     }
                 }
+                .zIndex(showsHomepageMenu ? 10 : 0)
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
                     sectionHeading("資料")
@@ -292,6 +324,7 @@ struct SettingsView: View {
         .background(MonoriPalette.canvas)
         .tint(MonoriPalette.ink)
         .navigationBarHidden(true)
+        } // ZStack
         }
         .confirmationDialog("刪除此裝置上的書庫資料？",
                             isPresented: $confirmClearLibrary, titleVisibility: .visible) {
