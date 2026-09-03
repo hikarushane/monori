@@ -2,6 +2,11 @@ import SwiftUI
 import SwiftData
 import MonoriCore
 
+private let uguisuGreen = Color(red: 0xA8/255, green: 0xB9/255, blue: 0xA0/255)
+private let menuIconGrey = Color(red: 0x73/255, green: 0x72/255, blue: 0x6E/255)
+private let menuBorderColor = Color(red: 0xF0/255, green: 0xEC/255, blue: 0xE7/255)
+private let zeroBadgeColor = Color(red: 0xBD/255, green: 0xBB/255, blue: 0xB7/255)
+
 struct LibraryView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.scenePhase) private var scenePhase
@@ -9,19 +14,31 @@ struct LibraryView: View {
     @Environment(\.monoriUIMetrics) private var metrics
     @Query private var allCollections: [LocalCollectionModel]
     @AppStorage("library.sortOrder") private var sortOrder: LibrarySortOrder = .title
+    @AppStorage("library.sortReversed") private var sortReversed = false
     @State private var searchText = ""
     @State private var sourceFilter: SourceKind?
-    @State private var statusFilter: CollectionReadingStatus = .reading
+    @State private var statusFilter: CollectionReadingStatus? = .reading
     @State private var showsSearch = false
     @State private var showsSortMenu = false
+    @State private var showsSourceMenu = false
     @State private var showsStatusMenu = false
     @State private var revealedCollectionID: String?
     @State private var longPressedCollection: LocalCollectionModel?
 
     private var collections: [LocalCollectionModel] {
-        LibraryQuery.apply(allCollections, sort: sortOrder,
+        var result = LibraryQuery.apply(allCollections, sort: sortOrder,
                            searchText: searchText, status: statusFilter)
             .filter { sourceFilter == nil || $0.sourceKind == sourceFilter }
+        if sortReversed { result.reverse() }
+        return result
+    }
+
+    private var sourceCountMap: [SourceKind: Int] {
+        Dictionary(grouping: allCollections, by: \.sourceKind).mapValues(\.count)
+    }
+
+    private var statusCountMap: [CollectionReadingStatus: Int] {
+        Dictionary(grouping: allCollections, by: \.readingStatus).mapValues(\.count)
     }
 
     var body: some View {
@@ -49,12 +66,13 @@ struct LibraryView: View {
                                        sourceFilter: sourceFilter)
                 }
                 .overlay {
-                    if showsSortMenu || showsStatusMenu || longPressedCollection != nil {
+                    if showsSortMenu || showsSourceMenu || showsStatusMenu || longPressedCollection != nil {
                         Color.black.opacity(0.001)
                             .ignoresSafeArea()
                             .onTapGesture {
                                 withAnimation(.easeOut(duration: 0.15)) {
                                     showsSortMenu = false
+                                    showsSourceMenu = false
                                     showsStatusMenu = false
                                     longPressedCollection = nil
                                 }
@@ -71,9 +89,18 @@ struct LibraryView: View {
                     }
                 }
                 .overlay(alignment: .topTrailing) {
+                    if showsSourceMenu {
+                        sourceMenuPopover
+                            .padding(.top, metrics.spacing.x1)
+                            .padding(.trailing, contentMargin)
+                            .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                                .combined(with: .opacity))
+                    }
+                }
+                .overlay(alignment: .topTrailing) {
                     if showsStatusMenu {
-                        statusDropdown
-                            .padding(.top, 78)
+                        statusMenuPopover
+                            .padding(.top, metrics.spacing.x1)
                             .padding(.trailing, contentMargin)
                             .transition(.scale(scale: 0.95, anchor: .topTrailing)
                                 .combined(with: .opacity))
@@ -98,31 +125,33 @@ struct LibraryView: View {
     }
 
     private func libraryHeader(contentMargin: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: metrics.spacing.x1) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
                 Text("書庫")
-                    .font(MonoriTypography.ui(metrics.largeTitleFontSize, relativeTo: .largeTitle, weight: .bold))
-                    .tracking(-0.6)
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundStyle(MonoriPalette.ink)
 
                 Spacer()
 
-                HStack(spacing: 18) {
+                HStack(spacing: metrics.spacing.x1 * 0.5) {
                     NavigationLink(value: LibraryRoute.history) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
-                                                       relativeTo: .title3, weight: .medium))
+                        LibraryClockIcon()
+                            .stroke(MonoriPalette.ink,
+                                    style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                            .frame(width: metrics.primaryActionIconSize,
+                                   height: metrics.primaryActionIconSize)
                             .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("閱歷")
                     .accessibilityIdentifier("smoke.readingHistoryButton")
 
-                    Button {
-                        showsSearch = true
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .font(MonoriTypography.ui(metrics.primaryActionIconSize,
-                                                       relativeTo: .title3, weight: .medium))
+                    Button { showsSearch = true } label: {
+                        LibrarySearchIcon()
+                            .stroke(MonoriPalette.ink,
+                                    style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                            .frame(width: metrics.primaryActionIconSize,
+                                   height: metrics.primaryActionIconSize)
                             .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
@@ -132,42 +161,44 @@ struct LibraryView: View {
                     Button {
                         withAnimation(.easeOut(duration: 0.15)) {
                             showsSortMenu.toggle()
+                            showsSourceMenu = false
+                            showsStatusMenu = false
                         }
                     } label: {
-                        SortIcon()
+                        LibrarySortIcon()
                             .stroke(MonoriPalette.ink,
-                                    style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                                    style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                             .frame(width: metrics.primaryActionIconSize,
                                    height: metrics.primaryActionIconSize)
                             .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("書庫選項")
+                    .accessibilityLabel("排序")
                     .accessibilityIdentifier("smoke.librarySortMenu")
                 }
-                .foregroundStyle(MonoriPalette.ink)
             }
 
-            HStack(alignment: .firstTextBaseline) {
+            HStack {
                 Text("共 \(collections.count) 部作品")
-                    .font(MonoriTypography.ui(metrics.secondaryFontSize,
-                                               relativeTo: .subheadline, weight: .medium))
-                    .tracking(MonoriTypography.uiTracking)
+                    .font(.system(size: 13, weight: .medium))
+                    .kerning(0.2)
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .accessibilityIdentifier("smoke.librarySummary")
 
                 Spacer()
 
-                statusScopeButton
+                HStack(spacing: 8) {
+                    sourceFilterPill
+                    statusFilterPill
+                }
             }
-
-            sourceFilterPicker
         }
         .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, contentMargin)
         .padding(.top, metrics.spacing.x3)
-        .padding(.bottom, metrics.spacing.x2)
+        .padding(.bottom, 16)
+        .contentShape(Rectangle())
         .background(MonoriPalette.canvas)
         .overlay(alignment: .bottom) {
             Rectangle()
@@ -176,90 +207,66 @@ struct LibraryView: View {
         }
     }
 
-    private var statusScopeButton: some View {
+    private var sourceFilterPill: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.15)) {
+                showsSourceMenu.toggle()
+                showsStatusMenu = false
+                showsSortMenu = false
+            }
+        } label: {
+            HStack(spacing: 6) {
+                SourceLayersIcon()
+                    .stroke(uguisuGreen,
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                    .frame(width: 13, height: 13)
+                Text("來源")
+                    .lineLimit(1)
+                PillChevronDown()
+                    .stroke(Color(uiColor: .systemGray),
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                    .frame(width: 10, height: 10)
+            }
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(MonoriPalette.ink)
+            .padding(.horizontal, 12)
+            .frame(height: 32)
+            .fixedSize()
+            .background(Color(red: 0xF2/255, green: 0xF0/255, blue: 0xED/255),
+                        in: RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("來源篩選")
+        .accessibilityIdentifier("smoke.librarySourceMenu")
+    }
+
+    private var statusFilterPill: some View {
         Button {
             withAnimation(.easeOut(duration: 0.15)) {
                 showsStatusMenu.toggle()
+                showsSourceMenu = false
+                showsSortMenu = false
             }
         } label: {
-            HStack(spacing: 4) {
-                Text(statusFilter.label)
-                DropdownChevron()
-                    .stroke(MonoriPalette.secondaryInk,
-                            style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+            HStack(spacing: 6) {
+                Text(statusFilter?.label ?? "全部")
+                    .lineLimit(1)
+                PillChevronDown()
+                    .stroke(Color(uiColor: .systemGray),
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
                     .frame(width: 10, height: 10)
-                    .rotationEffect(.degrees(showsStatusMenu ? 180 : 0))
             }
-            .font(MonoriTypography.ui(metrics.secondaryFontSize,
-                                       relativeTo: .subheadline, weight: .medium))
-            .tracking(MonoriTypography.uiTracking)
-            .foregroundStyle(MonoriPalette.secondaryInk)
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(MonoriPalette.ink)
+            .padding(.horizontal, 12)
+            .frame(height: 32)
+            .fixedSize()
+            .background(Color(red: 0xF2/255, green: 0xF0/255, blue: 0xED/255),
+                        in: RoundedRectangle(cornerRadius: 16))
         }
-        .offset(x: -2.5)
         .buttonStyle(.plain)
-        .accessibilityLabel("閱讀狀態：\(statusFilter.label)")
+        .accessibilityLabel("閱讀狀態：\(statusFilter?.label ?? "全部")")
         .accessibilityIdentifier("smoke.libraryStatusMenu")
-    }
-
-    private var statusDropdown: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(CollectionReadingStatus.allCases.enumerated()), id: \.element.rawValue) { index, status in
-                if index > 0 { menuGroupDivider() }
-                menuOptionRow(status.label, selected: statusFilter == status,
-                              dismiss: $showsStatusMenu) {
-                    statusFilter = status
-                }
-                .accessibilityIdentifier("smoke.libraryStatus\(status.rawValue.capitalized)")
-            }
-        }
-        .background(MonoriPalette.surface,
-                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
-        .overlay {
-            RoundedRectangle(cornerRadius: MonoriRadius.container)
-                .stroke(MonoriPalette.divider, lineWidth: 1)
-        }
-        .frame(width: 130)
-    }
-
-    private var sourceFilterPicker: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: metrics.spacing.x1) {
-                sourceFilterChip(nil, title: "全部")
-                ForEach(SourceRegistry.all) { provider in
-                    sourceFilterChip(provider.kind, title: provider.displayName)
-                }
-            }
-            .padding(.vertical, MonoriSpacing.x1)
-        }
-        .contentMargins(.horizontal, 0, for: .scrollContent)
-        .scrollIndicators(.hidden)
-        .accessibilityLabel("來源篩選")
-    }
-
-    private func sourceFilterChip(_ kind: SourceKind?, title: String) -> some View {
-        let isSelected = sourceFilter == kind
-        return Button {
-            sourceFilter = kind
-        } label: {
-            Text(title)
-                .font(MonoriTypography.ui(metrics.filterLabelFontSize, relativeTo: .subheadline,
-                                           weight: isSelected ? .semibold : .medium))
-                .tracking(MonoriTypography.uiTracking)
-                .foregroundStyle(MonoriPalette.ink)
-                .lineLimit(1)
-                .padding(.horizontal, metrics.spacing.x2)
-                .padding(.vertical, metrics.spacing.x1)
-                .background(isSelected ? MonoriPalette.surface : MonoriPalette.canvas,
-                            in: RoundedRectangle(cornerRadius: MonoriRadius.control))
-                .overlay {
-                    RoundedRectangle(cornerRadius: MonoriRadius.control)
-                        .stroke(isSelected ? MonoriPalette.ink : MonoriPalette.divider,
-                                lineWidth: 1)
-                }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("來源：\(title)")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private func listContent(contentMargin: CGFloat) -> some View {
@@ -310,84 +317,262 @@ struct LibraryView: View {
         }
     }
 
-    private var sortDropdown: some View {
-        VStack(spacing: 0) {
-            menuOptionRow("標題", selected: sortOrder == .title, dismiss: $showsSortMenu) { sortOrder = .title }
-            menuGroupDivider()
-            menuOptionRow("最近更新", selected: sortOrder == .recentlyUpdated, dismiss: $showsSortMenu) { sortOrder = .recentlyUpdated }
-            menuGroupDivider()
-            menuOptionRow("最近閱讀", selected: sortOrder == .recentlyRead, dismiss: $showsSortMenu) { sortOrder = .recentlyRead }
-            menuGroupDivider()
-            menuOptionRow("來源", selected: sortOrder == .source, dismiss: $showsSortMenu) { sortOrder = .source }
+    // MARK: - Uguisu Zen dropdown menus
+
+    private func dismissAllMenus() {
+        withAnimation(.easeOut(duration: 0.15)) {
+            showsSortMenu = false
+            showsSourceMenu = false
+            showsStatusMenu = false
         }
-        .background(MonoriPalette.surface,
-                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
-        .overlay {
-            RoundedRectangle(cornerRadius: MonoriRadius.container)
-                .stroke(MonoriPalette.divider, lineWidth: 1)
-        }
-        .frame(width: 200)
     }
 
-    private func menuOptionRow(_ title: String, selected: Bool,
-                               dismiss: Binding<Bool>,
-                               action: @escaping () -> Void) -> some View {
+    private func uguisuMenuRow<Icon: View>(
+        @ViewBuilder icon: () -> Icon,
+        label: String,
+        count: Int? = nil,
+        selected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
         Button {
             action()
-            withAnimation(.easeOut(duration: 0.15)) {
-                dismiss.wrappedValue = false
-            }
+            dismissAllMenus()
         } label: {
-            HStack {
-                Text(title)
-                    .font(MonoriTypography.ui(metrics.buttonLabelFontSize, relativeTo: .body,
-                                              weight: selected ? .semibold : .regular))
+            HStack(spacing: 10) {
+                icon()
+                    .frame(width: 17, height: 17)
+                Text(label)
+                    .font(.system(size: 13.5, weight: selected ? .semibold : .medium))
                     .foregroundStyle(MonoriPalette.ink)
                 Spacer()
+                if let count {
+                    Text("\(count)")
+                        .font(.system(size: 12.5, weight: .medium))
+                        .foregroundStyle(count > 0 ? menuIconGrey : zeroBadgeColor)
+                }
                 if selected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(MonoriPalette.ink)
+                    MenuCheckmark()
+                        .stroke(uguisuGreen,
+                                style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                        .frame(width: 14, height: 14)
                 }
             }
-            .padding(.horizontal, metrics.spacing.x3)
-            .padding(.vertical, metrics.spacing.x2)
+            .padding(.horizontal, 14)
+            .frame(height: 40)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
-    private func menuGroupDivider() -> some View {
+    private func uguisuMenuDivider() -> some View {
         Rectangle()
-            .fill(MonoriPalette.divider)
+            .fill(menuBorderColor)
             .frame(height: 1)
-            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.horizontal, 14)
     }
 
-    private func readingStatusDropdown(for collection: LocalCollectionModel) -> some View {
+    @ViewBuilder
+    private func uguisuMenuContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(spacing: 0) {
-            ForEach(Array(CollectionReadingStatus.allCases.enumerated()),
-                    id: \.element.rawValue) { index, status in
-                if index > 0 { menuGroupDivider() }
-                menuOptionRow(
-                    status.label,
-                    selected: collection.readingStatus == status,
-                    dismiss: Binding(
-                        get: { longPressedCollection != nil },
-                        set: { if !$0 { longPressedCollection = nil } }
-                    )
-                ) {
-                    env.store.setReadingStatus(status, for: collection)
+            content()
+        }
+        .padding(.vertical, 6)
+        .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(menuBorderColor, lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 8)
+        .frame(width: 200)
+    }
+
+    private var sortDropdown: some View {
+        uguisuMenuContainer {
+            uguisuMenuRow(
+                icon: {
+                    LibraryClockIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "最近閱讀",
+                selected: sortOrder == .recentlyRead
+            ) { sortOrder = .recentlyRead }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuBoltIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "最近更新",
+                selected: sortOrder == .recentlyUpdated
+            ) { sortOrder = .recentlyUpdated }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuFolderIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "作品名稱",
+                selected: sortOrder == .title
+            ) { sortOrder = .title }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuPersonIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "作者名稱",
+                selected: sortOrder == .author
+            ) { sortOrder = .author }
+
+            uguisuMenuDivider()
+
+            Button {
+                sortReversed.toggle()
+            } label: {
+                HStack(spacing: 10) {
+                    PillChevronDown()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                        .frame(width: 17, height: 17)
+                        .rotationEffect(.degrees(sortReversed ? 180 : 0))
+                    Text(sortReversed ? "升序" : "降序")
+                        .font(.system(size: 13.5, weight: .medium))
+                        .foregroundStyle(MonoriPalette.ink)
+                    Spacer()
                 }
+                .padding(.horizontal, 14)
+                .frame(height: 40)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var sourceMenuPopover: some View {
+        uguisuMenuContainer {
+            uguisuMenuRow(
+                icon: {
+                    SourceLayersIcon()
+                        .stroke(uguisuGreen,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "全部來源",
+                count: allCollections.count,
+                selected: sourceFilter == nil
+            ) { sourceFilter = nil }
+
+            uguisuMenuDivider()
+
+            ForEach(SourceRegistry.all) { provider in
+                uguisuMenuRow(
+                    icon: {
+                        SourceGlyph(kind: provider.kind)
+                            .foregroundStyle(uguisuGreen)
+                    },
+                    label: provider.displayName,
+                    count: sourceCountMap[provider.kind] ?? 0,
+                    selected: sourceFilter == provider.kind
+                ) { sourceFilter = provider.kind }
             }
         }
-        .background(MonoriPalette.surface,
-                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
-        .overlay {
-            RoundedRectangle(cornerRadius: MonoriRadius.container)
-                .stroke(MonoriPalette.divider, lineWidth: 1)
+    }
+
+    private var statusMenuPopover: some View {
+        uguisuMenuContainer {
+            uguisuMenuRow(
+                icon: {
+                    SourceLayersIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "全部狀態",
+                count: allCollections.count,
+                selected: statusFilter == nil
+            ) { statusFilter = nil }
+
+            uguisuMenuDivider()
+
+            uguisuMenuRow(
+                icon: {
+                    MenuBookmarkIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "追更中",
+                count: statusCountMap[.reading] ?? 0,
+                selected: statusFilter == .reading
+            ) { statusFilter = .reading }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuCircleCheckIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "已讀完",
+                count: statusCountMap[.finished] ?? 0,
+                selected: statusFilter == .finished
+            ) { statusFilter = .finished }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuCircleMinusIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: "棄坑",
+                count: statusCountMap[.dropped] ?? 0,
+                selected: statusFilter == .dropped
+            ) { statusFilter = .dropped }
         }
-        .frame(width: 160)
+    }
+
+
+    private func readingStatusDropdown(for collection: LocalCollectionModel) -> some View {
+        uguisuMenuContainer {
+            uguisuMenuRow(
+                icon: {
+                    MenuBookmarkIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: CollectionReadingStatus.reading.label,
+                selected: collection.readingStatus == .reading
+            ) {
+                env.store.setReadingStatus(.reading, for: collection)
+                longPressedCollection = nil
+            }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuCircleCheckIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: CollectionReadingStatus.finished.label,
+                selected: collection.readingStatus == .finished
+            ) {
+                env.store.setReadingStatus(.finished, for: collection)
+                longPressedCollection = nil
+            }
+
+            uguisuMenuRow(
+                icon: {
+                    MenuCircleMinusIcon()
+                        .stroke(menuIconGrey,
+                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                },
+                label: CollectionReadingStatus.dropped.label,
+                selected: collection.readingStatus == .dropped
+            ) {
+                env.store.setReadingStatus(.dropped, for: collection)
+                longPressedCollection = nil
+            }
+        }
     }
 
     @ViewBuilder
@@ -504,6 +689,7 @@ struct LibraryView: View {
         if sourceFilter != nil {
             return "此來源沒有符合目前狀態的作品"
         }
+        guard let statusFilter else { return "沒有符合條件的作品" }
         switch statusFilter {
         case .reading: return "目前沒有追更中的作品"
         case .finished: return "還沒有完食的作品"
@@ -513,32 +699,11 @@ struct LibraryView: View {
 
     private var scopedEmptyHint: String? {
         if sourceFilter != nil { return nil }
-        switch statusFilter {
-        case .finished: return "可在作品的章節選單中改成「完食」。"
-        default: return nil
-        }
+        guard statusFilter == .finished else { return nil }
+        return "可在作品的章節選單中改成「完食」。"
     }
 }
 
-private struct SortIcon: Shape {
-    func path(in rect: CGRect) -> Path {
-        let s = min(rect.width, rect.height) / 24
-        var p = Path()
-        p.move(to: CGPoint(x: 17*s, y: 4*s))
-        p.addLine(to: CGPoint(x: 17*s, y: 20*s))
-        p.move(to: CGPoint(x: 17*s, y: 20*s))
-        p.addLine(to: CGPoint(x: 13*s, y: 16*s))
-        p.move(to: CGPoint(x: 17*s, y: 20*s))
-        p.addLine(to: CGPoint(x: 21*s, y: 16*s))
-        p.move(to: CGPoint(x: 7*s, y: 20*s))
-        p.addLine(to: CGPoint(x: 7*s, y: 4*s))
-        p.move(to: CGPoint(x: 7*s, y: 4*s))
-        p.addLine(to: CGPoint(x: 3*s, y: 8*s))
-        p.move(to: CGPoint(x: 7*s, y: 4*s))
-        p.addLine(to: CGPoint(x: 11*s, y: 8*s))
-        return p
-    }
-}
 
 #if DEBUG
 #Preview("書庫・有內容") {
@@ -613,7 +778,7 @@ private enum LibraryRoute: Hashable {
 private struct LibrarySearchSheet: View {
     let allCollections: [LocalCollectionModel]
     @Binding var searchText: String
-    let statusFilter: CollectionReadingStatus
+    let statusFilter: CollectionReadingStatus?
     let sourceFilter: SourceKind?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.monoriUIMetrics) private var metrics

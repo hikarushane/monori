@@ -5,6 +5,7 @@ public enum LibrarySortOrder: String, CaseIterable, Sendable {
     case recentlyUpdated
     case recentlyRead
     case source
+    case author
 }
 
 public enum LibraryQuery {
@@ -37,6 +38,14 @@ public enum LibraryQuery {
                 let s0 = $0.sourceKind.rawValue
                 let s1 = $1.sourceKind.rawValue
                 if s0 != s1 { return s0 < s1 }
+                return $0.title.localizedStandardCompare($1.title) == .orderedAscending
+            }
+        case .author:
+            return result.sorted {
+                let a = $0.creatorName ?? ""
+                let b = $1.creatorName ?? ""
+                if a.isEmpty != b.isEmpty { return !a.isEmpty }
+                if a != b { return a.localizedStandardCompare(b) == .orderedAscending }
                 return $0.title.localizedStandardCompare($1.title) == .orderedAscending
             }
         }
