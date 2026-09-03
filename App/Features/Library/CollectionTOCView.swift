@@ -9,6 +9,7 @@ struct CollectionTOCView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
     @Environment(\.monoriUIMetrics) private var metrics
+    @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
     let collection: LocalCollectionModel
     @State private var readerTarget: ReaderTarget?
     @State private var refreshing = false
@@ -186,6 +187,11 @@ struct CollectionTOCView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .listRowSeparatorTint(MonoriPalette.divider)
+            .contentMargins(
+                .bottom,
+                bottomNavigationHeight + metrics.spacing.x2,
+                for: .scrollContent
+            )
         }
         .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760)
         .frame(maxWidth: .infinity)

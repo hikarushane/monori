@@ -1,6 +1,12 @@
 import Foundation
 import Observation
 
+public enum ChineseConversion: String, Codable, CaseIterable, Sendable {
+    case off
+    case toTraditional
+    case toSimplified
+}
+
 @MainActor
 @Observable
 public final class ReaderPreferences {
@@ -13,12 +19,14 @@ public final class ReaderPreferences {
         static let fontSize = "reader.fontSize"
         static let lineSpacing = "reader.lineSpacing"
         static let fontID = "reader.fontID"
+        static let chineseConversion = "reader.chineseConversion"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
     private var fontSizeStorage: Int
     private var lineSpacingStorage: Double
     private var selectedFontIDStorage: String
+    private var chineseConversionStorage: String
 
     public var fontSize: Int {
         get { fontSizeStorage }
@@ -46,6 +54,14 @@ public final class ReaderPreferences {
         }
     }
 
+    public var chineseConversion: ChineseConversion {
+        get { ChineseConversion(rawValue: chineseConversionStorage) ?? .off }
+        set {
+            chineseConversionStorage = newValue.rawValue
+            defaults.set(newValue.rawValue, forKey: Key.chineseConversion)
+        }
+    }
+
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let storedSize = defaults.integer(forKey: Key.fontSize)
@@ -60,6 +76,9 @@ public final class ReaderPreferences {
 
         selectedFontIDStorage = defaults.string(forKey: Key.fontID)
             ?? Self.defaultFontID
+
+        chineseConversionStorage = defaults.string(forKey: Key.chineseConversion)
+            ?? ChineseConversion.off.rawValue
     }
 
     public func resetFontToDefault() {

@@ -155,6 +155,46 @@ struct SettingsView: View {
                 }
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                    sectionHeading("瀏覽")
+                    settingsGroup {
+                        HStack(spacing: MonoriSpacing.x2) {
+                            Text("預設首頁")
+                                .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                          relativeTo: .body, weight: .semibold))
+                                .tracking(MonoriTypography.uiTracking)
+                                .foregroundStyle(MonoriPalette.ink)
+                            Spacer()
+                            Menu {
+                                ForEach(SourceRegistry.all) { provider in
+                                    Button {
+                                        env.appPrefs.browseDefaultSource = provider.kind
+                                    } label: {
+                                        if env.appPrefs.browseDefaultSource == provider.kind {
+                                            Label(provider.displayName, systemImage: "checkmark")
+                                        } else {
+                                            Text(provider.displayName)
+                                        }
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: MonoriSpacing.x1) {
+                                    Text(SourceRegistry.provider(for: env.appPrefs.browseDefaultSource).displayName)
+                                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                                   relativeTo: .body))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: metrics.accessoryIconSize))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                }
+                            }
+                        }
+                        .frame(minHeight: 56)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
                     sectionHeading("資料")
                     settingsGroup {
                         settingsAction("清除書庫資料", destructive: true) {

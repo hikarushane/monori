@@ -16,6 +16,7 @@ struct LibraryView: View {
     @State private var showsSortMenu = false
     @State private var showsStatusMenu = false
     @State private var revealedCollectionID: String?
+    @State private var longPressedCollection: LocalCollectionModel?
 
     private var collections: [LocalCollectionModel] {
         LibraryQuery.apply(allCollections, sort: sortOrder,
@@ -48,13 +49,14 @@ struct LibraryView: View {
                                        sourceFilter: sourceFilter)
                 }
                 .overlay {
-                    if showsSortMenu || showsStatusMenu {
+                    if showsSortMenu || showsStatusMenu || longPressedCollection != nil {
                         Color.black.opacity(0.001)
                             .ignoresSafeArea()
                             .onTapGesture {
                                 withAnimation(.easeOut(duration: 0.15)) {
                                     showsSortMenu = false
                                     showsStatusMenu = false
+                                    longPressedCollection = nil
                                 }
                             }
                     }
@@ -74,6 +76,14 @@ struct LibraryView: View {
                             .padding(.top, 78)
                             .padding(.trailing, contentMargin)
                             .transition(.scale(scale: 0.95, anchor: .topTrailing)
+                                .combined(with: .opacity))
+                    }
+                }
+                .overlay(alignment: .trailing) {
+                    if let collection = longPressedCollection {
+                        readingStatusDropdown(for: collection)
+                            .padding(.trailing, contentMargin)
+                            .transition(.scale(scale: 0.95, anchor: .trailing)
                                 .combined(with: .opacity))
                     }
                 }
@@ -263,6 +273,15 @@ struct LibraryView: View {
                     revealedID: $revealedCollectionID,
                     onDelete: { env.store.deleteCollection(collection) }
                 )
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.45)
+                        .onEnded { _ in
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                longPressedCollection = collection
+                            }
+                        }
+                )
                 .listRowInsets(EdgeInsets(top: 0, leading: contentMargin,
                                            bottom: 0, trailing: contentMargin))
                 .listRowBackground(MonoriPalette.canvas)
@@ -343,6 +362,32 @@ struct LibraryView: View {
             .fill(MonoriPalette.divider)
             .frame(height: 1)
             .padding(.horizontal, metrics.spacing.x3)
+    }
+
+    private func readingStatusDropdown(for collection: LocalCollectionModel) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(CollectionReadingStatus.allCases.enumerated()),
+                    id: \.element.rawValue) { index, status in
+                if index > 0 { menuGroupDivider() }
+                menuOptionRow(
+                    status.label,
+                    selected: collection.readingStatus == status,
+                    dismiss: Binding(
+                        get: { longPressedCollection != nil },
+                        set: { if !$0 { longPressedCollection = nil } }
+                    )
+                ) {
+                    env.store.setReadingStatus(status, for: collection)
+                }
+            }
+        }
+        .background(MonoriPalette.surface,
+                    in: RoundedRectangle(cornerRadius: MonoriRadius.container))
+        .overlay {
+            RoundedRectangle(cornerRadius: MonoriRadius.container)
+                .stroke(MonoriPalette.divider, lineWidth: 1)
+        }
+        .frame(width: 160)
     }
 
     @ViewBuilder

@@ -4,9 +4,16 @@ import MonoriCore
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.monoriUIMetrics) private var metrics
-    @State private var activeKind: SourceKind = .patreon
+    @Environment(\.bottomNavigationHeight) private var bottomNavigationHeight
+    @State private var activeKind: SourceKind
     @State private var isPickerExpanded = false
     @State private var showImportConfirmation = false
+
+    init() {
+        let stored = UserDefaults.standard.string(forKey: "app.browseDefaultSource")
+            ?? SourceKind.patreon.rawValue
+        _activeKind = State(initialValue: SourceKind(rawValue: stored) ?? .patreon)
+    }
 
     /// The web view shown for the selected source. Each source owns a distinct
     /// WebViewModel -- and thus a distinct WKWebView and back/forward history --
@@ -45,6 +52,7 @@ struct BrowseView: View {
                 }
             }
         }
+        .padding(.bottom, bottomNavigationHeight)
         .overlay {
             if showImportConfirmation {
                 ImportConfirmationOverlay(importedCount: env.importedCountThisSession) {

@@ -445,6 +445,28 @@ public enum ReaderStyler {
         }
     }
 
+    public static func chineseConversionScript(mode: ChineseConversion, mapString: String) -> String {
+        let modeStr = mode.rawValue
+        return """
+        (function(){
+          if(!window.__monoriConv)window.__monoriConv=new WeakMap();
+          var s=window.__monoriConv;
+          var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+          var n;
+          while(n=w.nextNode()){var o=s.get(n);if(o!==undefined)n.nodeValue=o;}
+          if('\(modeStr)'==='off')return;
+          var m={},p='\(mapString)';
+          for(var i=0;i<p.length;i+=2)m[p[i]]=p[i+1];
+          var w2=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+          while(n=w2.nextNode()){
+            var t=n.nodeValue,r='',c=false;
+            for(var j=0;j<t.length;j++){var x=m[t[j]];if(x){r+=x;c=true;}else r+=t[j];}
+            if(c){s.set(n,t);n.nodeValue=r;}
+          }
+        })();
+        """
+    }
+
     /// Full HTML document wrapper for stored chapter HTML (Google Docs import).
     /// Google Docs export inline `font-size`/`line-height` on every paragraph and
     /// span, which beats a plain `body` rule — so the reader's prefs never reach

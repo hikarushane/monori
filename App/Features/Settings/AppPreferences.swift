@@ -1,4 +1,5 @@
 import SwiftUI
+import MonoriCore
 
 enum AppearanceMode: String, CaseIterable {
     case system
@@ -45,9 +46,21 @@ final class AppPreferences {
         }
     }
 
+    private var browseDefaultSourceStorage: String
+
+    var browseDefaultSource: SourceKind {
+        get { SourceKind(rawValue: browseDefaultSourceStorage) ?? .patreon }
+        set {
+            browseDefaultSourceStorage = newValue.rawValue
+            UserDefaults.standard.set(newValue.rawValue, forKey: "app.browseDefaultSource")
+        }
+    }
+
     init() {
         appearanceStorage = UserDefaults.standard.string(forKey: "app.appearance")
             ?? AppearanceMode.system.rawValue
         autoCheckStorage = UserDefaults.standard.object(forKey: "app.autoCheckEnabled") as? Bool ?? true
+        browseDefaultSourceStorage = UserDefaults.standard.string(forKey: "app.browseDefaultSource")
+            ?? SourceKind.patreon.rawValue
     }
 }

@@ -94,6 +94,7 @@ struct ReaderView: View {
                 .onChange(of: prefs.fontSize) { _, _ in applyTypography() }
                 .onChange(of: prefs.lineSpacing) { _, _ in applyTypography() }
                 .onChange(of: prefs.selectedFontID) { _, _ in applyFont() }
+                .onChange(of: prefs.chineseConversion) { _, _ in applyChineseConversion() }
         }
         .ignoresSafeArea(edges: .bottom)
     }
@@ -386,6 +387,21 @@ struct ReaderView: View {
             guard prefs.selectedFontID == expectedID else { return }
             _ = try? await webView.evaluateJavaScript(
                 ReaderStyler.fontFamilyScript(font: fontCSS))
+        }
+    }
+
+    private func applyChineseConversion() {
+        let webView = env.reader.webView
+        let mode = prefs.chineseConversion
+        let mapString: String
+        switch mode {
+        case .off: mapString = ""
+        case .toTraditional: mapString = ChineseConversionMap.shared.s2tMap
+        case .toSimplified: mapString = ChineseConversionMap.shared.t2sMap
+        }
+        Task { @MainActor in
+            _ = try? await webView.evaluateJavaScript(
+                ReaderStyler.chineseConversionScript(mode: mode, mapString: mapString))
         }
     }
 
