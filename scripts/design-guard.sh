@@ -41,6 +41,7 @@ check_swift "Material / blur / vibrancy" \
 check_swift "secondarySystemFill" '\.secondarySystemFill'
 check_swift "Capsule shape" 'Capsule\(\)'
 check_swift "Color.accentColor (unauthorized)" 'Color\.accentColor'
+check_swift "Native Menu (use UguisuMenuContainer)" '\bMenu\s*\{'
 
 banner "Swift: banned fonts"
 check_swift "SF Pro / system font as design base" \
