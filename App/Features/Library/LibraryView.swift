@@ -228,7 +228,7 @@ struct LibraryView: View {
             .padding(.horizontal, 12)
             .frame(height: 32)
             .fixedSize()
-            .background(Color(red: 0xF2/255, green: 0xF0/255, blue: 0xED/255),
+            .background(MonoriPalette.surface,
                         in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
@@ -257,7 +257,7 @@ struct LibraryView: View {
             .padding(.horizontal, 12)
             .frame(height: 32)
             .fixedSize()
-            .background(Color(red: 0xF2/255, green: 0xF0/255, blue: 0xED/255),
+            .background(MonoriPalette.surface,
                         in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)

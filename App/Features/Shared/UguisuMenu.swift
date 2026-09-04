@@ -1,11 +1,22 @@
 import SwiftUI
+import UIKit
 
 // MARK: Uguisu Zen menu color tokens
 
 let uguisuGreen = Color(red: 0xA8/255, green: 0xB9/255, blue: 0xA0/255)
-let uguisuMenuIconGrey = Color(red: 0x73/255, green: 0x72/255, blue: 0x6E/255)
-private let menuBorderColor = Color(red: 0xF0/255, green: 0xEC/255, blue: 0xE7/255)
-private let zeroBadgeColor = Color(red: 0xBD/255, green: 0xBB/255, blue: 0xB7/255)
+let uguisuMenuIconGrey = MonoriPalette.secondaryInk
+
+private let menuBackground = Color(uiColor: .init { traits in
+    traits.userInterfaceStyle == .dark
+        ? .init(red: 0.20, green: 0.19, blue: 0.17, alpha: 1)
+        : .white
+})
+
+private let zeroBadgeColor = Color(uiColor: .init { traits in
+    traits.userInterfaceStyle == .dark
+        ? .init(red: 0.35, green: 0.34, blue: 0.33, alpha: 1)
+        : .init(red: 0xBD/255, green: 0xBB/255, blue: 0xB7/255, alpha: 1)
+})
 
 // MARK: Uguisu Zen menu components
 
@@ -16,10 +27,10 @@ struct UguisuMenuContainer<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) { content() }
             .padding(.vertical, 6)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
+            .background(menuBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(menuBorderColor, lineWidth: 1)
+                    .stroke(MonoriPalette.divider, lineWidth: 1)
             }
             .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 8)
             .frame(width: width)
@@ -45,7 +56,7 @@ struct UguisuMenuRow<Icon: View>: View {
                 if let count {
                     Text("\(count)")
                         .font(.system(size: 12.5, weight: .medium))
-                        .foregroundStyle(count > 0 ? uguisuMenuIconGrey : zeroBadgeColor)
+                        .foregroundStyle(count > 0 ? MonoriPalette.secondaryInk : zeroBadgeColor)
                 }
                 if selected {
                     MenuCheckmark()
@@ -65,7 +76,7 @@ struct UguisuMenuRow<Icon: View>: View {
 struct UguisuMenuDivider: View {
     var body: some View {
         Rectangle()
-            .fill(menuBorderColor)
+            .fill(MonoriPalette.divider)
             .frame(height: 1)
             .padding(.horizontal, 14)
     }
