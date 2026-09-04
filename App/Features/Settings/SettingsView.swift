@@ -14,6 +14,9 @@ struct SettingsView: View {
     @State private var logExport: LogExport?
     @State private var showNoLogsAlert = false
     @State private var showsHomepageMenu = false
+    @State private var showsConversionMenu = false
+    @State private var conversionButtonFrame: CGRect = .zero
+    @State private var homepageButtonFrame: CGRect = .zero
     @State private var showExportFailedAlert = false
     @State private var confirmRestore = false
     @State private var showForceBackupConfirm = false
@@ -27,15 +30,124 @@ struct SettingsView: View {
 
         NavigationStack {
         ZStack {
-        if showsHomepageMenu {
+        if showsHomepageMenu || showsConversionMenu {
             Color.black.opacity(0.001)
                 .ignoresSafeArea()
                 .onTapGesture {
                     withAnimation(.easeOut(duration: 0.15)) {
                         showsHomepageMenu = false
+                        showsConversionMenu = false
                     }
                 }
                 .zIndex(1)
+        }
+        if showsConversionMenu {
+            GeometryReader { geo in
+                let mh: CGFloat = 176
+                let gap: CGFloat = 4
+                let bf = conversionButtonFrame
+                let goesUp = bf.maxY + mh + gap > geo.size.height
+
+                UguisuMenuContainer {
+                    UguisuMenuRow(
+                        icon: {
+                            Text("自")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(uguisuMenuIconGrey)
+                        },
+                        label: ChineseConversion.auto.displayName,
+                        selected: prefs.chineseConversion == .auto
+                    ) {
+                        prefs.chineseConversion = .auto
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsConversionMenu = false
+                        }
+                    }
+                    UguisuMenuDivider()
+                    UguisuMenuRow(
+                        icon: {
+                            Text("繁")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(uguisuMenuIconGrey)
+                        },
+                        label: "繁體",
+                        selected: prefs.chineseConversion == .toTraditional
+                    ) {
+                        prefs.chineseConversion = .toTraditional
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsConversionMenu = false
+                        }
+                    }
+                    UguisuMenuRow(
+                        icon: {
+                            Text("简")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(uguisuMenuIconGrey)
+                        },
+                        label: "简体",
+                        selected: prefs.chineseConversion == .toSimplified
+                    ) {
+                        prefs.chineseConversion = .toSimplified
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsConversionMenu = false
+                        }
+                    }
+                    UguisuMenuDivider()
+                    UguisuMenuRow(
+                        icon: {
+                            Text("–")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(uguisuMenuIconGrey)
+                        },
+                        label: "不轉換",
+                        selected: prefs.chineseConversion == .off
+                    ) {
+                        prefs.chineseConversion = .off
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            showsConversionMenu = false
+                        }
+                    }
+                }
+                .position(
+                    x: bf.maxX - metrics.spacing.x3 - 100,
+                    y: goesUp ? bf.minY - mh / 2 - gap : bf.maxY + mh / 2 + gap
+                )
+            }
+            .zIndex(2)
+            .transition(.opacity)
+        }
+        if showsHomepageMenu {
+            GeometryReader { geo in
+                let sourceCount = CGFloat(SourceRegistry.all.count)
+                let mh = sourceCount * 40 + 12
+                let gap: CGFloat = 4
+                let bf = homepageButtonFrame
+                let goesUp = bf.maxY + mh + gap > geo.size.height
+
+                UguisuMenuContainer {
+                    ForEach(SourceRegistry.all) { provider in
+                        UguisuMenuRow(
+                            icon: {
+                                SourceGlyph(kind: provider.kind)
+                                    .foregroundStyle(uguisuGreen)
+                            },
+                            label: provider.displayName,
+                            selected: env.appPrefs.browseDefaultSource == provider.kind
+                        ) {
+                            env.appPrefs.browseDefaultSource = provider.kind
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                showsHomepageMenu = false
+                            }
+                        }
+                    }
+                }
+                .position(
+                    x: bf.maxX - metrics.spacing.x3 - 100,
+                    y: goesUp ? bf.minY - mh / 2 - gap : bf.maxY + mh / 2 + gap
+                )
+            }
+            .zIndex(2)
+            .transition(.opacity)
         }
         ScrollView {
             VStack(alignment: .leading, spacing: metrics.spacing.x5) {
@@ -164,6 +276,45 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    settingsGroup {
+                        Button {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                showsConversionMenu.toggle()
+                                showsHomepageMenu = false
+                            }
+                        } label: {
+                            HStack(spacing: MonoriSpacing.x2) {
+                                Text("簡繁轉換")
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize,
+                                                              relativeTo: .body, weight: .semibold))
+                                    .tracking(MonoriTypography.uiTracking)
+                                    .foregroundStyle(MonoriPalette.ink)
+                                Spacer()
+                                HStack(spacing: MonoriSpacing.x1) {
+                                    Text(prefs.chineseConversion.displayName)
+                                        .font(MonoriTypography.ui(metrics.secondaryFontSize,
+                                                                   relativeTo: .body))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                    PillChevronDown()
+                                        .stroke(Color(uiColor: .systemGray),
+                                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                                        .frame(width: 10, height: 10)
+                                }
+                            }
+                            .frame(minHeight: 56)
+                            .padding(.horizontal, metrics.spacing.x3)
+                            .padding(.vertical, metrics.spacing.x2)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(key: MenuAnchorKey.self,
+                                                   value: ["conversion": geo.frame(in: .named("settingsRoot"))])
+                        }
+                    )
+                    sectionFootnote("「自動」依照裝置語言判斷：繁體中文裝置讀簡體文章時自動轉繁，反之亦然。原文與偏好相同時不轉換。")
                 }
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
@@ -172,6 +323,7 @@ struct SettingsView: View {
                         Button {
                             withAnimation(.easeOut(duration: 0.15)) {
                                 showsHomepageMenu.toggle()
+                                showsConversionMenu = false
                             }
                         } label: {
                             HStack(spacing: MonoriSpacing.x2) {
@@ -199,32 +351,13 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .overlay(alignment: .topTrailing) {
-                        if showsHomepageMenu {
-                            UguisuMenuContainer {
-                                ForEach(SourceRegistry.all) { provider in
-                                    UguisuMenuRow(
-                                        icon: {
-                                            SourceGlyph(kind: provider.kind)
-                                                .foregroundStyle(uguisuGreen)
-                                        },
-                                        label: provider.displayName,
-                                        selected: env.appPrefs.browseDefaultSource == provider.kind
-                                    ) {
-                                        env.appPrefs.browseDefaultSource = provider.kind
-                                        withAnimation(.easeOut(duration: 0.15)) {
-                                            showsHomepageMenu = false
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(.top, 60)
-                            .padding(.trailing, metrics.spacing.x3)
-                            .transition(.scale(scale: 0.95, anchor: .topTrailing).combined(with: .opacity))
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(key: MenuAnchorKey.self,
+                                                   value: ["homepage": geo.frame(in: .named("settingsRoot"))])
                         }
-                    }
+                    )
                 }
-                .zIndex(showsHomepageMenu ? 10 : 0)
 
                 VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
                     sectionHeading("資料")
@@ -325,6 +458,11 @@ struct SettingsView: View {
         .tint(MonoriPalette.ink)
         .navigationBarHidden(true)
         } // ZStack
+        .coordinateSpace(name: "settingsRoot")
+        .onPreferenceChange(MenuAnchorKey.self) { frames in
+            if let f = frames["conversion"] { conversionButtonFrame = f }
+            if let f = frames["homepage"] { homepageButtonFrame = f }
+        }
         }
         .confirmationDialog("刪除此裝置上的書庫資料？",
                             isPresented: $confirmClearLibrary, titleVisibility: .visible) {
@@ -653,6 +791,13 @@ struct SettingsView: View {
         .environment(\.dynamicTypeSize, .accessibility3)
 }
 #endif
+
+private struct MenuAnchorKey: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
 
 private struct ExternalLinkIcon: Shape {
     func path(in rect: CGRect) -> Path {

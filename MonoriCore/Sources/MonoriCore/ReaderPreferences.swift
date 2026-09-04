@@ -3,8 +3,31 @@ import Observation
 
 public enum ChineseConversion: String, Codable, CaseIterable, Sendable {
     case off
+    case auto
     case toTraditional
     case toSimplified
+
+    public var resolved: ChineseConversion {
+        guard self == .auto else { return self }
+        guard let lang = Locale.preferredLanguages.first else { return .off }
+        if lang.hasPrefix("zh-Hant") { return .toTraditional }
+        if lang.hasPrefix("zh-Hans") { return .toSimplified }
+        return .off
+    }
+
+    public var displayName: String {
+        switch self {
+        case .auto:
+            switch resolved {
+            case .toTraditional: return "自動（繁體）"
+            case .toSimplified: return "自動（简体）"
+            default: return "自動"
+            }
+        case .toTraditional: return "繁體"
+        case .toSimplified: return "简体"
+        case .off: return "不轉換"
+        }
+    }
 }
 
 @MainActor
@@ -78,7 +101,7 @@ public final class ReaderPreferences {
             ?? Self.defaultFontID
 
         chineseConversionStorage = defaults.string(forKey: Key.chineseConversion)
-            ?? ChineseConversion.off.rawValue
+            ?? ChineseConversion.auto.rawValue
     }
 
     public func resetFontToDefault() {

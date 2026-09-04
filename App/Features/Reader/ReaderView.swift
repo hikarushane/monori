@@ -379,6 +379,15 @@ struct ReaderView: View {
             ReaderStyler.fontSizeScript(points: prefs.fontSize))
         _ = try? await webView.evaluateJavaScript(
             ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
+        let mode = prefs.chineseConversion.resolved
+        let mapString: String
+        switch mode {
+        case .off, .auto: mapString = ""
+        case .toTraditional: mapString = ChineseConversionMap.shared.s2tMap
+        case .toSimplified: mapString = ChineseConversionMap.shared.t2sMap
+        }
+        _ = try? await webView.evaluateJavaScript(
+            ReaderStyler.chineseConversionScript(mode: mode, mapString: mapString))
     }
 
     /// Applies the current font-size/line-spacing prefs to the web view.
@@ -408,10 +417,10 @@ struct ReaderView: View {
 
     private func applyChineseConversion() {
         let webView = env.reader.webView
-        let mode = prefs.chineseConversion
+        let mode = prefs.chineseConversion.resolved
         let mapString: String
         switch mode {
-        case .off: mapString = ""
+        case .off, .auto: mapString = ""
         case .toTraditional: mapString = ChineseConversionMap.shared.s2tMap
         case .toSimplified: mapString = ChineseConversionMap.shared.t2sMap
         }

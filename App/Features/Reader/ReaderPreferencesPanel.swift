@@ -71,15 +71,6 @@ struct ReaderPreferencesPanel: View {
             preferenceRow(title: "主題") {
                 ThemeToggle()
             }
-
-            Rectangle()
-                .fill(MonoriPalette.divider)
-                .frame(height: 1)
-
-            preferenceRow(title: "簡繁轉換") {
-                conversionToggle(.toTraditional, label: "簡轉繁")
-                conversionToggle(.toSimplified, label: "繁轉簡")
-            }
         }
         .padding(.horizontal, metrics.contentHorizontalPadding)
         .padding(.vertical, metrics.spacing.x2)
@@ -180,41 +171,6 @@ struct ReaderPreferencesPanel: View {
         .accessibilityLabel(accessibilityLabel)
     }
 
-    private func conversionToggle(_ mode: ChineseConversion, label: String) -> some View {
-        let isActive = prefs.chineseConversion == mode
-        return Button {
-            prefs.chineseConversion = isActive ? .off : mode
-        } label: {
-            Text(label)
-                .font(
-                    MonoriTypography.ui(
-                        metrics.buttonLabelFontSize,
-                        relativeTo: .body,
-                        weight: .semibold
-                    )
-                )
-                .foregroundStyle(isActive ? MonoriPalette.canvas : MonoriPalette.ink)
-                .padding(.horizontal, metrics.spacing.x2)
-                .frame(height: 44)
-                .background(
-                    isActive ? MonoriPalette.ink : MonoriPalette.canvas,
-                    in: RoundedRectangle(
-                        cornerRadius: MonoriRadius.control,
-                        style: .continuous
-                    )
-                )
-                .overlay {
-                    RoundedRectangle(
-                        cornerRadius: MonoriRadius.control,
-                        style: .continuous
-                    )
-                    .stroke(MonoriPalette.divider, lineWidth: 1)
-                }
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
-    }
 }
 
 #if DEBUG
