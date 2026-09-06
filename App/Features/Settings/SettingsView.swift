@@ -375,6 +375,25 @@ struct SettingsView: View {
                         }
                         .padding(.horizontal, MonoriSpacing.x3)
                         .padding(.vertical, MonoriSpacing.x2)
+
+                        groupDivider()
+
+                        Link(destination: URL(string: "https://privacy.patreon.com/policies")!) {
+                            HStack {
+                                Text("刪除 Patreon 帳號")
+                                    .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .semibold))
+                                    .foregroundStyle(MonoriPalette.bookmark)
+                                Spacer()
+                                ExternalLinkIcon()
+                                    .stroke(MonoriPalette.secondaryInk.opacity(0.5),
+                                            style: StrokeStyle(lineWidth: 1.5,
+                                                               lineCap: .round,
+                                                               lineJoin: .round))
+                                    .frame(width: 14, height: 14)
+                            }
+                            .padding(.horizontal, MonoriSpacing.x3)
+                            .padding(.vertical, MonoriSpacing.x2)
+                        }
                     }
                     sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節、書籤與閱歷。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。iCloud 備份不受影響。")
                 }
@@ -749,7 +768,7 @@ struct SettingsView: View {
             Text(title)
                 .font(MonoriTypography.ui(metrics.buttonLabelFontSize,
                                            relativeTo: .body, weight: .semibold))
-                .foregroundStyle(destructive ? Color.red : MonoriPalette.ink)
+                .foregroundStyle(destructive ? MonoriPalette.bookmark : MonoriPalette.ink)
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 .contentShape(Rectangle())
         }
