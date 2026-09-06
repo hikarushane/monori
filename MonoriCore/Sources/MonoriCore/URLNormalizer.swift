@@ -264,6 +264,14 @@ public enum URLNormalizer {
         return host == "cxc.today" || host.hasSuffix(".cxc.today")
     }
 
+    /// True for the bare site root (`https://cxc.today/`, `/zh`, ...). The cxc.today SPA
+    /// rewrites `location` to the root for a moment while routing to a reader page, so a
+    /// reader must not treat this transient URL as a real page change.
+    public static func isCXCSiteRoot(_ url: URL) -> Bool {
+        guard isCXCHost(url) else { return false }
+        return cxcPathSegments(url).isEmpty
+    }
+
     /// Extracts the creator username (without the leading `@`) from a CXC creator-store
     /// or work URL, e.g. `/zh/@nanami777/work/38982` -> `"nanami777"`.
     public static func cxcUsername(_ url: URL) -> String? {

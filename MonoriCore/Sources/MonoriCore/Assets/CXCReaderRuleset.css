@@ -1,17 +1,30 @@
 /* MonoriCore/Sources/MonoriCore/Assets/CXCReaderRuleset.css
-   CXC (cxc.today) reader ruleset — Uguisu Zen. DOM selectors are generic
-   placeholders pending real DevTools inspection of cxc.today's reading page
-   (see CXCWorkDetect.js / CXCWorkImport.js, which carry the same caveat for
-   the work/chapter-list page). Refine once the real markup is confirmed —
-   if a selector stops matching, the page simply renders as plain CXC
-   (graceful degradation, same philosophy as ReaderRuleset.css).
+   CXC (cxc.today) reader ruleset — Uguisu Zen. Selectors confirmed against
+   the live reader page on 2026-09-06 (Quasar/Vue SPA, `#q-app`):
 
-   Unlike Patreon/Vocus/AFF, CXC's own reading page ships a dark theme by
-   default regardless of device color scheme, with light-colored text meant
-   to sit on that dark background. Forcing the Monori washi-white background
-   without also forcing dark ink would make that native text disappear, so
-   both are set explicitly below — not only inside the dark-mode branch like
-   the other rulesets. */
+     body > #q-app > .page_work_reader > .readerBox > .reader > .reader-box
+       > .work-reader-vertical            reading column
+           > .content-box--bg             absolute background plate
+           > .content-banner .section-name chapter title
+           > .content-box                 prose (div/span per paragraph,
+                                          empty <c>/<s>/<g> filler tags)
+       > .work-reader-header              logo / breadcrumb / tool bar
+       > .sticky-box                      catalog, sound, settings, footer bar
+     .other_box .left .comment_section    comment thread — keep visible
+     .other_box .like_box / .book_info / .book-info / .right   site chrome
+
+   `.content-box` sits seven levels under <body>, so the generic
+   `body > * > * ...` colour reset used by the other rulesets never reaches
+   it; CXC keeps its own dark-grey ink on the prose (rgb 77,78,82) and the
+   text vanished on the dark Monori background. Colour and padding are
+   forced on the reader subtree explicitly below.
+
+   Font family is deliberately NOT overridden on the prose: every chapter
+   ships its own obfuscation font (`work_reader_{id}_hant`, set inline on
+   .work-reader-vertical) and about half of the characters are Private Use
+   Area code points that only that font can draw. Replacing the stack
+   renders them as tofu. The Monori serif is applied to the chapter title
+   only. */
 
 :root {
   color-scheme: light dark;
@@ -35,63 +48,86 @@
 }
 
 /* --- hide chrome --- */
-/* No selector here targets a comment thread — once the real markup is known,
-   a broad guess must never risk hiding it (same caution as the whitelist
-   note in ReaderRuleset.css / AFFReaderRuleset.css). */
-nav,
-header,
-footer,
-aside,
-[class*="sidebar"],
-[class*="breadcrumb"],
-[class*="site-header"],
-[class*="site-footer"],
-[class*="promo"],
-[class*="recommend"],
-[class*="related-work"],
-[class*="share-bar"] {
+/* Nothing here touches .comment_section (the comment thread). */
+.work-reader-header,
+.sticky-box,
+.footer-cover,
+.page_work_reader > .footer,
+.like_box,
+.book_info,
+.book-info,
+.other_box .right,
+.next-chapter-button,
+.content-box--bg,
+.sound-player,
+.q-notifications,
+#fb-root {
   display: none !important;
 }
 
 /* --- reading column --- */
-main,
-article,
-[class*="chapter-content"],
-[class*="article-content"],
-[class*="reading-content"] {
+.work-reader-vertical {
   max-width: 34em !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding-left: clamp(24px, 6vw, 48px) !important;
-  padding-right: clamp(24px, 6vw, 48px) !important;
-  font-family: var(--monori-font-family) !important;
+  padding: 1em clamp(24px, 6vw, 48px) !important;
+  min-height: 0 !important;
+  overflow: visible !important;
 }
 
-/* Size/spacing/color must hit the text nodes themselves — a value only on
-   the container may never reach the prose if the site sets per-paragraph
-   styles (same Bug 1 reasoning as ReaderRuleset.css), and CXC's own inline
-   light-mode text color needs an explicit override here too. */
-main, main p, main li, main blockquote, main span,
-article, article p, article li, article blockquote, article span,
-[class*="chapter-content"], [class*="chapter-content"] p, [class*="chapter-content"] span,
-[class*="article-content"], [class*="article-content"] p, [class*="article-content"] span,
-[class*="reading-content"], [class*="reading-content"] p, [class*="reading-content"] span {
+/* CXC pads the prose 60px 100px for desktop; on a phone that leaves a
+   one-character column. The column padding above replaces it. */
+.content-box {
+  padding: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+/* CXC's wrappers assume a desktop canvas; keep every layer inside the
+   viewport so lines wrap instead of running off the right edge. */
+.readerBox,
+.reader,
+.reader-box {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.content-banner {
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 0 1em !important;
+  text-align: left !important;
+}
+
+.content-banner .section-name {
+  font-family: var(--monori-font-family) !important;
+  font-size: 1.3em !important;
+  line-height: 1.4 !important;
+}
+
+/* Size/spacing must hit the text nodes themselves — CXC sets its own
+   font-size on .content-box and the <c> filler tags are inline-block, so a
+   value only on the container would not reach every line. */
+.content-box,
+.content-box div,
+.content-box p,
+.content-box span,
+.content-box c,
+.content-box g,
+.content-box s {
   font-size: var(--monori-font-size, 19px) !important;
   line-height: var(--monori-line-height, 1.9) !important;
-  color: inherit !important;
 }
 
-/* Paragraph spacing */
-main p,
-article p,
-[class*="chapter-content"] p,
-[class*="article-content"] p,
-[class*="reading-content"] p {
+/* Paragraph spacing (CXC emits <p> for rich-text chapters; plain chapters
+   use <div> + <br> and keep the author's own blank lines). */
+.content-box p {
   margin-bottom: 0.85em !important;
 }
 
 /* --- background / dark mode --- */
-/* Forced in light mode too (see file header) — CXC ships dark-by-default. */
+/* Forced in light mode too — CXC ships dark-by-default (`body--dark`). */
 html,
 body {
   background-color: #FBF9F8 !important;
@@ -102,9 +138,9 @@ body {
   margin: 0 !important;
 }
 
-/* Defeats inline background/text colors CXC's own dark theme likely paints
-   on several nested wrapper divs — same technique as
-   VocusReaderRuleset.css / AFFReaderRuleset.css. */
+/* Wrapper reset (same technique as VocusReaderRuleset.css /
+   AFFReaderRuleset.css) plus an explicit reset for the whole reader page,
+   because the prose is deeper than six levels. */
 body > *,
 body > * > *,
 body > * > * > *,
@@ -112,6 +148,12 @@ body > * > * > * > *,
 body > * > * > * > * > *,
 body > * > * > * > * > * > * {
   background-color: inherit !important;
+  color: inherit !important;
+}
+
+.page_work_reader,
+.page_work_reader * {
+  background-color: transparent !important;
   color: inherit !important;
 }
 

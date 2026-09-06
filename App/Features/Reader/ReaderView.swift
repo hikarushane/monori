@@ -34,6 +34,15 @@ struct ReaderView: View {
 
     private var prefs: ReaderPreferences { env.prefs }
 
+    /// cxc.today draws roughly half of every chapter through a per-chapter
+    /// obfuscation font (Private Use Area code points), so a character map can
+    /// only convert the other half and leaves mixed script. Conversion stays
+    /// off for CXC pages loaded from the site.
+    private var effectiveConversion: ChineseConversion {
+        if !renderingStoredHTML, current.collection?.sourceKind == .cxc { return .off }
+        return prefs.chineseConversion.resolved
+    }
+
     private func wrappedHTML(_ inner: String) -> String {
         ReaderStyler.wrappedDocument(inner: inner,
                                      fontSizePoints: prefs.fontSize,
@@ -280,6 +289,10 @@ struct ReaderView: View {
                 foreignPageKey = nil
                 applyReaderTreatment()
             }
+        } else if foreignPageTitle == nil, URLNormalizer.isCXCSiteRoot(url) {
+            // cxc.today's SPA bounces `location` through the site root while it
+            // routes to the reader page; the real chapter URL follows right after.
+            return
         } else {
             let key = URLNormalizer.patreonPostID(url.absoluteString)
                 ?? URLNormalizer.normalize(url.absoluteString)?.absoluteString
@@ -293,9 +306,12 @@ struct ReaderView: View {
             let fallback: String = {
                 let s = url.absoluteString
                 if URLNormalizer.isVocusHost(s) { return "Vocus" }
+                if URLNormalizer.isCXCHost(url) { return "CxC post" }
                 return "Patreon post"
             }()
             foreignPageTitle = slugTitle.isEmpty ? fallback : slugTitle
+            DiagnosticLog.shared.log(category: "reader",
+                "foreign page url=\(NavigationTrace.redact(url)) current=\(NavigationTrace.redact(URL(string: current.urlString) ?? url))")
             applyReaderTreatment()
             pollForeignTitle(rejecting: staleTitles)
         }
@@ -379,7 +395,7 @@ struct ReaderView: View {
             ReaderStyler.fontSizeScript(points: prefs.fontSize))
         _ = try? await webView.evaluateJavaScript(
             ReaderStyler.lineHeightScript(value: prefs.lineSpacing))
-        let mode = prefs.chineseConversion.resolved
+        let mode = effectiveConversion
         let mapString: String
         switch mode {
         case .off, .auto: mapString = ""
@@ -417,7 +433,7 @@ struct ReaderView: View {
 
     private func applyChineseConversion() {
         let webView = env.reader.webView
-        let mode = prefs.chineseConversion.resolved
+        let mode = effectiveConversion
         let mapString: String
         switch mode {
         case .off, .auto: mapString = ""

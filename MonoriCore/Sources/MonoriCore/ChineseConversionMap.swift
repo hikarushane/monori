@@ -34,7 +34,10 @@ public final class ChineseConversionMap: @unchecked Sendable {
             let mutable = NSMutableString(string: original)
             CFStringTransform(mutable, nil, transform as CFString, false)
             let converted = mutable as String
-            if converted != original && converted.count == 1 {
+            // The reader script indexes the map by UTF-16 unit, so a
+            // supplementary-plane result (ICU emits ~160 for Hant-Hans)
+            // must be dropped or every later pair shifts by one.
+            if converted != original && converted.utf16.count == 1 {
                 pairs.append(original)
                 pairs.append(converted)
             }

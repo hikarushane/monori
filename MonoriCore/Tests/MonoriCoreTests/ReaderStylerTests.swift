@@ -709,6 +709,38 @@ final class ReaderStylerTests: XCTestCase {
         }
     }
 
+    // MARK: - Chinese conversion keeps up with SPA re-renders
+
+    func testChineseConversionScriptObservesLaterDOMChanges() {
+        let script = ReaderStyler.chineseConversionScript(mode: .toSimplified, mapString: "體体")
+        XCTAssertTrue(script.contains("MutationObserver"),
+                      "one-shot conversion is lost when Patreon/AFF re-render text after load")
+        XCTAssertTrue(script.contains("childList:true"), "must catch replaced text nodes")
+        XCTAssertTrue(script.contains("characterData:true"), "must catch in-place text edits")
+        XCTAssertTrue(script.contains("'體体'"), "should embed the map string")
+    }
+
+    func testChineseConversionScriptOffDisconnectsObserverBeforeRestoring() {
+        let script = ReaderStyler.chineseConversionScript(mode: .off, mapString: "")
+        XCTAssertTrue(script.contains("disconnect()"), "turning conversion off must stop the observer")
+        let disconnectIndex = script.range(of: "disconnect()")!.lowerBound
+        let offCheckIndex = script.range(of: "==='off'")!.lowerBound
+        XCTAssertLessThan(disconnectIndex, offCheckIndex,
+                          "observer must be stopped before the early return for off mode")
+    }
+
+    // MARK: - CXC reader ruleset targets the real cxc.today markup
+
+    func testCXCRulesetForcesContentBoxColorAndPadding() {
+        let css = ReaderStyler.cxcRuleset()
+        XCTAssertTrue(css.contains(".content-box"), "cxc.today prose lives in .content-box")
+        XCTAssertTrue(css.contains(".work-reader-vertical"), "reading column is .work-reader-vertical")
+        XCTAssertTrue(css.contains(".work-reader-header"), "site header must be hidden")
+        let rulesOnly = css.replacingOccurrences(of: "(?s)/\\*.*?\\*/", with: "",
+                                                 options: .regularExpression)
+        XCTAssertFalse(rulesOnly.contains(".comment_section"), "comment thread must never be hidden")
+    }
+
     // MARK: - iPad delayed prefs re-application
 
     func testIPadDelayedPrefsScriptContainsCorrectValues() {

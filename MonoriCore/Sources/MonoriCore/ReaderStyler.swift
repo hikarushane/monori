@@ -388,7 +388,7 @@ public enum ReaderStyler {
           document.documentElement.appendChild(style);
         \(fontCheckSnippet)
           function clearCxcAncestors() {
-            var c = document.querySelector('article') || document.querySelector('main');
+            var c = document.querySelector('.work-reader-vertical') || document.querySelector('article') || document.querySelector('main');
             if (c) {
               c.style.setProperty('padding-left', 'clamp(24px, 6vw, 48px)', 'important');
               c.style.setProperty('padding-right', 'clamp(24px, 6vw, 48px)', 'important');
@@ -543,24 +543,48 @@ public enum ReaderStyler {
         }
     }
 
+    /// Converts every text node under `body` with a char-to-char map, then keeps
+    /// watching the DOM: Patreon re-renders the post after hydration and AFF
+    /// fills the chapter in late, both of which replace text nodes that a
+    /// one-shot walk already converted. `off` disconnects the observer and
+    /// restores the originals we wrote (text the site changed since is left as is).
     public static func chineseConversionScript(mode: ChineseConversion, mapString: String) -> String {
         let modeStr = mode.rawValue
         return """
         (function(){
-          if(!window.__monoriConv)window.__monoriConv=new WeakMap();
-          var s=window.__monoriConv;
-          var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-          var n;
-          while(n=w.nextNode()){var o=s.get(n);if(o!==undefined)n.nodeValue=o;}
+          var W=window;
+          if(!W.__monoriConv)W.__monoriConv=new WeakMap();
+          if(!W.__monoriConvOut)W.__monoriConvOut=new WeakMap();
+          var s=W.__monoriConv,out=W.__monoriConvOut;
+          if(W.__monoriConvObserver){W.__monoriConvObserver.disconnect();W.__monoriConvObserver=null;}
+          var root=document.body;if(!root)return;
+          var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),n;
+          while(n=w.nextNode()){var o=s.get(n);if(o!==undefined&&n.nodeValue===out.get(n))n.nodeValue=o;s.delete(n);out.delete(n);}
           if('\(modeStr)'==='off')return;
           var m={},p='\(mapString)';
           for(var i=0;i<p.length;i+=2)m[p[i]]=p[i+1];
-          var w2=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-          while(n=w2.nextNode()){
-            var t=n.nodeValue,r='',c=false;
+          function conv(n){
+            var t=n.nodeValue;if(!t||out.get(n)===t)return;
+            var r='',c=false;
             for(var j=0;j<t.length;j++){var x=m[t[j]];if(x){r+=x;c=true;}else r+=t[j];}
-            if(c){s.set(n,t);n.nodeValue=r;}
+            if(c){s.set(n,t);out.set(n,r);n.nodeValue=r;}
           }
+          function walk(node){
+            if(node.nodeType===3){conv(node);return;}
+            if(node.nodeType!==1&&node.nodeType!==11)return;
+            var w=document.createTreeWalker(node,NodeFilter.SHOW_TEXT),t;
+            while(t=w.nextNode())conv(t);
+          }
+          walk(root);
+          var obs=new MutationObserver(function(list){
+            for(var i=0;i<list.length;i++){
+              var mu=list[i];
+              if(mu.type==='characterData'){conv(mu.target);continue;}
+              for(var k=0;k<mu.addedNodes.length;k++)walk(mu.addedNodes[k]);
+            }
+          });
+          obs.observe(root,{childList:true,subtree:true,characterData:true});
+          W.__monoriConvObserver=obs;
         })();
         """
     }

@@ -151,6 +151,21 @@ final class URLNormalizerCXCTests: XCTestCase {
         XCTAssertNil(URLNormalizer.canonicalCXCWorkURL(URL(string: "https://cxc.today/zh/@foo")!))
     }
 
+    // MARK: - Site root (SPA bounces through "/" while routing to a reader page)
+
+    func testIsCXCSiteRootForBareHostAndLangPrefixOnly() {
+        XCTAssertTrue(URLNormalizer.isCXCSiteRoot(URL(string: "https://cxc.today/")!))
+        XCTAssertTrue(URLNormalizer.isCXCSiteRoot(URL(string: "https://cxc.today")!))
+        XCTAssertTrue(URLNormalizer.isCXCSiteRoot(URL(string: "https://cxc.today/zh")!))
+        XCTAssertTrue(URLNormalizer.isCXCSiteRoot(URL(string: "https://gl.cxc.today/zh/")!))
+    }
+
+    func testIsCXCSiteRootFalseForHomeWorkAndOtherHosts() {
+        XCTAssertFalse(URLNormalizer.isCXCSiteRoot(URL(string: "https://cxc.today/zh/home")!))
+        XCTAssertFalse(URLNormalizer.isCXCSiteRoot(URL(string: "https://cxc.today/zh/@foo/work/1/reader/2")!))
+        XCTAssertFalse(URLNormalizer.isCXCSiteRoot(URL(string: "https://example.com/")!))
+    }
+
     func testCanonicalCXCWorkURLNilForNonCXCHost() {
         XCTAssertNil(URLNormalizer.canonicalCXCWorkURL(URL(string: "https://example.com/zh/@foo/work/123")!))
     }
