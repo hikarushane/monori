@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var homepageButtonFrame: CGRect = .zero
     @State private var showExportFailedAlert = false
     @State private var confirmRestore = false
+    @State private var showDeleteAccountSheet = false
     @State private var showForceBackupConfirm = false
     @State private var forceBackupMessage = ""
     @State private var showResultAlert = false
@@ -378,11 +379,18 @@ struct SettingsView: View {
 
                         groupDivider()
 
-                        Link(destination: URL(string: "https://privacy.patreon.com/policies")!) {
+                        Button {
+                            showDeleteAccountSheet = true
+                        } label: {
                             HStack {
-                                Text("刪除 Patreon 帳號")
-                                    .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .semibold))
-                                    .foregroundStyle(MonoriPalette.bookmark)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("刪除 Patreon 帳號")
+                                        .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body, weight: .semibold))
+                                        .foregroundStyle(MonoriPalette.bookmark)
+                                    Text("Delete Patreon Account")
+                                        .font(MonoriTypography.ui(metrics.footnoteFontSize, relativeTo: .footnote))
+                                        .foregroundStyle(MonoriPalette.secondaryInk)
+                                }
                                 Spacer()
                                 ExternalLinkIcon()
                                     .stroke(MonoriPalette.secondaryInk.opacity(0.5),
@@ -391,9 +399,13 @@ struct SettingsView: View {
                                                                lineJoin: .round))
                                     .frame(width: 14, height: 14)
                             }
-                            .padding(.horizontal, MonoriSpacing.x3)
-                            .padding(.vertical, MonoriSpacing.x2)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, MonoriSpacing.x3)
+                        .padding(.vertical, MonoriSpacing.x2)
+                        .accessibilityIdentifier("smoke.deleteAccountButton")
                     }
                     sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節、書籤與閱歷。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。iCloud 備份不受影響。")
                 }
@@ -494,6 +506,9 @@ struct SettingsView: View {
             Button("清除瀏覽器資料", role: .destructive) {
                 Task { await env.clearBrowserData() }
             }
+        }
+        .sheet(isPresented: $showDeleteAccountSheet) {
+            AccountDeletionSheet()
         }
         .sheet(item: $logExport) { export in
             ActivityView(items: [export.url])
