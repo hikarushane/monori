@@ -44,7 +44,7 @@ struct SettingsView: View {
         }
         if showsConversionMenu {
             GeometryReader { geo in
-                let mh: CGFloat = 176
+                let mh = 4 * metrics.menuRowHeight + (metrics.isRegularWidth ? 16 : 12)
                 let gap: CGFloat = 4
                 let bf = conversionButtonFrame
                 let goesUp = bf.maxY + mh + gap > geo.size.height
@@ -53,7 +53,7 @@ struct SettingsView: View {
                     UguisuMenuRow(
                         icon: {
                             Text("自")
-                                .font(.system(size: 13, weight: .bold))
+                                .font(MonoriTypography.ui(metrics.filterLabelFontSize, weight: .bold))
                                 .foregroundStyle(uguisuMenuIconGrey)
                         },
                         label: ChineseConversion.auto.displayName,
@@ -68,7 +68,7 @@ struct SettingsView: View {
                     UguisuMenuRow(
                         icon: {
                             Text("繁")
-                                .font(.system(size: 13, weight: .bold))
+                                .font(MonoriTypography.ui(metrics.filterLabelFontSize, weight: .bold))
                                 .foregroundStyle(uguisuMenuIconGrey)
                         },
                         label: "繁體",
@@ -82,7 +82,7 @@ struct SettingsView: View {
                     UguisuMenuRow(
                         icon: {
                             Text("简")
-                                .font(.system(size: 13, weight: .bold))
+                                .font(MonoriTypography.ui(metrics.filterLabelFontSize, weight: .bold))
                                 .foregroundStyle(uguisuMenuIconGrey)
                         },
                         label: "简体",
@@ -97,7 +97,7 @@ struct SettingsView: View {
                     UguisuMenuRow(
                         icon: {
                             Text("–")
-                                .font(.system(size: 13, weight: .bold))
+                                .font(MonoriTypography.ui(metrics.filterLabelFontSize, weight: .bold))
                                 .foregroundStyle(uguisuMenuIconGrey)
                         },
                         label: "不轉換",
@@ -120,7 +120,7 @@ struct SettingsView: View {
         if showsHomepageMenu {
             GeometryReader { geo in
                 let sourceCount = CGFloat(SourceRegistry.all.count)
-                let mh = sourceCount * 40 + 12
+                let mh = sourceCount * metrics.menuRowHeight + (metrics.isRegularWidth ? 16 : 12)
                 let gap: CGFloat = 4
                 let bf = homepageButtonFrame
                 let goesUp = bf.maxY + mh + gap > geo.size.height
@@ -153,7 +153,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: metrics.spacing.x5) {
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x1) {
                     Text("設定")
                         .font(MonoriTypography.ui(metrics.largeTitleFontSize, relativeTo: .largeTitle, weight: .bold))
                         .tracking(-0.6)
@@ -213,7 +213,7 @@ struct SettingsView: View {
                                     .foregroundStyle(MonoriPalette.secondaryInk)
                             }
                             Spacer()
-                            HStack(spacing: MonoriSpacing.x1) {
+                            HStack(spacing: metrics.spacing.x1) {
                                 valueButton(symbol: "−", accessibilityLabel: "字體大小減少",
                                             identifier: "Decrement",
                                             disabled: prefs.fontSize <= ReaderPreferences.fontSizeRange.lowerBound) {
@@ -235,7 +235,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
                     sectionHeading("外觀")
                     settingsGroup {
-                        HStack(spacing: MonoriSpacing.x2) {
+                        HStack(spacing: metrics.spacing.x2) {
                             Text("主題")
                                 .font(MonoriTypography.ui(metrics.bodyFontSize, relativeTo: .body,
                                                           weight: .semibold))
@@ -244,7 +244,7 @@ struct SettingsView: View {
                             Spacer()
                             ThemeToggle()
                         }
-                        .frame(minHeight: 56)
+                        .frame(minHeight: metrics.toolbarHeight)
                         .padding(.horizontal, metrics.spacing.x3)
                         .padding(.vertical, metrics.spacing.x2)
 
@@ -261,7 +261,7 @@ struct SettingsView: View {
                                                                    relativeTo: .body, weight: .semibold))
                                         .foregroundStyle(MonoriPalette.ink)
                                     Text(currentFontDisplayName)
-                                        .font(MonoriTypography.reader(14, relativeTo: .subheadline))
+                                        .font(MonoriTypography.reader(metrics.secondaryFontSize, relativeTo: .subheadline))
                                         .italic()
                                         .foregroundStyle(MonoriPalette.secondaryInk)
                                 }
@@ -284,14 +284,14 @@ struct SettingsView: View {
                                 showsHomepageMenu = false
                             }
                         } label: {
-                            HStack(spacing: MonoriSpacing.x2) {
+                            HStack(spacing: metrics.spacing.x2) {
                                 Text("簡繁轉換")
                                     .font(MonoriTypography.ui(metrics.bodyFontSize,
                                                               relativeTo: .body, weight: .semibold))
                                     .tracking(MonoriTypography.uiTracking)
                                     .foregroundStyle(MonoriPalette.ink)
                                 Spacer()
-                                HStack(spacing: MonoriSpacing.x1) {
+                                HStack(spacing: metrics.spacing.x1) {
                                     Text(prefs.chineseConversion.displayName)
                                         .font(MonoriTypography.ui(metrics.secondaryFontSize,
                                                                    relativeTo: .body))
@@ -299,10 +299,10 @@ struct SettingsView: View {
                                     PillChevronDown()
                                         .stroke(Color(uiColor: .systemGray),
                                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                                        .frame(width: 10, height: 10)
+                                        .frame(width: metrics.pillChevronSize, height: metrics.pillChevronSize)
                                 }
                             }
-                            .frame(minHeight: 56)
+                            .frame(minHeight: metrics.toolbarHeight)
                             .padding(.horizontal, metrics.spacing.x3)
                             .padding(.vertical, metrics.spacing.x2)
                             .contentShape(Rectangle())
@@ -318,7 +318,7 @@ struct SettingsView: View {
                     sectionFootnote("「自動」依照裝置語言判斷：繁體中文裝置讀簡體文章時自動轉繁，反之亦然。原文與偏好相同時不轉換。")
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x2) {
                     sectionHeading("瀏覽")
                     settingsGroup {
                         Button {
@@ -327,14 +327,14 @@ struct SettingsView: View {
                                 showsConversionMenu = false
                             }
                         } label: {
-                            HStack(spacing: MonoriSpacing.x2) {
+                            HStack(spacing: metrics.spacing.x2) {
                                 Text("預設首頁")
                                     .font(MonoriTypography.ui(metrics.bodyFontSize,
                                                               relativeTo: .body, weight: .semibold))
                                     .tracking(MonoriTypography.uiTracking)
                                     .foregroundStyle(MonoriPalette.ink)
                                 Spacer()
-                                HStack(spacing: MonoriSpacing.x1) {
+                                HStack(spacing: metrics.spacing.x1) {
                                     Text(SourceRegistry.provider(for: env.appPrefs.browseDefaultSource).displayName)
                                         .font(MonoriTypography.ui(metrics.secondaryFontSize,
                                                                    relativeTo: .body))
@@ -342,10 +342,10 @@ struct SettingsView: View {
                                     PillChevronDown()
                                         .stroke(Color(uiColor: .systemGray),
                                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                                        .frame(width: 10, height: 10)
+                                        .frame(width: metrics.pillChevronSize, height: metrics.pillChevronSize)
                                 }
                             }
-                            .frame(minHeight: 56)
+                            .frame(minHeight: metrics.toolbarHeight)
                             .padding(.horizontal, metrics.spacing.x3)
                             .padding(.vertical, metrics.spacing.x2)
                             .contentShape(Rectangle())
@@ -360,22 +360,22 @@ struct SettingsView: View {
                     )
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x2) {
                     sectionHeading("資料")
                     settingsGroup {
                         settingsAction("清除書庫資料", destructive: true) {
                             confirmClearLibrary = true
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
 
                         groupDivider()
 
                         settingsAction("清除瀏覽器資料", destructive: true) {
                             confirmLogout = true
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
 
                         groupDivider()
 
@@ -397,20 +397,20 @@ struct SettingsView: View {
                                             style: StrokeStyle(lineWidth: 1.5,
                                                                lineCap: .round,
                                                                lineJoin: .round))
-                                    .frame(width: 14, height: 14)
+                                    .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
                             }
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
                         .accessibilityIdentifier("smoke.deleteAccountButton")
                     }
                     sectionFootnote("「清除書庫資料」會刪除裝置上儲存的收藏、章節、書籤與閱歷。「清除瀏覽器資料」會清除內建瀏覽器的所有 cookie 與登入狀態，等同登出所有來源。兩者互相獨立。iCloud 備份不受影響。")
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x2) {
                     sectionHeading("iCloud 備份")
                     settingsGroup {
                         backupSectionContent()
@@ -418,19 +418,19 @@ struct SettingsView: View {
                     sectionFootnote("僅備份書庫、書籤、閱讀進度與閱歷。不含文章內容、登入資料或個人帳號資訊。")
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x2) {
                     sectionHeading("診斷")
                     settingsGroup {
                         settingsAction("匯出診斷記錄") {
                             exportDiagnosticLog()
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
                     }
                     sectionFootnote("記錄操作事件與錯誤，不含文章內容、密碼或登入資訊。")
                 }
 
-                VStack(alignment: .leading, spacing: MonoriSpacing.x2) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x2) {
                     sectionHeading("關於")
                     settingsGroup {
                         HStack {
@@ -441,13 +441,13 @@ struct SettingsView: View {
                             Text(MonoriCore.version)
                                 .font(.system(size: metrics.footnoteFontSize, design: .monospaced).weight(.medium))
                                 .foregroundStyle(MonoriPalette.secondaryInk)
-                                .padding(.horizontal, MonoriSpacing.x1)
+                                .padding(.horizontal, metrics.spacing.x1)
                                 .padding(.vertical, 4)
                                 .background(MonoriPalette.canvas,
                                             in: RoundedRectangle(cornerRadius: 4))
                         }
-                        .padding(.horizontal, MonoriSpacing.x3)
-                        .padding(.vertical, MonoriSpacing.x2)
+                        .padding(.horizontal, metrics.spacing.x3)
+                        .padding(.vertical, metrics.spacing.x2)
 
                         groupDivider()
 
@@ -462,10 +462,10 @@ struct SettingsView: View {
                                             style: StrokeStyle(lineWidth: 1.5,
                                                                lineCap: .round,
                                                                lineJoin: .round))
-                                    .frame(width: 14, height: 14)
+                                    .frame(width: metrics.accessoryIconSize, height: metrics.accessoryIconSize)
                             }
-                            .padding(.horizontal, MonoriSpacing.x3)
-                            .padding(.vertical, MonoriSpacing.x2)
+                            .padding(.horizontal, metrics.spacing.x3)
+                            .padding(.vertical, metrics.spacing.x2)
                         }
 
                         groupDivider()
@@ -474,8 +474,8 @@ struct SettingsView: View {
                             .font(MonoriTypography.ui(metrics.secondaryFontSize, relativeTo: .subheadline))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                             .lineSpacing(6)
-                            .padding(.horizontal, MonoriSpacing.x3)
-                            .padding(.vertical, MonoriSpacing.x2)
+                            .padding(.horizontal, metrics.spacing.x3)
+                            .padding(.vertical, metrics.spacing.x2)
                     }
                 }
             }
@@ -615,8 +615,8 @@ struct SettingsView: View {
                     .font(MonoriTypography.ui(metrics.secondaryFontSize,
                                                relativeTo: .subheadline))
                     .foregroundStyle(MonoriPalette.secondaryInk)
-                    .padding(.horizontal, MonoriSpacing.x3)
-                    .padding(.vertical, MonoriSpacing.x2)
+                    .padding(.horizontal, metrics.spacing.x3)
+                    .padding(.vertical, metrics.spacing.x2)
             }
 
             groupDivider()
@@ -642,8 +642,8 @@ struct SettingsView: View {
             .disabled(bs.state != .available)
             .opacity(bs.state == .backingUp ? 0.6 : 1)
             .accessibilityIdentifier("smoke.backupNowButton")
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
 
             groupDivider()
 
@@ -668,8 +668,8 @@ struct SettingsView: View {
             .disabled(bs.state != .available || bs.lastBackupMetadata == nil)
             .opacity(bs.state == .restoring ? 0.6 : 1)
             .accessibilityIdentifier("smoke.restoreFromCloudButton")
-            .padding(.horizontal, MonoriSpacing.x3)
-            .padding(.vertical, MonoriSpacing.x2)
+            .padding(.horizontal, metrics.spacing.x3)
+            .padding(.vertical, metrics.spacing.x2)
         }
     }
 

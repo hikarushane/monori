@@ -44,7 +44,7 @@ struct ReadingHistoryView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+        VStack(alignment: .leading, spacing: metrics.spacing.x1) {
             HStack(alignment: .firstTextBaseline) {
                 Button { dismiss() } label: {
                     Image(systemName: "chevron.left")
@@ -56,7 +56,7 @@ struct ReadingHistoryView: View {
                 .accessibilityLabel("返回")
 
                 Text("閱歷")
-                    .font(MonoriTypography.ui(24, relativeTo: .title2, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.pageTitleFontSize, relativeTo: .title2, weight: .bold))
                     .tracking(-0.4)
 
                 Spacer()
@@ -83,7 +83,7 @@ struct ReadingHistoryView: View {
                 .tracking(MonoriTypography.uiTracking)
                 .foregroundStyle(MonoriPalette.secondaryInk)
         }
-        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, metrics.contentHorizontalPadding)
         .padding(.top, metrics.spacing.x3)
@@ -119,7 +119,7 @@ struct ReadingHistoryView: View {
         .scrollContentBackground(.hidden)
         .background(MonoriPalette.canvas)
         .listRowSeparatorTint(MonoriPalette.divider)
-        .frame(maxWidth: 760)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760)
         .frame(maxWidth: .infinity)
         .accessibilityIdentifier("smoke.readingHistoryList")
     }
@@ -156,7 +156,7 @@ struct ReadingHistoryView: View {
 
                     if !isAvailable {
                         Text("已從書庫移除")
-                            .font(MonoriTypography.ui(12, relativeTo: .caption))
+                            .font(MonoriTypography.ui(metrics.chapterProgressFontSize, relativeTo: .caption))
                             .foregroundStyle(MonoriPalette.secondaryInk)
                     }
                 }
@@ -209,7 +209,7 @@ struct ReadingHistoryView: View {
                 .lineSpacing(6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .frame(maxWidth: 760, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: metrics.isRegularWidth ? .infinity : 760, maxHeight: .infinity, alignment: .topLeading)
         .padding(.horizontal, metrics.contentHorizontalPadding)
     }
 }

@@ -95,7 +95,7 @@ struct CollectionTOCView: View {
             RoundedRectangle(cornerRadius: MonoriRadius.container)
                 .stroke(MonoriPalette.divider, lineWidth: 1)
         }
-        .frame(width: 220)
+        .frame(width: metrics.menuWidth + 20)
     }
 
     private func dropdownRadioRow(_ title: String, selected: Bool,
@@ -229,8 +229,8 @@ struct CollectionTOCView: View {
                     .accessibilityLabel("章節選項")
                 }
             }
-            .padding(.horizontal, MonoriSpacing.x2)
-            .frame(height: 56)
+            .padding(.horizontal, metrics.spacing.x2)
+            .frame(height: metrics.toolbarHeight)
             .background(MonoriPalette.canvas)
             .overlay(alignment: .bottom) {
                 Rectangle()
@@ -252,8 +252,8 @@ struct CollectionTOCView: View {
         .overlay(alignment: .topTrailing) {
             if showsOptionsMenu {
                 optionsDropdown
-                    .padding(.top, MonoriSpacing.x1)
-                    .padding(.trailing, MonoriSpacing.x2)
+                    .padding(.top, metrics.spacing.x1)
+                    .padding(.trailing, metrics.spacing.x2)
                     .transition(.scale(scale: 0.95, anchor: .topTrailing)
                         .combined(with: .opacity))
             }
@@ -282,7 +282,7 @@ struct CollectionTOCView: View {
         }
         .overlay(alignment: .bottom) {
             if refreshing {
-                VStack(alignment: .leading, spacing: MonoriSpacing.x1) {
+                VStack(alignment: .leading, spacing: metrics.spacing.x1) {
                     Text("正在檢查新章節⋯大型收藏可能需要幾分鐘。")
                         .font(MonoriTypography.ui(metrics.footnoteFontSize, relativeTo: .footnote, weight: .medium))
                         .tracking(MonoriTypography.uiTracking)
@@ -291,7 +291,7 @@ struct CollectionTOCView: View {
                         .tint(MonoriPalette.highlight)
                         .progressViewStyle(.linear)
                 }
-                .padding(MonoriSpacing.x2)
+                .padding(metrics.spacing.x2)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(MonoriPalette.surface,
                             in: RoundedRectangle(cornerRadius: MonoriRadius.container))
@@ -299,8 +299,8 @@ struct CollectionTOCView: View {
                     RoundedRectangle(cornerRadius: MonoriRadius.container)
                         .stroke(MonoriPalette.divider, lineWidth: 1)
                 }
-                .padding(.horizontal, MonoriSpacing.x3)
-                .padding(.bottom, MonoriSpacing.x2)
+                .padding(.horizontal, metrics.spacing.x3)
+                .padding(.bottom, metrics.spacing.x2)
                 .accessibilityIdentifier("smoke.refreshStatusBanner")
             }
         }
@@ -380,7 +380,7 @@ struct CollectionTOCView: View {
                 .foregroundStyle(MonoriPalette.ink)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 12)
+            Spacer(minLength: metrics.spacing.x2)
             if chapter.isNew {
                 Text("新")
                     .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption2, weight: .bold))

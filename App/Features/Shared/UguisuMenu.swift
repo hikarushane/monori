@@ -21,23 +21,26 @@ private let zeroBadgeColor = Color(uiColor: .init { traits in
 // MARK: Uguisu Zen menu components
 
 struct UguisuMenuContainer<Content: View>: View {
-    var width: CGFloat = 200
+    @Environment(\.monoriUIMetrics) private var metrics
+    var width: CGFloat?
     @ViewBuilder let content: () -> Content
 
     var body: some View {
+        let w = width ?? metrics.menuWidth
         VStack(spacing: 0) { content() }
-            .padding(.vertical, 6)
+            .padding(.vertical, metrics.isRegularWidth ? 8 : 6)
             .background(menuBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(MonoriPalette.divider, lineWidth: 1)
             }
             .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 8)
-            .frame(width: width)
+            .frame(width: w)
     }
 }
 
 struct UguisuMenuRow<Icon: View>: View {
+    @Environment(\.monoriUIMetrics) private var metrics
     @ViewBuilder var icon: () -> Icon
     let label: String
     var count: Int? = nil
@@ -46,27 +49,31 @@ struct UguisuMenuRow<Icon: View>: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
+            HStack(spacing: metrics.rowInformationSpacing) {
                 icon()
-                    .frame(width: 17, height: 17)
+                    .frame(width: metrics.accessoryIconSize,
+                           height: metrics.accessoryIconSize)
                 Text(label)
-                    .font(.system(size: 13.5, weight: selected ? .semibold : .medium))
+                    .font(MonoriTypography.ui(metrics.filterLabelFontSize,
+                                               weight: selected ? .semibold : .medium))
                     .foregroundStyle(MonoriPalette.ink)
                 Spacer()
                 if let count {
                     Text("\(count)")
-                        .font(.system(size: 12.5, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.chapterProgressFontSize,
+                                                    relativeTo: .caption, weight: .medium))
                         .foregroundStyle(count > 0 ? MonoriPalette.secondaryInk : zeroBadgeColor)
                 }
                 if selected {
                     MenuCheckmark()
                         .stroke(uguisuGreen,
                                 style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                        .frame(width: 14, height: 14)
+                        .frame(width: metrics.accessoryIconSize,
+                               height: metrics.accessoryIconSize)
                 }
             }
-            .padding(.horizontal, 14)
-            .frame(height: 40)
+            .padding(.horizontal, metrics.spacing.x2)
+            .frame(height: metrics.menuRowHeight)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -74,10 +81,12 @@ struct UguisuMenuRow<Icon: View>: View {
 }
 
 struct UguisuMenuDivider: View {
+    @Environment(\.monoriUIMetrics) private var metrics
+
     var body: some View {
         Rectangle()
             .fill(MonoriPalette.divider)
             .frame(height: 1)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, metrics.spacing.x2)
     }
 }

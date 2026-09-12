@@ -87,6 +87,17 @@ struct MonoriUIMetrics: Equatable {
     let footnoteFontSize: CGFloat
     let readerTopBarHeight: CGFloat
     let chapterProgressFontSize: CGFloat
+    let menuWidth: CGFloat
+    let menuRowHeight: CGFloat
+    let pillHeight: CGFloat
+    let pillChevronSize: CGFloat
+    let pillHorizontalPadding: CGFloat
+    let switchTrackWidth: CGFloat
+    let switchTrackHeight: CGFloat
+    let switchThumbSize: CGFloat
+    let toolbarHeight: CGFloat
+    let badgeMinSize: CGFloat
+    let pageTitleFontSize: CGFloat
 
     init(horizontalSizeClass: UserInterfaceSizeClass?) {
         isRegularWidth = horizontalSizeClass == .regular
@@ -118,6 +129,17 @@ struct MonoriUIMetrics: Equatable {
             footnoteFontSize = 20
             readerTopBarHeight = 96
             chapterProgressFontSize = 18
+            menuWidth = 280
+            menuRowHeight = 56
+            pillHeight = 48
+            pillChevronSize = 15
+            pillHorizontalPadding = 18
+            switchTrackWidth = 72
+            switchTrackHeight = 48
+            switchThumbSize = 39
+            toolbarHeight = 80
+            badgeMinSize = 42
+            pageTitleFontSize = 36
         } else {
             spacing = Spacing(x1: MonoriSpacing.x1, x2: MonoriSpacing.x2,
                               x3: MonoriSpacing.x3, x4: MonoriSpacing.x4,
@@ -148,6 +170,17 @@ struct MonoriUIMetrics: Equatable {
             footnoteFontSize = 13
             readerTopBarHeight = 64
             chapterProgressFontSize = 12
+            menuWidth = 200
+            menuRowHeight = 40
+            pillHeight = 32
+            pillChevronSize = 10
+            pillHorizontalPadding = 12
+            switchTrackWidth = 48
+            switchTrackHeight = 32
+            switchThumbSize = 26
+            toolbarHeight = 56
+            badgeMinSize = 28
+            pageTitleFontSize = 24
         }
     }
 

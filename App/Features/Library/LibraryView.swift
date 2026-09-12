@@ -121,10 +121,10 @@ struct LibraryView: View {
     }
 
     private func libraryHeader(contentMargin: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: metrics.spacing.x2) {
             HStack(alignment: .firstTextBaseline) {
                 Text("書庫")
-                    .font(.system(size: 32, weight: .bold))
+                    .font(MonoriTypography.ui(metrics.largeTitleFontSize, relativeTo: .largeTitle, weight: .bold))
                     .foregroundStyle(MonoriPalette.ink)
 
                 Spacer()
@@ -176,14 +176,14 @@ struct LibraryView: View {
 
             HStack {
                 Text("共 \(collections.count) 部作品")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(MonoriTypography.ui(metrics.sectionTitleFontSize, relativeTo: .footnote, weight: .medium))
                     .kerning(0.2)
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .accessibilityIdentifier("smoke.librarySummary")
 
                 Spacer()
 
-                HStack(spacing: 8) {
+                HStack(spacing: metrics.spacing.x1) {
                     sourceFilterPill
                     statusFilterPill
                 }
@@ -211,25 +211,27 @@ struct LibraryView: View {
                 showsSortMenu = false
             }
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: metrics.rowInformationSpacing) {
                 SourceLayersIcon()
                     .stroke(uguisuGreen,
                             style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                    .frame(width: 13, height: 13)
+                    .frame(width: metrics.sectionTitleFontSize,
+                           height: metrics.sectionTitleFontSize)
                 Text("來源")
                     .lineLimit(1)
                 PillChevronDown()
                     .stroke(Color(uiColor: .systemGray),
                             style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                    .frame(width: 10, height: 10)
+                    .frame(width: metrics.pillChevronSize,
+                           height: metrics.pillChevronSize)
             }
-            .font(.system(size: 13, weight: .medium))
+            .font(MonoriTypography.ui(metrics.sectionTitleFontSize, relativeTo: .footnote, weight: .medium))
             .foregroundStyle(MonoriPalette.ink)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
+            .padding(.horizontal, metrics.pillHorizontalPadding)
+            .frame(height: metrics.pillHeight)
             .fixedSize()
             .background(MonoriPalette.surface,
-                        in: RoundedRectangle(cornerRadius: 16))
+                        in: RoundedRectangle(cornerRadius: metrics.pillHeight / 2))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("來源篩選")
@@ -244,21 +246,22 @@ struct LibraryView: View {
                 showsSortMenu = false
             }
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: metrics.rowInformationSpacing) {
                 Text(statusFilter?.label ?? "全部")
                     .lineLimit(1)
                 PillChevronDown()
                     .stroke(Color(uiColor: .systemGray),
                             style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                    .frame(width: 10, height: 10)
+                    .frame(width: metrics.pillChevronSize,
+                           height: metrics.pillChevronSize)
             }
-            .font(.system(size: 13, weight: .medium))
+            .font(MonoriTypography.ui(metrics.sectionTitleFontSize, relativeTo: .footnote, weight: .medium))
             .foregroundStyle(MonoriPalette.ink)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
+            .padding(.horizontal, metrics.pillHorizontalPadding)
+            .frame(height: metrics.pillHeight)
             .fixedSize()
             .background(MonoriPalette.surface,
-                        in: RoundedRectangle(cornerRadius: 16))
+                        in: RoundedRectangle(cornerRadius: metrics.pillHeight / 2))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("閱讀狀態：\(statusFilter?.label ?? "全部")")
@@ -384,19 +387,20 @@ struct LibraryView: View {
             Button {
                 sortReversed.toggle()
             } label: {
-                HStack(spacing: 10) {
+                HStack(spacing: metrics.rowInformationSpacing) {
                     PillChevronDown()
                         .stroke(uguisuMenuIconGrey,
                                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
-                        .frame(width: 17, height: 17)
+                        .frame(width: metrics.accessoryIconSize,
+                               height: metrics.accessoryIconSize)
                         .rotationEffect(.degrees(sortReversed ? 180 : 0))
                     Text(sortReversed ? "升序" : "降序")
-                        .font(.system(size: 13.5, weight: .medium))
+                        .font(MonoriTypography.ui(metrics.filterLabelFontSize, weight: .medium))
                         .foregroundStyle(MonoriPalette.ink)
                     Spacer()
                 }
-                .padding(.horizontal, 14)
-                .frame(height: 40)
+                .padding(.horizontal, metrics.spacing.x2)
+                .frame(height: metrics.menuRowHeight)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -570,7 +574,7 @@ struct LibraryView: View {
                                                    relativeTo: .subheadline))
                         .foregroundStyle(MonoriPalette.secondaryInk)
                 }
-                HStack(spacing: 6) {
+                HStack(spacing: metrics.rowInformationSpacing) {
                     Text("\(collection.chapters.count) 章")
                     if let updated = collection.lastNewChapterAt {
                         Text("・更新於 \(updated.formatted(.relative(presentation: .named).locale(Locale(identifier: "zh-Hant"))))")
@@ -583,6 +587,7 @@ struct LibraryView: View {
             Spacer()
             if env.autoCheck.needsLoginCollectionIDs.contains(collection.id) {
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
+                    .font(.system(size: metrics.actionIconSize))
                     .foregroundStyle(MonoriPalette.secondaryInk)
                     .accessibilityLabel("需要登入")
             }
@@ -590,7 +595,7 @@ struct LibraryView: View {
                 Text("\(collection.unreadCount)")
                     .font(MonoriTypography.ui(metrics.captionFontSize, relativeTo: .caption2, weight: .bold))
                     .foregroundStyle(MonoriPalette.ink)
-                    .frame(minWidth: 28, minHeight: 28)
+                    .frame(minWidth: metrics.badgeMinSize, minHeight: metrics.badgeMinSize)
                     .background(MonoriPalette.highlight,
                                 in: RoundedRectangle(cornerRadius: MonoriRadius.control))
                     .accessibilityIdentifier("smoke.libraryUnreadBadge")

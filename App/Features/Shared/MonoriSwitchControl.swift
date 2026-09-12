@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Shared switch geometry (track + circular thumb) used by Settings toggles.
-/// Purely visual: callers own the `isOn` state, tap handling, and all colors.
 struct MonoriSwitchControl<ThumbContent: View>: View {
+    @Environment(\.monoriUIMetrics) private var metrics
     let isOn: Bool
     let onTrackColor: Color
     let offTrackColor: Color
@@ -12,6 +11,7 @@ struct MonoriSwitchControl<ThumbContent: View>: View {
     @ViewBuilder let thumbContent: (Bool) -> ThumbContent
 
     var body: some View {
+        let thumbPadding: CGFloat = metrics.isRegularWidth ? 4.5 : 3
         ZStack(alignment: isOn ? .trailing : .leading) {
             RoundedRectangle(cornerRadius: MonoriRadius.control, style: .continuous)
                 .fill(isOn ? onTrackColor : offTrackColor)
@@ -22,13 +22,13 @@ struct MonoriSwitchControl<ThumbContent: View>: View {
 
             Circle()
                 .fill(isOn ? onThumbColor : offThumbColor)
-                .frame(width: 26, height: 26)
+                .frame(width: metrics.switchThumbSize, height: metrics.switchThumbSize)
                 .overlay {
                     thumbContent(isOn)
                 }
-                .padding(3)
+                .padding(thumbPadding)
         }
-        .frame(width: 48, height: 32)
+        .frame(width: metrics.switchTrackWidth, height: metrics.switchTrackHeight)
         .frame(minWidth: 44, minHeight: 44)
     }
 }
