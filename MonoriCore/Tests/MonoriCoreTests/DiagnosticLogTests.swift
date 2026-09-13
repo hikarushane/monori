@@ -110,6 +110,24 @@ final class DiagnosticLogTests: XCTestCase {
                       "rotated (older) content must precede current content")
     }
 
+    func testNavigationTraceRedactNeverLeaksPath() {
+        let urls = [
+            "https://www.patreon.com/posts/my-secret-post-12345",
+            "https://archiveofourown.org/works/98765/chapters/1",
+            "https://slashtw.space/forum.php?mod=viewthread&tid=42",
+            "https://creativity.cxc.com.tw/works/abc-123/chapters/1",
+        ]
+        for raw in urls {
+            let redacted = NavigationTrace.redact(URL(string: raw)!)
+            let host = URL(string: raw)!.host!
+            XCTAssertTrue(redacted.contains(host), "must keep host")
+            for component in URL(string: raw)!.pathComponents where component != "/" {
+                XCTAssertFalse(redacted.contains(component),
+                               "path component '\(component)' leaked in: \(redacted)")
+            }
+        }
+    }
+
     func testExportHeaderHasNoUDIDOrAccountFields() throws {
         log.log(category: "t", "x")
         log.flush()

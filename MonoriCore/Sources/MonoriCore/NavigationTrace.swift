@@ -17,8 +17,9 @@ public enum NavigationTrace {
     public static func redact(_ url: URL) -> String {
         let scheme = url.scheme?.lowercased() ?? "unknown"
         guard let host = url.host?.lowercased() else { return "\(scheme)://<no-host>" }
-        let path = url.path.isEmpty ? "/" : url.path
-        return "\(scheme)://\(host)\(path)"
+        let segments = url.pathComponents.filter { $0 != "/" }
+        if segments.isEmpty { return "\(scheme)://\(host)/" }
+        return "\(scheme)://\(host)/<\(segments.count) segments>"
     }
 
     private static func name(_ decision: NavigationDecision) -> String {

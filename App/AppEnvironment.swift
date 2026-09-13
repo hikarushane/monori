@@ -240,7 +240,7 @@ final class AppEnvironment {
             guard let model, model.isOnPostPage || model.isOnAO3WorkPage || model.isOnVocusRoomPage || model.isOnAFFForewordPage || model.isOnCXCWorkPage || model.isOnSlashTWThreadPage else { return }
             model.detectedCollection = payload
             DiagnosticLog.shared.log(category: "import",
-                "collection detected: \(payload.collectionName)")
+                "collection detected (host=\(URL(string: payload.collectionURL)?.host ?? "unknown"))")
         }
     }
 
