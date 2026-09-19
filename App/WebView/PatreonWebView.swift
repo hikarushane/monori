@@ -2,6 +2,27 @@ import SwiftUI
 import WebKit
 import os
 
+final class ClippingWebContainer: UIView {
+    let webView: WKWebView
+    init(webView: WKWebView) {
+        self.webView = webView
+        super.init(frame: .zero)
+        clipsToBounds = true
+        webView.clipsToBounds = true
+        webView.scrollView.clipsToBounds = true
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(webView)
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: topAnchor),
+            webView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+}
+
 struct PatreonWebView: UIViewRepresentable {
     let model: WebViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -36,7 +57,7 @@ struct PatreonWebView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    func makeUIView(context: Context) -> WKWebView {
+    func makeUIView(context: Context) -> ClippingWebContainer {
         let webView = model.webView
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         context.coordinator.model = model
@@ -45,8 +66,6 @@ struct PatreonWebView: UIViewRepresentable {
         context.coordinator.allowBackSwipe = allowBackSwipe
         context.coordinator.onOverscroll = onOverscroll
         context.coordinator.onChapterBoundary = onChapterBoundary
-        // The web view is shared and outlives this representable; re-attach the
-        // gestures to the current coordinator so closures never go stale.
         for gesture in webView.gestureRecognizers ?? []
         where gesture.name == Self.backSwipeName || gesture.name == Self.contentTapName {
             webView.removeGestureRecognizer(gesture)
@@ -59,8 +78,6 @@ struct PatreonWebView: UIViewRepresentable {
         edge.delegate = context.coordinator
         webView.addGestureRecognizer(edge)
 
-        // Pull-to-refresh: only enabled in Browse, not in the Reader where
-        // pulling down would discard the user's reading position.
         if enablePullToRefresh {
             let refreshControl = UIRefreshControl()
             refreshControl.addTarget(context.coordinator,
@@ -69,10 +86,6 @@ struct PatreonWebView: UIViewRepresentable {
             webView.scrollView.refreshControl = refreshControl
         }
 
-        // Only the Reader uses center-tap-to-toggle-chrome. Attaching this
-        // recognizer to the Browse/login web view is unnecessary and adds gesture
-        // pressure to the WKWebView text-input session, so install it only when a
-        // handler is set.
         if onContentTap != nil {
             let tap = UITapGestureRecognizer(
                 target: context.coordinator,
@@ -84,22 +97,24 @@ struct PatreonWebView: UIViewRepresentable {
         }
         context.coordinator.setupChapterSwipeDetection(webView)
         webView.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
+
+        let container = ClippingWebContainer(webView: webView)
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native makeUIView bounds=\(NSCoder.string(for: webView.bounds), privacy: .public)")
         }
         #endif
-        return webView
+        return container
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    func updateUIView(_ uiView: ClippingWebContainer, context: Context) {
         context.coordinator.model = model
         context.coordinator.onContentTap = onContentTap
         context.coordinator.backSwipeOverride = backSwipeOverride
         context.coordinator.allowBackSwipe = allowBackSwipe
         context.coordinator.onOverscroll = onOverscroll
         context.coordinator.onChapterBoundary = onChapterBoundary
-        uiView.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
+        uiView.webView.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
         #if DEBUG
         if AppEnvironment.isSmokeMode {
             Self.diagLog.notice("[DRAWER] native updateUIView bounds=\(NSCoder.string(for: uiView.bounds), privacy: .public)")

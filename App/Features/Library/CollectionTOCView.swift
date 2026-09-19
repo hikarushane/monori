@@ -189,7 +189,7 @@ struct CollectionTOCView: View {
             .listRowSeparatorTint(MonoriPalette.divider)
             .contentMargins(
                 .bottom,
-                bottomNavigationHeight + metrics.spacing.x2,
+                metrics.spacing.x2,
                 for: .scrollContent
             )
         }

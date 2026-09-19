@@ -12,8 +12,11 @@ public enum BrowserIdentity {
     /// tester hit on iOS 26.6 (2026-08-12). With both tokens present the SDK
     /// loads (200) and Patreon serves its normal login page.
     ///
-    /// `Version/` tracks the OS token WebKit itself reports (currently
-    /// `iPhone OS 18_7`), not the device's iOS release — keep the two in step if
-    /// WebKit ever moves its frozen value.
-    public static let userAgentSuffix = "Version/18.7 Safari/604.1"
+    /// `Version/` is derived from the device's OS version at runtime so the
+    /// token stays current across OS updates. Safari/604.1 is stable across
+    /// all modern WebKit releases and does not need to track the OS.
+    public static var userAgentSuffix: String {
+        let v = ProcessInfo.processInfo.operatingSystemVersion
+        return "Version/\(v.majorVersion).\(v.minorVersion) Safari/604.1"
+    }
 }

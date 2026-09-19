@@ -54,7 +54,7 @@ struct BrowseView: View {
                 }
             }
         }
-        .padding(.bottom, bottomNavigationHeight)
+        // Tab bar is outside the TabView in a VStack, so no bottom padding needed.
         .overlay {
             if showImportConfirmation {
                 ImportConfirmationOverlay(importedCount: env.importedCountThisSession) {

@@ -19,7 +19,7 @@ extension EnvironmentValues {
 
 struct AppRootView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    private enum AppTab: Hashable { case browse, library, settings }
+    enum AppTab: Hashable { case browse, library, settings }
 
     @State private var env: AppEnvironment
     @State private var selectedTab = AppTab.library
@@ -38,23 +38,21 @@ struct AppRootView: View {
                 isRegularWidth: metrics.isRegularWidth
             )
 
-            TabView(selection: tabSelection) {
-                BrowseView()
-                    .tabItem { Label { Text("瀏覽") } icon: { MonoriTabIcon.browse } }
-                    .toolbar(.hidden, for: .tabBar)
-                    .tag(AppTab.browse)
-                LibraryView()
-                    .tabItem { Label { Text("書庫") } icon: { MonoriTabIcon.library } }
-                    .toolbar(.hidden, for: .tabBar)
-                    .tag(AppTab.library)
-                SettingsView()
-                    .tabItem { Label { Text("設定") } icon: { MonoriTabIcon.settings } }
-                    .toolbar(.hidden, for: .tabBar)
-                    .tag(AppTab.settings)
-            }
-            .toolbar(.hidden, for: .tabBar)
-            .background(MonoriPalette.canvas)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                ZStack {
+                    BrowseView()
+                        .opacity(selectedTab == .browse ? 1 : 0)
+                        .allowsHitTesting(selectedTab == .browse)
+                    LibraryView()
+                        .opacity(selectedTab == .library ? 1 : 0)
+                        .allowsHitTesting(selectedTab == .library)
+                    SettingsView()
+                        .opacity(selectedTab == .settings ? 1 : 0)
+                        .allowsHitTesting(selectedTab == .settings)
+                }
+                .clipped()
+                .background(MonoriPalette.canvas)
+
                 tabBar(height: tabBarHeight, bottomInset: proxy.safeAreaInsets.bottom,
                        metrics: metrics)
             }
@@ -77,7 +75,6 @@ struct AppRootView: View {
             }
             #endif
         }
-        .ignoresSafeArea(edges: .bottom)
     }
 
     private var tabSelection: Binding<AppTab> {
@@ -93,57 +90,22 @@ struct AppRootView: View {
 
     private func tabBar(height: CGFloat, bottomInset: CGFloat,
                         metrics: MonoriUIMetrics) -> some View {
-        GeometryReader { proxy in
-            let iconSize = metrics.isRegularWidth
-                ? CGFloat(39)
-                : min(max(proxy.size.height * 0.28, 24), 30)
-
-            HStack(spacing: 0) {
-                tabButton(.browse, title: "瀏覽", icon: MonoriTabIcon.browse,
-                          identifier: "smoke.browseTab", iconSize: iconSize)
-                tabButton(.library, title: "書庫", icon: MonoriTabIcon.library,
-                          identifier: "smoke.libraryTab", iconSize: iconSize)
-                tabButton(.settings, title: "設定", icon: MonoriTabIcon.settings,
-                          identifier: "smoke.settingsTab", iconSize: iconSize)
-            }
-            .padding(.horizontal, metrics.contentHorizontalPadding)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        NativeTabBarView(
+            selectedTab: tabSelection,
+            isRegularWidth: metrics.isRegularWidth,
+            contentPadding: metrics.contentHorizontalPadding
+        )
+        .frame(height: height)
+        .padding(.bottom, bottomInset)
+        .background {
+            MonoriPalette.canvas
+                .ignoresSafeArea(edges: .bottom)
         }
-        .frame(height: height + bottomInset)
-        .background(MonoriPalette.canvas)
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(MonoriPalette.divider)
                 .frame(height: 1)
         }
-    }
-
-    private func tabButton(_ tab: AppTab, title: String, icon: Image,
-                           identifier: String, iconSize: CGFloat) -> some View {
-        let isSelected = selectedTab == tab
-        return Button {
-            tabSelection.wrappedValue = tab
-        } label: {
-            VStack(spacing: MonoriSpacing.x1) {
-                icon
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(isSelected ? MonoriPalette.navigationAccent : MonoriPalette.secondaryInk)
-                Text(title)
-                    .font(MonoriTypography.ui(
-                        horizontalSizeClass == .regular ? 20 : 11,
-                        relativeTo: .caption2,
-                                               weight: isSelected ? .semibold : .medium))
-                    .tracking(MonoriTypography.navigationTracking)
-                    .foregroundStyle(isSelected ? MonoriPalette.ink : MonoriPalette.secondaryInk)
-            }
-            .frame(maxWidth: .infinity, minHeight: 44)
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(identifier)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
