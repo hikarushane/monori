@@ -509,6 +509,38 @@ final class AppEnvironment {
         return imported.chapters.count
     }
 
+    /// Imports a PDF, EPUB, or TXT the user picked (file picker or "Open in
+    /// Monori"). Parsing runs off the main actor; persistence runs on it.
+    /// Logs counts and error case names only, never file contents.
+    @discardableResult
+    func importLocalFile(url: URL) async -> Result<Int, LocalFileImportError> {
+        let fileName = url.lastPathComponent
+        let typeIdentifier = (try? url.resourceValues(forKeys: [.typeIdentifierKey]))?.typeIdentifier
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+
+        guard let data = try? Data(contentsOf: url) else {
+            DiagnosticLog.shared.error(category: "import", "local-file: unreadable file")
+            return .failure(.unreadableFile)
+        }
+        let parsed = await Task.detached(priority: .userInitiated) {
+            Result { try LocalFileImporter.importFile(data: data, fileName: fileName, typeIdentifier: typeIdentifier) }
+        }.value
+
+        switch parsed {
+        case .success(let imported):
+            try? store.applyDocImport(imported)
+            importedCountThisSession = imported.chapters.count
+            DiagnosticLog.shared.log(category: "import",
+                "local-file: imported \(imported.chapters.count) chapters")
+            return .success(imported.chapters.count)
+        case .failure(let error):
+            let code = (error as? LocalFileImportError) ?? .unreadableFile
+            DiagnosticLog.shared.error(category: "import", "local-file: \(code)")
+            return .failure(code)
+        }
+    }
+
     /// Imports the slashtw thread currently shown in `model` into the library.
     /// Calls SlashTWThreadImport.js via callAsyncJavaScript and persists results
     /// through applyDocImport with sourceKind .slashtw.

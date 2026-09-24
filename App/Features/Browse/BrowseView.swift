@@ -1,5 +1,6 @@
 import SwiftUI
 import MonoriCore
+import UniformTypeIdentifiers
 
 struct BrowseView: View {
     @Environment(AppEnvironment.self) private var env
@@ -8,11 +9,14 @@ struct BrowseView: View {
     @State private var activeKind: SourceKind
     @State private var isPickerExpanded = false
     @State private var showImportConfirmation = false
+    @State private var showFileImporter = false
+    @State private var importErrorMessage: String?
 
     init() {
         let stored = UserDefaults.standard.string(forKey: "app.browseDefaultSource")
             ?? SourceKind.patreon.rawValue
-        _activeKind = State(initialValue: SourceKind(rawValue: stored) ?? .patreon)
+        let kind = SourceKind(rawValue: stored) ?? .patreon
+        _activeKind = State(initialValue: kind == .localFile ? .patreon : kind)
     }
 
     /// The web view shown for the selected source. Each source owns a distinct
@@ -27,6 +31,7 @@ struct BrowseView: View {
         case .asianFanfics: return env.affBrowse
         case .cxc: return env.cxcBrowse
         case .slashtw: return env.slashtwBrowse
+        case .localFile: return env.browse
         default: return env.browse
         }
     }
@@ -65,6 +70,20 @@ struct BrowseView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: showImportConfirmation)
         .onAppear { ensureLoaded(activeKind) }
+        .fileImporter(isPresented: $showFileImporter,
+                      allowedContentTypes: [.pdf, .epub, .plainText],
+                      allowsMultipleSelection: false) { result in
+            guard case .success(let urls) = result, let url = urls.first else { return }
+            Task { await importPickedFile(url) }
+        }
+        .alert("無法匯入", isPresented: Binding(
+            get: { importErrorMessage != nil },
+            set: { if !$0 { importErrorMessage = nil } }
+        ), presenting: importErrorMessage) { _ in
+            Button("好") { importErrorMessage = nil }
+        } message: { message in
+            Text(message)
+        }
         .sheet(isPresented: Binding(
             get: { activeModel.popupWebView != nil },
             set: { if !$0 { activeModel.popupWebView = nil } }
@@ -76,6 +95,7 @@ struct BrowseView: View {
     /// Loads a source's start page the first time it is shown. A source the user
     /// already visited keeps its place (no reload) when switched back to.
     private func ensureLoaded(_ kind: SourceKind) {
+        if kind == .localFile { return }
         let model: WebViewModel
         switch kind {
         case .googleDocs: model = env.googleBrowse
@@ -88,6 +108,15 @@ struct BrowseView: View {
         }
         if model.currentURL == nil {
             model.load(SourceRegistry.provider(for: kind).startURL)
+        }
+    }
+
+    private func importPickedFile(_ url: URL) async {
+        switch await env.importLocalFile(url: url) {
+        case .success:
+            showImportConfirmation = true
+        case .failure(let error):
+            importErrorMessage = error.message
         }
     }
 
@@ -128,9 +157,15 @@ struct BrowseView: View {
                         .padding(.horizontal, MonoriSpacing.x3)
                     Button {
                         withAnimation(.easeOut(duration: 0.18)) {
-                            activeKind = provider.kind
-                            ensureLoaded(provider.kind)
                             isPickerExpanded = false
+                        }
+                        if provider.kind == .localFile {
+                            showFileImporter = true
+                        } else {
+                            withAnimation(.easeOut(duration: 0.18)) {
+                                activeKind = provider.kind
+                            }
+                            ensureLoaded(provider.kind)
                         }
                     } label: {
                         HStack(spacing: metrics.spacing.x2) {

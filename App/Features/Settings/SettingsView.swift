@@ -119,14 +119,14 @@ struct SettingsView: View {
         }
         if showsHomepageMenu {
             GeometryReader { geo in
-                let sourceCount = CGFloat(SourceRegistry.all.count)
+                let sourceCount = CGFloat(SourceRegistry.browsable.count)
                 let mh = sourceCount * metrics.menuRowHeight + (metrics.isRegularWidth ? 16 : 12)
                 let gap: CGFloat = 4
                 let bf = homepageButtonFrame
                 let goesUp = bf.maxY + mh + gap > geo.size.height
 
                 UguisuMenuContainer {
-                    ForEach(SourceRegistry.all) { provider in
+                    ForEach(SourceRegistry.browsable) { provider in
                         UguisuMenuRow(
                             icon: {
                                 SourceGlyph(kind: provider.kind)
