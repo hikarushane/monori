@@ -50,8 +50,11 @@ public enum TextEncodingDetector {
             let v = scalar.value
             let isPlausible = scalar.isASCII
                 || (0x4E00...0x9FFF).contains(v)   // CJK Unified Ideographs
+                || (0x3400...0x4DBF).contains(v)   // CJK Unified Ideographs Extension A
                 || (0x3000...0x303F).contains(v)   // CJK punctuation
                 || (0xFF00...0xFFEF).contains(v)   // Halfwidth/Fullwidth forms
+                || (0x2000...0x206F).contains(v)   // General Punctuation (“ ” ‘ ’ … — etc.)
+                || v == 0x00B7                     // · (middle dot)
             return count + (isPlausible ? 0 : 1)
         }
     }

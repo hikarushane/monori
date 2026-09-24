@@ -35,4 +35,10 @@ final class TextEncodingDetectorTests: XCTestCase {
     func testGarbageReturnsNil() {
         XCTAssertNil(TextEncodingDetector.decode(Data([0x80, 0xFF, 0x80, 0xFF, 0x81, 0x00, 0xFE])))
     }
+
+    func testGB18030DialogueWithGeneralPunctuation() throws {
+        let s = try XCTUnwrap(TextEncodingDetector.decode(try fixture("local-gb18030-dialogue")))
+        XCTAssertTrue(s.hasPrefix("“你在说什么……”她愣了一下——随即笑了。“约翰·史密斯？”"), s)
+        XCTAssertFalse(s.contains("※"), s)
+    }
 }
