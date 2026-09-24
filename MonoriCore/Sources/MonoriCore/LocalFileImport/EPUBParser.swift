@@ -74,16 +74,72 @@ public enum EPUBParser {
         return out
     }
 
-    /// Filled in by Task 6. Returns nil when the package declares no TOC.
     static func tocEntries(package: Package, navItem: ManifestItem?, opfDir: String,
                            reader: ArchiveReader) -> [TOCEntry]? {
-        nil
+        if let nav = navItem {
+            let navPath = ArchivePath.resolve(nav.href, relativeTo: opfDir)
+            if let xhtml = reader.string(at: navPath) {
+                let entries = navEntries(in: xhtml, navDir: ArchivePath.directory(of: navPath))
+                if !entries.isEmpty { return entries }
+            }
+        }
+        if let ncxID = package.ncxID, let ncx = package.manifest[ncxID] {
+            let ncxPath = ArchivePath.resolve(ncx.href, relativeTo: opfDir)
+            if let xml = reader.string(at: ncxPath) {
+                let entries = NCXParser.parse(xml, ncxDir: ArchivePath.directory(of: ncxPath))
+                if !entries.isEmpty { return entries }
+            }
+        }
+        return nil
     }
 
-    /// Filled in by Task 6.
+    /// EPUB 3 nav document: every `<a href>` inside `<nav epub:type="toc">`,
+    /// document order, nesting flattened.
+    static func navEntries(in xhtml: String, navDir: String) -> [TOCEntry] {
+        guard let nav = firstMatch("<nav\\b[^>]*epub:type=\"toc\"[^>]*>([\\s\\S]*?)</nav>", in: xhtml) else { return [] }
+        guard let re = try? NSRegularExpression(pattern: "<a\\b[^>]*href=\"([^\"]*)\"[^>]*>([\\s\\S]*?)</a>",
+                                                options: .caseInsensitive) else { return [] }
+        return re.matches(in: nav, range: NSRange(nav.startIndex..., in: nav)).compactMap { m in
+            guard let hr = Range(m.range(at: 1), in: nav), let tr = Range(m.range(at: 2), in: nav) else { return nil }
+            let title = collapse(stripTags(String(nav[tr])))
+            guard !title.isEmpty else { return nil }
+            return TOCEntry(title: title, href: ArchivePath.resolve(String(nav[hr]), relativeTo: navDir))
+        }
+    }
+
     static func chaptersFromTOC(_ toc: [TOCEntry], spinePaths: [String],
                                 reader: ArchiveReader) -> [(title: String, html: String)] {
-        []
+        // Map each entry to a spine index; drop entries outside the spine and
+        // entries that repeat an earlier entry's spine file.
+        var indexByPath: [String: Int] = [:]
+        for (i, p) in spinePaths.enumerated() where indexByPath[p] == nil { indexByPath[p] = i }
+        var starts: [(title: String, index: Int)] = []
+        var seen = Set<Int>()
+        for entry in toc {
+            guard let i = indexByPath[entry.href], !seen.contains(i) else { continue }
+            seen.insert(i)
+            starts.append((entry.title, i))
+        }
+        guard !starts.isEmpty else { return [] }
+        starts.sort { $0.index < $1.index }
+
+        func html(forSpineRange range: Range<Int>) -> String {
+            range.compactMap { i -> String? in
+                guard let xhtml = reader.string(at: spinePaths[i]) else { return nil }
+                let h = chapterHTML(from: xhtml)
+                return hasText(h) ? h : nil
+            }.joined(separator: "\n")
+        }
+
+        var out: [(String, String)] = []
+        let foreword = html(forSpineRange: 0..<starts[0].index)
+        if hasText(foreword) { out.append((TextChapterSplitter.forewordTitle, foreword)) }
+        for (n, start) in starts.enumerated() {
+            let end = n + 1 < starts.count ? starts[n + 1].index : spinePaths.count
+            let h = html(forSpineRange: start.index..<end)
+            if hasText(h) { out.append((start.title, h)) }
+        }
+        return out
     }
 
     // MARK: HTML helpers
@@ -242,5 +298,46 @@ final class OPFParser: NSObject, XMLParserDelegate {
         let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if c == "title" { package.title = value } else { package.creator = value }
         capturing = nil
+    }
+}
+
+/// EPUB 2 NCX: `navPoint` entries in document order, nesting flattened.
+final class NCXParser: NSObject, XMLParserDelegate {
+    private var entries: [EPUBParser.TOCEntry] = []
+    private var ncxDir = ""
+    private var pendingLabel: String?
+    private var inText = false
+    private var text = ""
+
+    static func parse(_ xml: String, ncxDir: String) -> [EPUBParser.TOCEntry] {
+        let p = NCXParser()
+        p.ncxDir = ncxDir
+        let parser = XMLParser(data: Data(xml.utf8))
+        parser.delegate = p
+        parser.shouldProcessNamespaces = true
+        parser.parse()
+        return p.entries
+    }
+
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?,
+                qualifiedName: String?, attributes: [String: String]) {
+        switch elementName {
+        case "navPoint": pendingLabel = nil
+        case "text": inText = true; text = ""
+        case "content":
+            guard let src = attributes["src"] else { return }
+            let title = (pendingLabel ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !title.isEmpty else { return }
+            entries.append(.init(title: title, href: ArchivePath.resolve(src, relativeTo: ncxDir)))
+        default: break
+        }
+    }
+
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
+        if inText { text += string }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName: String?) {
+        if elementName == "text" { inText = false; if pendingLabel == nil { pendingLabel = text } }
     }
 }

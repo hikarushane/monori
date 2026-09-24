@@ -54,4 +54,28 @@ final class EPUBParserTests: XCTestCase {
     }
 
     // MARK: TOC and rejections (Task 6)
+
+    func testEPUB3NavTOCBuildsChaptersAndSkipsNonLinearAndNav() throws {
+        let r = try EPUBParser.parse(data: try fixture("local-epub3-nav"), fileName: "x.epub")
+        XCTAssertEqual(r.title, "山與海")
+        XCTAssertEqual(r.creatorName, "林作者")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章 山", "第二章 海", "第三章 歸"])
+        let c1 = try XCTUnwrap(r.chapters[0].contentHTML)
+        XCTAssertTrue(c1.contains("山很高"))
+        XCTAssertFalse(c1.contains("<img"))
+        XCTAssertFalse(c1.contains("<script"))
+        XCTAssertFalse(c1.contains("封面頁文字"))
+        let c2 = try XCTUnwrap(r.chapters[1].contentHTML)
+        XCTAssertTrue(c2.contains("海很深") && c2.contains("海的尾聲"))
+        let c3 = try XCTUnwrap(r.chapters[2].contentHTML)
+        XCTAssertTrue(c3.contains("外部連結"))
+        XCTAssertFalse(c3.contains("https://example.com"))
+    }
+
+    func testEPUB2NCXTOC() throws {
+        let r = try EPUBParser.parse(data: try fixture("local-epub2-ncx"), fileName: "y.epub")
+        XCTAssertEqual(r.title, "舊書")
+        XCTAssertEqual(r.chapters.map(\.title), ["甲", "乙"])
+        XCTAssertTrue(r.chapters[1].contentHTML?.contains("乙的內容") ?? false)
+    }
 }
