@@ -515,10 +515,17 @@ final class AppEnvironment {
     @discardableResult
     func importLocalFile(url: URL) async -> Result<Int, LocalFileImportError> {
         let fileName = url.lastPathComponent
-        let typeIdentifier = (try? url.resourceValues(forKeys: [.typeIdentifierKey]))?.typeIdentifier
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
 
+        // Read metadata inside the security scope, and refuse oversized files
+        // before Data(contentsOf:) pulls them into memory.
+        let values = try? url.resourceValues(forKeys: [.fileSizeKey, .typeIdentifierKey])
+        let typeIdentifier = values?.typeIdentifier
+        if let fileSize = values?.fileSize, fileSize > LocalFileIdentity.maxFileSize {
+            DiagnosticLog.shared.error(category: "import", "local-file: \(LocalFileImportError.fileTooLarge)")
+            return .failure(.fileTooLarge)
+        }
         guard let data = try? Data(contentsOf: url) else {
             DiagnosticLog.shared.error(category: "import", "local-file: unreadable file")
             return .failure(.unreadableFile)

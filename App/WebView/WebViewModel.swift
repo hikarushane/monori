@@ -418,11 +418,22 @@ extension WebViewModel: WKNavigationDelegate {
         return WKNavigationActionPolicy(rawValue: WKNavigationActionPolicy.allow.rawValue + 2) ?? .allow
     }
 
+    /// Preferences overload so the per-navigation JavaScript switch lives next to
+    /// the policy decision (WebKit calls only this overload when it exists).
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        guard let url = navigationAction.request.url else { return decisionHandler(.cancel) }
+                 preferences: WKWebpagePreferences,
+                 decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        guard let url = navigationAction.request.url else { return decisionHandler(.cancel, preferences) }
         let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
+        // Imported local files (EPUB/TXT/PDF) are untrusted documents rendered via
+        // loadHTMLString with a monori-local base URL: page scripts, inline event
+        // handlers and javascript: URLs must not run next to the app's message
+        // handlers. App-injected evaluateJavaScript (reader styling, scroll
+        // position) is not content JavaScript and keeps working.
+        if isMainFrame {
+            preferences.allowsContentJavaScript = url.scheme?.lowercased() != LocalFileIdentity.scheme
+        }
         let decision = NavigationPolicy.decide(url: url, isMainFrame: isMainFrame)
         let kind: String = switch navigationAction.navigationType {
         case .linkActivated: "link"
@@ -446,12 +457,12 @@ extension WebViewModel: WKNavigationDelegate {
                 DiagnosticLog.shared.log(category: "nav",
                     "policy rawValue=\(policy.rawValue) for \(NavigationTrace.redact(url))")
             }
-            decisionHandler(policy)
+            decisionHandler(policy, preferences)
         case .openInSafari:
-            decisionHandler(.cancel)
+            decisionHandler(.cancel, preferences)
             UIApplication.shared.open(url)
         case .block:
-            decisionHandler(.cancel)
+            decisionHandler(.cancel, preferences)
         }
     }
 
