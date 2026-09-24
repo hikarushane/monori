@@ -65,7 +65,8 @@ write("local-epub3-nav.epub", [
     ("OEBPS/text/c1.xhtml", xhtml("c1", '<p>山很高。</p><img src="../img/a.png" alt="x"/><script>alert(1)</script>')),
     ("OEBPS/text/c2.xhtml", xhtml("c2", '<p id="start">海很深。</p><p id="part2">海更深。</p>')),
     ("OEBPS/text/c2b.xhtml", xhtml("c2b", "<p>海的尾聲。</p>")),
-    ("OEBPS/text/c3.xhtml", xhtml("c3", '<p>回家。<a href="https://example.com">外部連結</a></p>')),
+    ("OEBPS/text/c3.xhtml", xhtml("c3", '<p>回家。<a href="https://example.com">外部連結</a></p>'
+                                  '<details open ontoggle="alert(1)">x</details><p onclick=alert(2)>y</p>')),
     ("OEBPS/img/a.png", b"\x89PNG\r\n\x1a\n"),
 ])
 

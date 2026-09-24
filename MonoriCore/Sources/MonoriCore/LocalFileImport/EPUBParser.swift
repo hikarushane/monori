@@ -176,9 +176,10 @@ public enum EPUBParser {
         }
         s = s.replacingOccurrences(of: "<(?:img|link)\\b[^>]*/?>", with: "",
                                   options: [.regularExpression, .caseInsensitive])
-        // External links: keep the text, drop the anchor.
-        s = s.replacingOccurrences(of: "<a\\b[^>]*href=\"(?:https?:|mailto:)[^\"]*\"[^>]*>([\\s\\S]*?)</a>",
-                                  with: "$1", options: [.regularExpression, .caseInsensitive])
+        // External links (double-, single- or unquoted href): keep the text, drop the anchor.
+        s = s.replacingOccurrences(
+            of: "<a\\b[^>]*href\\s*=\\s*(?:\"(?:https?:|mailto:)[^\"]*\"|'(?:https?:|mailto:)[^']*'|(?:https?:|mailto:)[^\\s>]*)[^>]*>([\\s\\S]*?)</a>",
+            with: "$1", options: [.regularExpression, .caseInsensitive])
         return s
     }
 

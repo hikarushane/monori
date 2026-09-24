@@ -26,6 +26,11 @@ final class EPUBParserTests: XCTestCase {
         XCTAssertEqual(EPUBParser.stripMedia(html), ##"<p>a</p><p>out <a href="#f">in</a></p>"##)
     }
 
+    func testStripMediaUnwrapsSingleQuotedAndUnquotedExternalLinks() {
+        let html = ##"<p><a href='https://e.com'>out2</a> <a href=https://e.com>out3</a> <a class="x" href='mailto:a@e.com'>out4</a> <a HREF=http://e.com/p?q=1 title="t">out5</a> <a href='#f'>in</a></p>"##
+        XCTAssertEqual(EPUBParser.stripMedia(html), ##"<p>out2 out3 out4 out5 <a href='#f'>in</a></p>"##)
+    }
+
     func testBodyAndTitleHelpers() {
         XCTAssertEqual(EPUBParser.bodyHTML(of: "<html><BODY class=\"x\"> <p>b</p> </BODY></html>"), " <p>b</p> ")
         XCTAssertNil(EPUBParser.bodyHTML(of: "<p>no body</p>"))
@@ -70,6 +75,10 @@ final class EPUBParserTests: XCTestCase {
         let c3 = try XCTUnwrap(r.chapters[2].contentHTML)
         XCTAssertTrue(c3.contains("外部連結"))
         XCTAssertFalse(c3.contains("https://example.com"))
+        // Regression fixture: event handlers in an imported EPUB must not survive to the reader.
+        XCTAssertTrue(c3.contains("回家"))
+        XCTAssertFalse(c3.lowercased().contains("ontoggle"))
+        XCTAssertFalse(c3.lowercased().contains("onclick"))
     }
 
     func testEPUB2NCXTOC() throws {
