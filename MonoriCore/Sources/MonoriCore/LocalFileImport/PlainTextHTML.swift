@@ -2,10 +2,12 @@ import Foundation
 
 /// Turns plain text into the minimal HTML the reader's stored-HTML path
 /// expects: one escaped `<p>` per paragraph. When the text has at least one
-/// blank line, paragraphs are separated by one or more blank lines; with no
-/// blank line at all, every line is its own paragraph (Chinese web-novel TXT
-/// layout). Soft-wrapped lines within a paragraph join without a space at a
-/// CJK boundary, and with a single space otherwise.
+/// blank line, paragraphs are separated by blank lines, but within a
+/// blank-line-delimited block a newline at a CJK boundary is itself a
+/// paragraph break (Chinese prose is essentially never hard-wrapped); only a
+/// newline between two non-CJK characters is a soft wrap, joined with a
+/// single space. With no blank line at all, every line is its own paragraph
+/// (Chinese web-novel TXT layout).
 public enum PlainTextHTML {
     /// How a plain-text document marks paragraph boundaries.
     public enum ParagraphLayout: Equatable, Sendable {
@@ -38,7 +40,7 @@ public enum PlainTextHTML {
     public static func paragraphs(from text: String, layout: ParagraphLayout? = nil) -> [String] {
         let lines = trimmedLines(of: text)
         guard !lines.isEmpty else { return [] }
-        let resolvedLayout = layout ?? (lines.contains(where: \.isEmpty) ? .blankLineSeparated : .onePerLine)
+        let resolvedLayout = layout ?? detectLayout(of: text)
         if resolvedLayout == .onePerLine {
             return lines.filter { !$0.isEmpty }
         }
@@ -48,18 +50,17 @@ public enum PlainTextHTML {
             if line.isEmpty {
                 if !current.isEmpty { paragraphs.append(current) }
                 current = ""
+            } else if current.isEmpty {
+                current = line
+            } else if let last = current.last, let first = line.first, isCJK(last) || isCJK(first) {
+                paragraphs.append(current)   // CJK boundary: the newline is a paragraph break
+                current = line
             } else {
-                current = current.isEmpty ? line : join(current, line)
+                current += " " + line
             }
         }
         if !current.isEmpty { paragraphs.append(current) }
         return paragraphs
-    }
-
-    /// Soft-wrapped lines rejoin without a space at a CJK boundary.
-    private static func join(_ a: String, _ b: String) -> String {
-        guard let last = a.last, let first = b.first else { return a + b }
-        return (isCJK(last) || isCJK(first)) ? a + b : a + " " + b
     }
 
     private static func isCJK(_ c: Character) -> Bool {

@@ -2,18 +2,18 @@ import XCTest
 @testable import MonoriCore
 
 final class PlainTextHTMLTests: XCTestCase {
-    func testSplitsOnBlankLinesAndJoinsCJKSoftWrapsWithoutSpace() {
+    func testCJKNewlineIsAParagraphBreak() {
         let text = "第一行\n第二行\n\n\n  第二段  \r\n\r\n"
-        XCTAssertEqual(PlainTextHTML.paragraphs(from: text), ["第一行第二行", "第二段"])
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: text), ["第一行", "第二行", "第二段"])
     }
 
     func testLatinSoftWrapsJoinWithOneSpace() {
         XCTAssertEqual(PlainTextHTML.paragraphs(from: "one\ntwo\n\nthree"), ["one two", "three"])
     }
 
-    func testMixedBoundaryUsesNoSpaceWhenEitherSideIsCJK() {
-        XCTAssertEqual(PlainTextHTML.paragraphs(from: "abc\n中文\n\nx"), ["abc中文", "x"])
-        XCTAssertEqual(PlainTextHTML.paragraphs(from: "中文\nabc\n\nx"), ["中文abc", "x"])
+    func testMixedBoundaryBreaksParagraphWhenEitherSideIsCJK() {
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: "abc\n中文\n\nx"), ["abc", "中文", "x"])
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: "中文\nabc\n\nx"), ["中文", "abc", "x"])
     }
 
     func testNoBlankLinesMeansOneParagraphPerLine() {
@@ -41,6 +41,12 @@ final class PlainTextHTMLTests: XCTestCase {
     func testExplicitLayoutOverridesDetection() {
         XCTAssertEqual(PlainTextHTML.paragraphs(from: "a\nb", layout: .blankLineSeparated), ["a b"])
         XCTAssertEqual(PlainTextHTML.paragraphs(from: "a\n\nb", layout: .onePerLine), ["a", "b"])
-        XCTAssertEqual(PlainTextHTML.render(text: "甲\n乙", layout: .blankLineSeparated), "<p>甲乙</p>")
+        XCTAssertEqual(PlainTextHTML.render(text: "甲\n乙", layout: .blankLineSeparated), "<p>甲</p>\n<p>乙</p>")
+    }
+
+    func testChineseNovelWithBlankLinesOnlyAroundHeadingsKeepsParagraphs() {
+        let text = "段一。\n段二。\n段三。\n\n第二章 B\n\n段四。\n段五。"
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: text, layout: .blankLineSeparated),
+                       ["段一。", "段二。", "段三。", "第二章 B", "段四。", "段五。"])
     }
 }

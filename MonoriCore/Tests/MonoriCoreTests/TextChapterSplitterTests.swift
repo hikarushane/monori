@@ -36,7 +36,7 @@ final class TextChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.title), ["前言", "第一章 初遇", "第二章 重逢"])
         XCTAssertEqual(r.chapters.map(\.orderIndex), [0, 1, 2])
         XCTAssertEqual(r.chapters[1].urlString, r.sourceURLString + "#1")
-        XCTAssertEqual(r.chapters[0].contentHTML, "<p>作者的話謝謝大家。</p>")
+        XCTAssertEqual(r.chapters[0].contentHTML, "<p>作者的話</p>\n<p>謝謝大家。</p>")
         XCTAssertEqual(r.chapters[1].contentHTML, "<p>她走進房間。</p>")
     }
 
@@ -70,5 +70,13 @@ final class TextChapterSplitterTests: XCTestCase {
         XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第二章"])
         XCTAssertEqual(r.chapters[0].contentHTML, "<p>甲。</p>\n<p>乙。</p>")
         XCTAssertEqual(r.chapters[1].contentHTML, "<p>丙。</p>")
+    }
+
+    func testBlankLinesOnlyAroundHeadingsKeepsOneParagraphPerLine() {
+        let text = "第一章 A\n\n段一。\n段二。\n段三。\n\n第二章 B\n\n段四。\n段五。"
+        let r = TextChapterSplitter.split(text: text, fileName: "n.txt")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章 A", "第二章 B"])
+        XCTAssertEqual(r.chapters[0].contentHTML, "<p>段一。</p>\n<p>段二。</p>\n<p>段三。</p>")
+        XCTAssertEqual(r.chapters[1].contentHTML, "<p>段四。</p>\n<p>段五。</p>")
     }
 }
