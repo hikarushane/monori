@@ -52,6 +52,17 @@ targets:
         CFBundleVersion: "15"
         UILaunchStoryboardName: LaunchScreen
         ITSAppUsesNonExemptEncryption: false
+        LSSupportsOpeningDocumentsInPlace: false
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: PDF Document
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [com.adobe.pdf]
+          - CFBundleTypeName: EPUB Publication
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [org.idpf.epub-container]
+          - CFBundleTypeName: Plain Text
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [public.plain-text]
         UIAppFonts:
           - Manrope[wght].ttf
           - SourceSerif4Variable-Roman.ttf

@@ -23,6 +23,8 @@ struct AppRootView: View {
 
     @State private var env: AppEnvironment
     @State private var selectedTab = AppTab.library
+    @State private var openedFileImportCount: Int?
+    @State private var openedFileError: String?
 
     init() { _env = State(initialValue: AppEnvironment()) }
 
@@ -63,6 +65,27 @@ struct AppRootView: View {
             .environment(env)
             .modelContainer(env.store.container)
             .task { env.startSmokeToolsIfNeeded() }
+            .onOpenURL { url in
+                guard url.isFileURL else { return }
+                Task { await importOpenedFile(url) }
+            }
+            .overlay {
+                if let count = openedFileImportCount {
+                    ImportConfirmationOverlay(importedCount: count) {
+                        openedFileImportCount = nil
+                    }
+                    .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: openedFileImportCount)
+            .alert("無法匯入", isPresented: Binding(
+                get: { openedFileError != nil },
+                set: { if !$0 { openedFileError = nil } }
+            ), presenting: openedFileError) { _ in
+                Button("好") { openedFileError = nil }
+            } message: { message in
+                Text(message)
+            }
             #if DEBUG
             .fullScreenCover(item: Binding(
                 get: { env.autopilotReaderTarget },
@@ -86,6 +109,22 @@ struct AppRootView: View {
                 }
                 selectedTab = newTab
             })
+    }
+
+    /// Files handed over by Files / the share sheet land in the app's Inbox;
+    /// the copy is removed once parsed because only chapters are kept.
+    private func importOpenedFile(_ url: URL) async {
+        let result = await env.importLocalFile(url: url)
+        if url.path.contains("/Inbox/") {
+            try? FileManager.default.removeItem(at: url)
+        }
+        switch result {
+        case .success(let count):
+            selectedTab = .library
+            openedFileImportCount = count
+        case .failure(let error):
+            openedFileError = error.message
+        }
     }
 
     private func tabBar(height: CGFloat, bottomInset: CGFloat,
