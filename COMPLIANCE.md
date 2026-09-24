@@ -2,7 +2,7 @@
 
 ## Monori 是什麼
 
-Monori 是 local-first 的 iOS 閱讀 App，讀的是使用者原本就能透過所支援網站存取的內容，目前支援 Patreon、Google Docs、AO3（Archive of Our Own）、方格子（Vocus）、AsianFanfics、CXC、slashtw（在水裡寫字）七個來源。
+Monori 是 local-first 的 iOS 閱讀 App，讀的是使用者原本就能透過所支援網站存取的內容，目前支援 Patreon、Google Docs、AO3（Archive of Our Own）、方格子（Vocus）、AsianFanfics、CXC、slashtw（在水裡寫字）七個網站來源，加上使用者自有檔案的本機匯入（PDF／EPUB／TXT）。
 
 App 沒有 Monori 自己的後端、帳號系統、分析服務、廣告服務，也沒有跨使用者的內容服務。網站內容一律透過 `WKWebView` 存取；部分支援匯入的來源，會用 WebView 裡已經登入的 session 直接發 request 取得內容。
 
@@ -70,6 +70,14 @@ Monori 不提供另外的內容託管服務，也不會把各平台的流量轉�
 - 內文 HTML 只存在使用者裝置上，供本人閱讀：不上傳、不分享、不匯出、不進 iCloud 備份、不提供跨使用者內容庫。Monori 不做後端 proxy，不會把 slashtw 的內容送到 Monori 的伺服器。
 - 版規查核（2026-09-03，`https://slashtw.space/forum.php?mod=viewthread&tid=2`）：版規禁止的是「無斷轉載」與未經原作者同意「從本論壇轉出他人創作」發表到其他地方；沒有條文涉及個人離線副本、快取、閱讀工具或第三方 App。Monori 的本機副本不是轉載或發表。slashtw 沒有獨立的服務條款。詳見 ADR-0012 的 2026-09-03 修訂。
 - 已知限制：作者在論壇修改或刪除作品後，使用者先前匯入的本機副本不會自動更新或移除；重新匯入會以當下頁面內容覆蓋。
+
+### 本機檔案（PDF／EPUB／TXT）
+
+- 使用者自己選檔：透過系統檔案選取器，或從 Files、其他 app 的分享選單把檔案交給 Monori。沒有網站、沒有登入、沒有第三方服務，Monori 只讀使用者主動交出的那一個檔案。
+- 解析全部在裝置上完成：TXT 依標題切章，EPUB 讀 nav／NCX 目錄，PDF 讀大綱或依標題切章。章節文字存在本機 library，原始檔案不保留（分享進來的 Inbox 副本匯入後即刪除）。
+- EPUB 內文視為不可信輸入：經本機 sanitize（移除 script、style、iframe、object、embed、meta、base、inline event handler、`javascript:` 與 `data:` 連結、外部連結與圖片）後才儲存；reader 載入本機檔案章節時關閉頁面 JavaScript。
+- 有 DRM（`META-INF/encryption.xml`）的 EPUB、加密的 PDF、超過 50 MB 的檔案一律拒絕匯入，不嘗試繞過任何保護。
+- 內文只存在使用者裝置上，供本人閱讀：不上傳、不分享、不匯出、不進 iCloud 備份、不提供跨使用者內容庫。
 
 ## 認證與網站資料
 
