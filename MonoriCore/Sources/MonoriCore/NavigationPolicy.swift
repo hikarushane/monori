@@ -9,6 +9,13 @@ public enum NavigationDecision: Equatable {
 public enum NavigationPolicy {
     public static func decide(url: URL, isMainFrame: Bool) -> NavigationDecision {
         guard isMainFrame else { return .allowInWebView }
+        // Stored chapters imported from local files are rendered with
+        // loadHTMLString(baseURL:) whose base is the app-internal
+        // monori-local:// identity URL; WebKit still runs a main-frame policy
+        // check for it. Nothing is ever fetched from this scheme.
+        if url.scheme?.lowercased() == LocalFileIdentity.scheme {
+            return .allowInWebView
+        }
         guard let scheme = url.scheme?.lowercased(), scheme == "https" || scheme == "http" else {
             return .block
         }

@@ -28,4 +28,16 @@ final class NavigationPolicyTests: XCTestCase {
         XCTAssertEqual(NavigationPolicy.decide(url: URL(string: "ftp://patreon.com/x")!, isMainFrame: true),
                        .block)
     }
+
+    func testLocalFileSchemeMainFrameAllowed() {
+        let base = URL(string: LocalFileIdentity.sourceURLString(fileName: "我的小說.epub"))!
+        XCTAssertEqual(NavigationPolicy.decide(url: base, isMainFrame: true), .allowInWebView)
+        XCTAssertEqual(NavigationPolicy.decide(url: URL(string: "monori-local://import")!, isMainFrame: true),
+                       .allowInWebView)
+    }
+
+    func testOtherCustomSchemesStayBlocked() {
+        XCTAssertEqual(NavigationPolicy.decide(url: URL(string: "monori-other://x")!, isMainFrame: true), .block)
+        XCTAssertEqual(NavigationPolicy.decide(url: URL(string: "file:///tmp/x.html")!, isMainFrame: true), .block)
+    }
 }
