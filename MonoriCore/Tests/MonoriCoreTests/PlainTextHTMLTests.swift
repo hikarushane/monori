@@ -31,4 +31,16 @@ final class PlainTextHTMLTests: XCTestCase {
         XCTAssertEqual(PlainTextHTML.render(text: "\n\n   \n\nx\n\n"), "<p>x</p>")
         XCTAssertEqual(PlainTextHTML.render(text: "   "), "")
     }
+
+    func testDetectLayout() {
+        XCTAssertEqual(PlainTextHTML.detectLayout(of: "a\nb\n"), .onePerLine)
+        XCTAssertEqual(PlainTextHTML.detectLayout(of: "\n\na\n\nb\n\n"), .blankLineSeparated)
+        XCTAssertEqual(PlainTextHTML.detectLayout(of: ""), .onePerLine)
+    }
+
+    func testExplicitLayoutOverridesDetection() {
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: "a\nb", layout: .blankLineSeparated), ["a b"])
+        XCTAssertEqual(PlainTextHTML.paragraphs(from: "a\n\nb", layout: .onePerLine), ["a", "b"])
+        XCTAssertEqual(PlainTextHTML.render(text: "甲\n乙", layout: .blankLineSeparated), "<p>甲乙</p>")
+    }
 }

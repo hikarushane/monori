@@ -63,4 +63,12 @@ final class TextChapterSplitterTests: XCTestCase {
     func testEmptyTextYieldsNoChapters() {
         XCTAssertTrue(TextChapterSplitter.split(text: "  \n\n ", fileName: "e.txt").chapters.isEmpty)
     }
+
+    func testOnePerLineFileKeepsEachLineAsParagraphInEveryChapter() {
+        let text = "第一章\n甲。\n乙。\n第二章\n丙。"
+        let r = TextChapterSplitter.split(text: text, fileName: "x.txt")
+        XCTAssertEqual(r.chapters.map(\.title), ["第一章", "第二章"])
+        XCTAssertEqual(r.chapters[0].contentHTML, "<p>甲。</p>\n<p>乙。</p>")
+        XCTAssertEqual(r.chapters[1].contentHTML, "<p>丙。</p>")
+    }
 }

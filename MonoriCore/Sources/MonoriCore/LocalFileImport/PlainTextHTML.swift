@@ -7,7 +7,24 @@ import Foundation
 /// layout). Soft-wrapped lines within a paragraph join without a space at a
 /// CJK boundary, and with a single space otherwise.
 public enum PlainTextHTML {
-    public static func paragraphs(from text: String) -> [String] {
+    /// How a plain-text document marks paragraph boundaries.
+    public enum ParagraphLayout: Equatable, Sendable {
+        /// One or more blank lines separate paragraphs; single newlines are soft wraps.
+        case blankLineSeparated
+        /// Every non-empty line is a paragraph (Chinese web-novel TXT layout).
+        case onePerLine
+    }
+
+    /// Detects the layout of a whole document: after dropping leading and
+    /// trailing empty lines, any remaining empty line means blank-line-separated.
+    public static func detectLayout(of text: String) -> ParagraphLayout {
+        let lines = trimmedLines(of: text)
+        return lines.contains(where: \.isEmpty) ? .blankLineSeparated : .onePerLine
+    }
+
+    /// Normalizes newlines, trims each line, and drops leading/trailing
+    /// empty lines. Shared by `detectLayout` and `paragraphs`.
+    private static func trimmedLines(of text: String) -> [String] {
         let normalized = text
             .replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
@@ -15,9 +32,16 @@ public enum PlainTextHTML {
             .map { $0.trimmingCharacters(in: .whitespaces) }
         while lines.first?.isEmpty == true { lines.removeFirst() }
         while lines.last?.isEmpty == true { lines.removeLast() }
+        return lines
+    }
+
+    public static func paragraphs(from text: String, layout: ParagraphLayout? = nil) -> [String] {
+        let lines = trimmedLines(of: text)
         guard !lines.isEmpty else { return [] }
-        // No blank line anywhere: one paragraph per line (Chinese web-novel layout).
-        if !lines.contains(where: \.isEmpty) { return lines }
+        let resolvedLayout = layout ?? (lines.contains(where: \.isEmpty) ? .blankLineSeparated : .onePerLine)
+        if resolvedLayout == .onePerLine {
+            return lines.filter { !$0.isEmpty }
+        }
         var paragraphs: [String] = []
         var current = ""
         for line in lines {
@@ -52,8 +76,8 @@ public enum PlainTextHTML {
         paragraphs.map { "<p>\(escape($0))</p>" }.joined(separator: "\n")
     }
 
-    public static func render(text: String) -> String {
-        render(paragraphs: paragraphs(from: text))
+    public static func render(text: String, layout: ParagraphLayout? = nil) -> String {
+        render(paragraphs: paragraphs(from: text, layout: layout))
     }
 
     public static func escape(_ s: String) -> String {
