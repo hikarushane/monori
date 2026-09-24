@@ -206,6 +206,36 @@ struct SlashTWMark: Shape {
     }
 }
 
+/// Local file source: a folder with an inward (download) arrow. Traced from
+/// the 24-unit design SVG: rounded folder outline, chevron 9,13→12,16→15,13,
+/// stem 12,10→12,16.
+struct LocalFileMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        guard rect.width > 0, rect.height > 0 else { return Path() }
+        let r = scaledValue(2, in: rect)
+        var p = Path()
+        // Folder outline (clockwise from the top-right corner of the body).
+        p.move(to: point(22, 19, in: rect))
+        p.addArc(tangent1End: point(22, 21, in: rect), tangent2End: point(20, 21, in: rect), radius: r)
+        p.addLine(to: point(4, 21, in: rect))
+        p.addArc(tangent1End: point(2, 21, in: rect), tangent2End: point(2, 19, in: rect), radius: r)
+        p.addLine(to: point(2, 5, in: rect))
+        p.addArc(tangent1End: point(2, 3, in: rect), tangent2End: point(4, 3, in: rect), radius: r)
+        p.addLine(to: point(9, 3, in: rect))
+        p.addLine(to: point(11, 6, in: rect))
+        p.addLine(to: point(20, 6, in: rect))
+        p.addArc(tangent1End: point(22, 6, in: rect), tangent2End: point(22, 8, in: rect), radius: r)
+        p.closeSubpath()
+        // Inward arrow.
+        p.move(to: point(9, 13, in: rect))
+        p.addLine(to: point(12, 16, in: rect))
+        p.addLine(to: point(15, 13, in: rect))
+        p.move(to: point(12, 10, in: rect))
+        p.addLine(to: point(12, 16, in: rect))
+        return p
+    }
+}
+
 /// Source layers icon: three stacked diamond layers representing multiple
 /// reading sources converging.
 struct SourceLayersIcon: Shape {
@@ -248,6 +278,8 @@ struct SourceGlyph: View {
             CXCMark().stroke(.foreground, style: monoriSourceStroke)
         case .slashtw:
             SlashTWMark().stroke(.foreground, style: monoriSourceStroke)
+        case .localFile:
+            LocalFileMark().stroke(.foreground, style: monoriSourceStroke)
         }
     }
 }

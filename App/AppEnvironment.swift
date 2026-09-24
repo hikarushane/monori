@@ -614,7 +614,7 @@ final class AppEnvironment {
                 refresher.webView.loadHTMLString("", baseURL: nil)
                 return .failed
             }
-        case .googleDocs, .cxc, .slashtw:
+        case .googleDocs, .cxc, .slashtw, .localFile:
             return .unsupported
         }
         let delta = collection.chapters.count - countBefore

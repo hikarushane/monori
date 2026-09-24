@@ -7,9 +7,13 @@ let package = Package(
     products: [
         .library(name: "MonoriCore", targets: ["MonoriCore"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.19"))
+    ],
     targets: [
         .target(
             name: "MonoriCore",
+            dependencies: [.product(name: "ZIPFoundation", package: "ZIPFoundation")],
             resources: [.process("Assets")]
         ),
         .testTarget(

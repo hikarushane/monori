@@ -8,6 +8,7 @@ public enum SourceKind: String, Codable, CaseIterable, Sendable {
     case asianFanfics
     case cxc
     case slashtw
+    case localFile
 }
 
 public struct SourceProvider: Identifiable, Sendable {
@@ -15,13 +16,17 @@ public struct SourceProvider: Identifiable, Sendable {
     public let displayName: String
     public let iconSystemName: String
     public let startURL: URL
+    /// False for sources that have no web page to browse (local files).
+    public let browsable: Bool
     public var id: SourceKind { kind }
 
-    public init(kind: SourceKind, displayName: String, iconSystemName: String, startURL: URL) {
+    public init(kind: SourceKind, displayName: String, iconSystemName: String,
+                startURL: URL, browsable: Bool = true) {
         self.kind = kind
         self.displayName = displayName
         self.iconSystemName = iconSystemName
         self.startURL = startURL
+        self.browsable = browsable
     }
 }
 
@@ -56,7 +61,14 @@ public enum SourceRegistry {
         kind: .slashtw, displayName: "在水裡寫字", iconSystemName: "w.circle",
         startURL: URL(string: "https://slashtw.space")!)
 
-    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus, asianFanfics, cxc, slashtw]
+    public static let localFile = SourceProvider(
+        kind: .localFile, displayName: "本機檔案", iconSystemName: "folder",
+        startURL: URL(string: "monori-local://import")!, browsable: false)
+
+    public static let all: [SourceProvider] = [patreon, googleDrive, ao3, vocus, asianFanfics, cxc, slashtw, localFile]
+
+    /// Providers that own a web view in the Browse tab.
+    public static var browsable: [SourceProvider] { all.filter(\.browsable) }
 
     public static func provider(for kind: SourceKind) -> SourceProvider {
         switch kind {
@@ -67,6 +79,7 @@ public enum SourceRegistry {
         case .asianFanfics: return asianFanfics
         case .cxc: return cxc
         case .slashtw: return slashtw
+        case .localFile: return localFile
         }
     }
 }
@@ -77,7 +90,7 @@ public extension SourceKind {
     var supportsAutoCheck: Bool {
         switch self {
         case .patreon, .vocus, .asianFanfics, .ao3: return true
-        case .googleDocs, .cxc, .slashtw: return false
+        case .googleDocs, .cxc, .slashtw, .localFile: return false
         }
     }
 }
