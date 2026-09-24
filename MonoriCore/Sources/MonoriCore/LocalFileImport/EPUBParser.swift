@@ -308,6 +308,7 @@ final class NCXParser: NSObject, XMLParserDelegate {
     private var pendingLabel: String?
     private var inText = false
     private var text = ""
+    private var navPointDepth = 0
 
     static func parse(_ xml: String, ncxDir: String) -> [EPUBParser.TOCEntry] {
         let p = NCXParser()
@@ -322,10 +323,10 @@ final class NCXParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?,
                 qualifiedName: String?, attributes: [String: String]) {
         switch elementName {
-        case "navPoint": pendingLabel = nil
+        case "navPoint": navPointDepth += 1; pendingLabel = nil
         case "text": inText = true; text = ""
         case "content":
-            guard let src = attributes["src"] else { return }
+            guard navPointDepth > 0, let src = attributes["src"] else { return }
             let title = (pendingLabel ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             guard !title.isEmpty else { return }
             entries.append(.init(title: title, href: ArchivePath.resolve(src, relativeTo: ncxDir)))
@@ -338,6 +339,14 @@ final class NCXParser: NSObject, XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName: String?) {
-        if elementName == "text" { inText = false; if pendingLabel == nil { pendingLabel = text } }
+        switch elementName {
+        case "text":
+            inText = false
+            if navPointDepth > 0, pendingLabel == nil { pendingLabel = text }
+        case "navPoint":
+            navPointDepth -= 1
+            pendingLabel = nil
+        default: break
+        }
     }
 }

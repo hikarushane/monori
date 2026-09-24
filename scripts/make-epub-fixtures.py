@@ -80,15 +80,20 @@ opf2 = """<?xml version="1.0"?>
     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
     <item id="a" href="a.xhtml" media-type="application/xhtml+xml"/>
     <item id="b" href="b.xhtml" media-type="application/xhtml+xml"/>
+    <item id="c" href="c.xhtml" media-type="application/xhtml+xml"/>
   </manifest>
-  <spine toc="ncx"><itemref idref="a"/><itemref idref="b"/></spine>
+  <spine toc="ncx"><itemref idref="a"/><itemref idref="b"/><itemref idref="c"/></spine>
 </package>"""
 ncx = """<?xml version="1.0"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+  <docTitle><text>舊書</text></docTitle>
   <navMap>
-    <navPoint id="n1" playOrder="1"><navLabel><text>甲</text></navLabel><content src="a.xhtml"/></navPoint>
-    <navPoint id="n2" playOrder="2"><navLabel><text>乙</text></navLabel><content src="b.xhtml#top"/></navPoint>
+    <navPoint id="n1" playOrder="1"><navLabel><text>甲</text></navLabel><content src="a.xhtml"/>
+      <navPoint id="n1a" playOrder="2"><navLabel><text>甲之一</text></navLabel><content src="a.xhtml#s1"/></navPoint>
+    </navPoint>
+    <navPoint id="n2" playOrder="3"><navLabel><text>乙</text></navLabel><content src="b.xhtml#top"/></navPoint>
   </navMap>
+  <pageList><pageTarget id="p9" type="normal" value="9"><navLabel><text>9</text></navLabel><content src="c.xhtml#p9"/></pageTarget></pageList>
 </ncx>"""
 write("local-epub2-ncx.epub", [
     ("META-INF/container.xml", CONTAINER),
@@ -96,6 +101,7 @@ write("local-epub2-ncx.epub", [
     ("OEBPS/toc.ncx", ncx),
     ("OEBPS/a.xhtml", xhtml("a", "<p>甲的內容</p>")),
     ("OEBPS/b.xhtml", xhtml("b", "<p>乙的內容</p>")),
+    ("OEBPS/c.xhtml", xhtml("c", "<p>乙的續篇</p>")),
 ])
 
 # --- No TOC at all ---

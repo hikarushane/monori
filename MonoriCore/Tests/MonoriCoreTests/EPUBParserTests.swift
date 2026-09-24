@@ -75,7 +75,11 @@ final class EPUBParserTests: XCTestCase {
     func testEPUB2NCXTOC() throws {
         let r = try EPUBParser.parse(data: try fixture("local-epub2-ncx"), fileName: "y.epub")
         XCTAssertEqual(r.title, "舊書")
+        // Nested navPoint pointing at a.xhtml#s1 is a duplicate of 甲 and is dropped;
+        // the pageList target must not become a chapter; c.xhtml folds into 乙.
         XCTAssertEqual(r.chapters.map(\.title), ["甲", "乙"])
-        XCTAssertTrue(r.chapters[1].contentHTML?.contains("乙的內容") ?? false)
+        let c2 = try XCTUnwrap(r.chapters[1].contentHTML)
+        XCTAssertTrue(c2.contains("乙的內容") && c2.contains("乙的續篇"))
+        XCTAssertFalse(r.chapters.contains { $0.title == "9" || $0.title == "甲之一" })
     }
 }
