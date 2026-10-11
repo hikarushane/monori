@@ -1,7 +1,7 @@
 # ADR-0007: Popup Windows Only for OAuth Endpoints
 
 ## Status
-Accepted — supersedes ADR-0005
+Accepted — supersedes ADR-0005. Amended 2026-10-11: the popup rule applies to every web view that can show a sign-in page (see end).
 
 ## Date
 2026-07-03
@@ -51,3 +51,16 @@ Exact-host match only — lookalike or suffixed hosts (`appleid.apple.com.evil.e
 - Adding a future OAuth provider (e.g. Facebook login) requires adding its auth host to **both** `NavigationPolicy.decide`'s allowlist and `requiresPopupWindow`. A host missing from the latter breaks that provider's popup login — the failure mode is visible (login form doesn't render) rather than silent.
 - Verified on-device 2026-07-03: Google Doc from 與我共享 loads in the main WebView with the import banner; Vocus room 九樓的女人們 loads with the room banner. Vocus's drawer room link sometimes navigates as a plain link and sometimes via `window.open` (SPA hydration timing) — both paths now end in the main WebView.
 - ADR-0005 is superseded; its root-cause attribution ("Vocus changed their SPA") is corrected by this record.
+
+## Amendment (2026-10-11): every web view that can show a sign-in page
+
+The popup rule is not specific to the browse web view. Any `WKWebView` that can display a third-party sign-in page needs a `WKUIDelegate` implementing `createWebViewWith`, or every OAuth button on that page fails.
+
+`AccountDeletionSheet` (8b535de, build 13, added for Guideline 5.1.1(v)) opened the Patreon Privacy Center in a web view with a navigation delegate but no UI delegate. Choosing **Erase** asks for a Patreon sign-in first. On that page:
+
+- **Continue with Apple**: WebKit first hands the `appleid.apple.com` popup to AppSSO for the native Sign in with Apple sheet. When that path fails (`AKAuthenticationError -7022` on a simulator with no Apple Account), WebKit falls back to asking the UI delegate for a window, got none, and Patreon showed 「發生錯誤。請重新整理頁面以重試。」.
+- **Continue with Google**: the Google button calls `window.open` from its iframe, which skips AppSSO and goes straight to the UI delegate. Nothing opened.
+
+Builds 13–15 shipped this. App Review rejected the next review on iPad Air 11-inch (M3) under 2.1(a) with "Sign In with Apple was not set up correctly". The reviewer sent no screenshot, so this is the reproduced match rather than a confirmed one.
+
+The sheet now hosts popups with the same rule as `WebViewModel`: `NavigationPolicy.requiresPopupWindow` hosts get a popup WKWebView in a `PopupWebSheet`; any other `window.open` loads in place. Verified on a fresh iPad Air 11-inch (M3) simulator, iOS 26.5: both the Apple and Google sign-in pages open from the Erase step.
