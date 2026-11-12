@@ -19,7 +19,6 @@ struct SettingsView: View {
     @State private var homepageButtonFrame: CGRect = .zero
     @State private var showExportFailedAlert = false
     @State private var confirmRestore = false
-    @State private var showDeleteAccountSheet = false
     @State private var showForceBackupConfirm = false
     @State private var forceBackupMessage = ""
     @State private var showResultAlert = false
@@ -379,9 +378,11 @@ struct SettingsView: View {
 
                         groupDivider()
 
-                        Button {
-                            showDeleteAccountSheet = true
-                        } label: {
+                        // Opens in Safari, not in an in-app web view: Patreon asks for a
+                        // sign-in before Erase, and App Review judged Patreon's
+                        // "Continue with Apple" there as Monori's own Sign in with Apple
+                        // (Guideline 4.0, build 16). See ADR-0007, 2026-11-12 amendment.
+                        Link(destination: URL(string: "https://privacy.patreon.com/policies")!) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("刪除 Patreon 帳號")
@@ -506,9 +507,6 @@ struct SettingsView: View {
             Button("清除瀏覽器資料", role: .destructive) {
                 Task { await env.clearBrowserData() }
             }
-        }
-        .sheet(isPresented: $showDeleteAccountSheet) {
-            AccountDeletionSheet()
         }
         .sheet(item: $logExport) { export in
             ActivityView(items: [export.url])
