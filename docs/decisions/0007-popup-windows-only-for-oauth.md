@@ -1,7 +1,7 @@
 # ADR-0007: Popup Windows Only for OAuth Endpoints
 
 ## Status
-Accepted — supersedes ADR-0005. Amended 2026-10-11: the popup rule applies to every web view that can show a sign-in page (see end).
+Accepted — supersedes ADR-0005. Amended 2026-10-11: the popup rule applies to every web view that can show a sign-in page (see end). Amended 2026-11-12: Patreon account deletion opens in Safari and `AccountDeletionSheet` is removed (see end).
 
 ## Date
 2026-07-03
@@ -64,3 +64,15 @@ The popup rule is not specific to the browse web view. Any `WKWebView` that can 
 Builds 13–15 shipped this. App Review rejected the next review on iPad Air 11-inch (M3) under 2.1(a) with "Sign In with Apple was not set up correctly". The reviewer sent no screenshot, so this is the reproduced match rather than a confirmed one.
 
 The sheet now hosts popups with the same rule as `WebViewModel`: `NavigationPolicy.requiresPopupWindow` hosts get a popup WKWebView in a `PopupWebSheet`; any other `window.open` loads in place. Verified on a fresh iPad Air 11-inch (M3) simulator, iOS 26.5: both the Apple and Google sign-in pages open from the Erase step.
+
+## Amendment (2026-11-12): Patreon account deletion opens in Safari
+
+Build 16 shipped the 2026-10-11 fix above. Its review got past "Sign In with Apple was not set up correctly" and was rejected under Guideline 4.0 instead (2026-11-09, repeated 2026-11-12 after we explained the flow belongs to Patreon): "users are required to provide their name and/or email address after using Sign in with Apple".
+
+Monori has no Sign in with Apple of its own. The build 16 archive links CloudKit and WebKit only, carries no `com.apple.developer.applesignin` entitlement, references no `ASAuthorization*` symbols, and has no native name or email field. What a reviewer meets is Patreon's "Continue with Apple". WebKit hands the `appleid.apple.com` popup to AppSSO, so on a device it appears as the system Sign in with Apple sheet, and whatever Patreon asks for next is Patreon's page. Inside a native sheet titled "Delete Patreon Account", the whole sequence reads as Monori's own flow.
+
+App Review sent no screenshot. The build 15 → 16 sequence points at the deletion sheet: in build 15 that sheet was the only place where Apple sign-in failed, and fixing it there is what moved the rejection from 2.1 to 4.0.
+
+The Settings row 「刪除 Patreon 帳號」 is now a SwiftUI `Link` to `https://privacy.patreon.com/policies`, so the page opens in Safari. `AccountDeletionSheet` is removed. Apple's account-deletion guidance allows linking to the web page where deletion is completed, so the row still answers Guideline 5.1.1(v). No third-party sign-in happens inside Monori's Settings.
+
+Not changed: the browse web view still hosts Patreon's sign-in, including "Continue with Apple", under the popup rule above. The App Review guide asks reviewers to use the Google review account there.
